@@ -3,6 +3,9 @@ import { useState } from "react";
 import { ExternalLink, Plug, GlassWater, HandCoins, IdCard, ScrollText, Wallet, Smartphone, BedDouble, CalendarClock } from "lucide-react";
 import { Screen } from "@/components/Shell";
 import { Section, Card, Group, Row, Field, Button, IconTile } from "@/components/ui";
+import { VisaCheck } from "@/components/VisaCheck";
+import { useProfile } from "@/components/useProfile";
+import { COUNTS, UNILATERAL_UNTIL } from "@/lib/visa";
 import { AppIcon } from "@/components/AppIcon";
 import { CityPicker } from "@/components/CityPicker";
 import { useCity } from "@/components/useCity";
@@ -18,6 +21,8 @@ const APP_LIST = ["alipay", "wechat", "amap", "didi", "tripcom", "rail12306"] as
 
 export default function Prepare() {
   const t = useT();
+  const [p] = useProfile();
+  const until = new Date(`${UNILATERAL_UNTIL}T00:00:00Z`).toLocaleDateString(p.lang, { timeZone: "UTC", day: "numeric", month: "long", year: "numeric" });
   const { city: here, detect } = useCity();
   const [fromPick, setFrom] = useState<City | null>(null);
   const from = fromPick ?? here;
@@ -28,10 +33,11 @@ export default function Prepare() {
   return (
     <Screen title={t.prepare.title} back>
       <Section title={t.prepare.visa} id="visa">
+        <VisaCheck />
         <Card>
           <div className="space-y-2 text-[15px] leading-relaxed">
-            <p>{t.prepare.visaFree}</p>
-            <p>{t.prepare.transit}</p>
+            <p>{fmt(t.prepare.visaFree, { u: COUNTS.unilateral, date: until, m: COUNTS.mutual })}</p>
+            <p>{fmt(t.prepare.transit, { t: COUNTS.transit240 })}</p>
             <p>{t.prepare.arrivalCard}</p>
             <p className="text-muted">{t.prepare.rulesChange}</p>
           </div>
@@ -77,7 +83,7 @@ export default function Prepare() {
         </Group>
         <div className="grid grid-cols-2 gap-2">
           <Button variant="cta" external href={goLink("trip", "train", { from: from.e, to: to.e, date }, "prepare_train")}>{t.prepare.findTrains}</Button>
-          <Button variant="cta" external href={goLink("trip", "flight", { from: from.e, to: to.e, date }, "prepare_flight")}>{t.prepare.findFlights}</Button>
+          <Button variant="soft" external href={goLink("trip", "flight", { from: from.e, to: to.e, date }, "prepare_flight")}>{t.prepare.findFlights}</Button>
         </div>
         <p className="px-1 text-[13px] text-muted">{t.prepare.bookNote}</p>
         <Group>
@@ -86,7 +92,7 @@ export default function Prepare() {
         <Card>
           <h3 className="text-[17px] font-semibold">{t.prepare.sights}</h3>
           <p className="mt-1 text-[15px] leading-relaxed">{t.prepare.sightsBody}</p>
-          <Button variant="cta" external className="mt-3 w-full" href={goLink("trip", "attraction", { city: to.s, cityEn: to.e }, "prepare_attraction")}>
+          <Button variant="soft" external className="mt-3 w-full" href={goLink("trip", "attraction", { city: to.s, cityEn: to.e }, "prepare_attraction")}>
             {fmt(t.prepare.tickets, { city: to.e })} <ExternalLink className="h-4 w-4" aria-hidden />
           </Button>
         </Card>

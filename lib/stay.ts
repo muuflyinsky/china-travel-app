@@ -8,25 +8,35 @@ export const ENTRY_DAYS: Record<Exclude<EntryType, "visa">, number> = {
   transit_240: 10, // 240 hours = 10 full days from 00:00 the day after entry
 };
 
+// Calendar-day arithmetic in UTC. Local-time Date maths drifts by a day across daylight-saving
+// changes (a 30-day stay from 18 Oct came out as 16 Nov instead of 17 Nov in Europe).
 const DAY = 864e5;
-const parse = (iso: string) => new Date(`${iso}T00:00:00`);
-const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const dayNum = (iso: string) => {
+  const [y, m, d] = iso.split("-").map(Number);
+  return Date.UTC(y, m - 1, d) / DAY;
+};
+const fromDayNum = (n: number) => new Date(n * DAY).toISOString().slice(0, 10);
+
+/** Today's date on the traveller's device, as YYYY-MM-DD. */
+export const todayIso = (now = new Date()) =>
+  `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+export const addDays = (iso: string, n: number) => fromDayNum(dayNum(iso) + n);
+export const daysBetween = (from: string, to: string) => dayNum(to) - dayNum(from);
 
 export function stayStatus(entryDate: string, type: EntryType, visaDays: number, today = new Date()) {
   if (!entryDate) return null;
   const days = type === "visa" ? Math.max(1, visaDays) : ENTRY_DAYS[type];
-  const entry = parse(entryDate);
-  const lastDay = new Date(entry.getTime() + days * DAY); // must leave by 24:00 on this date
-  const todayMid = parse(iso(today));
-  const daysLeft = Math.round((lastDay.getTime() - todayMid.getTime()) / DAY);
-  const dayOfStay = Math.round((todayMid.getTime() - entry.getTime()) / DAY) + 1;
-  return { lastDay: iso(lastDay), daysLeft, dayOfStay, allowed: days, overdue: daysLeft < 0 };
+  const lastDay = addDays(entryDate, days); // must leave by 24:00 on this date
+  const now = todayIso(today);
+  const daysLeft = daysBetween(now, lastDay);
+  const dayOfStay = daysBetween(entryDate, now) + 1;
+  return { lastDay, daysLeft, dayOfStay, allowed: days, overdue: daysLeft < 0 };
 }
 
 /** A calendar file with two alerts: 3 days before and on the last day. */
 export function stayReminderIcs(lastDay: string, title: string, description: string) {
   const d = lastDay.replaceAll("-", "");
-  const next = iso(new Date(parse(lastDay).getTime() + DAY)).replaceAll("-", "");
+  const next = addDays(lastDay, 1).replaceAll("-", "");
   const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+/, "");
   return [
     "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//China Travel Buddy//EN", "BEGIN:VEVENT",

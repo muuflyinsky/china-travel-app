@@ -1,0 +1,56 @@
+"use client";
+import { useRef, useState } from "react";
+import { Preloader } from "konsta/react";
+import { BedDouble, Camera } from "lucide-react";
+import { Group, Row, IconTile, Note } from "./ui";
+import { ShowCard } from "./ShowCard";
+import { useProfile } from "./useProfile";
+import { useT } from "./useT";
+import { compressImage } from "@/lib/image";
+
+/** "Back to my hotel": one photo of the booking, then a one-tap taxi card forever after. */
+export function HotelCard() {
+  const t = useT();
+  const [p, set] = useProfile();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(false);
+  const [card, setCard] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  async function onFile(f?: File) {
+    if (!f) return;
+    setBusy(true); setError(false);
+    try {
+      const img = await compressImage(f);
+      const r = await fetch("/api/hotel", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ image: img.data, mediaType: img.mediaType }) });
+      const d = await r.json();
+      if (!r.ok) throw new Error();
+      set({ hotel: { name: d.name, address: d.address, nameEn: d.nameEn } });
+    } catch {
+      setError(true);
+    } finally {
+      setBusy(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  }
+
+  return (
+    <>
+      <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => onFile(e.target.files?.[0])} />
+      <Group>
+        {p.hotel ? (
+          <>
+            <Row onClick={() => setCard(true)} icon={<IconTile><BedDouble className="h-5 w-5" aria-hidden /></IconTile>}
+              title={t.hotel.back} sub={<span className="zh">{p.hotel.nameEn ? `${p.hotel.nameEn} · ` : ""}{p.hotel.name}</span>} />
+            <Row onClick={() => fileRef.current?.click()} icon={<Camera className="h-5 w-5 text-muted" aria-hidden />} title={<span className="text-[15px] text-cobalt">{t.hotel.change}</span>} chevron={false} />
+          </>
+        ) : (
+          <Row onClick={() => fileRef.current?.click()} icon={<IconTile>{busy ? <Preloader className="h-5! w-5!" /> : <BedDouble className="h-5 w-5" aria-hidden />}</IconTile>}
+            title={busy ? t.hotel.reading : t.hotel.add} sub={t.hotel.addSub} />
+        )}
+      </Group>
+      {error && <Note tone="warn">{t.hotel.error}</Note>}
+      {card && p.hotel && <ShowCard lines={["师傅您好，请带我回酒店：", p.hotel.name, `地址：${p.hotel.address}`]} sub={p.hotel.nameEn} onClose={() => setCard(false)} />}
+    </>
+  );
+}

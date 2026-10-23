@@ -90,13 +90,13 @@ export default function TalkPage() {
             <button onClick={listen} disabled={listening} aria-label={t.talk.speak} className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl ${listening ? "bg-danger text-white" : "bg-cobalt-soft text-cobalt"}`}>
               <Mic className="h-5 w-5" />
             </button>
-            <button onClick={() => go()} disabled={loading || !text.trim()} className="flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl bg-cobalt text-[17px] font-semibold text-white disabled:opacity-40 dark:text-[#12141c]">
+            <button onClick={() => go()} disabled={loading || !text.trim()} className="flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl bg-cobalt text-[17px] font-semibold text-white disabled:bg-line disabled:text-muted dark:text-[#12141c] dark:disabled:text-muted">
               {loading ? <Preloader className="h-5! w-5!" /> : t.talk.translate}
             </button>
           </div>
           {res && (
             <div className="mt-4 space-y-2 border-t border-line pt-4">
-              <DemoNote show={res.demo} what="ANTHROPIC_API_KEY" />
+              <DemoNote show={res.demo} what={t.common.aiKey} />
               <p className="zh text-[26px] leading-snug font-bold">{res.translation}</p>
               {res.pinyin && <p className="text-[15px] text-muted">{res.pinyin}</p>}
               {res.note && <p className="text-[13px] text-muted">{res.note}</p>}

@@ -8,6 +8,7 @@ import { Screen, DemoNote } from "@/components/Shell";
 import { Section, Card, Group, Row, Button, Note } from "@/components/ui";
 import { AppIcon } from "@/components/AppIcon";
 import { ShowCard } from "@/components/ShowCard";
+import { HotelCard } from "@/components/HotelCard";
 import { CityPicker } from "@/components/CityPicker";
 import { useCity, type Here } from "@/components/useCity";
 import { useT } from "@/components/useT";
@@ -115,7 +116,7 @@ export default function GoPage() {
           ))}
         </div>
         {notice && <Note tone="warn">{notice}</Note>}
-        <DemoNote show={demo} what="AMAP_KEY" />
+        <DemoNote show={demo} what={t.common.mapKey} />
         {busy === "search" && <div className="flex justify-center py-6"><Preloader /></div>}
         {places.length > 0 && (
           <Group>
@@ -127,6 +128,8 @@ export default function GoPage() {
           </Group>
         )}
       </Section>
+
+      {!dest && places.length === 0 && <Section><HotelCard /></Section>}
 
       {dest && (
         <Section>

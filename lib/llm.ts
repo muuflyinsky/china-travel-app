@@ -108,3 +108,31 @@ export async function translate(text: string, from: string, to: string) {
   if (!res.parsed_output) throw new Error("Translation failed");
   return res.parsed_output;
 }
+
+const HotelSchema = z.object({
+  found: z.boolean().describe("False if the image is not a hotel booking or the address is unreadable"),
+  name_zh: z.string().describe("Hotel name in Simplified Chinese, exactly as a taxi driver would know it"),
+  address_zh: z.string().describe("Full street address in Simplified Chinese (city, district, road, number)"),
+  name_en: z.string().describe("Hotel name in English if shown, else empty"),
+});
+
+/** Reads a booking confirmation (screenshot or photo) into a Chinese name + address for taxis. */
+export async function extractHotel(imageBase64: string, mediaType = "image/jpeg") {
+  const res = await client().beta.messages.parse({
+    model: config.model,
+    max_tokens: 2000,
+    system:
+      "You read hotel booking confirmations for travellers in mainland China. Return the hotel's Chinese name and Chinese street address so a taxi driver can find it. If only an English name or address is shown, give the official Chinese name and address you are confident of; if you are not confident, set found=false rather than guessing.",
+    output_config: { effort: "low", format: betaZodOutputFormat(HotelSchema) },
+    messages: [{
+      role: "user",
+      content: [
+        { type: "image", source: { type: "base64", media_type: mediaType as "image/jpeg", data: imageBase64 } },
+        { type: "text", text: "Extract the hotel from this booking." },
+      ],
+    }],
+    ...FALLBACK,
+  });
+  if (res.stop_reason === "refusal" || !res.parsed_output) throw new Error("Could not read the booking");
+  return res.parsed_output;
+}

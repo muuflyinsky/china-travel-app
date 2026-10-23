@@ -13,19 +13,20 @@ import { useT } from "@/components/useT";
 import { goLink } from "@/lib/affiliate";
 import { amapNav } from "@/lib/maplinks";
 import { fmt } from "@/lib/i18n";
+import { addDays, daysBetween, todayIso } from "@/lib/stay";
 import type { Place } from "@/lib/amap";
 
-const iso = (d: Date) => d.toISOString().slice(0, 10);
-const plus = (days: number) => iso(new Date(Date.now() + days * 864e5));
+const plus = (days: number) => addDays(todayIso(), days);
 
 export default function StayPage() {
   const t = useT();
-  const [profile] = useProfile();
+  const [profile, setProfile, loaded] = useProfile();
   const fx = useFx(profile.homeCurrency);
   const { city, setCity, detect } = useCity();
   const [checkin, setCheckin] = useState(plus(7));
   const [checkout, setCheckout] = useState(plus(9));
-  const [adults, setAdults] = useState(2);
+  const adults = profile.guests;
+  const setAdults = (n: number) => setProfile({ guests: n });
   const [area, setArea] = useState("");
   const [hotels, setHotels] = useState<Place[]>([]);
   const [demo, setDemo] = useState(false);
@@ -39,8 +40,17 @@ export default function StayPage() {
     setHotels(d.places ?? []); setDemo(d.demo); setLoading(false);
   }
   useEffect(() => { load(); }, [city.a]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Default to the trip dates the traveller already gave us, if they are still ahead.
+  useEffect(() => {
+    if (!loaded) return;
+    const today = todayIso();
+    if (profile.arrival && profile.arrival >= today) {
+      setCheckin(profile.arrival);
+      setCheckout(profile.departure > profile.arrival ? profile.departure : addDays(profile.arrival, 2));
+    }
+  }, [loaded]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const nights = Math.max(1, Math.round((+new Date(checkout) - +new Date(checkin)) / 864e5));
+  const nights = Math.max(1, daysBetween(checkin, checkout));
   const base = { city: city.s, cityEn: city.e, checkin, checkout, adults };
   const price = (cny: string) => {
     const home = fx && profile.homeCurrency !== "CNY" ? ` (≈ ${formatMoney(Number(cny) / fx.value, profile.homeCurrency, profile.lang)})` : "";
@@ -67,7 +77,7 @@ export default function StayPage() {
       </Section>
 
       <Section title={<>{fmt(t.stay.hotelsIn, { city: city.e })}{area && ` · ${area}`}</>}>
-        <DemoNote show={demo} what="AMAP_KEY" />
+        <DemoNote show={demo} what={t.common.mapKey} />
         {loading && <div className="flex justify-center py-6"><Preloader /></div>}
         {!loading && hotels.length === 0 && <p className="px-1 text-[15px] text-muted">{t.stay.none}</p>}
         {hotels.map((h) => (
@@ -83,7 +93,7 @@ export default function StayPage() {
                 {h.cost && <span className="text-muted">· {price(h.cost)}</span>}
               </p>
               <div className="mt-2 flex gap-2">
-                <a target="_blank" rel="noopener" href={goLink("trip", "hotel_search", { ...base, keyword: h.name }, "stay_card")} className="flex min-h-11 flex-1 items-center justify-center rounded-xl bg-cta text-[15px] font-semibold text-cta-ink">{t.stay.checkPrice}</a>
+                <a target="_blank" rel="noopener" href={goLink("trip", "hotel_search", { ...base, keyword: h.name }, "stay_card")} className="flex min-h-11 flex-1 items-center justify-center rounded-xl bg-cobalt-soft text-[15px] font-semibold text-cobalt">{t.stay.checkPrice}</a>
                 <a target="_blank" rel="noopener" href={amapNav(h, "car")} aria-label={fmt(t.stay.onMap, { name: h.name })} className="grid min-h-11 w-11 place-items-center rounded-xl bg-cobalt-soft"><AppIcon id="amap" size={24} /></a>
               </div>
             </div>

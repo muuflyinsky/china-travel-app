@@ -1,6 +1,8 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import type { EntryType } from "@/lib/stay";
+import { LANGUAGES } from "@/lib/languages";
+import { currencyFor, guessCountry } from "@/lib/visa";
 
 export type Mode = "planning" | "in_china";
 
@@ -16,21 +18,39 @@ export type Profile = {
   entryDate: string; // actual entry date, YYYY-MM-DD
   entryType: EntryType;
   visaDays: number; // "duration of each stay" on a visa
+  departure: string; // planned departure date, YYYY-MM-DD
+  nationality: string; // ISO country code, confirmed by the traveller ("" = not yet)
+  onwardThird: boolean | null; // only asked when the passport qualifies for transit only
+  guests: number; // remembered for hotel search
+  hotel: { name: string; address: string; nameEn?: string } | null; // "back to my hotel" card
+  allergiesAsked: boolean; // the first-visit allergy sheet on Eat has been answered
 };
 
 const DEFAULT: Profile = {
   lang: "en", allergens: [], diets: [], homeCurrency: "USD", name: "",
   mode: null, arrival: "", entryDate: "", entryType: "visa_free_30", visaDays: 30,
+  departure: "", nationality: "", onwardThird: null, guests: 1, hotel: null, allergiesAsked: false,
 };
 const KEY = "ctg.profile";
 const EVENT = "ctg-profile";
+
+/** First visit: language and currency are inferred from the browser instead of asked. */
+function inferred(): Profile {
+  const lang = navigator.language.split("-")[0];
+  const country = guessCountry();
+  return {
+    ...DEFAULT,
+    lang: LANGUAGES.some((l) => l.code === lang) ? lang : "en",
+    homeCurrency: country ? currencyFor(country) : DEFAULT.homeCurrency,
+  };
+}
 
 function read(): Profile {
   try {
     const raw = localStorage.getItem(KEY);
     if (raw) return { ...DEFAULT, ...JSON.parse(raw) };
   } catch {}
-  return DEFAULT;
+  return inferred();
 }
 
 /** Traveller preferences, kept in this browser only and shared live across screens. */

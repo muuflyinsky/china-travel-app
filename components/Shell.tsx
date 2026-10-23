@@ -51,7 +51,7 @@ export function Screen({ title, right, children, back }: { title: string; right?
     <Page colors={{ bgIos: "bg-porcelain" }}>
       <Navbar
         large
-        transparent
+        transparent={!back}
         centerTitle
         title={title}
         left={back ? (

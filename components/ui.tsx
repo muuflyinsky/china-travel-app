@@ -74,7 +74,7 @@ export function Button({ children, variant = "primary", href, external, onClick,
     ink: "bg-ink text-porcelain",
     ghost: "text-cobalt",
   }[variant];
-  const cls = `inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl px-4 text-[17px] font-semibold disabled:opacity-40 ${v} ${className}`;
+  const cls = `inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl px-4 text-[17px] font-semibold disabled:bg-line disabled:text-muted ${v} ${className}`;
   if (href) return external ? <a href={href} target="_blank" rel="noopener" className={cls} aria-label={ariaLabel}>{children}</a> : <NextLink href={href} className={cls} aria-label={ariaLabel}>{children}</NextLink>;
   return <button type={type} onClick={onClick} disabled={disabled} className={cls} aria-label={ariaLabel}>{children}</button>;
 }
