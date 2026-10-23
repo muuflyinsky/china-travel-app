@@ -109,12 +109,19 @@ async function post(body: object): Promise<ChatReply> {
   const urls = config.ai.baseUrls;
   for (let i = 0; ; i++) {
     const at = (region + i) % urls.length;
-    const res = await fetch(`${urls[at]}/chat/completions`, {
-      method: "POST",
-      headers: { "content-type": "application/json", authorization: `Bearer ${config.ai.key}` },
-      body: JSON.stringify(body),
-      signal: AbortSignal.timeout(110_000),
-    });
+    let res: Response;
+    try {
+      res = await fetch(`${urls[at]}/chat/completions`, {
+        method: "POST",
+        headers: { "content-type": "application/json", authorization: `Bearer ${config.ai.key}` },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(110_000),
+      });
+    } catch (e) {
+      // Connection failed (DNS, reset, region unreachable): the other region may still work.
+      if (i < urls.length - 1 && (e as Error).name !== "TimeoutError") continue;
+      throw new Error(`AI unreachable at ${new URL(urls[at]).host}: ${(e as Error).message}`);
+    }
     if (res.ok) { region = at; return res.json(); }
     const detail = (await res.text()).slice(0, 300);
     // A key from the other region is rejected as invalid, so try the next endpoint.
