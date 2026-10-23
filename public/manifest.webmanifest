@@ -1,0 +1,9 @@
+{
+  "name": "China Travel Buddy",
+  "short_name": "ChinaBuddy",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6f4ef",
+  "theme_color": "#c8102e",
+  "icons": []
+}
