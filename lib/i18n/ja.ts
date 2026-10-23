@@ -167,6 +167,7 @@ export const ja: Dict = {
     onMap: "{name}を地図で見る",
   },
   eat: {
+    aiDown: "メニュー読み取りが現在応答していません。1分後にもう一度試すか、料理名を入力してください。",
     blockedSevere: "主材料に{x}が入っています。重いアレルギーがある方にはおすすめしません。",
     replyContainsAny: "アレルギーの食材が入っています",
     add: "追加",

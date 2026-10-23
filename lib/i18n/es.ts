@@ -167,6 +167,7 @@ export const es: Dict = {
     onMap: "{name} en el mapa",
   },
   eat: {
+    aiDown: "El lector de menús no responde ahora mismo. Inténtalo de nuevo en un minuto o escribe los nombres de los platos.",
     blockedSevere: "Lleva {x} como ingrediente principal. No recomendado con alergia grave.",
     replyContainsAny: "Lleva algo a lo que eres alérgico",
     add: "Añadir",

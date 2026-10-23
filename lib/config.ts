@@ -1,7 +1,12 @@
 export const config = {
-  // Primary AI: any OpenAI-compatible endpoint (default: Alibaba Cloud Model Studio, Singapore).
+  // Primary AI: any OpenAI-compatible endpoint (default: Alibaba Cloud Model Studio). Model Studio
+  // keys only work in the region they were created in, so without AI_BASE_URL both the
+  // international (Singapore) and the mainland (Beijing) endpoints are tried. AI_BASE_URL may list
+  // several endpoints, comma-separated.
   ai: {
-    baseUrl: (process.env.AI_BASE_URL || "https://dashscope-intl.aliyuncs.com/compatible-mode/v1").replace(/\/$/, ""),
+    baseUrls: process.env.AI_BASE_URL
+      ? process.env.AI_BASE_URL.split(",").map((u) => u.trim().replace(/\/$/, "")).filter(Boolean)
+      : ["https://dashscope-intl.aliyuncs.com/compatible-mode/v1", "https://dashscope.aliyuncs.com/compatible-mode/v1"],
     key: process.env.AI_API_KEY ?? "",
     visionModel: process.env.AI_MODEL_VISION || "qwen-vl-max",
     textModel: process.env.AI_MODEL_TEXT || "qwen-plus",

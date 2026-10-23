@@ -167,6 +167,7 @@ export const ko: Dict = {
     onMap: "지도에서 {name} 보기",
   },
   eat: {
+    aiDown: "메뉴 판독기가 지금 응답하지 않습니다. 1분 후 다시 시도하거나 요리 이름을 입력하세요.",
     blockedSevere: "주재료에 {x}이(가) 들어 있습니다. 심한 알레르기가 있으면 권하지 않습니다.",
     replyContainsAny: "알레르기 재료가 들어 있습니다",
     add: "추가",

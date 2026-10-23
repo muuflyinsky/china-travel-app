@@ -178,13 +178,15 @@ export default function MenuPage() {
     try {
       const r = await fetch("/api/menu", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...body, lang: profile.lang, city: `${city.e} (${city.n}, ${city.p})` }) });
       const d = await r.json();
-      // 503: no AI configured (production) · 422: the model's answer didn't validate → retake.
-      if (!r.ok) throw new Error(r.status === 503 ? "unavailable" : "unreadable");
+      // 503: no AI configured (production) · 422: the model's answer didn't validate → retake ·
+      // anything else: the AI service failed (key, quota, timeout), so retaking won't help.
+      if (!r.ok) throw new Error(r.status === 503 ? "unavailable" : r.status === 422 ? "unreadable" : "down");
       setMenu(d);
       setInputOpen(false);
       setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
     } catch (e) {
-      setError((e as Error).message === "unavailable" ? t.common.unavailable : t.eat.error);
+      const m = (e as Error).message;
+      setError(m === "unavailable" ? t.common.unavailable : m === "unreadable" ? t.eat.error : t.eat.aiDown);
     } finally {
       setLoading(false);
     }

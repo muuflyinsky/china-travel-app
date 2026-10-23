@@ -170,6 +170,7 @@ export const en = {
     onMap: "{name} on the map",
   },
   eat: {
+    aiDown: "The menu reader isn’t responding right now. Try again in a minute, or type the dish names.",
     blockedSevere: "Contains {x} as a main ingredient. Not recommended with a severe allergy.",
     replyContainsAny: "It contains something you’re allergic to",
     add: "Add",

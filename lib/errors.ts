@@ -14,7 +14,10 @@ export function errorResponse(e: unknown, where: string) {
     console.error(`[${where}] unavailable: ${e.message}`);
     return NextResponse.json({ error: "unavailable" }, { status: 503 });
   }
-  if (e instanceof Unreadable) return NextResponse.json({ error: "unreadable" }, { status: 422 });
+  if (e instanceof Unreadable) {
+    console.error(`[${where}] unreadable: ${e.message}`);
+    return NextResponse.json({ error: "unreadable" }, { status: 422 });
+  }
   console.error(`[${where}]`, e);
   return NextResponse.json({ error: (e as Error).message ?? "error" }, { status: 502 });
 }

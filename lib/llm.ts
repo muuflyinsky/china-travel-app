@@ -8,7 +8,7 @@ import { langName } from "./languages";
 
 const client = () => new Anthropic({ apiKey: config.anthropicKey });
 
-type Ask = { system: string; text: string; image?: { data: string; mediaType: string }; maxTokens: number };
+type Ask = { system: string; text: string; image?: { data: string; mediaType: string }; maxTokens: number; repair?: (raw: unknown) => unknown };
 
 /**
  * One structured call to whichever model is configured. The answer is always validated
@@ -36,7 +36,8 @@ async function structured<T extends z.ZodType>(schema: T, ask: Ask): Promise<z.i
 /**
  * OpenAI-compatible chat completions (Qwen on Alibaba Cloud Model Studio by default). The
  * JSON Schema goes in the system prompt; JSON mode is requested for text models only, since
- * not every vision model supports it. One retry if the reply isn't valid.
+ * not every vision model supports it. `repair` normalises near-misses (an allergen written as
+ * "peanuts", a missing note) before validation. One retry, told what was wrong.
  */
 async function openaiCompatible<T extends z.ZodType>(schema: T, ask: Ask): Promise<z.infer<T>> {
   const vision = Boolean(ask.image);
@@ -44,31 +45,70 @@ async function openaiCompatible<T extends z.ZodType>(schema: T, ask: Ask): Promi
   const user = vision
     ? [{ type: "image_url", image_url: { url: `data:${ask.image!.mediaType};base64,${ask.image!.data}` } }, { type: "text", text: ask.text }]
     : ask.text;
-  let last = "";
+  let last = "", retry = "";
   for (let attempt = 0; attempt < 2; attempt++) {
-    const res = await fetch(`${config.ai.baseUrl}/chat/completions`, {
-      method: "POST",
-      headers: { "content-type": "application/json", authorization: `Bearer ${config.ai.key}` },
-      body: JSON.stringify({
-        model: vision ? config.ai.visionModel : config.ai.textModel,
-        messages: [{ role: "system", content: system }, { role: "user", content: user }],
-        max_tokens: Math.min(ask.maxTokens, 8192),
-        temperature: 0.2,
-        ...(vision ? {} : { response_format: { type: "json_object" } }),
-      }),
+    const data = await chat({
+      model: vision ? config.ai.visionModel : config.ai.textModel,
+      messages: [{ role: "system", content: system + retry }, { role: "user", content: user }],
+      max_tokens: Math.min(ask.maxTokens, 8192),
+      temperature: 0.2,
+      ...(vision ? {} : { response_format: { type: "json_object" } }),
     });
-    if (!res.ok) throw new Error(`AI ${res.status}: ${(await res.text()).slice(0, 200)}`);
-    const data = await res.json();
-    last = String(data.choices?.[0]?.message?.content ?? "");
-    const json = last.slice(last.indexOf("{"), last.lastIndexOf("}") + 1);
-    try {
-      const parsed = schema.safeParse(JSON.parse(json));
-      if (parsed.success) return parsed.data;
-      last = parsed.error.message;
-    } catch (e) { last = (e as Error).message; }
+    const choice = data.choices?.[0];
+    last = String(choice?.message?.content ?? "");
+    if (choice?.finish_reason === "length") {
+      last = "reply cut off at max_tokens";
+      retry = "\n\nYour previous reply was too long and was cut off. Answer again more briefly: one short sentence per text field and at most 20 dishes.";
+    } else {
+      try {
+        const raw = JSON.parse(last.slice(last.indexOf("{"), last.lastIndexOf("}") + 1));
+        const parsed = schema.safeParse(ask.repair ? ask.repair(raw) : raw);
+        if (parsed.success) return parsed.data;
+        last = z.prettifyError(parsed.error);
+      } catch (e) { last = `not JSON: ${(e as Error).message}; reply began: ${last.slice(0, 120)}`; }
+      retry = `\n\nYour previous reply did not match the schema (${last.slice(0, 300)}). Reply again with valid JSON only.`;
+    }
+    console.error(`[ai] ${vision ? config.ai.visionModel : config.ai.textModel} attempt ${attempt + 1}: ${last.slice(0, 500)}`);
   }
   throw new Unreadable(`invalid model output: ${last.slice(0, 200)}`);
 }
+
+let region = 0; // index of the endpoint in config.ai.baseUrls that last accepted the key
+
+/** POST to the first endpoint that accepts the key; upstream errors carry status and body for the logs. */
+async function chat(body: object): Promise<{ choices?: { message?: { content?: unknown }; finish_reason?: string }[] }> {
+  const urls = config.ai.baseUrls;
+  for (let i = 0; ; i++) {
+    const at = (region + i) % urls.length;
+    const res = await fetch(`${urls[at]}/chat/completions`, {
+      method: "POST",
+      headers: { "content-type": "application/json", authorization: `Bearer ${config.ai.key}` },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(110_000),
+    });
+    if (res.ok) { region = at; return res.json(); }
+    const detail = (await res.text()).slice(0, 300);
+    // A key from the other region is rejected as invalid, so try the next endpoint.
+    if ((res.status === 401 || res.status === 403) && i < urls.length - 1) continue;
+    throw new Error(`AI ${res.status} from ${new URL(urls[at]).host}: ${detail}`);
+  }
+}
+
+/** Connectivity check for /api/ai-check: one tiny call per model, errors returned as text. */
+export async function checkAi() {
+  const probe = async (model: string, content: unknown) => {
+    try {
+      const d = await chat({ model, max_tokens: 5, messages: [{ role: "user", content }] });
+      return { ok: true, endpoint: new URL(config.ai.baseUrls[region]).host, reply: String(d.choices?.[0]?.message?.content ?? "").slice(0, 40) };
+    } catch (e) { return { ok: false, error: (e as Error).message.slice(0, 400) }; }
+  };
+  return {
+    text: await probe(config.ai.textModel, "Reply with OK."),
+    vision: await probe(config.ai.visionModel, [{ type: "image_url", image_url: { url: PROBE_PNG } }, { type: "text", text: "What colour is this? One word." }]),
+  };
+}
+// 32×32 solid red PNG (some vision models reject images smaller than ~10 px).
+const PROBE_PNG = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAKElEQVR4nO3NsQ0AAAzCMP5/un0CNkuZ41wybXsHAAAAAAAAAAAAxR4yw/wuPL6QkAAAAABJRU5ErkJggg==";
 
 // Server-side refusal fallback: the API reroutes a declined request inside the same call.
 // Only Fable / Opus 5+ / Sonnet 5.5 accept it; Haiku (the low-cost option) has no fallback.
@@ -125,10 +165,89 @@ Extract every dish on the menu (or every dish name the user typed). For each dis
 - If the menu is not a food menu or is unreadable, return an empty dishes array and explain in tips.
 Write every free-text field except "original", "pinyin" and ingredient "zh" in the target language.`;
 
+// ---- tolerant reading of model output --------------------------------------------------------
+
+const ALLERGEN_ALIASES: Record<string, string> = {
+  peanuts: "peanut", groundnut: "peanut", shellfish: "crustacean", crustaceans: "crustacean", shrimp: "crustacean",
+  prawn: "crustacean", crab: "crustacean", lobster: "crustacean", wheat: "gluten", flour: "gluten", eggs: "egg",
+  dairy: "milk", lactose: "milk", soya: "soy", soybean: "soy", soybeans: "soy", tofu: "soy", sesame_seed: "sesame",
+  sesame_seeds: "sesame", nuts: "tree_nut", tree_nuts: "tree_nut", treenut: "tree_nut", walnut: "tree_nut",
+  cashew: "tree_nut", almond: "tree_nut", molluscs: "mollusc", mollusk: "mollusc", mollusks: "mollusc",
+  oyster: "mollusc", squid: "mollusc", clam: "mollusc", sulfites: "sulphites", sulfite: "sulphites", sulphite: "sulphites",
+  monosodium_glutamate: "msg", fish_sauce: "fish",
+};
+const known = new Set<string>(allergenIds);
+const MEATS = new Set(["pork", "beef", "lamb", "chicken", "duck", "fish", "seafood", "offal", "other"]);
+const str = (v: unknown) => (v == null ? "" : typeof v === "string" ? v : String(v));
+const list = (v: unknown): unknown[] => (Array.isArray(v) ? v : v == null || v === "" ? [] : [v]);
+const oneOf = <T extends string>(v: unknown, ok: readonly T[], fallback: T): T => {
+  const s = str(v).toLowerCase().trim().replace(/[\s-]+/g, "_") as T;
+  return ok.includes(s) ? s : fallback;
+};
+const bool = (v: unknown) => v === true || str(v).toLowerCase() === "true";
+
+/** Maps allergen spellings to ids; anything unrecognised is reported so the dish can be marked uncertain. */
+function allergensOf(v: unknown) {
+  const ids = new Set<string>(); let unknown = false;
+  for (const a of list(v)) {
+    const k = str(a).toLowerCase().trim().replace(/[\s-]+/g, "_");
+    const id = known.has(k) ? k : ALLERGEN_ALIASES[k];
+    if (id) ids.add(id); else if (k) unknown = true;
+  }
+  return { ids: [...ids], unknown };
+}
+
+/**
+ * Fixes the near-misses open models make (wrong enum spelling, a missing field, a string where a
+ * list belongs) without inventing anything. Safety direction: unknown roles count as "main",
+ * dish allergens include every ingredient's, and anything we couldn't map lowers confidence.
+ */
+function repairMenu(raw: unknown): unknown {
+  let m = raw as Record<string, unknown>;
+  if (m && !Array.isArray(m.dishes)) {
+    const inner = Object.values(m).find((v) => v && typeof v === "object" && Array.isArray((v as Record<string, unknown>).dishes));
+    if (inner) m = inner as Record<string, unknown>;
+  }
+  if (!m || !Array.isArray(m.dishes)) return raw;
+  return {
+    restaurant_type: str(m.restaurant_type),
+    tips: list(m.tips).map(str).filter(Boolean),
+    dishes: m.dishes.map((x) => {
+      const d = (x ?? {}) as Record<string, unknown>;
+      let unsure = false;
+      const ingredients = list(d.ingredients).map((y) => {
+        const i = (typeof y === "string" ? { name: y } : y ?? {}) as Record<string, unknown>;
+        const a = allergensOf(i.allergens); unsure ||= a.unknown;
+        return {
+          name: str(i.name), zh: str(i.zh),
+          source: oneOf(i.source, ["menu", "standard_recipe"] as const, "standard_recipe"),
+          role: oneOf(i.role, ["main", "sauce", "garnish"] as const, "main"),
+          allergens: a.ids,
+        };
+      });
+      const dish = allergensOf(d.allergens); unsure ||= dish.unknown;
+      const allergens = [...new Set([...dish.ids, ...ingredients.flatMap((i) => i.allergens)])];
+      const spice = Math.round(Number(d.spice_level));
+      const confidence = oneOf(d.confidence, ["high", "medium", "low"] as const, "low");
+      return {
+        original: str(d.original), pinyin: str(d.pinyin), translated: str(d.translated), literal: str(d.literal),
+        description: str(d.description), category: str(d.category), price: str(d.price),
+        ingredients, allergens,
+        meat: [...new Set(list(d.meat).map((v) => (MEATS.has(str(v).toLowerCase()) ? str(v).toLowerCase() : "other")))],
+        vegetarian: bool(d.vegetarian), contains_alcohol: bool(d.contains_alcohol),
+        spice_level: Number.isFinite(spice) ? Math.min(3, Math.max(0, spice)) : 0,
+        confidence: unsure ? "low" : confidence,
+        notes: str(d.notes),
+      };
+    }),
+  };
+}
+
 export async function analyzeMenu(input: { imageBase64?: string; mediaType?: string; text?: string; lang: string; city?: string }) {
   return structured(MenuSchema, {
     system: MENU_SYSTEM,
     maxTokens: 16000,
+    repair: repairMenu,
     image: input.imageBase64 ? { data: input.imageBase64, mediaType: input.mediaType ?? "image/jpeg" } : undefined,
     text:
       `Target language: ${langName(input.lang)}.\n` +
