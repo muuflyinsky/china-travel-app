@@ -23,9 +23,17 @@ export type GuideDish = {
   confidence: "high" | "low";
 };
 
+/** A first-time-visitor area to stay in: AI-suggested, located and metro-counted with Amap. */
+export type GuideArea = {
+  zh: string; name: L10n; reason: L10n;
+  location: string; // "lng,lat" GCJ-02, centre used for the hotel search
+  metro: number; // metro stations within 1 km
+};
+
 export type CityGuide = {
   city: string; cityEn: string; adcode: string;
   generatedAt: string; model: string;
   sources: string[];
   sights: GuideSight[]; dishes: GuideDish[];
+  areas?: GuideArea[];
 };

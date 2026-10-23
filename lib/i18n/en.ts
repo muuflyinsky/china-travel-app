@@ -2,6 +2,7 @@
 // {name} placeholders are filled by fmt().
 export const en = {
   common: {
+    unavailable: "Temporarily unavailable. Please try again later.",
     skip: "Skip",
     aiKey: "the AI key",
     mapKey: "the map key",
@@ -17,7 +18,7 @@ export const en = {
     back: "Back",
   },
   tabs: { today: "Today", eat: "Eat", go: "Explore", stay: "Stay", talk: "Talk" },
-  show: { title: "Show this screen", play: "Play aloud in Chinese" },
+  show: { title: "Show this screen", play: "Play aloud in Chinese", whatItSays: "What this card says" },
   mode: {
     question: "Where are you right now?",
     planning: "Planning my trip",
@@ -43,6 +44,17 @@ export const en = {
     near: "near {city}",
   },
   today: {
+    tileMenu: "Scan a menu",
+    tileMenuSub: "Translated, with an allergy check",
+    tileDriver: "Show the driver",
+    tileDriverAdd: "Add your hotel from a booking screenshot",
+    tilePay: "Pay",
+    tilePaySub: "Alipay · WeChat · price check",
+    tileToday: "Today",
+    tileTodaySub: "Top 5 in {city}",
+    tileTodayAlarm: "{name} · tickets {when}",
+    driverElse: "Somewhere else: a place or address",
+    getReadySub: "Payments, mobile data, apps, trains",
     hotelsFor: "Hotels in {city}",
     addCities: "Add the cities you’ll visit",
     addCitiesSub: "We’ll pick hotels in every price range for each city",
@@ -92,6 +104,10 @@ export const en = {
     stayTrackSub: "Add your entry date to get a leave-by reminder",
   },
   stay: {
+    whereToStay: "Where to stay",
+    aiPick: "AI recommended",
+    metroCount: "{n} metro stations within 1 km",
+    tierFallback: "No {tier} picks in this area. Showing {other} instead.",
     tiers: {"economy": "Economy", "comfort": "Comfort", "upscale": "Upscale", "luxury": "Luxury"},
     priceRange: "Price range",
     perNight: "{price} a night",
@@ -142,6 +158,8 @@ export const en = {
     onMap: "{name} on the map",
   },
   eat: {
+    blockedSevere: "Contains {x} as a main ingredient. Not recommended with a severe allergy.",
+    replyContainsAny: "It contains something you’re allergic to",
     add: "Add",
     inOrder: "In order",
     askWithout: "Ask without {x}",
@@ -172,7 +190,7 @@ export const en = {
     checkingFor: "Checking for",
     addRestrictions: "Add allergies & diet to get warnings",
     reading: "Reading every dish… this takes 10–40 seconds",
-    error: "We couldn't read that menu. Try a sharper, well-lit photo, or type the dish names.",
+    error: "We couldn’t read it clearly. Please take the photo again, or type the dish names.",
     dishes: "{type} · {n} dishes",
     notForYou: "{n} not for you",
     all: "All dishes",
@@ -196,6 +214,8 @@ export const en = {
     approx: "≈ {amount}",
   },
   go: {
+    findPlace: "Find a place",
+    otherCity: "Other city",
     openAmap: "Directions in Amap",
     amapNote: "Amap shows live metro, bus and walking routes, in English.",
     back: "Back to results",
@@ -243,6 +263,9 @@ export const en = {
     groups: { basics: "Basics", eating: "Eating", around: "Getting around", hotel: "Hotel", emergency: "Emergency" },
   },
   settings: {
+    cityFrom: "from",
+    cityTo: "to",
+    cityDatesNote: "Optional: the days you’ll be in each city. Today then shows the right city each day.",
     you: "You",
     add: "Add",
     dates: "Dates",
@@ -364,7 +387,7 @@ export const en = {
     sightsBody: "Top sights such as the Forbidden City and the National Museum need a real-name reservation with your passport, often days ahead.",
     tickets: "Tickets in {city}",
     hotels: "Hotels",
-    hotelsBody: "Pick hotels that are licensed for foreign guests.",
+    hotelsBody: "Chain hotels · usually accept foreign guests",
     hotelsLink: "Find hotels",
     good: "Good to know",
     goodItems: {
@@ -385,7 +408,7 @@ export const en = {
   },
   visa: {
     title: "Can I enter visa-free?",
-    confirm: "Do you hold a {country} passport?",
+    confirm: "Your passport: {country}?",
     yes: "Yes",
     change: "Change",
     ordinary: "For ordinary passports",
@@ -447,6 +470,9 @@ export const en = {
     "mustEatSub": "5 local dishes, with allergens and where to find them"
   },
   resv: {
+    opensRule: "Tickets open {time} Beijing time, {n} days ahead",
+    opensDays: "Booking opens about {n} days ahead",
+    noRelease: "Book ahead with your passport",
     "visitDate": "Day you want to visit",
     "forDate": "Tickets for {date} go on sale",
     "beijing": "Your time · {time} in Beijing",

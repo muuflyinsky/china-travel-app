@@ -11,7 +11,8 @@ import { useT } from "./useT";
 import { fmt } from "@/lib/i18n";
 import { goLink } from "@/lib/affiliate";
 import { amapNav } from "@/lib/maplinks";
-import { ALLERGENS, staffCardZh } from "@/lib/allergens";
+import { ALLERGENS, allergyLinesZh, blockedBySevere } from "@/lib/allergens";
+import { track } from "@/lib/track";
 import { RESERVATIONS } from "@/lib/reservations";
 import { pick, type CityGuide as Guide, type GuideDish, type GuideSight } from "@/lib/city-guide-types";
 import { AwardBadges } from "./AwardBadges";
@@ -57,7 +58,7 @@ function AwardRestaurants({ adcode, onPick }: { adcode: string; onPick: (p: Plac
 type Tab = "see" | "eat";
 
 /** Static pre-generated file first (CDN), then the API, which generates and caches. */
-function useGuide(adcode: string) {
+export function useGuide(adcode: string) {
   const [g, setG] = useState<(Guide & { demo?: boolean }) | null>(null);
   const [state, setState] = useState<"loading" | "ok" | "none">("loading");
   useEffect(() => {
@@ -114,11 +115,11 @@ function SightCard({ s, city, cityEn, index }: { s: GuideSight; city: string; ci
         <Ticket className="h-5 w-5" aria-hidden />{t.guide.tickets}<ExternalLink className="h-4 w-4" aria-hidden />
       </a>
       <div className="mt-2 grid grid-cols-2 gap-2">
-        <Button variant="soft" className="text-subhead!" onClick={() => setCard(true)}><CarTaxiFront className="h-5 w-5" aria-hidden />{t.guide.taxi}</Button>
+        <Button variant="soft" className="text-subhead!" onClick={() => { setCard(true); track("taxi_card_shown", { source: "guide" }); }}><CarTaxiFront className="h-5 w-5" aria-hidden />{t.guide.taxi}</Button>
         <a href={amapNav({ location: s.location, name: s.zh }, "bus")} target="_blank" rel="noopener" className="flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-cobalt-soft text-subhead font-semibold text-cobalt"><AppIcon id="amap" size={22} />{t.guide.route}</a>
       </div>
       <Feedback city={city} kind="sight" name={s.zh} />
-      {card && <ShowCard lines={["师傅您好，请带我去：", s.zh, `地址：${s.address}`]} sub={s.en} onClose={() => setCard(false)} />}
+      {card && <ShowCard kind="taxi" lines={["师傅您好，请带我去：", s.zh, `地址：${s.address}`]} sub={s.en} onClose={() => setCard(false)} />}
       {r && <ReservationSheet r={r} open={resv} onClose={() => setResv(false)} />}
     </Card>
   );
@@ -130,11 +131,10 @@ function DishCard({ d, city, onFind }: { d: GuideDish; city: string; onFind: (zh
   const [card, setCard] = useState(false);
   const mine = d.allergens.filter((a) => p.allergens.includes(a));
   const zhOf = (id: string) => ALLERGENS.find((a) => a.id === id)?.zh.split("（")[0] ?? id;
-  const lines = [
-    "你好，我要点：",
-    `${d.zh}${mine.length ? `（不要放${mine.map(zhOf).join("、")}）` : ""}`,
-    ...(p.allergens.length || p.diets.length ? staffCardZh(p.allergens, p.diets, p.severe).slice(1, -1) : []),
-  ];
+  // No ingredient roles for guide dishes: blockedBySevere treats every allergen as a main ingredient.
+  const blocked = blockedBySevere(d, p.severe.filter((a) => p.allergens.includes(a)));
+  const { severe, rest } = allergyLinesZh(p.allergens, p.diets, p.severe);
+  const lines = ["您好，我要点：", `${d.zh}${mine.length ? `（不要放${mine.map(zhOf).join("、")}）` : ""}`];
   return (
     <Card tone={mine.length ? "danger" : "plain"}>
       <h3 className="text-headline">{pick(d.name, p.lang)}</h3>
@@ -146,12 +146,19 @@ function DishCard({ d, city, onFind }: { d: GuideDish; city: string; onFind: (zh
         {d.spice > 0 && <span className="tag" aria-label={fmt(t.eat.spice, { n: d.spice })}>{Array.from({ length: d.spice }, (_, i) => <Flame key={i} className="h-3.5 w-3.5" aria-hidden />)}</span>}
       </div>
       {d.spend && <p className="mt-2 text-footnote text-muted">{fmt(t.guide.spend, { range: `¥${d.spend[0]}–${d.spend[1]}` })}</p>}
+      {blocked.length > 0 && (
+        <p className="mt-3 rounded-xl border border-danger px-3 py-2.5 text-subhead font-semibold text-danger" role="note">
+          {fmt(t.eat.blockedSevere, { x: blocked.map((a) => (t.allergens[a as keyof typeof t.allergens] ?? a).toLowerCase()).join(", ") })}
+        </p>
+      )}
       <div className="mt-3 grid grid-cols-2 gap-2">
-        <Button className="text-subhead!" onClick={() => setCard(true)}><ReceiptText className="h-5 w-5" aria-hidden />{t.guide.orderCard}</Button>
+        {blocked.length === 0 && <Button className="text-subhead!" onClick={() => { setCard(true); track("order_card_shown", { dishes: 1, source: "guide" }); }}><ReceiptText className="h-5 w-5" aria-hidden />{t.guide.orderCard}</Button>}
         <Button variant="soft" className="text-subhead!" onClick={() => onFind(d.zh)}><Search className="h-5 w-5" aria-hidden />{t.guide.whereToEat}</Button>
       </div>
       <Feedback city={city} kind="dish" name={d.zh} />
-      {card && <ShowCard lines={lines} explain={fmt(t.guide.orderExplain, { dish: pick(d.name, p.lang) })} onClose={() => setCard(false)} />}
+      {card && <ShowCard kind="order" lead={severe || undefined} lines={lines} rest={rest} explain={fmt(t.guide.orderExplain, { dish: pick(d.name, p.lang) })}
+        replies={[{ zh: "可以，没问题", mine: t.eat.replyOk }, { zh: "这道菜做不了", mine: t.eat.replyCant }, ...(p.allergens.length ? [{ zh: "里面有您过敏的东西", mine: t.eat.replyContainsAny }] : [])]}
+        onClose={() => setCard(false)} />}
     </Card>
   );
 }

@@ -1,6 +1,7 @@
 import { pinyin } from "pinyin-pro";
 import { config, demo } from "./config";
 import * as mock from "./demo";
+import { Unavailable } from "./errors";
 
 // Amap (高德) Web Service API. Docs: https://lbs.amap.com/api/webservice/summary
 const BASE = "https://restapi.amap.com";
@@ -25,6 +26,7 @@ export type Place = {
 };
 
 async function amap<T>(path: string, params: Record<string, string | undefined>): Promise<T> {
+  if (!config.amapKey) throw new Unavailable("map");
   const qs = new URLSearchParams({ key: config.amapKey });
   for (const [k, v] of Object.entries(params)) if (v) qs.set(k, v);
   const res = await fetch(`${BASE}${path}?${qs}`, { next: { revalidate: 300 } });

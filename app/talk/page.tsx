@@ -7,7 +7,7 @@ import { Mic, Volume2, Maximize2, ArrowLeftRight, CarTaxiFront, ShieldAlert, Sir
 import { Screen, DemoNote } from "@/components/Shell";
 import { Section, Card, Group, Row, Note, IconTile } from "@/components/ui";
 import { HotelCard } from "@/components/HotelCard";
-import { staffCardZh } from "@/lib/allergens";
+import { allergyLinesZh } from "@/lib/allergens";
 import { useProfile } from "@/components/useProfile";
 import { useT } from "@/components/useT";
 import { ShowCard } from "@/components/ShowCard";
@@ -43,6 +43,7 @@ export default function TalkPage() {
   const [listening, setListening] = useState(false);
   const [group, setGroup] = useState<(typeof PHRASES)[number]["group"]>("basics");
   const [card, setCard] = useState<string[] | null>(null);
+  const [allergyCard, setAllergyCard] = useState(false);
   const router = useRouter();
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const hasRestrictions = profile.allergens.length + profile.diets.length > 0;
@@ -123,7 +124,7 @@ export default function TalkPage() {
             icon={<IconTile tone="danger"><ShieldAlert className="h-5 w-5" aria-hidden /></IconTile>}
             title={t.today.allergyCard}
             sub={hasRestrictions ? t.today.allergyCardSub : t.today.allergyCardEmpty}
-            onClick={() => (hasRestrictions ? setCard(staffCardZh(profile.allergens, profile.diets, profile.severe)) : router.push("/settings#allergies"))}
+            onClick={() => (hasRestrictions ? setAllergyCard(true) : router.push("/settings#allergies"))}
           />
           <HotelCard bare />
           <Row href="/sos" icon={<IconTile tone="danger"><Siren className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.help} sub={t.today.helpSub} />
@@ -153,6 +154,11 @@ export default function TalkPage() {
         </Group>
       </Section>
       {card && <ShowCard lines={card} onClose={() => setCard(null)} />}
+      {allergyCard && (() => {
+        const { severe, rest } = allergyLinesZh(profile.allergens, profile.diets, profile.severe);
+        return <ShowCard kind="allergy" lead={severe || undefined} lines={["您好！我有饮食限制，麻烦您帮忙确认，谢谢！"]} rest={rest}
+          replies={[{ zh: "可以，没问题", mine: t.eat.replyOk }, { zh: "里面有您过敏的东西", mine: t.eat.replyContainsAny }]} onClose={() => setAllergyCard(false)} />;
+      })()}
     </Screen>
   );
 }

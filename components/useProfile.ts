@@ -4,6 +4,8 @@ import type { EntryType } from "@/lib/stay";
 import { LANGUAGES } from "@/lib/languages";
 import { currencyFor, guessCountry } from "@/lib/visa";
 
+export type TripCity = { a: string; e: string; s: string; n?: string; p?: string; from?: string; to?: string };
+
 export type Profile = {
   lang: string;
   allergens: string[];
@@ -23,7 +25,8 @@ export type Profile = {
   hotel: { name: string; address: string; nameEn?: string } | null; // "back to my hotel" card
   allergiesAsked: boolean; // the first-visit allergy sheet on Eat has been answered
   severe: string[]; // allergens where even a trace is dangerous
-  cities: { a: string; e: string; s: string }[]; // destination cities: adcode, English, Chinese short name
+  /** Destination cities: adcode, English, Chinese short + full name, province; optional dates there. */
+  cities: TripCity[];
 };
 
 const DEFAULT: Profile = {

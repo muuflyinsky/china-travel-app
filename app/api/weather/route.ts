@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { errorResponse } from "@/lib/errors";
 import { weather } from "@/lib/amap";
 
 export async function GET(req: Request) {
@@ -6,6 +7,6 @@ export async function GET(req: Request) {
   try {
     return NextResponse.json(await weather(adcode));
   } catch (e) {
-    return NextResponse.json({ error: (e as Error).message }, { status: 502 });
+    return errorResponse(e, "weather");
   }
 }

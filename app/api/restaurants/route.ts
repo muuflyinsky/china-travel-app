@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { errorResponse } from "@/lib/errors";
 import { awardLists, awardRestaurants } from "@/lib/restaurants";
 import { demo } from "@/lib/config";
 
@@ -9,6 +10,6 @@ export async function GET(req: Request) {
   try {
     return NextResponse.json({ restaurants: await awardRestaurants(city), lists: awardLists(), demo: demo.maps }, { headers: { "cache-control": "public, max-age=3600" } });
   } catch (e) {
-    return NextResponse.json({ error: (e as Error).message }, { status: 502 });
+    return errorResponse(e, "restaurants");
   }
 }

@@ -9,6 +9,7 @@ import { fmt } from "@/lib/i18n";
 import { goLink } from "@/lib/affiliate";
 import { downloadIcs, icsEvent } from "@/lib/ics";
 import { saveReminder } from "@/lib/reminders";
+import { track } from "@/lib/track";
 import { RESERVATION_SOURCE, releaseAt, type Reservation } from "@/lib/reservations";
 import { addDays, todayIso } from "@/lib/stay";
 
@@ -31,6 +32,7 @@ export function ReservationSheet({ r, open, onClose }: { r: Reservation; open: b
     const title = fmt(t.resv.alarmTitle, { name: r.en });
     downloadIcs(icsEvent({ start: at, title, body: `${r.zh}\n${r.url ?? r.guide}`, uid: `${r.id}-${visit}`, url: r.url ?? r.guide }), `${r.id}-tickets.ics`);
     saveReminder({ id: r.id, visit, at: at.toISOString() });
+    track("resv_alarm_added", { sight: r.id });
     setSaved(true);
   }
 

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { errorResponse } from "@/lib/errors";
 import { extractHotel } from "@/lib/llm";
 import { demo } from "@/lib/config";
 
@@ -16,6 +17,6 @@ export async function POST(req: Request) {
     if (!h.found || !h.name_zh || !h.address_zh) return NextResponse.json({ error: "not_found" }, { status: 422 });
     return NextResponse.json({ name: h.name_zh, address: h.address_zh, nameEn: h.name_en || undefined });
   } catch (e) {
-    return NextResponse.json({ error: (e as Error).message }, { status: 502 });
+    return errorResponse(e, "hotel");
   }
 }

@@ -2,12 +2,14 @@
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Preloader } from "konsta/react";
-import { MapPin, Minus, Plus, ExternalLink } from "lucide-react";
+import { MapPin, Minus, Plus, ExternalLink, Check, TrainFront, Sparkles } from "lucide-react";
 import { Screen, DemoNote } from "@/components/Shell";
 import { Section, Group, Field, Note, Seg } from "@/components/ui";
 import { EditSheet } from "@/components/EditSheet";
 import { CityPicker } from "@/components/CityPicker";
 import { FeaturedHotel, HotelRow, useHotelPicks } from "@/components/HotelPicks";
+import { useGuide } from "@/components/CityGuide";
+import { pick } from "@/lib/city-guide-types";
 import { useCity } from "@/components/useCity";
 import { useProfile } from "@/components/useProfile";
 import { useFx, formatMoney } from "@/components/useFx";
@@ -44,8 +46,23 @@ function Stay() {
     }
   }, [loaded]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // A trip city with its own dates fills them in (from today if the stay has already started).
+  useEffect(() => {
+    const tc = profile.cities.find((x) => x.a === city?.a);
+    if (!tc?.from || !tc.to || tc.to <= todayIso()) return;
+    const start = tc.from > todayIso() ? tc.from : todayIso();
+    setCheckin(start);
+    setCheckout(tc.to > start ? tc.to : addDays(start, 1));
+  }, [city?.a, profile.cities]);
+
   const c = city ?? { a: here.a, e: here.e, s: here.s };
-  const { data, error } = useHotelPicks(c.a, c.s);
+  // Areas first (SPEC v0.5): 2–3 places first-time visitors stay, from the city guide.
+  const { g: guide } = useGuide(c.a);
+  const areas = guide?.areas ?? [];
+  const [areaIdx, setAreaIdx] = useState(0);
+  useEffect(() => setAreaIdx(0), [c.a]);
+  const area = areas[areaIdx];
+  const { data, error } = useHotelPicks(c.a, c.s, area?.location);
   const nights = Math.max(1, daysBetween(checkin, checkout));
   const guests = profile.guests;
   const link = { city: c.s, cityEn: c.e, checkin, checkout, adults: guests };
@@ -61,8 +78,18 @@ function Stay() {
     return `${cny} · ≈ ${hi === null ? `${home(lo)}+` : `${home(lo)}–${home(hi)}`}`;
   }, [data, tier, fx, profile.homeCurrency, profile.lang]);
 
-  const picks = data?.tiers[tier] ?? [];
+  // An empty tier never dead-ends: show the nearest tier that has picks (cheaper first on a tie) and say so.
+  const shownTier = useMemo<TierId>(() => {
+    if (!data || data.tiers[tier].length) return tier;
+    const i = TIER_IDS.indexOf(tier);
+    for (let d = 1; d < TIER_IDS.length; d++) {
+      for (const j of [i - d, i + d]) if (TIER_IDS[j] && data.tiers[TIER_IDS[j]].length) return TIER_IDS[j];
+    }
+    return tier;
+  }, [data, tier]);
+  const picks = data?.tiers[shownTier] ?? [];
   const [top, ...rest] = picks;
+  const tagBase = `stay-${area ? `a${areaIdx + 1}-` : ""}${shownTier}`;
 
   return (
     <Screen title={t.stay.title}>
@@ -79,15 +106,37 @@ function Stay() {
         </button>
       </Section>
 
+      {areas.length > 0 && (
+        <Section title={t.stay.whereToStay} aside={<span className="flex items-center gap-1 text-footnote text-muted"><Sparkles className="h-3.5 w-3.5" aria-hidden />{t.stay.aiPick}</span>}>
+          <Group>
+            {areas.map((a, i) => (
+              <li key={a.zh}>
+                <button onClick={() => setAreaIdx(i)} aria-pressed={i === areaIdx} className="flex w-full items-start gap-3 px-4 py-3 text-left">
+                  <span className={`mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full border-2 ${i === areaIdx ? "border-cobalt bg-cobalt text-white dark:text-porcelain" : "border-line"}`}>
+                    {i === areaIdx && <Check className="h-3.5 w-3.5" strokeWidth={3} aria-hidden />}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-body">{pick(a.name, profile.lang)} <span className="zh text-muted">{a.zh}</span></span>
+                    {i === areaIdx && <span className="mt-0.5 block text-footnote text-muted">{pick(a.reason, profile.lang)}</span>}
+                    <span className="mt-0.5 flex items-center gap-1 text-footnote text-muted"><TrainFront className="h-3.5 w-3.5 text-cobalt" aria-hidden />{fmt(t.stay.metroCount, { n: a.metro })}</span>
+                  </span>
+                </button>
+              </li>
+            ))}
+          </Group>
+        </Section>
+      )}
+
       <Section>
         <Seg value={tier} onChange={setTier} label={t.stay.priceRange} options={TIER_IDS.map((id) => ({ value: id, label: t.stay.tiers[id] }))} />
         <p className="px-1 text-footnote text-muted tabular-nums">{fmt(t.stay.perNight, { price: range })}</p>
         <DemoNote show={data?.demo} what={t.common.mapKey} />
         {!data && !error && <div className="flex justify-center py-8"><Preloader /></div>}
         {error && <Note tone="warn">{t.stay.picksDown}</Note>}
+        {data && shownTier !== tier && <Note>{fmt(t.stay.tierFallback, { tier: t.stay.tiers[tier], other: t.stay.tiers[shownTier] })}</Note>}
         {data && !top && <p className="px-1 text-subhead text-muted">{t.stay.noneTier}</p>}
-        {top && <FeaturedHotel h={top} label={fmt(t.stay.pick, { tier: t.stay.tiers[tier] })} link={link} tag={`stay-${tier}-1`} />}
-        {rest.length > 0 && <Group>{rest.map((h, i) => <HotelRow key={h.id} h={h} link={link} tag={`stay-${tier}-${i + 2}`} />)}</Group>}
+        {top && <FeaturedHotel h={top} label={fmt(t.stay.pick, { tier: t.stay.tiers[shownTier] })} link={link} tag={`${tagBase}-1`} />}
+        {rest.length > 0 && <Group>{rest.map((h, i) => <HotelRow key={h.id} h={h} link={link} tag={`${tagBase}-${i + 2}`} />)}</Group>}
       </Section>
 
       <Section>

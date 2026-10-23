@@ -2,6 +2,7 @@ import type { Dict } from "./en";
 
 export const es: Dict = {
   common: {
+    unavailable: "No disponible por ahora. Inténtalo más tarde.",
     skip: "Omitir",
     aiKey: "la clave de IA",
     mapKey: "la clave de mapas",
@@ -17,7 +18,7 @@ export const es: Dict = {
     back: "Atrás",
   },
   tabs: { today: "Hoy", eat: "Comer", go: "Explorar", stay: "Dormir", talk: "Hablar" },
-  show: { title: "Muestra esta pantalla", play: "Reproducir en chino" },
+  show: { title: "Muestra esta pantalla", play: "Reproducir en chino", whatItSays: "Qué dice esta tarjeta" },
   mode: {
     question: "¿Dónde estás ahora?",
     planning: "Preparando mi viaje",
@@ -43,6 +44,17 @@ export const es: Dict = {
     near: "cerca de {city}",
   },
   today: {
+    tileMenu: "Escanear menú",
+    tileMenuSub: "Traducido y revisado por alergias",
+    tileDriver: "Mostrar al taxista",
+    tileDriverAdd: "Añade tu hotel con una captura de la reserva",
+    tilePay: "Pagar",
+    tilePaySub: "Alipay · WeChat · conversor",
+    tileToday: "Hoy",
+    tileTodaySub: "Lo mejor de {city}",
+    tileTodayAlarm: "{name} · entradas {when}",
+    driverElse: "Otro destino: lugar o dirección",
+    getReadySub: "Pagos, datos móviles, apps, trenes",
     hotelsFor: "Hoteles en {city}",
     addCities: "Añade las ciudades que visitarás",
     addCitiesSub: "Elegiremos hoteles de cada rango de precio en cada ciudad",
@@ -90,6 +102,10 @@ export const es: Dict = {
     stayTrackSub: "Añade tu fecha de entrada y te recordaremos cuándo salir",
   },
   stay: {
+    whereToStay: "Dónde alojarse",
+    aiPick: "Recomendado por IA",
+    metroCount: "{n} estaciones de metro a menos de 1 km",
+    tierFallback: "No hay selección {tier} en esta zona. Mostramos {other}.",
     tiers: {"economy": "Económico", "comfort": "Confort", "upscale": "Superior", "luxury": "Lujo"},
     priceRange: "Rango de precio",
     perNight: "{price} por noche",
@@ -139,6 +155,8 @@ export const es: Dict = {
     onMap: "{name} en el mapa",
   },
   eat: {
+    blockedSevere: "Lleva {x} como ingrediente principal. No recomendado con alergia grave.",
+    replyContainsAny: "Lleva algo a lo que eres alérgico",
     add: "Añadir",
     inOrder: "En el pedido",
     askWithout: "Pedir sin {x}",
@@ -169,7 +187,7 @@ export const es: Dict = {
     checkingFor: "Comprobando",
     addRestrictions: "Añade alergias y dieta para recibir avisos",
     reading: "Leyendo cada plato… tarda entre 10 y 40 segundos",
-    error: "No pudimos leer el menú. Prueba con una foto más nítida y bien iluminada, o escribe los platos.",
+    error: "No se ha leído bien. Haz la foto otra vez o escribe los platos.",
     dishes: "{type} · {n} platos",
     notForYou: "{n} no aptos para ti",
     all: "Todos",
@@ -193,6 +211,8 @@ export const es: Dict = {
     approx: "≈ {amount}",
   },
   go: {
+    findPlace: "Buscar un lugar",
+    otherCity: "Otra ciudad",
     openAmap: "Cómo llegar en Amap",
     amapNote: "Amap muestra rutas de metro, autobús y a pie en tiempo real, en inglés.",
     back: "Volver a los resultados",
@@ -240,6 +260,9 @@ export const es: Dict = {
     groups: { basics: "Básico", eating: "Comer", around: "Moverse", hotel: "Hotel", emergency: "Emergencia" },
   },
   settings: {
+    cityFrom: "desde",
+    cityTo: "hasta",
+    cityDatesNote: "Opcional: los días en cada ciudad. Así Hoy muestra la ciudad correcta cada día.",
     you: "Tú",
     add: "Añadir",
     dates: "Fechas",
@@ -361,7 +384,7 @@ export const es: Dict = {
     sightsBody: "Lugares como la Ciudad Prohibida o el Museo Nacional exigen reserva nominal con pasaporte, a menudo con días de antelación.",
     tickets: "Entradas en {city}",
     hotels: "Hoteles",
-    hotelsBody: "Elige hoteles autorizados para alojar extranjeros.",
+    hotelsBody: "Cadenas hoteleras · suelen aceptar huéspedes extranjeros",
     hotelsLink: "Buscar hoteles",
     good: "Conviene saber",
     goodItems: {
@@ -382,7 +405,7 @@ export const es: Dict = {
   },
   visa: {
     title: "¿Puedo entrar sin visado?",
-    confirm: "¿Tienes pasaporte de {country}?",
+    confirm: "Tu pasaporte: {country}, ¿correcto?",
     yes: "Sí",
     change: "Cambiar",
     ordinary: "Para pasaportes ordinarios",
@@ -444,6 +467,9 @@ export const es: Dict = {
     "mustEatSub": "5 platos locales, con alérgenos y dónde encontrarlos"
   },
   resv: {
+    opensRule: "Entradas a las {time} hora de Pekín, {n} días antes",
+    opensDays: "Las reservas abren unos {n} días antes",
+    noRelease: "Reserva con tu pasaporte",
     "visitDate": "Día de la visita",
     "forDate": "Las entradas para el {date} salen a la venta",
     "beijing": "Tu hora · {time} en Pekín",

@@ -2,6 +2,7 @@ import type { Dict } from "./en";
 
 export const ja: Dict = {
   common: {
+    unavailable: "現在ご利用いただけません。しばらくしてからお試しください。",
     skip: "スキップ",
     aiKey: "AIのキー",
     mapKey: "地図のキー",
@@ -17,7 +18,7 @@ export const ja: Dict = {
     back: "戻る",
   },
   tabs: { today: "今日", eat: "食事", go: "探す", stay: "宿泊", talk: "会話" },
-  show: { title: "この画面を見せてください", play: "中国語で読み上げる" },
+  show: { title: "この画面を見せてください", play: "中国語で読み上げる", whatItSays: "カードの内容" },
   mode: {
     question: "いまどちらにいますか？",
     planning: "旅行の準備中",
@@ -43,6 +44,17 @@ export const ja: Dict = {
     near: "{city}近郊",
   },
   today: {
+    tileMenu: "メニューを読む",
+    tileMenuSub: "翻訳とアレルギーチェック",
+    tileDriver: "運転手に見せる",
+    tileDriverAdd: "予約のスクショでホテルを追加",
+    tilePay: "支払う",
+    tilePaySub: "Alipay · WeChat · 換算",
+    tileToday: "今日",
+    tileTodaySub: "{city}のおすすめ5選",
+    tileTodayAlarm: "{name} · {when}販売開始",
+    driverElse: "ほかの行き先：場所や住所",
+    getReadySub: "支払い、モバイルデータ、アプリ、列車",
     hotelsFor: "{city}のホテル",
     addCities: "訪れる都市を追加",
     addCitiesSub: "都市ごとに各価格帯のホテルを選びます",
@@ -90,6 +102,10 @@ export const ja: Dict = {
     stayTrackSub: "入国日を登録すると出国期限をお知らせします",
   },
   stay: {
+    whereToStay: "泊まるエリア",
+    aiPick: "AIのおすすめ",
+    metroCount: "1 km以内に地下鉄駅{n}つ",
+    tierFallback: "このエリアに{tier}のおすすめはありません。代わりに{other}を表示しています。",
     tiers: {"economy": "エコノミー", "comfort": "スタンダード", "upscale": "アッパー", "luxury": "ラグジュアリー"},
     priceRange: "価格帯",
     perNight: "1泊 {price}",
@@ -139,6 +155,8 @@ export const ja: Dict = {
     onMap: "{name}を地図で見る",
   },
   eat: {
+    blockedSevere: "主材料に{x}が入っています。重いアレルギーがある方にはおすすめしません。",
+    replyContainsAny: "アレルギーの食材が入っています",
     add: "追加",
     inOrder: "注文に追加済み",
     askWithout: "{x}抜きで頼む",
@@ -169,7 +187,7 @@ export const ja: Dict = {
     checkingFor: "チェック中：",
     addRestrictions: "アレルギーと食事制限を登録すると警告が表示されます",
     reading: "料理を読み取り中…10〜40秒かかります",
-    error: "メニューを読み取れませんでした。明るい場所で鮮明に撮り直すか、料理名を入力してください。",
+    error: "うまく読み取れませんでした。もう一度撮るか、料理名を入力してください。",
     dishes: "{type} · {n}品",
     notForYou: "{n}品は不適",
     all: "すべて",
@@ -193,6 +211,8 @@ export const ja: Dict = {
     approx: "≈ {amount}",
   },
   go: {
+    findPlace: "場所を探す",
+    otherCity: "ほかの都市",
     openAmap: "Amapで経路を見る",
     amapNote: "Amapは地下鉄・バス・徒歩のリアルタイム経路を英語で表示します。",
     back: "検索結果に戻る",
@@ -240,6 +260,9 @@ export const ja: Dict = {
     groups: { basics: "基本", eating: "食事", around: "移動", hotel: "ホテル", emergency: "緊急" },
   },
   settings: {
+    cityFrom: "から",
+    cityTo: "まで",
+    cityDatesNote: "任意：各都市に滞在する日。「今日」に毎日その日の都市が表示されます。",
     you: "あなた",
     add: "追加",
     dates: "日程",
@@ -361,7 +384,7 @@ export const ja: Dict = {
     sightsBody: "故宮や国家博物館などの人気観光地は、パスポートでの実名予約が必要で、数日前に埋まることも多いです。",
     tickets: "{city}のチケット",
     hotels: "ホテル",
-    hotelsBody: "外国人が宿泊できるホテルを選びましょう。",
+    hotelsBody: "チェーンホテル · 通常は外国人も宿泊可",
     hotelsLink: "ホテルを探す",
     good: "知っておくと便利",
     goodItems: {
@@ -382,7 +405,7 @@ export const ja: Dict = {
   },
   visa: {
     title: "ビザなしで入国できますか？",
-    confirm: "{country}のパスポートをお持ちですか？",
+    confirm: "パスポート：{country}でよろしいですか？",
     yes: "はい",
     change: "変更",
     ordinary: "一般旅券が対象",
@@ -444,6 +467,9 @@ export const ja: Dict = {
     "mustEatSub": "郷土料理5品。アレルゲンと食べられる店も"
   },
   resv: {
+    opensRule: "北京時間{time}、{n}日前に販売開始",
+    opensDays: "約{n}日前から予約可能",
+    noRelease: "パスポートで事前に予約",
     "visitDate": "訪問日",
     "forDate": "{date}のチケット販売開始",
     "beijing": "あなたの時刻 · 北京時間{time}",

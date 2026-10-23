@@ -6,7 +6,7 @@ import { Section, Group, Row, Field, Note } from "@/components/ui";
 import { EditSheet } from "@/components/EditSheet";
 import { CountryPicker, useCountryName } from "@/components/VisaCheck";
 import { CityPicker } from "@/components/CityPicker";
-import { useProfile } from "@/components/useProfile";
+import { useProfile, type TripCity } from "@/components/useProfile";
 import { useT } from "@/components/useT";
 import { LANGUAGES, langName } from "@/lib/languages";
 import { ALLERGENS, COMMON_ALLERGENS, DIETS } from "@/lib/allergens";
@@ -155,20 +155,34 @@ export default function SettingsPage() {
 
       <EditSheet open={sheet === "cities"} title={t.settings.cities} onClose={close}>
         <Group>
-          {p.cities.map((c) => (
-            <li key={c.a} className="flex min-h-12 items-center gap-2 pl-4">
-              <span className="flex-1 text-body">{c.e} <span className="zh text-muted">{c.s}</span></span>
-              <button onClick={() => set({ cities: p.cities.filter((x) => x.a !== c.a) })} aria-label={`${t.common.close}: ${c.e}`} className="grid h-11 w-11 place-items-center text-muted"><X className="h-5 w-5" /></button>
-            </li>
-          ))}
+          {p.cities.map((c) => {
+            const patch = (x: Partial<TripCity>) => set({ cities: p.cities.map((y) => (y.a === c.a ? { ...y, ...x } : y)) });
+            return (
+              <li key={c.a} className="py-1 pl-4">
+                <div className="flex min-h-12 items-center gap-2">
+                  <span className="flex-1 text-body">{c.e} <span className="zh text-muted">{c.s}</span></span>
+                  <button onClick={() => set({ cities: p.cities.filter((x) => x.a !== c.a) })} aria-label={`${t.common.close}: ${c.e}`} className="grid h-11 w-11 place-items-center text-muted"><X className="h-5 w-5" /></button>
+                </div>
+                {/* Optional: lets Today pick the right city on each day of the trip. */}
+                <div className="flex items-center gap-2 pr-4 pb-2 text-subhead text-muted">
+                  <input type="date" aria-label={`${c.e}: ${t.settings.cityFrom}`} value={c.from ?? ""} min={p.arrival || undefined} max={p.departure || undefined}
+                    onChange={(e) => patch({ from: e.target.value || undefined })} className="min-w-0 flex-1 rounded-lg bg-porcelain px-2 py-1.5 text-ink" />
+                  –
+                  <input type="date" aria-label={`${c.e}: ${t.settings.cityTo}`} value={c.to ?? ""} min={c.from || p.arrival || undefined} max={p.departure || undefined}
+                    onChange={(e) => patch({ to: e.target.value || undefined })} className="min-w-0 flex-1 rounded-lg bg-porcelain px-2 py-1.5 text-ink" />
+                </div>
+              </li>
+            );
+          })}
           <li>
             <CityPicker value={DEFAULT_CITY} label={t.settings.addCity}
-              onChange={(c) => { if (!p.cities.some((x) => x.a === c.a)) set({ cities: [...p.cities, { a: c.a, e: c.e, s: c.s }] }); }}
+              onChange={(c) => { if (!p.cities.some((x) => x.a === c.a)) set({ cities: [...p.cities, { a: c.a, e: c.e, s: c.s, n: c.n, p: c.p }] }); }}
               trigger={(open) => (
                 <button onClick={open} className="flex min-h-12 w-full items-center gap-2 px-4 text-body text-cobalt"><Plus className="h-5 w-5" aria-hidden />{t.settings.addCity}</button>
               )} />
           </li>
         </Group>
+        <p className="px-1 text-footnote text-muted">{t.settings.cityDatesNote}</p>
       </EditSheet>
 
       <EditSheet open={sheet === "allergies"} title={t.settings.allergies} onClose={close}>

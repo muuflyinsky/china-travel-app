@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { errorResponse } from "@/lib/errors";
 import { cityGuide } from "@/lib/city-guide";
 import { HOT_CITIES } from "@/lib/hot-cities";
 import { demo } from "@/lib/config";
@@ -18,6 +19,6 @@ export async function GET(req: Request) {
     const guide = await cityGuide(city.a, city.s, city.e, refresh);
     return NextResponse.json({ ...guide, demo: demo.maps || demo.ai }, { headers: { "cache-control": "public, max-age=3600" } });
   } catch (e) {
-    return NextResponse.json({ error: (e as Error).message }, { status: 502 });
+    return errorResponse(e, "city-guide");
   }
 }

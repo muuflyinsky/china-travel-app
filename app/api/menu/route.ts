@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { errorResponse } from "@/lib/errors";
 import { analyzeMenu } from "@/lib/llm";
 import { demo } from "@/lib/config";
 import { menu as demoMenu } from "@/lib/demo";
@@ -13,6 +14,6 @@ export async function POST(req: Request) {
     const menu = await analyzeMenu({ imageBase64: body.image, mediaType: body.mediaType, text: body.text, lang: body.lang ?? "en", city: body.city?.slice(0, 80) });
     return NextResponse.json(menu);
   } catch (e) {
-    return NextResponse.json({ error: (e as Error).message }, { status: 502 });
+    return errorResponse(e, "menu");
   }
 }

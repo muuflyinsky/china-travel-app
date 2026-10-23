@@ -7,13 +7,14 @@ import { ShowCard } from "./ShowCard";
 import { useProfile } from "./useProfile";
 import { useT } from "./useT";
 import { compressImage } from "@/lib/image";
+import { track } from "@/lib/track";
 
 /** "Back to my hotel": one photo of the booking, then a one-tap taxi card forever after. */
 export function HotelCard({ bare }: { bare?: boolean } = {}) {
   const t = useT();
   const [p, set] = useProfile();
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<boolean | "unavailable">(false);
   const [card, setCard] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -24,10 +25,10 @@ export function HotelCard({ bare }: { bare?: boolean } = {}) {
       const img = await compressImage(f);
       const r = await fetch("/api/hotel", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ image: img.data, mediaType: img.mediaType }) });
       const d = await r.json();
-      if (!r.ok) throw new Error();
+      if (!r.ok) throw new Error(r.status === 503 ? "unavailable" : "");
       set({ hotel: { name: d.name, address: d.address, nameEn: d.nameEn } });
-    } catch {
-      setError(true);
+    } catch (e) {
+      setError((e as Error).message === "unavailable" ? "unavailable" : true);
     } finally {
       setBusy(false);
       if (fileRef.current) fileRef.current.value = "";
@@ -35,10 +36,10 @@ export function HotelCard({ bare }: { bare?: boolean } = {}) {
   }
 
   const input = <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => onFile(e.target.files?.[0])} />;
-  const show = card && p.hotel && <ShowCard lines={["师傅您好，请带我回酒店：", p.hotel.name, `地址：${p.hotel.address}`]} sub={p.hotel.nameEn} onClose={() => setCard(false)} />;
+  const show = card && p.hotel && <ShowCard kind="hotel" lines={["师傅您好，请带我回酒店：", p.hotel.name, `地址：${p.hotel.address}`]} sub={p.hotel.nameEn} onClose={() => setCard(false)} />;
   const rows = p.hotel ? (
     <>
-      <Row onClick={() => setCard(true)} icon={<IconTile><BedDouble className="h-5 w-5" aria-hidden /></IconTile>}
+      <Row onClick={() => { setCard(true); track("hotel_card_shown", {}); }} icon={<IconTile><BedDouble className="h-5 w-5" aria-hidden /></IconTile>}
         title={t.hotel.back} sub={<span className="zh">{p.hotel.nameEn ? `${p.hotel.nameEn} · ` : ""}{p.hotel.name}</span>} />
       <Row onClick={() => fileRef.current?.click()} icon={<Camera className="h-5 w-5 text-muted" aria-hidden />} title={<span className="text-subhead text-cobalt">{t.hotel.change}</span>} chevron={false} />
     </>
@@ -52,7 +53,7 @@ export function HotelCard({ bare }: { bare?: boolean } = {}) {
     return (
       <>
         {rows}
-        {error && <li className="px-4 pb-3"><Note tone="warn">{t.hotel.error}</Note></li>}
+        {error && <li className="px-4 pb-3"><Note tone="warn">{error === "unavailable" ? t.common.unavailable : t.hotel.error}</Note></li>}
         <li className="contents">{input}{show}</li>
       </>
     );
@@ -61,7 +62,7 @@ export function HotelCard({ bare }: { bare?: boolean } = {}) {
     <>
       {input}
       <Group>{rows}</Group>
-      {error && <Note tone="warn">{t.hotel.error}</Note>}
+      {error && <Note tone="warn">{error === "unavailable" ? t.common.unavailable : t.hotel.error}</Note>}
       {show}
     </>
   );

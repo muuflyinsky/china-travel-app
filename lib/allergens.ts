@@ -36,16 +36,51 @@ export const DIETS = [
 
 export type DietId = (typeof DIETS)[number]["id"];
 
-/** `severe` = even a trace is dangerous, so the card also asks for clean pans and utensils. */
-export function staffCardZh(allergens: string[], diets: string[], severe: string[] = []) {
-  const lines: string[] = ["您好！我有饮食限制，麻烦您帮忙确认，谢谢！"];
-  const a = ALLERGENS.filter((x) => allergens.includes(x.id));
-  if (a.length) {
-    lines.push(`我对以下食物过敏：${a.map((x) => x.zh).join("、")}。请不要放这些材料。`);
-    const s = a.filter((x) => severe.includes(x.id));
-    if (s.length) lines.push(`其中${s.map((x) => x.zh.split("（")[0]).join("、")}我严重过敏，一点点都不能吃。请用干净的锅和工具，也不要用接触过它们的油和调料。`);
+type DishLike = { allergens: string[]; ingredients?: { role?: string; allergens?: string[] }[] };
+
+/**
+ * Allergens that come from a main ingredient — the dish can't be made without them, so "ask
+ * them to leave it out" isn't a real option. Conservative: an allergen we can't trace to a
+ * sauce or garnish counts as main.
+ */
+export function mainAllergens(d: DishLike) {
+  const traced = new Map<string, boolean>(); // allergen → only in sauce/garnish?
+  for (const ing of d.ingredients ?? []) {
+    for (const a of ing.allergens ?? []) traced.set(a, (traced.get(a) ?? true) && (ing.role === "sauce" || ing.role === "garnish"));
   }
-  for (const d of DIETS.filter((x) => diets.includes(x.id))) lines.push(d.zh + "。");
-  lines.push("如果不确定菜里有没有，请告诉我，我换一道菜。非常感谢！");
-  return lines;
+  return d.allergens.filter((a) => traced.get(a) !== true);
+}
+
+/** The traveller's severe allergens that are a main ingredient of this dish: don't let them order it. */
+export const blockedBySevere = (d: DishLike, severe: string[]) => mainAllergens(d).filter((a) => severe.includes(a));
+
+const zhShort = (a: { zh: string }) => a.zh.split("（")[0];
+
+/**
+ * Allergy and diet lines for staff cards, most important first:
+ * `severe` is one short sentence for the top of the card; `rest` follows the dishes.
+ */
+export function allergyLinesZh(allergens: string[], diets: string[], severe: string[] = []) {
+  const a = ALLERGENS.filter((x) => allergens.includes(x.id));
+  const s = a.filter((x) => severe.includes(x.id));
+  const mild = a.filter((x) => !severe.includes(x.id));
+  const rest: string[] = [];
+  if (mild.length) rest.push(`我对${mild.map((x) => x.zh).join("、")}过敏，请不要放。`);
+  if (s.length) rest.push(`请用干净的锅和工具，也不要用接触过${s.map(zhShort).join("、")}的油和调料。`);
+  for (const d of DIETS.filter((x) => diets.includes(x.id))) rest.push(d.zh + "。");
+  return {
+    severe: s.length ? `我对${s.map(zhShort).join("、")}严重过敏，一点点都不能吃！` : "",
+    rest,
+  };
+}
+
+/** The standalone allergy card (Talk, Eat): severe sentence first, then the rest. */
+export function staffCardZh(allergens: string[], diets: string[], severe: string[] = []) {
+  const { severe: top, rest } = allergyLinesZh(allergens, diets, severe);
+  return [
+    ...(top ? [top] : []),
+    "您好！我有饮食限制，麻烦您帮忙确认，谢谢！",
+    ...rest,
+    "如果不确定菜里有没有，请告诉我，我换一道菜。非常感谢！",
+  ];
 }

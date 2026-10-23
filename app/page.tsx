@@ -2,8 +2,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
-  Camera, Search, Siren, Check, CalendarClock, CalendarPlus, Plane, Smartphone, Wallet, LayoutGrid, Ticket, Lightbulb, BedDouble,
-  Sun, CloudSun, Cloud, CloudRain, CloudLightning, Snowflake, CloudFog, ChevronRight, ChevronDown, Calculator, LogIn, Receipt, PlaneTakeoff,
+  Camera, Search, Siren, Check, CalendarClock, CalendarPlus, Plane, Smartphone, Wallet, LayoutGrid, Ticket, Lightbulb, BedDouble, CarTaxiFront,
+  Sun, CloudSun, Cloud, CloudRain, CloudLightning, Snowflake, CloudFog, ChevronRight, ChevronDown, LogIn, Receipt, PlaneTakeoff, ListChecks,
 } from "lucide-react";
 import { Screen, DemoNote } from "@/components/Shell";
 import { Section, Card, Group, Row, Button, IconTile } from "@/components/ui";
@@ -21,10 +21,13 @@ import { useProfile } from "@/components/useProfile";
 import { useCity } from "@/components/useCity";
 import { useT } from "@/components/useT";
 import { CityPicker } from "@/components/CityPicker";
+import { EditSheet } from "@/components/EditSheet";
+import { ReservationSheet } from "@/components/ReservationSheet";
+import { useRouter } from "next/navigation";
 import { stayStatus, stayReminderIcs, todayIso, daysBetween } from "@/lib/stay";
 import { tripPhase } from "@/lib/phase";
 import { upcomingReminders, type Reminder } from "@/lib/reminders";
-import { RESERVATIONS } from "@/lib/reservations";
+import { RESERVATIONS, type Reservation } from "@/lib/reservations";
 import { fmt } from "@/lib/i18n";
 
 type Weather = { casts: { date: string; dayweather: string; daytemp: string; nighttemp: string }[] };
@@ -43,13 +46,26 @@ function WeatherIcon({ zh }: { zh: string }) {
 const fmtDay = (iso: string, lang: string, month: "short" | "long" = "short") =>
   new Date(`${iso}T00:00:00Z`).toLocaleDateString(lang, { timeZone: "UTC", day: "numeric", month });
 
-/** Ticket releases the traveller set an alarm for, in the next 48 hours. */
-function ReleaseReminders() {
+/** How a sight's tickets are released, in one short line. */
+function releaseRule(t: ReturnType<typeof useT>, r: Reservation) {
+  return !r.release ? t.resv.noRelease
+    : r.release.time ? fmt(t.resv.opensRule, { time: r.release.time, n: r.release.days })
+    : fmt(t.resv.opensDays, { n: r.release.days });
+}
+
+/**
+ * Ticket alarms: releases the traveller set an alarm for (next 48 h), then sights in their trip
+ * cities that need a reservation and have no alarm yet.
+ */
+function Alarms({ suggest }: { suggest: boolean }) {
   const t = useT();
   const [p] = useProfile();
   const [list, setList] = useState<Reminder[]>([]);
-  useEffect(() => setList(upcomingReminders()), []);
-  if (!list.length) return null;
+  const [open, setOpen] = useState<Reservation | null>(null);
+  useEffect(() => setList(upcomingReminders()), [open]);
+  const cities = p.cities.map((c) => c.a);
+  const ideas = suggest ? RESERVATIONS.filter((r) => cities.includes(r.city) && !list.some((x) => x.id === r.id)) : [];
+  if (!list.length && !ideas.length) return null;
   return (
     <Section title={t.resv.reminders}>
       <Group>
@@ -61,7 +77,12 @@ function ReleaseReminders() {
               title={s.en} sub={fmt(t.resv.reminderLine, { date: fmtDay(r.visit, p.lang, "long"), when })} />
           );
         })}
+        {ideas.map((r) => (
+          <Row key={r.id} onClick={() => setOpen(r)} icon={<IconTile><Ticket className="h-5 w-5" aria-hidden /></IconTile>}
+            title={r.en} sub={releaseRule(t, r)} after={<span className="text-subhead font-semibold text-cobalt">{t.resv.alarm}</span>} chevron={false} />
+        ))}
       </Group>
+      {open && <ReservationSheet r={open} open onClose={() => setOpen(null)} />}
     </Section>
   );
 }
@@ -106,10 +127,11 @@ function Checklist() {
   const t = useT();
   const [done, setDone] = useState<string[]>([]);
   const [open, setOpen] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState(false);
   useEffect(() => {
     try { setDone(JSON.parse(localStorage.getItem("ctg.prep") ?? "[]")); } catch {}
     const h = location.hash.slice(1);
-    if (PREP.some((x) => x.key === h)) { setOpen(h); setTimeout(() => document.getElementById(h)?.scrollIntoView({ block: "start" }), 50); }
+    if (PREP.some((x) => x.key === h)) { setExpanded(true); setOpen(h); setTimeout(() => document.getElementById(h)?.scrollIntoView({ block: "start" }), 50); }
   }, []);
   const tick = (k: string) => {
     const n = done.includes(k) ? done.filter((x) => x !== k) : [...done, k];
@@ -117,6 +139,17 @@ function Checklist() {
     try { localStorage.setItem("ctg.prep", JSON.stringify(n)); } catch {}
   };
   const count = PREP.filter((x) => done.includes(x.key)).length;
+  // Collapsed to one row until opened: the prep list matters, but less than visa and hotels.
+  if (!expanded) {
+    return (
+      <Section>
+        <Group>
+          <Row onClick={() => setExpanded(true)} icon={<IconTile><ListChecks className="h-5 w-5" aria-hidden /></IconTile>}
+            title={fmt(t.today.getReady, { done: count, total: PREP.length })} sub={t.today.getReadySub} />
+        </Group>
+      </Section>
+    );
+  }
   return (
     <Section title={fmt(t.today.getReady, { done: count, total: PREP.length })}>
       <ul className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-card">
@@ -154,23 +187,16 @@ function BeforeTrip() {
         <VisaCheck />
         <p className="px-1 text-footnote text-muted">{t.prepare.arrivalCard}</p>
       </Section>
-      <Section>
-        <Link href="/settings#dates" className="flex items-center gap-3 rounded-2xl bg-cobalt p-4 text-white dark:text-porcelain">
-          <Plane className="h-6 w-6 shrink-0" aria-hidden />
-          <span className="flex-1 text-headline">
-            {days === null || days < 0 ? t.today.addArrival : fmt(t.today.arrivingIn, { n: days })}
-          </span>
-          <ChevronRight className="h-5 w-5 opacity-80" aria-hidden />
-        </Link>
+      <Section title={days === null || days < 0 ? undefined : fmt(t.today.arrivingIn, { n: days })}>
+        {(days === null || days < 0) && (
+          <Group>
+            <Row href="/settings#dates" icon={<IconTile><Plane className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.addArrival} />
+          </Group>
+        )}
         <CityHotels />
       </Section>
-      <ReleaseReminders />
+      <Alarms suggest />
       <Checklist />
-      <Section>
-        <Group>
-          <Row href="/menu" icon={<IconTile><Camera className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.tryMenu} sub={t.today.tryMenuSub} />
-        </Group>
-      </Section>
     </>
   );
 }
@@ -197,13 +223,7 @@ function StayCard() {
   const t = useT();
   const [p] = useProfile();
   const s = stayStatus(p.entryDate, p.entryType, p.visaDays);
-  if (!s) {
-    return (
-      <Group>
-        <Row href="/settings#entry" icon={<IconTile><CalendarClock className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.stayTrack} sub={t.today.stayTrackSub} />
-      </Group>
-    );
-  }
+  if (!s) return null;
   const download = () => {
     const blob = new Blob([stayReminderIcs(s.lastDay, t.stay.reminderTitle, t.stay.reminderBody)], { type: "text/calendar" });
     const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: "leave-china-reminder.ics" });
@@ -224,6 +244,7 @@ function StayCard() {
         <Button variant="soft" onClick={download} className="flex-1 text-subhead!"><CalendarPlus className="h-4 w-4" aria-hidden />{t.stay.reminder}</Button>
         <Button variant="ghost" href="/settings#entry" className="text-subhead!">{t.common.edit}</Button>
       </div>
+      <p className="mt-2 text-footnote text-muted">{t.stay.checkStamp}</p>
     </Card>
   );
 }
@@ -250,65 +271,94 @@ function CityLine() {
   );
 }
 
-function MenuHero() {
-  const t = useT();
-  return (
-    <Card tone="brand">
-      <h2 className="text-title">{t.today.readMenu}</h2>
-      <p className="mt-1 text-subhead opacity-90">{t.today.readMenuSub}</p>
-      <Link href="/menu" className="mt-4 flex h-12 items-center justify-center gap-2 rounded-2xl bg-white text-headline text-cobalt dark:bg-porcelain">
-        <Camera className="h-5 w-5" aria-hidden /> {t.today.scanMenu}
-      </Link>
-    </Card>
+/** One of the four first-screen actions in China. */
+function Tile({ icon, title, sub, onClick, href, primary }: {
+  icon: React.ReactNode; title: string; sub: React.ReactNode; onClick?: () => void; href?: string; primary?: boolean;
+}) {
+  const cls = `flex min-h-[132px] flex-col items-start gap-2 rounded-2xl p-4 text-left ${primary ? "bg-cobalt text-white dark:text-porcelain" : "border border-line bg-card"}`;
+  const body = (
+    <>
+      <span className={`grid h-10 w-10 place-items-center rounded-xl ${primary ? "bg-white/20" : "bg-cobalt-soft text-cobalt"}`}>{icon}</span>
+      <span className="text-headline">{title}</span>
+      <span className={`line-clamp-2 text-footnote ${primary ? "opacity-90" : "text-muted"}`}>{sub}</span>
+    </>
   );
+  return href ? <Link href={href} className={cls}>{body}</Link> : <button onClick={onClick} className={cls}>{body}</button>;
 }
 
-function PaySection() {
+/**
+ * First screen in China (SPEC v0.5): scan a menu · show the driver · pay · today, as a 2×2
+ * grid that fits above the fold, then the stay countdown and emergency help.
+ */
+function Moments() {
   const t = useT();
-  const [calc, setCalc] = useState(false);
-  return (
-    <Section title={t.today.pay} aside={
-      <button onClick={() => setCalc(!calc)} aria-expanded={calc} className="flex min-h-11 items-center gap-1 text-subhead font-semibold text-cobalt">
-        <Calculator className="h-4 w-4" aria-hidden />{t.today.priceCheck}
-      </button>
-    }>
-      {calc && <Card><PriceCheck /></Card>}
-      <PayButtons compact />
-    </Section>
-  );
-}
+  const router = useRouter();
+  const [p] = useProfile();
+  const { city } = useCity();
+  const [sheet, setSheet] = useState<"driver" | "pay" | "today" | "stay" | null>(null);
+  const [dest, setDest] = useState("");
+  const [alarms, setAlarms] = useState<Reminder[]>([]);
+  useEffect(() => setAlarms(upcomingReminders()), [sheet]);
+  const next = alarms[0] && RESERVATIONS.find((r) => r.id === alarms[0].id);
+  const nextWhen = alarms[0] && new Date(alarms[0].at).toLocaleTimeString(p.lang, { hour: "2-digit", minute: "2-digit" });
+  const s = stayStatus(p.entryDate, p.entryType, p.visaDays);
 
-function ArrivalDay() {
-  const t = useT();
   return (
     <>
-      <Section>
-        <CityLine />
-        <EntryConfirm />
-      </Section>
-      <Section title={t.hotel.back}><HotelCard /></Section>
-      <Section><MenuHero /></Section>
-      <PaySection />
+      <div className="grid grid-cols-2 gap-3">
+        <Tile primary href="/menu" icon={<Camera className="h-5 w-5" aria-hidden />} title={t.today.tileMenu} sub={t.today.tileMenuSub} />
+        <Tile onClick={() => setSheet("driver")} icon={<CarTaxiFront className="h-5 w-5" aria-hidden />} title={t.today.tileDriver}
+          sub={p.hotel ? <span className="zh">{p.hotel.name}</span> : t.today.tileDriverAdd} />
+        <Tile onClick={() => setSheet("pay")} icon={<Wallet className="h-5 w-5" aria-hidden />} title={t.today.tilePay} sub={t.today.tilePaySub} />
+        <Tile onClick={() => (alarms.length ? setSheet("today") : router.push("/explore"))} icon={<CalendarClock className="h-5 w-5" aria-hidden />}
+          title={t.today.tileToday} sub={next ? fmt(t.today.tileTodayAlarm, { name: next.en, when: nextWhen! }) : fmt(t.today.tileTodaySub, { city: city.e })} />
+      </div>
+      <Group>
+        {s ? (
+          <Row onClick={() => setSheet("stay")} icon={<IconTile><CalendarClock className="h-5 w-5" aria-hidden /></IconTile>}
+            title={fmt(t.stay.leaveBy, { date: fmtDay(s.lastDay, p.lang) })}
+            sub={`${fmt(t.stay.dayOf, { day: Math.max(1, s.dayOfStay), total: s.allowed })} · ${s.overdue ? fmt(t.stay.overdue, { n: -s.daysLeft }) : fmt(t.stay.daysLeft, { n: s.daysLeft })}`}
+            // Only a red badge when it's urgent; otherwise the count sits in the subtitle.
+            after={s.overdue || s.daysLeft <= 3 ? <span className="shrink-0 rounded-full bg-danger-soft px-2.5 py-0.5 text-footnote font-semibold text-danger tabular-nums">{s.overdue ? "!" : s.daysLeft}</span> : undefined} />
+        ) : (
+          <Row href="/settings#entry" icon={<IconTile><CalendarClock className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.stayTrack} sub={t.today.stayTrackSub} />
+        )}
+        <Row href="/sos" icon={<IconTile tone="danger"><Siren className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.help} sub={t.today.helpSub} />
+      </Group>
+
+      <EditSheet open={sheet === "driver"} title={t.today.tileDriver} onClose={() => setSheet(null)}>
+        <HotelCard />
+        <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); if (dest.trim()) router.push(`/explore?q=${encodeURIComponent(dest.trim())}`); }}>
+          <label className="flex h-12 min-w-0 flex-1 items-center gap-2 rounded-2xl border border-line bg-card px-3">
+            <Search className="h-5 w-5 shrink-0 text-muted" aria-hidden />
+            <input value={dest} onChange={(e) => setDest(e.target.value)} placeholder={t.today.driverElse} aria-label={t.today.driverElse} className="h-full min-w-0 flex-1 bg-transparent text-body outline-none placeholder:text-muted" />
+          </label>
+          <Button type="submit" className="shrink-0 px-5">{t.go.go}</Button>
+        </form>
+      </EditSheet>
+      <EditSheet open={sheet === "pay"} title={t.today.tilePay} onClose={() => setSheet(null)}>
+        <PayButtons />
+        <Card><PriceCheck /></Card>
+      </EditSheet>
+      <EditSheet open={sheet === "today"} title={t.today.tileToday} onClose={() => setSheet(null)}>
+        <Alarms suggest={false} />
+        <Button variant="soft" href="/explore" className="w-full">{fmt(t.today.tileTodaySub, { city: city.e })}</Button>
+      </EditSheet>
+      <EditSheet open={sheet === "stay"} title={t.stay.trip} onClose={() => setSheet(null)}>
+        <StayCard />
+      </EditSheet>
     </>
   );
 }
 
+/** In China, including arrival day (EntryConfirm only shows until the entry date is set). */
 function InChina() {
-  const t = useT();
   return (
-    <>
-      <Section>
-        <CityLine />
-        <EntryConfirm />
-        <MenuHero />
-        <Link href="/explore" className="flex h-12 items-center gap-2 rounded-2xl border border-line bg-card px-4 text-body text-muted">
-          <Search className="h-5 w-5" aria-hidden /> {t.today.whereTo}
-        </Link>
-      </Section>
-      <ReleaseReminders />
-      <PaySection />
-      <Section><StayCard /></Section>
-    </>
+    <Section>
+      <CityLine />
+      <EntryConfirm />
+      <Moments />
+    </Section>
   );
 }
 
@@ -317,10 +367,7 @@ function Leaving() {
   const [p] = useProfile();
   return (
     <>
-      <Section>
-        <CityLine />
-        <StayCard />
-      </Section>
+      <InChina />
       <Section>
         <Card>
           <h3 className="flex items-center gap-2 text-headline"><PlaneTakeoff className="h-5 w-5 shrink-0 text-cobalt" aria-hidden />{t.today.airportTitle}</h3>
@@ -332,7 +379,6 @@ function Leaving() {
           <p className="mt-1 text-subhead">{t.today.taxBody}</p>
         </Card>
       </Section>
-      <PaySection />
     </>
   );
 }
@@ -364,11 +410,10 @@ export default function Home() {
       <DemoNote show={Boolean(demo?.demoAi || demo?.demoMaps)} what={[demo?.demoAi && t.common.aiKey, demo?.demoMaps && t.common.mapKey].filter(Boolean).join(" + ")} />
       {loaded && (
         phase === "before" ? <BeforeTrip />
-        : phase === "arrival" ? <ArrivalDay />
         : phase === "leaving" ? <Leaving />
         : <InChina />
       )}
-      {loaded && (
+      {loaded && phase === "before" && (
         <Section>
           <Group>
             <Row href="/sos" icon={<IconTile tone="danger"><Siren className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.help} sub={t.today.helpSub} />

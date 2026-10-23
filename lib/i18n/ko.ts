@@ -2,6 +2,7 @@ import type { Dict } from "./en";
 
 export const ko: Dict = {
   common: {
+    unavailable: "지금은 이용할 수 없습니다. 잠시 후 다시 시도해 주세요.",
     skip: "건너뛰기",
     aiKey: "AI 키",
     mapKey: "지도 키",
@@ -17,7 +18,7 @@ export const ko: Dict = {
     back: "뒤로",
   },
   tabs: { today: "오늘", eat: "식사", go: "탐색", stay: "숙소", talk: "대화" },
-  show: { title: "이 화면을 보여 주세요", play: "중국어로 읽어 주기" },
+  show: { title: "이 화면을 보여 주세요", play: "중국어로 읽어 주기", whatItSays: "카드 내용 보기" },
   mode: {
     question: "지금 어디에 계신가요?",
     planning: "여행 준비 중",
@@ -43,6 +44,17 @@ export const ko: Dict = {
     near: "{city} 근처",
   },
   today: {
+    tileMenu: "메뉴 스캔",
+    tileMenuSub: "번역과 알레르기 확인",
+    tileDriver: "기사에게 보여주기",
+    tileDriverAdd: "예약 캡처로 호텔 추가",
+    tilePay: "결제",
+    tilePaySub: "Alipay · WeChat · 환율 계산",
+    tileToday: "오늘",
+    tileTodaySub: "{city} 추천 5곳",
+    tileTodayAlarm: "{name} · {when} 티켓 오픈",
+    driverElse: "다른 목적지: 장소나 주소",
+    getReadySub: "결제, 모바일 데이터, 앱, 기차",
     hotelsFor: "{city} 호텔",
     addCities: "방문할 도시 추가",
     addCitiesSub: "도시마다 가격대별 호텔을 골라 드립니다",
@@ -90,6 +102,10 @@ export const ko: Dict = {
     stayTrackSub: "입국일을 등록하면 출국 기한을 알려 드려요",
   },
   stay: {
+    whereToStay: "어디에 묵을까",
+    aiPick: "AI 추천",
+    metroCount: "1 km 안에 지하철역 {n}곳",
+    tierFallback: "이 지역에는 {tier} 추천이 없습니다. 대신 {other}을(를) 보여 드립니다.",
     tiers: {"economy": "실속", "comfort": "편안", "upscale": "고급", "luxury": "럭셔리"},
     priceRange: "가격대",
     perNight: "1박 {price}",
@@ -139,6 +155,8 @@ export const ko: Dict = {
     onMap: "지도에서 {name} 보기",
   },
   eat: {
+    blockedSevere: "주재료에 {x}이(가) 들어 있습니다. 심한 알레르기가 있으면 권하지 않습니다.",
+    replyContainsAny: "알레르기 재료가 들어 있습니다",
     add: "추가",
     inOrder: "주문에 담김",
     askWithout: "{x} 빼 달라고 하기",
@@ -169,7 +187,7 @@ export const ko: Dict = {
     checkingFor: "확인 중:",
     addRestrictions: "알레르기와 식단을 등록하면 경고를 받을 수 있어요",
     reading: "요리를 하나씩 읽는 중… 10~40초 걸려요",
-    error: "메뉴를 읽지 못했습니다. 밝은 곳에서 선명하게 다시 찍거나 요리 이름을 입력하세요.",
+    error: "잘 읽지 못했습니다. 다시 찍거나 요리 이름을 입력해 주세요.",
     dishes: "{type} · 요리 {n}개",
     notForYou: "{n}개는 맞지 않음",
     all: "전체",
@@ -193,6 +211,8 @@ export const ko: Dict = {
     approx: "≈ {amount}",
   },
   go: {
+    findPlace: "장소 찾기",
+    otherCity: "다른 도시",
     openAmap: "Amap에서 길찾기",
     amapNote: "Amap은 지하철·버스·도보 경로를 실시간으로, 영어로 보여 줍니다.",
     back: "검색 결과로",
@@ -240,6 +260,9 @@ export const ko: Dict = {
     groups: { basics: "기본", eating: "식사", around: "이동", hotel: "호텔", emergency: "긴급" },
   },
   settings: {
+    cityFrom: "부터",
+    cityTo: "까지",
+    cityDatesNote: "선택: 각 도시에 머무는 날짜. ‘오늘’에 날마다 맞는 도시가 나옵니다.",
     you: "나",
     add: "추가",
     dates: "일정",
@@ -361,7 +384,7 @@ export const ko: Dict = {
     sightsBody: "고궁(자금성), 국가박물관 같은 인기 명소는 여권 실명 예약이 필요하며, 며칠 전에 마감되는 경우가 많습니다.",
     tickets: "{city} 입장권",
     hotels: "호텔",
-    hotelsBody: "외국인 투숙이 허가된 호텔을 고르세요.",
+    hotelsBody: "체인 호텔 · 보통 외국인 투숙 가능",
     hotelsLink: "호텔 찾기",
     good: "알아 두면 좋은 것",
     goodItems: {
@@ -382,7 +405,7 @@ export const ko: Dict = {
   },
   visa: {
     title: "무비자로 입국할 수 있나요?",
-    confirm: "{country} 여권을 갖고 계신가요?",
+    confirm: "여권: {country} 맞나요?",
     yes: "예",
     change: "변경",
     ordinary: "일반 여권 기준",
@@ -444,6 +467,9 @@ export const ko: Dict = {
     "mustEatSub": "현지 요리 5가지, 알레르기 성분과 파는 곳"
   },
   resv: {
+    opensRule: "베이징 시간 {time}, {n}일 전 오픈",
+    opensDays: "약 {n}일 전부터 예약 가능",
+    noRelease: "여권으로 미리 예약하세요",
     "visitDate": "방문 날짜",
     "forDate": "{date} 티켓 판매 시작",
     "beijing": "내 시간 · 베이징 {time}",

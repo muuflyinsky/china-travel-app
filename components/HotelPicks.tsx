@@ -9,19 +9,20 @@ import { useT } from "./useT";
 import { goLink, type LinkParams } from "@/lib/affiliate";
 import { amapNav } from "@/lib/maplinks";
 import { fmt } from "@/lib/i18n";
+import { track } from "@/lib/track";
 import type { CityPicks, HotelPick } from "@/lib/hotel-tiers";
 
 export type PicksResponse = CityPicks & { bounds: [number, number, number]; demo: boolean };
 
 /** Hotel picks for a city (adcode + short Chinese name), from /api/hotels. */
-export function useHotelPicks(adcode: string, name: string) {
+export function useHotelPicks(adcode: string, name: string, around?: string) {
   const [data, setData] = useState<PicksResponse | null>(null);
   const [error, setError] = useState(false);
   useEffect(() => {
     setData(null); setError(false);
-    fetch(`/api/hotels?${new URLSearchParams({ city: adcode, name })}`)
+    fetch(`/api/hotels?${new URLSearchParams({ city: adcode, name, ...(around ? { around } : {}) })}`)
       .then((r) => (r.ok ? r.json() : Promise.reject())).then(setData).catch(() => setError(true));
-  }, [adcode, name]);
+  }, [adcode, name, around]);
   return { data, error };
 }
 
@@ -63,7 +64,7 @@ export function FeaturedHotel({ h, label, link, tag }: { h: HotelPick; label: st
       <p className="mt-3 text-title tabular-nums">{fmt(t.stay.perNight, { price: price(h.cny) })}</p>
       <p className="text-footnote text-muted">{t.stay.priceRef}</p>
       <div className="mt-3 flex gap-2">
-        <a href={goLink("trip", "hotel_search", { ...link, keyword: h.name }, "stay_pick", tag)} target="_blank" rel="noopener"
+        <a href={goLink("trip", "hotel_search", { ...link, keyword: h.name }, "stay_pick", tag)} target="_blank" rel="noopener" onClick={() => track("hotel_pick_click", { tag })}
           className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-2xl bg-cta px-4 text-headline text-cta-ink">
           {t.stay.checkTrip} <ExternalLink className="h-4 w-4" aria-hidden />
         </a>
@@ -85,7 +86,7 @@ export function HotelRow({ h, link, tag }: { h: HotelPick; link: LinkParams; tag
           {[h.brand, h.metro ? fmt(t.stay.metroShort, { m: h.metro.meters }) : null, price(h.cny)].filter(Boolean).join(" · ")}
         </p>
       </div>
-      <a href={goLink("trip", "hotel_search", { ...link, keyword: h.name }, "stay_pick", tag)} target="_blank" rel="noopener"
+      <a href={goLink("trip", "hotel_search", { ...link, keyword: h.name }, "stay_pick", tag)} target="_blank" rel="noopener" onClick={() => track("hotel_pick_click", { tag })}
         className="flex min-h-11 shrink-0 items-center gap-1 text-subhead font-semibold text-cobalt">
         {t.stay.checkPrice}<ExternalLink className="h-3.5 w-3.5" aria-hidden />
       </a>

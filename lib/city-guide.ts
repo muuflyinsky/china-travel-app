@@ -4,7 +4,7 @@ import { analyzeMenu, writeCityGuide } from "./llm";
 import { config, demo } from "./config";
 import { RESERVATION_SOURCE, reservationFor } from "./reservations";
 import * as mock from "./demo";
-import type { CityGuide, GuideDish, GuideSight } from "./city-guide-types";
+import type { CityGuide, GuideArea, GuideDish, GuideSight } from "./city-guide-types";
 
 // Automatic city guides (SPEC v0.4 · Explore). Facts come from data, words from the model:
 // - Sights: Amap scenic-spot and museum POIs, ranked by national status and rating.
@@ -74,8 +74,17 @@ export async function generateGuide(adcode: string, cityZh: string, cityEn: stri
     };
   }));
 
+  // Areas: locate each suggestion's landmark, then count metro stations within 1 km of it.
+  const located = await Promise.all((text.areas ?? []).slice(0, 3).map(async (a): Promise<GuideArea | null> => {
+    const [spot] = await searchPlaces({ keywords: a.anchor_zh, city: adcode, pageSize: 1 }).catch(() => []);
+    if (!spot) return null;
+    const stations = await searchPlaces({ around: spot.location, types: "150500", radius: 1000, pageSize: 25 }).catch(() => []);
+    return { zh: a.zh, name: a.name, reason: a.reason, location: spot.location, metro: stations.length };
+  }));
+  const areas = located.filter((a): a is GuideArea => a !== null);
+
   return {
-    city: cityZh, cityEn, adcode, generatedAt: new Date().toISOString(), model: config.model,
+    city: cityZh, cityEn, adcode, generatedAt: new Date().toISOString(), model: config.ai.key ? config.ai.textModel : config.model, areas,
     sources: ["Amap (高德) POI data", `${RESERVATION_SOURCE.name}, ${RESERVATION_SOURCE.license}`],
     sights, dishes,
   };

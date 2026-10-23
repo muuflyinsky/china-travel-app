@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { errorResponse } from "@/lib/errors";
 import { searchPlaces } from "@/lib/amap";
 import { demo } from "@/lib/config";
 import { withAwards } from "@/lib/restaurants";
@@ -15,6 +16,6 @@ export async function GET(req: Request) {
     });
     return NextResponse.json({ places: withAwards(places), demo: demo.maps });
   } catch (e) {
-    return NextResponse.json({ error: (e as Error).message }, { status: 502 });
+    return errorResponse(e, "places");
   }
 }

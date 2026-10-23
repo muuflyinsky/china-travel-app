@@ -2,6 +2,7 @@ import type { Dict } from "./en";
 
 export const de: Dict = {
   common: {
+    unavailable: "Vorübergehend nicht verfügbar. Bitte später erneut versuchen.",
     skip: "Überspringen",
     aiKey: "den KI-Schlüssel",
     mapKey: "den Karten-Schlüssel",
@@ -17,7 +18,7 @@ export const de: Dict = {
     back: "Zurück",
   },
   tabs: { today: "Heute", eat: "Essen", go: "Entdecken", stay: "Hotel", talk: "Sprechen" },
-  show: { title: "Diesen Bildschirm zeigen", play: "Auf Chinesisch vorlesen" },
+  show: { title: "Diesen Bildschirm zeigen", play: "Auf Chinesisch vorlesen", whatItSays: "Was auf der Karte steht" },
   mode: {
     question: "Wo bist du gerade?",
     planning: "Ich plane meine Reise",
@@ -43,6 +44,17 @@ export const de: Dict = {
     near: "bei {city}",
   },
   today: {
+    tileMenu: "Speisekarte scannen",
+    tileMenuSub: "Übersetzt, mit Allergie-Check",
+    tileDriver: "Dem Fahrer zeigen",
+    tileDriverAdd: "Hotel per Buchungs-Screenshot hinzufügen",
+    tilePay: "Bezahlen",
+    tilePaySub: "Alipay · WeChat · Umrechner",
+    tileToday: "Heute",
+    tileTodaySub: "Top 5 in {city}",
+    tileTodayAlarm: "{name} · Tickets {when}",
+    driverElse: "Anderes Ziel: Ort oder Adresse",
+    getReadySub: "Bezahlen, mobile Daten, Apps, Züge",
     hotelsFor: "Hotels in {city}",
     addCities: "Füge die Städte deiner Reise hinzu",
     addCitiesSub: "Wir suchen für jede Stadt Hotels in jeder Preisklasse aus",
@@ -90,6 +102,10 @@ export const de: Dict = {
     stayTrackSub: "Trage dein Einreisedatum ein und erhalte eine Ausreise-Erinnerung",
   },
   stay: {
+    whereToStay: "Wo übernachten",
+    aiPick: "KI-Empfehlung",
+    metroCount: "{n} U-Bahn-Stationen im Umkreis von 1 km",
+    tierFallback: "Keine {tier}-Tipps in dieser Gegend. Stattdessen: {other}.",
     tiers: {"economy": "Günstig", "comfort": "Komfort", "upscale": "Gehoben", "luxury": "Luxus"},
     priceRange: "Preisklasse",
     perNight: "{price} pro Nacht",
@@ -139,6 +155,8 @@ export const de: Dict = {
     onMap: "{name} auf der Karte",
   },
   eat: {
+    blockedSevere: "Enthält {x} als Hauptzutat. Bei schwerer Allergie nicht empfohlen.",
+    replyContainsAny: "Es enthält etwas, worauf du allergisch bist",
     add: "Hinzufügen",
     inOrder: "In der Bestellung",
     askWithout: "Ohne {x} fragen",
@@ -169,7 +187,7 @@ export const de: Dict = {
     checkingFor: "Geprüft auf",
     addRestrictions: "Allergien und Ernährung eintragen, um Warnungen zu erhalten",
     reading: "Jedes Gericht wird gelesen… das dauert 10–40 Sekunden",
-    error: "Die Speisekarte konnte nicht gelesen werden. Versuche ein schärferes, gut beleuchtetes Foto oder tippe die Gerichte ein.",
+    error: "Nicht deutlich lesbar. Mach das Foto bitte noch einmal oder tippe die Gerichte ein.",
     dishes: "{type} · {n} Gerichte",
     notForYou: "{n} nicht für dich",
     all: "Alle Gerichte",
@@ -193,6 +211,8 @@ export const de: Dict = {
     approx: "≈ {amount}",
   },
   go: {
+    findPlace: "Ort suchen",
+    otherCity: "Andere Stadt",
     openAmap: "Route in Amap",
     amapNote: "Amap zeigt U-Bahn-, Bus- und Fußwege in Echtzeit, auf Englisch.",
     back: "Zurück zu den Ergebnissen",
@@ -240,6 +260,9 @@ export const de: Dict = {
     groups: { basics: "Grundlagen", eating: "Essen", around: "Unterwegs", hotel: "Hotel", emergency: "Notfall" },
   },
   settings: {
+    cityFrom: "von",
+    cityTo: "bis",
+    cityDatesNote: "Optional: deine Tage in jeder Stadt. Dann zeigt Heute jeden Tag die richtige Stadt.",
     you: "Du",
     add: "Hinzufügen",
     dates: "Reisedaten",
@@ -361,7 +384,7 @@ export const de: Dict = {
     sightsBody: "Top-Ziele wie die Verbotene Stadt oder das Nationalmuseum verlangen eine Reservierung auf deinen Namen mit Pass, oft Tage im Voraus.",
     tickets: "Tickets in {city}",
     hotels: "Hotels",
-    hotelsBody: "Wähle Hotels, die ausländische Gäste aufnehmen dürfen.",
+    hotelsBody: "Hotelketten · nehmen in der Regel ausländische Gäste auf",
     hotelsLink: "Hotels finden",
     good: "Gut zu wissen",
     goodItems: {
@@ -382,7 +405,7 @@ export const de: Dict = {
   },
   visa: {
     title: "Kann ich ohne Visum einreisen?",
-    confirm: "Hast du einen Pass aus {country}?",
+    confirm: "Dein Pass: {country}?",
     yes: "Ja",
     change: "Ändern",
     ordinary: "Für gewöhnliche Reisepässe",
@@ -444,6 +467,9 @@ export const de: Dict = {
     "mustEatSub": "5 lokale Gerichte mit Allergenen und wo es sie gibt"
   },
   resv: {
+    opensRule: "Tickets um {time} Pekinger Zeit, {n} Tage vorher",
+    opensDays: "Buchung öffnet etwa {n} Tage vorher",
+    noRelease: "Vorab mit dem Pass buchen",
     "visitDate": "Tag des Besuchs",
     "forDate": "Tickets für den {date} gibt es ab",
     "beijing": "Deine Zeit · {time} in Peking",

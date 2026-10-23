@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { errorResponse } from "@/lib/errors";
 import { reverseGeocode } from "@/lib/amap";
 import { wgs84ToGcj02 } from "@/lib/coords";
 
@@ -12,6 +13,6 @@ export async function GET(req: Request) {
     const info = await reverseGeocode(`${gLng},${gLat}`);
     return NextResponse.json({ location: `${gLng},${gLat}`, ...info });
   } catch (e) {
-    return NextResponse.json({ error: (e as Error).message }, { status: 502 });
+    return errorResponse(e, "regeo");
   }
 }

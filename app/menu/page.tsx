@@ -12,7 +12,8 @@ import { useFx, parseCny, formatMoney } from "@/components/useFx";
 import { useT } from "@/components/useT";
 import { ShowCard, type StaffReply } from "@/components/ShowCard";
 import { LANGUAGES } from "@/lib/languages";
-import { ALLERGENS, DIETS, staffCardZh, type AllergenId, type DietId } from "@/lib/allergens";
+import { ALLERGENS, DIETS, allergyLinesZh, blockedBySevere, type AllergenId, type DietId } from "@/lib/allergens";
+import { track } from "@/lib/track";
 import { compressImage } from "@/lib/image";
 import { fmt, type Dict } from "@/lib/i18n";
 import type { Dish, Menu } from "@/lib/llm";
@@ -20,16 +21,21 @@ import type { Dish, Menu } from "@/lib/llm";
 const allergenZh = (id: string) => ALLERGENS.find((a) => a.id === id)?.zh.split("（")[0] ?? id;
 const toggle = (list: string[], id: string) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
 
-type Conflict = { allergens: string[]; diet: string[] };
+/** `blocked`: severe allergens that are a main ingredient — the dish can't be ordered safely. */
+type Conflict = { allergens: string[]; diet: string[]; blocked: string[] };
 
-function conflicts(t: Dict, d: Dish, allergens: string[], diets: string[]): Conflict {
+function conflicts(t: Dict, d: Dish, allergens: string[], diets: string[], severe: string[]): Conflict {
   const diet: string[] = [];
   if ((diets.includes("vegetarian") || diets.includes("vegan")) && !d.vegetarian) diet.push(t.eat.notVeg);
   if ((diets.includes("no_pork") || diets.includes("halal")) && d.meat.includes("pork")) diet.push(t.eat.pork);
   if (diets.includes("no_beef") && d.meat.includes("beef")) diet.push(t.eat.beef);
   if ((diets.includes("halal") || diets.includes("no_alcohol")) && d.contains_alcohol) diet.push(t.eat.cookedAlcohol);
   if (diets.includes("no_spicy") && d.spice_level >= 2) diet.push(t.eat.spicy);
-  return { allergens: d.allergens.filter((a) => allergens.includes(a)), diet };
+  return {
+    allergens: d.allergens.filter((a) => allergens.includes(a)),
+    diet,
+    blocked: blockedBySevere(d, severe.filter((a) => allergens.includes(a))),
+  };
 }
 const hasConflict = (c: Conflict) => c.allergens.length + c.diet.length > 0;
 
@@ -92,7 +98,13 @@ function DishCard({ d, c, line, onChange, homePrice }: { d: Dish; c: Conflict; l
       )}
       {d.notes && <p className="flex gap-2 text-footnote text-muted"><Info className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />{d.notes}</p>}
 
-      {line ? (
+      {c.blocked.length > 0 ? (
+        // Severe allergy and it's a main ingredient: no "add", no "ask without" — it isn't safe to try.
+        <p className="mt-3 flex items-start gap-2 rounded-xl border border-danger px-3 py-2.5 text-subhead font-semibold text-danger" role="note">
+          <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+          {fmt(t.eat.blockedSevere, { x: c.blocked.map((a) => t.allergens[a as AllergenId].toLowerCase()).join(", ") })}
+        </p>
+      ) : line ? (
         <div className="mt-3 flex items-center justify-between rounded-xl bg-cobalt-soft p-1">
           <button onClick={() => onChange(line.qty > 1 ? { ...line, qty: line.qty - 1 } : undefined)} aria-label="−" className="grid h-11 w-11 place-items-center rounded-lg text-cobalt"><Minus className="h-5 w-5" /></button>
           <span className="text-subhead font-semibold text-cobalt">{t.eat.inOrder} · ×{line.qty}</span>
@@ -100,7 +112,7 @@ function DishCard({ d, c, line, onChange, homePrice }: { d: Dish; c: Conflict; l
         </div>
       ) : c.allergens.length > 0 ? (
         // Don't nudge people to order a dish with their allergen; offer to ask for it without.
-        <Button variant="ghost" className="mt-2 w-full border border-line text-subhead!" onClick={() => onChange({ qty: 1, without: true })}>
+        <Button variant="ghost" className="mt-3 w-full border border-line text-subhead!" onClick={() => onChange({ qty: 1, without: true })}>
           <Plus className="h-4 w-4" aria-hidden />{fmt(t.eat.askWithout, { x: c.allergens.map((a) => t.allergens[a as AllergenId].toLowerCase()).join(", ") })}
         </Button>
       ) : (
@@ -153,7 +165,7 @@ export default function MenuPage() {
   const [inputOpen, setInputOpen] = useState(true);
   const [filter, setFilter] = useState<"all" | "safe">("all");
   const [order, setOrder] = useState<Record<number, Line>>({});
-  const [card, setCard] = useState<{ lines: string[]; explain?: string; replies?: StaffReply[] } | null>(null);
+  const [card, setCard] = useState<{ kind: string; lead?: string; lines: string[]; rest?: string[]; explain?: string; replies?: StaffReply[] } | null>(null);
   const [askAllergies, setAskAllergies] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
@@ -161,16 +173,18 @@ export default function MenuPage() {
   useEffect(() => { if (loaded && !profile.allergiesAsked) setAskAllergies(true); }, [loaded, profile.allergiesAsked]);
 
   async function run(body: object) {
+    track("menu_scan", { input: "image" in body ? "photo" : "text" });
     setLoading(true); setError(undefined); setMenu(null); setOrder({});
     try {
       const r = await fetch("/api/menu", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...body, lang: profile.lang, city: `${city.e} (${city.n}, ${city.p})` }) });
       const d = await r.json();
-      if (!r.ok) throw new Error(d.error);
+      // 503: no AI configured (production) · 422: the model's answer didn't validate → retake.
+      if (!r.ok) throw new Error(r.status === 503 ? "unavailable" : "unreadable");
       setMenu(d);
       setInputOpen(false);
       setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
-    } catch {
-      setError(t.eat.error);
+    } catch (e) {
+      setError((e as Error).message === "unavailable" ? t.common.unavailable : t.eat.error);
     } finally {
       setLoading(false);
     }
@@ -183,7 +197,7 @@ export default function MenuPage() {
     run({ image: img.data, mediaType: img.mediaType });
   }
 
-  const rows = useMemo(() => (menu?.dishes ?? []).map((d, i) => ({ d, i, c: conflicts(t, d, profile.allergens, profile.diets) })), [menu, profile, t]);
+  const rows = useMemo(() => (menu?.dishes ?? []).map((d, i) => ({ d, i, c: conflicts(t, d, profile.allergens, profile.diets, profile.severe) })), [menu, profile, t]);
   const shown = filter === "safe" ? rows.filter((r) => !hasConflict(r.c)) : rows;
   const flagged = rows.filter((r) => hasConflict(r.c)).length;
   const restrictions = [...profile.allergens.map((a) => t.allergens[a as AllergenId]), ...profile.diets.map((d) => t.diets[d as DietId])];
@@ -193,25 +207,37 @@ export default function MenuPage() {
     const cny = parseCny(price);
     return cny && fx && profile.homeCurrency !== "CNY" ? formatMoney(cny / fx.value, profile.homeCurrency, profile.lang) : undefined;
   };
-  const orderLines = Object.entries(order).map(([i, l]) => ({ d: menu!.dishes[Number(i)], l }));
+  // A dish added before an allergy was marked severe drops out of the order.
+  const orderLines = Object.entries(order).map(([i, l]) => ({ d: menu!.dishes[Number(i)], l, i: Number(i) }))
+    .filter(({ i }) => !rows[i]?.c.blocked.length);
   const dishCount = orderLines.reduce((n, x) => n + x.l.qty, 0);
 
+  // At most three answers, so they fit under the card without scrolling.
   const replies = (withCant: boolean): StaffReply[] => [
     { zh: "可以，没问题", mine: t.eat.replyOk },
     ...(withCant ? [{ zh: "这道菜做不了", mine: t.eat.replyCant }] : []),
-    ...profile.allergens.map((a) => ({ zh: `里面有${allergenZh(a)}`, mine: fmt(t.eat.replyContains, { x: t.allergens[a as AllergenId].toLowerCase() }) })),
+    ...(profile.allergens.length ? [{ zh: "里面有您过敏的东西", mine: t.eat.replyContainsAny }] : []),
   ];
   const allergyExplain = myAllergensMine.length ? fmt(t.eat.orderExplainAllergy, { allergens: myAllergensMine.join(", ") }) : "";
 
   function showOrder() {
     const without = myAllergensZh.length ? `（不要放${myAllergensZh.join("、")}）` : "";
-    const lines = [
-      "你好，我要点：",
-      ...orderLines.map(({ d, l }) => `${d.original} ×${l.qty}${l.without ? without : ""}`),
-      ...(profile.allergens.length || profile.diets.length ? staffCardZh(profile.allergens, profile.diets, profile.severe).slice(1, -1) : []),
-    ];
+    const { severe, rest } = allergyLinesZh(profile.allergens, profile.diets, profile.severe);
     const dishes = orderLines.map(({ d, l }) => `${d.translated} ×${l.qty}`).join(", ");
-    setCard({ lines, explain: [fmt(t.eat.orderExplain, { dishes }), allergyExplain].filter(Boolean).join(" "), replies: replies(true) });
+    track("order_card_shown", { dishes: orderLines.length, severe: Boolean(severe) });
+    setCard({
+      kind: "order",
+      lead: severe || undefined,
+      lines: ["您好，我要点：", ...orderLines.map(({ d, l }) => `${d.original} ×${l.qty}${l.without ? without : ""}`)],
+      rest,
+      explain: [fmt(t.eat.orderExplain, { dishes }), allergyExplain].filter(Boolean).join(" "),
+      replies: replies(true),
+    });
+  }
+
+  function showAllergyCard() {
+    const { severe, rest } = allergyLinesZh(profile.allergens, profile.diets, profile.severe);
+    setCard({ kind: "allergy", lead: severe || undefined, lines: ["您好！我有饮食限制，麻烦您帮忙确认，谢谢！"], rest, explain: allergyExplain, replies: replies(false) });
   }
 
   return (
@@ -312,14 +338,14 @@ export default function MenuPage() {
           )}
           {restrictions.length > 0 && (
             <button aria-label={t.eat.showAllergyCard}
-              onClick={() => setCard({ lines: staffCardZh(profile.allergens, profile.diets, profile.severe), explain: allergyExplain, replies: replies(false) })}
+              onClick={showAllergyCard}
               className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-card text-danger shadow-[0_6px_20px_rgb(0_0_0/0.18)] ring-1 ring-line">
               <ShieldAlert className="h-6 w-6" />
             </button>
           )}
         </div>
       )}
-      {card && <ShowCard lines={card.lines} explain={card.explain} replies={card.replies} onClose={() => setCard(null)} />}
+      {card && <ShowCard {...card} onClose={() => setCard(null)} />}
       {askAllergies && <AllergySheet onDone={() => setAskAllergies(false)} />}
       <Link href="/settings#food" className="sr-only">{t.common.settings}</Link>
     </Screen>

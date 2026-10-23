@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { errorResponse } from "@/lib/errors";
 import { translate } from "@/lib/llm";
 import { demo } from "@/lib/config";
 import { py } from "@/lib/amap";
@@ -13,6 +14,6 @@ export async function POST(req: Request) {
   try {
     return NextResponse.json(await translate(text.slice(0, 2000), from, to));
   } catch (e) {
-    return NextResponse.json({ error: (e as Error).message }, { status: 502 });
+    return errorResponse(e, "translate");
   }
 }
