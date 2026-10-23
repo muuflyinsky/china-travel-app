@@ -6,6 +6,8 @@ export const metadata: Metadata = {
   title: "China Travel Buddy",
   description: "Menus, maps, metro, hotels and survival tools for travellers in China",
   manifest: "/manifest.webmanifest",
+  // Opened from the iPhone home screen: full screen, no Safari bars.
+  appleWebApp: { capable: true, title: "China Buddy", statusBarStyle: "default" },
 };
 export const viewport: Viewport = {
   width: "device-width",
