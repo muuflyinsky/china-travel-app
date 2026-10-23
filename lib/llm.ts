@@ -136,3 +136,49 @@ export async function extractHotel(imageBase64: string, mediaType = "image/jpeg"
   if (res.stop_reason === "refusal" || !res.parsed_output) throw new Error("Could not read the booking");
   return res.parsed_output;
 }
+
+// ---- city guide ---------------------------------------------------------------------------
+
+const L10nSchema = z.object({ en: z.string(), es: z.string(), fr: z.string(), de: z.string(), ja: z.string(), ko: z.string() });
+
+const GuideSchema = z.object({
+  sights: z.array(z.object({
+    zh: z.string().describe("The sight's Chinese name exactly as given in the input"),
+    en: z.string().describe("Its usual English name"),
+    intro: L10nSchema.describe("1-2 sentences per language: what it is and why people go"),
+    best_time: L10nSchema.describe("Short phrase per language, e.g. 'early morning, before the crowds' or 'at night, when it is lit up'"),
+    hours: z.number().describe("Typical visit length in hours, 0.5 to 8"),
+    confidence: z.enum(["high", "low"]).describe("low if you are not sure what this place is"),
+  })),
+  dishes: z.array(z.object({
+    zh: z.string().describe("Dish name in Simplified Chinese, as restaurants write it"),
+    name: L10nSchema.describe("Natural dish name per language"),
+    intro: L10nSchema.describe("1-2 sentences per language: what it is and how it tastes"),
+    confidence: z.enum(["high", "low"]),
+  })).describe("Exactly 5 dishes the city is known for and a visitor can find in ordinary restaurants there"),
+});
+
+const GUIDE_SYSTEM = `You write short, factual travel notes for foreign visitors to mainland China, in English, Spanish, French, German, Japanese and Korean.
+Rules:
+- Describe each sight only from what it is widely known for. Never state prices, opening hours, ticket release times, dates or rules: those come from other sources and change.
+- If a name in the list is ambiguous or you don't recognise it, still return it, mark confidence "low" and keep the text generic.
+- Dishes must be specific to this city or its region, not national staples.
+- Plain, friendly sentences. No superlatives you can't back up.`;
+
+/** Text for a city guide. Sights are given (from Amap); dishes are chosen by the model. */
+export async function writeCityGuide(input: { cityZh: string; cityEn: string; sights: { zh: string; type: string; address: string; rating?: number }[] }) {
+  const res = await client().beta.messages.parse({
+    model: config.model,
+    max_tokens: 16000,
+    system: GUIDE_SYSTEM,
+    output_config: { effort: "low", format: betaZodOutputFormat(GuideSchema) },
+    messages: [{
+      role: "user",
+      content: `City: ${input.cityEn} (${input.cityZh}).\nSights (from the map, keep the order):\n` +
+        input.sights.map((x, i) => `${i + 1}. ${x.zh} — ${x.type}; ${x.address}${x.rating ? `; rated ${x.rating}` : ""}`).join("\n"),
+    }],
+    ...FALLBACK,
+  });
+  if (res.stop_reason === "refusal" || !res.parsed_output) throw new Error("City guide could not be written.");
+  return res.parsed_output;
+}

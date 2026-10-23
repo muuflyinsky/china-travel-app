@@ -2,6 +2,7 @@
 import type { Place } from "./amap";
 import type { Menu } from "./llm";
 import type { CityPicks, HotelPick } from "./hotel-tiers";
+import type { CityGuide } from "./city-guide-types";
 
 const P = (id: string, name: string, pinyin: string, address: string, location: string, type: string, extra: Partial<Place> = {}): Place => ({
   id, name, pinyin, address, city: "上海市", citycode: "021", location, type, ...extra,
@@ -135,4 +136,39 @@ export const hotelPicks: CityPicks = {
       H("D12", "上海和平饭店", "Shang Hai He Ping Fan Dian", "黄浦区", 2100, 4.8, 5, null, undefined, ["南京东路", 500], "luxury"),
     ],
   },
+};
+
+// Sample city guide (Shanghai, English only). Spend ranges are illustrative, not live data.
+export const cityGuide: CityGuide = {
+  city: "上海", cityEn: "Shanghai", adcode: "310000", generatedAt: "2026-10-23T00:00:00.000Z", model: "sample",
+  sources: ["Sample data"],
+  sights: [
+    { id: "S1", zh: "外滩", en: "The Bund", location: "121.4905,31.2397", address: "上海市黄浦区中山东一路", rating: 4.9, national: true,
+      intro: { en: "A riverside promenade lined with 1920s banks and hotels, facing the Pudong skyline across the Huangpu River." },
+      bestTime: { en: "After dark, when both banks are lit up" }, hours: 1.5, confidence: "high" },
+    { id: "S2", zh: "上海博物馆", en: "Shanghai Museum", location: "121.4752,31.2280", address: "上海市黄浦区人民大道201号", rating: 4.8, national: false,
+      intro: { en: "One of China's great art museums, known for its bronzes, ceramics and calligraphy." },
+      bestTime: { en: "Weekday mornings" }, hours: 2.5, confidence: "high", reservation: "shanghai_museum" },
+    { id: "S3", zh: "豫园", en: "Yu Garden", location: "121.4921,31.2272", address: "上海市黄浦区福佑路168号", rating: 4.7, national: true,
+      intro: { en: "A Ming-dynasty classical garden of rockeries, ponds and pavilions, surrounded by a busy old bazaar." },
+      bestTime: { en: "Right at opening, before tour groups" }, hours: 2, confidence: "high" },
+    { id: "S4", zh: "东方明珠广播电视塔", en: "Oriental Pearl Tower", location: "121.4997,31.2397", address: "上海市浦东新区世纪大道1号", rating: 4.6, national: true,
+      intro: { en: "The pink-sphered TV tower that defines the Pudong skyline, with observation decks and a glass floor." },
+      bestTime: { en: "Late afternoon into sunset" }, hours: 2, confidence: "high" },
+    { id: "S5", zh: "玉佛禅寺", en: "Jade Buddha Temple", location: "121.4452,31.2415", address: "上海市普陀区安远路170号", rating: 4.7, national: false,
+      intro: { en: "An active Buddhist temple housing two Burmese jade Buddhas." },
+      bestTime: { en: "Morning, when monks are chanting" }, hours: 1, confidence: "high" },
+  ],
+  dishes: [
+    { zh: "小笼包", pinyin: "xiǎo lóng bāo", name: { en: "Soup dumplings" }, intro: { en: "Thin-skinned steamed dumplings filled with pork and hot broth. Bite a small hole and sip the soup first." },
+      allergens: ["gluten", "soy"], spice: 0, vegetarian: false, spend: [40, 90], confidence: "high" },
+    { zh: "生煎包", pinyin: "shēng jiān bāo", name: { en: "Pan-fried pork buns" }, intro: { en: "Juicy pork buns fried until crisp on the bottom, topped with sesame and scallion." },
+      allergens: ["gluten", "soy", "sesame"], spice: 0, vegetarian: false, spend: [20, 40], confidence: "high" },
+    { zh: "红烧肉", pinyin: "hóng shāo ròu", name: { en: "Red-braised pork belly" }, intro: { en: "Pork belly slow-braised in soy sauce, rice wine and rock sugar until glossy and sweet." },
+      allergens: ["soy", "gluten", "sulphites"], spice: 0, vegetarian: false, spend: [60, 120], confidence: "high" },
+    { zh: "葱油拌面", pinyin: "cōng yóu bàn miàn", name: { en: "Scallion oil noodles" }, intro: { en: "Plain noodles tossed in fried-scallion oil and soy sauce; a cheap Shanghai breakfast classic." },
+      allergens: ["gluten", "soy"], spice: 0, vegetarian: false, spend: [20, 40], confidence: "high" },
+    { zh: "腌笃鲜", pinyin: "yān dǔ xiān", name: { en: "Fresh and cured pork soup with bamboo shoots" }, intro: { en: "A spring soup of fresh pork, cured pork and bamboo shoots simmered until milky." },
+      allergens: ["sulphites"], spice: 0, vegetarian: false, spend: [60, 120], confidence: "high" },
+  ],
 };

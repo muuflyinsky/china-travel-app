@@ -2,9 +2,10 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Popup, Preloader } from "konsta/react";
-import { Camera, Flame, Info, Leaf, ShieldAlert, ChevronDown, Plus, Minus, TriangleAlert, ReceiptText, Keyboard } from "lucide-react";
+import { Camera, Flame, Info, Leaf, ShieldAlert, ChevronDown, Plus, Minus, TriangleAlert, ReceiptText, Keyboard, UtensilsCrossed } from "lucide-react";
 import { Screen, DemoNote } from "@/components/Shell";
-import { Section, Card, Group, Field, Button, Note, Seg } from "@/components/ui";
+import { Section, Card, Group, Row, Field, Button, Note, Seg, IconTile } from "@/components/ui";
+import { isHotCity } from "@/lib/hot-cities";
 import { useProfile } from "@/components/useProfile";
 import { useCity } from "@/components/useCity";
 import { useFx, parseCny, formatMoney } from "@/components/useFx";
@@ -263,6 +264,11 @@ export default function MenuPage() {
               </button>
             </li>
           </Group>
+          {!menu && isHotCity(city.a) && (
+            <Group>
+              <Row href="/explore?tab=eat" icon={<IconTile><UtensilsCrossed className="h-5 w-5" aria-hidden /></IconTile>} title={fmt(t.guide.mustEat, { city: city.e })} sub={t.guide.mustEatSub} />
+            </Group>
+          )}
         </Section>
       )}
 

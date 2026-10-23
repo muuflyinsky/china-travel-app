@@ -6,3 +6,5 @@ data/clicks.jsonl
 next-env.d.ts
 *.tsbuildinfo
 data/hotels/
+data/city-guide/
+data/review.jsonl

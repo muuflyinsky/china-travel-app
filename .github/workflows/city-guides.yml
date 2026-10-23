@@ -1,0 +1,34 @@
+# Monthly refresh of the automatic city guides (top sights + signature dishes per hot city).
+# Needs repository secrets ANTHROPIC_API_KEY and AMAP_KEY (Settings → Secrets and variables → Actions).
+name: City guides
+on:
+  schedule:
+    - cron: "17 3 1 * *" # 03:17 UTC on the 1st of each month
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm run build
+      - name: Generate guides
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          AMAP_KEY: ${{ secrets.AMAP_KEY }}
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ] || [ -z "$AMAP_KEY" ]; then echo "Secrets missing; skipping."; exit 0; fi
+          export CITY_GUIDE_TOKEN=$(openssl rand -hex 24)
+          npx next start -p 3000 & sleep 8
+          node scripts/build-city-guides.mjs http://localhost:3000
+      - name: Commit
+        run: |
+          git config user.name "city-guides-bot"
+          git config user.email "city-guides-bot@users.noreply.github.com"
+          git add public/city-guide
+          git diff --cached --quiet || (git commit -m "Refresh city guides" && git push)

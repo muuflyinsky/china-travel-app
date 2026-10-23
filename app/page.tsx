@@ -23,6 +23,8 @@ import { useT } from "@/components/useT";
 import { CityPicker } from "@/components/CityPicker";
 import { stayStatus, stayReminderIcs, todayIso, daysBetween } from "@/lib/stay";
 import { tripPhase } from "@/lib/phase";
+import { upcomingReminders, type Reminder } from "@/lib/reminders";
+import { RESERVATIONS } from "@/lib/reservations";
 import { fmt } from "@/lib/i18n";
 
 type Weather = { casts: { date: string; dayweather: string; daytemp: string; nighttemp: string }[] };
@@ -40,6 +42,29 @@ function WeatherIcon({ zh }: { zh: string }) {
 
 const fmtDay = (iso: string, lang: string, month: "short" | "long" = "short") =>
   new Date(`${iso}T00:00:00Z`).toLocaleDateString(lang, { timeZone: "UTC", day: "numeric", month });
+
+/** Ticket releases the traveller set an alarm for, in the next 48 hours. */
+function ReleaseReminders() {
+  const t = useT();
+  const [p] = useProfile();
+  const [list, setList] = useState<Reminder[]>([]);
+  useEffect(() => setList(upcomingReminders()), []);
+  if (!list.length) return null;
+  return (
+    <Section title={t.resv.reminders}>
+      <Group>
+        {list.map((r) => {
+          const s = RESERVATIONS.find((x) => x.id === r.id);
+          const when = new Date(r.at).toLocaleString(p.lang, { weekday: "short", hour: "2-digit", minute: "2-digit" });
+          return s && (
+            <Row key={r.id + r.visit} href={s.url ?? s.guide} external icon={<IconTile><CalendarClock className="h-5 w-5" aria-hidden /></IconTile>}
+              title={s.en} sub={fmt(t.resv.reminderLine, { date: fmtDay(r.visit, p.lang, "long"), when })} />
+          );
+        })}
+      </Group>
+    </Section>
+  );
+}
 
 // ---- before the trip ---------------------------------------------------------------------
 
@@ -139,6 +164,7 @@ function BeforeTrip() {
         </Link>
         <CityHotels />
       </Section>
+      <ReleaseReminders />
       <Checklist />
       <Section>
         <Group>
@@ -279,6 +305,7 @@ function InChina() {
           <Search className="h-5 w-5" aria-hidden /> {t.today.whereTo}
         </Link>
       </Section>
+      <ReleaseReminders />
       <PaySection />
       <Section><StayCard /></Section>
     </>

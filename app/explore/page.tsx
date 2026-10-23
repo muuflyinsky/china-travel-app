@@ -2,15 +2,18 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Preloader } from "konsta/react";
-import { LocateFixed, Search, TrainFront, Bath, Pill, Landmark, Store, Hospital, CarTaxiFront } from "lucide-react";
+import { LocateFixed, Search, TrainFront, Bath, Pill, Landmark, Store, Hospital, CarTaxiFront, ExternalLink } from "lucide-react";
 import { Screen, DemoNote } from "@/components/Shell";
 import { Section, Card, Group, Row, Button, Note } from "@/components/ui";
 import { AppIcon } from "@/components/AppIcon";
 import { ShowCard } from "@/components/ShowCard";
 import { CityPicker } from "@/components/CityPicker";
+import { CityGuide } from "@/components/CityGuide";
+import { isHotCity } from "@/lib/hot-cities";
 import { useCity, type Here } from "@/components/useCity";
 import { useT } from "@/components/useT";
 import { amapNav, appleNav } from "@/lib/maplinks";
+import { goLink } from "@/lib/affiliate";
 import { fmt } from "@/lib/i18n";
 import type { Place } from "@/lib/amap";
 
@@ -47,13 +50,16 @@ function Explore() {
     setBusy("");
   }
 
-  async function search(keyword: string, nearby = false) {
+  /** `byRating`: for "where to eat this dish", best-rated first, then nearest. */
+  async function search(keyword: string, nearby = false, byRating = false) {
     setBusy("search"); setNotice(undefined); setDest(null);
     const qs = new URLSearchParams({ q: keyword });
     if (nearby && here) qs.set("around", here.location); else qs.set("city", city.a);
     const r = await fetch(`/api/places?${qs}`);
     const d = await r.json();
-    if (r.ok) { setPlaces(d.places); setDemo(d.demo); if (!d.places.length) setNotice(fmt(t.go.nothing, { q: keyword })); }
+    const list: Place[] = r.ok ? d.places : [];
+    if (byRating) list.sort((a, b) => Number(b.rating ?? 0) - Number(a.rating ?? 0) || Number(a.distance ?? 0) - Number(b.distance ?? 0));
+    if (r.ok) { setPlaces(list); setDemo(d.demo); if (!d.places.length) setNotice(fmt(t.go.nothing, { q: keyword })); }
     else setNotice(t.go.searchDown);
     setBusy("");
   }
@@ -123,6 +129,9 @@ function Explore() {
           <DemoNote show={demo} what={t.common.mapKey} />
           {busy === "search" && <div className="flex justify-center py-6"><Preloader /></div>}
           {places.length > 0 && (
+            <button onClick={() => { setPlaces([]); setQ(""); }} className="flex min-h-11 items-center px-1 text-subhead font-semibold text-cobalt">{t.guide.backToPicks}</button>
+          )}
+          {places.length > 0 && (
             <Group>
               {places.map((p) => (
                 <Row key={p.id} onClick={() => setDest(p)} title={<span className="zh">{p.name}</span>}
@@ -131,6 +140,20 @@ function Explore() {
               ))}
             </Group>
           )}
+        </Section>
+      )}
+
+      {!dest && places.length === 0 && busy !== "search" && isHotCity(city.a) && (
+        <Section title={fmt(t.guide.title, { city: city.e })}>
+          <CityGuide adcode={city.a} cityEn={city.e} initialTab={params.get("tab") === "eat" ? "eat" : "see"}
+            onFindDish={(zh) => { setQ(zh); search(zh, Boolean(here), true); window.scrollTo({ top: 0 }); }} />
+        </Section>
+      )}
+      {!dest && places.length === 0 && busy !== "search" && !isHotCity(city.a) && (
+        <Section>
+          <a href={goLink("trip", "attraction", { cityEn: city.e, city: city.s }, "explore_top", "explore-top")} target="_blank" rel="noopener" className="flex min-h-11 items-center gap-1 px-1 text-subhead font-semibold text-cobalt">
+            {fmt(t.guide.topTrip, { city: city.e })}<ExternalLink className="h-3.5 w-3.5" aria-hidden />
+          </a>
         </Section>
       )}
       {card && <ShowCard lines={card} sub={dest?.pinyin} onClose={() => setCard(null)} />}
