@@ -14,7 +14,7 @@
   - 字号从 36px 逐级缩到 28px，尽量一屏放下；服务员回复按钮固定在底部，最多 3 个；用户语言说明默认折叠。
   - 实测 390×844 下，2 道菜 + 1 个严重过敏原一屏看全，回复按钮可见（英、法、德）。
 - **AI 改为 OpenAI 兼容接口**（`lib/llm.ts` 的 `structured()`）：
-  - 环境变量 `AI_BASE_URL`、`AI_API_KEY`、`AI_MODEL_VISION`、`AI_MODEL_TEXT`，默认阿里云百炼（qwen-vl-max / qwen-plus）。不设 `AI_BASE_URL` 时先试新加坡站，Key 被拒（401/403）再试北京站，因为百炼的 Key 只能在创建它的地域使用。
+  - 环境变量 `AI_BASE_URL`、`AI_API_KEY`、`AI_MODEL_VISION`、`AI_MODEL_TEXT`，默认阿里云百炼（图片 qwen3-vl-plus、文字 qwen-plus）；模型不存在时按顺序换下一个（图片：qwen-vl-max、qwen-vl-max-latest、qwen3-vl-flash、qwen-vl-plus），并记住能用的那个。不设 `AI_BASE_URL` 时先试新加坡站，Key 被拒（401/403）再试北京站，因为百炼的 Key 只能在创建它的地域使用。
   - 自检：打开 `/api/ai-check`，返回实际使用的地域、模型名，以及文字和图片模型各一次极小调用的结果和错误原文（不含 Key）。
   - 模型回复的小偏差先自动修正再校验：过敏原写法（peanuts → peanut）、缺字段、大小写、字符串形式的配料等。无法识别的过敏原会把这道菜标为低置信度；菜品过敏原总包含各配料的过敏原。回复被截断时让模型简短重答。
   - 错误分开显示：422（回复无法解析）提示重拍；AI 服务出错（Key、额度、超时）提示“菜单识别暂时没有响应”。两种情况都在服务器日志里记录原因（`[ai]`、`[menu]`）。

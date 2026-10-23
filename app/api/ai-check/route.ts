@@ -23,8 +23,8 @@ export async function GET() {
     key: { length: config.ai.key.length, startsWithSk: config.ai.key.startsWith("sk-") },
     baseUrlSet: Boolean(process.env.AI_BASE_URL),
     deployedCommit: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? "local",
-    textModel: config.ai.textModel,
-    visionModel: config.ai.visionModel,
+    textModels: config.ai.textModels,
+    visionModels: config.ai.visionModels,
     ...result,
   }, { headers: { "cache-control": "no-store" } });
 }

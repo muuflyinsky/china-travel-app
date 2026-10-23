@@ -20,8 +20,9 @@ export const config = {
       : [DASHSCOPE_INTL, DASHSCOPE_CN]),
     // Pasted keys often carry a trailing newline or quotes, which the API rejects as invalid.
     key: (process.env.AI_API_KEY ?? "").trim().replace(/^["']|["']$/g, ""),
-    visionModel: process.env.AI_MODEL_VISION || "qwen-vl-max",
-    textModel: process.env.AI_MODEL_TEXT || "qwen-plus",
+    // Tried in order until one exists for this key (names differ by region and get retired).
+    visionModels: [...new Set([process.env.AI_MODEL_VISION || "qwen3-vl-plus", "qwen3-vl-plus", "qwen-vl-max", "qwen-vl-max-latest", "qwen3-vl-flash", "qwen-vl-plus"])],
+    textModels: [...new Set([process.env.AI_MODEL_TEXT || "qwen-plus", "qwen-plus", "qwen-plus-latest", "qwen3.6-flash", "qwen-turbo"])],
   },
   // Optional alternative: Claude, used only when AI_API_KEY is not set.
   anthropicKey: process.env.ANTHROPIC_API_KEY ?? "",

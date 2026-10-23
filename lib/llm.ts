@@ -47,8 +47,7 @@ async function openaiCompatible<T extends z.ZodType>(schema: T, ask: Ask): Promi
     : ask.text;
   let last = "", retry = "";
   for (let attempt = 0; attempt < 2; attempt++) {
-    const data = await chat({
-      model: vision ? config.ai.visionModel : config.ai.textModel,
+    const data = await chat(vision ? "vision" : "text", {
       messages: [{ role: "system", content: system + retry }, { role: "user", content: user }],
       max_tokens: Math.min(ask.maxTokens, 8192),
       temperature: 0.2,
@@ -68,15 +67,38 @@ async function openaiCompatible<T extends z.ZodType>(schema: T, ask: Ask): Promi
       } catch (e) { last = `not JSON: ${(e as Error).message}; reply began: ${last.slice(0, 120)}`; }
       retry = `\n\nYour previous reply did not match the schema (${last.slice(0, 300)}). Reply again with valid JSON only.`;
     }
-    console.error(`[ai] ${vision ? config.ai.visionModel : config.ai.textModel} attempt ${attempt + 1}: ${last.slice(0, 500)}`);
+    console.error(`[ai] ${currentModel(vision ? "vision" : "text")} attempt ${attempt + 1}: ${last.slice(0, 500)}`);
   }
   throw new Unreadable(`invalid model output: ${last.slice(0, 200)}`);
 }
 
 let region = 0; // index of the endpoint in config.ai.baseUrls that last accepted the key
+const modelAt = { vision: 0, text: 0 }; // index of the model that last existed for this key
+
+type Kind = keyof typeof modelAt;
+const models = (kind: Kind) => (kind === "vision" ? config.ai.visionModels : config.ai.textModels);
+export const currentModel = (kind: Kind) => models(kind)[modelAt[kind]];
+
+/** Tries each model in turn while the endpoint says it doesn't exist, and remembers the first that does. */
+async function chat(kind: Kind, body: object): Promise<ChatReply> {
+  const list = models(kind);
+  for (let i = 0; ; i++) {
+    const at = (modelAt[kind] + i) % list.length;
+    try {
+      const data = await post({ ...body, model: list[at] });
+      modelAt[kind] = at;
+      return data;
+    } catch (e) {
+      const missing = /AI 404|model_not_found|Model not exist|does not exist/i.test((e as Error).message);
+      if (!missing || i >= list.length - 1) throw e;
+    }
+  }
+}
+
+type ChatReply = { choices?: { message?: { content?: unknown }; finish_reason?: string }[] };
 
 /** POST to the first endpoint that accepts the key; upstream errors carry status and body for the logs. */
-async function chat(body: object): Promise<{ choices?: { message?: { content?: unknown }; finish_reason?: string }[] }> {
+async function post(body: object): Promise<ChatReply> {
   const urls = config.ai.baseUrls;
   for (let i = 0; ; i++) {
     const at = (region + i) % urls.length;
@@ -96,15 +118,15 @@ async function chat(body: object): Promise<{ choices?: { message?: { content?: u
 
 /** Connectivity check for /api/ai-check: one tiny call per model, errors returned as text. */
 export async function checkAi() {
-  const probe = async (model: string, content: unknown) => {
+  const probe = async (kind: Kind, content: unknown) => {
     try {
-      const d = await chat({ model, max_tokens: 5, messages: [{ role: "user", content }] });
-      return { ok: true, endpoint: new URL(config.ai.baseUrls[region]).host, reply: String(d.choices?.[0]?.message?.content ?? "").slice(0, 40) };
+      const d = await chat(kind, { max_tokens: 5, messages: [{ role: "user", content }] });
+      return { ok: true, endpoint: new URL(config.ai.baseUrls[region]).host, model: currentModel(kind), reply: String(d.choices?.[0]?.message?.content ?? "").slice(0, 40) };
     } catch (e) { return { ok: false, error: (e as Error).message.slice(0, 400) }; }
   };
   return {
-    text: await probe(config.ai.textModel, "Reply with OK."),
-    vision: await probe(config.ai.visionModel, [{ type: "image_url", image_url: { url: PROBE_PNG } }, { type: "text", text: "What colour is this? One word." }]),
+    text: await probe("text", "Reply with OK."),
+    vision: await probe("vision", [{ type: "image_url", image_url: { url: PROBE_PNG } }, { type: "text", text: "What colour is this? One word." }]),
   };
 }
 // 32×32 solid red PNG (some vision models reject images smaller than ~10 px).

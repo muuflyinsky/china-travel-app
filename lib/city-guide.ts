@@ -1,6 +1,6 @@
 import { readFile, writeFile, mkdir, appendFile } from "node:fs/promises";
 import { searchPlaces, py, type Place } from "./amap";
-import { analyzeMenu, writeCityGuide } from "./llm";
+import { analyzeMenu, currentModel, writeCityGuide } from "./llm";
 import { aiProvider, config, demo } from "./config";
 import { Unavailable } from "./errors";
 import { RESERVATION_SOURCE, reservationFor } from "./reservations";
@@ -112,7 +112,7 @@ export async function generateGuide(adcode: string, cityZh: string, cityEn: stri
   const areas = located.filter((a): a is GuideArea => a !== null);
 
   return {
-    city: cityZh, cityEn, adcode, generatedAt: new Date().toISOString(), model: config.ai.key ? config.ai.textModel : config.model, areas,
+    city: cityZh, cityEn, adcode, generatedAt: new Date().toISOString(), model: config.ai.key ? currentModel("text") : config.model, areas,
     sources: ["Amap (高德) POI data", `${RESERVATION_SOURCE.name}, ${RESERVATION_SOURCE.license}`],
     sights, dishes,
   };
