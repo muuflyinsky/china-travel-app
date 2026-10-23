@@ -1,12 +1,16 @@
 "use client";
 import { useEffect, useState } from "react";
-import { DemoBadge } from "@/components/DemoBadge";
+import { BlockTitle, List, ListInput, Preloader } from "konsta/react";
+import { BedDouble, Star, Map, IdCard, ExternalLink } from "lucide-react";
+import { Screen, DemoNote } from "@/components/Shell";
 import { goLink, CITY_EN } from "@/lib/affiliate";
 import { amapNav } from "@/lib/maplinks";
 import type { Place } from "@/lib/amap";
 
 const iso = (d: Date) => d.toISOString().slice(0, 10);
 const plus = (days: number) => iso(new Date(Date.now() + days * 864e5));
+
+type Change = React.ChangeEvent<HTMLInputElement & HTMLSelectElement>;
 
 export default function StayPage() {
   const [city, setCity] = useState("上海");
@@ -27,57 +31,62 @@ export default function StayPage() {
   }
   useEffect(() => { load(); }, [city]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const nights = Math.max(1, Math.round((+new Date(checkout) - +new Date(checkin)) / 864e5));
   const base = { city, checkin, checkout, adults };
 
   return (
-    <>
-      <h1>Places to stay</h1>
-      <p className="muted">Compare on Trip.com — English, foreign cards, and a filter for hotels licensed to host foreign guests.</p>
+    <Screen title="Stay">
+      <List strong inset className="mt-1!">
+        <ListInput type="select" dropdown label="City" value={city} onChange={(e: Change) => setCity(e.target.value)}>
+          {Object.entries(CITY_EN).map(([zh, en]) => <option key={zh} value={zh}>{en} · {zh}</option>)}
+        </ListInput>
+        <ListInput type="date" label="Check-in" value={checkin} onChange={(e: Change) => setCheckin(e.target.value)} />
+        <ListInput type="date" label={`Check-out · ${nights} night${nights > 1 ? "s" : ""}`} value={checkout} onChange={(e: Change) => setCheckout(e.target.value)} />
+        <ListInput type="number" label="Guests" value={adults} min={1} max={8} onChange={(e: Change) => setAdults(+e.target.value)} />
+        <ListInput type="text" label="Near (optional)" placeholder="外滩, 王府井, Jing’an…" value={area} onChange={(e: Change) => setArea(e.target.value)} onBlur={load} />
+      </List>
 
-      <div className="card stack" style={{ marginTop: 12 }}>
-        <label className="field">City
-          <select value={city} onChange={(e) => setCity(e.target.value)}>
-            {Object.entries(CITY_EN).map(([zh, en]) => <option key={zh} value={zh}>{en} · {zh}</option>)}
-          </select>
-        </label>
-        <div className="grid2">
-          <label className="field">Check-in<input type="date" value={checkin} onChange={(e) => setCheckin(e.target.value)} /></label>
-          <label className="field">Check-out<input type="date" value={checkout} onChange={(e) => setCheckout(e.target.value)} /></label>
-        </div>
-        <div className="grid2">
-          <label className="field">Guests<input type="number" min={1} max={8} value={adults} onChange={(e) => setAdults(+e.target.value)} /></label>
-          <label className="field">Area / landmark<input value={area} placeholder="e.g. 外滩, 王府井" onChange={(e) => setArea(e.target.value)} onBlur={load} /></label>
-        </div>
-        <a className="btn primary block" href={goLink("trip", "hotel_list", base, "stay_search")} target="_blank">Search hotels on Trip.com</a>
-        <a className="btn block" href={goLink("fliggy", "hotel_list", { ...base, keyword: area }, "stay_search")} target="_blank">Search on Fliggy 飞猪 (Chinese)</a>
+      <div className="mx-4 space-y-2">
+        <a href={goLink("trip", "hotel_list", base, "stay_search")} target="_blank" className="flex h-12 items-center justify-center gap-2 rounded-2xl bg-cta text-[17px] font-semibold text-cta-ink">
+          Search hotels on Trip.com <ExternalLink className="h-4 w-4" aria-hidden />
+        </a>
+        <a href={goLink("fliggy", "hotel_list", { ...base, keyword: area }, "stay_search")} target="_blank" className="flex min-h-11 items-center justify-center text-[15px] font-semibold text-cobalt">
+          Or search Fliggy 飞猪 (Chinese only)
+        </a>
       </div>
 
-      <div className="banner warn" style={{ marginTop: 12 }}>
-        🛂 Bring your passport. Hotels must register foreign guests with the police on check-in; budget guesthouses sometimes can’t. If staying with friends, register at the local police station within 24 h.
-      </div>
+      <p className="mx-4 mt-2 flex gap-2 rounded-2xl bg-cobalt-soft p-3 text-[15px]">
+        <IdCard className="mt-0.5 h-5 w-5 shrink-0 text-cobalt" aria-hidden />
+        <span>Hotels register foreign guests with the police at check-in, so bring your passport. Some budget guesthouses can’t host foreigners — Trip.com marks the ones that can.</span>
+      </p>
 
-      <h2>Hotels in {CITY_EN[city] ?? city}{area && ` near ${area}`}</h2>
-      <DemoBadge show={demo} what="AMAP_KEY" />
-      {loading && <p className="muted">Loading…</p>}
-      <div className="stack">
+      <BlockTitle>Hotels in {CITY_EN[city] ?? city}{area && ` near ${area}`}</BlockTitle>
+      <DemoNote show={demo} what="AMAP_KEY" />
+      {loading && <div className="flex justify-center py-6"><Preloader /></div>}
+      {!loading && hotels.length === 0 && <p className="mx-4 text-[15px] text-muted">No hotels found here. Try a different area, or search Trip.com directly.</p>}
+
+      <ul className="mx-4 space-y-3">
         {hotels.map((h) => (
-          <div key={h.id} className="card row" style={{ alignItems: "flex-start" }}>
-            {h.photo ? <img className="thumb" src={h.photo} alt="" /> : <div className="thumb" />}
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <h3 className="zh">{h.name}</h3>
-              <div className="small">{h.pinyin}</div>
-              <div className="small muted">
-                {h.rating && `★ ${h.rating}`} {h.cost && ` · from ~¥${h.cost}`} {h.type.split(";")[2] && ` · ${h.type.split(";")[2]}`}
-              </div>
-              <div className="row wrap" style={{ marginTop: 8 }}>
-                <a className="btn primary sm" target="_blank" href={goLink("trip", "hotel_search", { ...base, keyword: h.name }, "stay_card")}>Check price</a>
-                <a className="btn sm" target="_blank" href={amapNav(h, "car")}>Map</a>
+          <li key={h.id} className="flex gap-3 rounded-2xl border border-line bg-card p-3">
+            {h.photo
+              ? <img className="h-20 w-20 shrink-0 rounded-xl object-cover" src={h.photo} alt="" />
+              : <span className="grid h-20 w-20 shrink-0 place-items-center rounded-xl bg-cobalt-soft text-cobalt"><BedDouble className="h-7 w-7" aria-hidden /></span>}
+            <div className="min-w-0 flex-1">
+              <h3 className="zh text-[17px] leading-snug font-semibold">{h.name}</h3>
+              <p className="truncate text-[13px] text-muted">{h.pinyin}</p>
+              <p className="mt-1 flex items-center gap-1 text-[13px]">
+                {h.rating && <><Star className="h-3.5 w-3.5 fill-current text-ink" aria-hidden /><b>{h.rating}</b></>}
+                {h.cost && <span className="text-muted"> · from ~¥{h.cost}</span>}
+              </p>
+              <div className="mt-2 flex gap-2">
+                <a target="_blank" href={goLink("trip", "hotel_search", { ...base, keyword: h.name }, "stay_card")} className="flex h-10 flex-1 items-center justify-center rounded-xl bg-cta text-[15px] font-semibold text-cta-ink">Check price</a>
+                <a target="_blank" href={amapNav(h, "car")} aria-label={`${h.name} on the map`} className="grid h-10 w-11 place-items-center rounded-xl bg-cobalt-soft text-cobalt"><Map className="h-4 w-4" aria-hidden /></a>
               </div>
             </div>
-          </div>
+          </li>
         ))}
-      </div>
-      <p className="small muted" style={{ marginTop: 16 }}>We may earn a commission when you book through these links, at no extra cost to you.</p>
-    </>
+      </ul>
+      <p className="mx-4 mt-4 text-[13px] text-muted">We may earn a commission when you book through these links, at no extra cost to you.</p>
+    </Screen>
   );
 }

@@ -24,14 +24,21 @@ Every feature works without keys, using sample data (marked with a “Demo data�
 
 ## Features
 
-| Tab | What it does | Tech |
+| Screen | What it does | Tech |
 |---|---|---|
-| **Menu** | Photo / typed dish names → translation into 15 languages, pinyin, description, ingredients (labelled “menu” vs “typical recipe”), allergens (EU 14 + MSG), meat / alcohol / spice flags, conflicts with *your* allergies and diet highlighted, “safe for me only” filter, full-screen Chinese allergy card and “order this” card with TTS | Claude vision + structured outputs (`lib/llm.ts`) |
+| **Eat** | Photo / typed dish names → translation into 15 languages, pinyin, description, ingredients (labelled “menu” vs “typical recipe”), allergens (EU 14 + MSG), meat / alcohol / spice flags, conflicts with *your* allergies and diet highlighted, “safe for me only” filter, full-screen Chinese allergy card and “order this” card with TTS | Claude vision + structured outputs (`lib/llm.ts`) |
 | **Go** | Search places in any script, current location with WGS-84→GCJ-02 correction, metro / bus / walk / taxi options with English line names + Chinese, deep links to Amap & Apple Maps, “show to driver” card, nearby metro / toilet / pharmacy / ATM / hospital | Amap Web Service v5 (`lib/amap.ts`, `lib/coords.ts`) |
 | **Stay** | City / dates / guests → Trip.com and Fliggy search, hotel list from Amap with rating & price, per-hotel “check price” link | `lib/affiliate.ts`, `/api/go` |
 | **Talk** | Two-way translation with voice input & speech output, offline phrasebook | Claude + Web Speech API |
-| **Essentials** | Allergy / diet / language profile, Alipay & WeChat Pay setup, currency converter, visa-free rules, eSIM, apps, train & flight search, attraction booking, emergency numbers | |
-| **Home** | Weather, quick actions, pre-trip checklist | |
+| **Trip guide** (from Today) | Allergy / diet / language profile, Alipay & WeChat Pay setup, currency converter, visa-free rules, eSIM, apps, train & flight search, attraction booking, emergency numbers | |
+| **Today** | Menu-scan hero, “Where to?”, weather, show-to-someone cards, pre-trip checklist | |
+
+## Design
+
+- **Palette “Porcelain” (青花瓷)**: cobalt `#2B4ACB` for actions, lantern gold `#F2B705` only on booking / commission buttons, porcelain white background. Red, green and amber are reserved for allergy danger, safe and caution. See [docs/design/COLOR_RESEARCH.md](docs/design/COLOR_RESEARCH.md) for the competitor research and method.
+- **UI kit**: [Konsta UI](https://konstaui.com) (iOS theme) on Tailwind CSS 4, with [lucide](https://lucide.dev) icons; light and dark mode.
+- **Review**: [docs/design/CRITIQUE-v1.md](docs/design/CRITIQUE-v1.md) covers the v1 critique; [before-after.png](docs/design/before-after.png) shows the result.
+- **Design skills** (for Claude Code, in `.claude/skills/`): [impeccable](https://github.com/pbakaus/impeccable) (`/impeccable critique|audit|polish …`, detector: `.claude/skills/impeccable/scripts/impeccable detect app components`) and [ui-ux-pro-max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill).
 
 ## Architecture
 

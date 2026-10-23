@@ -1,22 +1,31 @@
 "use client";
 import { useState } from "react";
+import { BlockTitle, List, ListItem, Preloader } from "konsta/react";
+import {
+  LocateFixed, Search, TrainFront, Bath, Pill, Landmark, Store, Hospital, Footprints, Bus, CarTaxiFront, Car, Map, ChevronRight,
+} from "lucide-react";
+import { Screen, DemoNote } from "@/components/Shell";
 import { ShowCard } from "@/components/ShowCard";
-import { DemoBadge } from "@/components/DemoBadge";
 import { amapNav, appleNav } from "@/lib/maplinks";
 import type { Place, RouteOption } from "@/lib/amap";
 
 type Here = { location: string; city: string; citycode: string; address: string };
 
 const NEARBY = [
-  { label: "🚇 Metro", q: "地铁站" },
-  { label: "🚻 Toilet", q: "公共厕所" },
-  { label: "💊 Pharmacy", q: "药店" },
-  { label: "🏧 ATM", q: "ATM" },
-  { label: "🏪 Convenience", q: "便利店" },
-  { label: "🏥 Hospital", q: "医院" },
+  { label: "Metro", q: "地铁站", Icon: TrainFront },
+  { label: "Toilet", q: "公共厕所", Icon: Bath },
+  { label: "Pharmacy", q: "药店", Icon: Pill },
+  { label: "ATM", q: "ATM", Icon: Landmark },
+  { label: "Convenience", q: "便利店", Icon: Store },
+  { label: "Hospital", q: "医院", Icon: Hospital },
 ];
 
-const MODE_ICON = { transit: "🚇", walking: "🚶", driving: "🚕" } as const;
+const MODE = {
+  transit: { Icon: TrainFront, label: "Metro & bus" },
+  walking: { Icon: Footprints, label: "Walk" },
+  driving: { Icon: CarTaxiFront, label: "Taxi / DiDi" },
+} as const;
+const STEP_ICON = { walk: Footprints, subway: TrainFront, bus: Bus, rail: TrainFront, drive: Car } as const;
 
 export default function GoPage() {
   const [here, setHere] = useState<Here | null>(null);
@@ -27,22 +36,21 @@ export default function GoPage() {
   const [routes, setRoutes] = useState<RouteOption[]>([]);
   const [demo, setDemo] = useState(false);
   const [busy, setBusy] = useState("");
-  const [error, setError] = useState<string>();
+  const [notice, setNotice] = useState<string>();
   const [card, setCard] = useState<string[] | null>(null);
 
-  async function locate() {
-    setBusy("locating"); setError(undefined);
+  function locate() {
+    setBusy("locating"); setNotice(undefined);
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         const r = await fetch(`/api/regeo?lng=${pos.coords.longitude}&lat=${pos.coords.latitude}`);
         const d = await r.json();
-        if (r.ok) { setHere(d); setCity(d.city.replace(/市$/, "")); } else setError(d.error);
+        if (r.ok) { setHere(d); setCity(d.city.replace(/市$/, "")); } else setNotice("Couldn't look up your address. Search still works.");
         setBusy("");
       },
       () => {
-        // Fallback for desktop / denied permission: use the city centre.
         setHere({ location: "121.4737,31.2304", city: "上海市", citycode: "021", address: "人民广场 People's Square (approx.)" });
-        setError("Location unavailable — using People's Square, Shanghai.");
+        setNotice("Location is off, so we're using People's Square, Shanghai. Allow location in your browser settings for accurate routes.");
         setBusy("");
       },
       { enableHighAccuracy: true, timeout: 10000 },
@@ -50,12 +58,13 @@ export default function GoPage() {
   }
 
   async function search(keyword: string, nearby = false) {
-    setBusy("search"); setError(undefined); setDest(null); setRoutes([]);
+    setBusy("search"); setNotice(undefined); setDest(null); setRoutes([]);
     const qs = new URLSearchParams({ q: keyword });
     if (nearby && here) qs.set("around", here.location); else qs.set("city", city);
     const r = await fetch(`/api/places?${qs}`);
     const d = await r.json();
-    if (r.ok) { setPlaces(d.places); setDemo(d.demo); } else setError(d.error);
+    if (r.ok) { setPlaces(d.places); setDemo(d.demo); if (!d.places.length) setNotice(`Nothing found for “${keyword}”. Try the Chinese name or a nearby landmark.`); }
+    else setNotice("Search is unavailable right now. Check your connection and try again.");
     setBusy("");
   }
 
@@ -66,94 +75,115 @@ export default function GoPage() {
     const qs = new URLSearchParams({ origin: here.location, destination: p.location, citycode: here.citycode, destCitycode: p.citycode || here.citycode });
     const r = await fetch(`/api/route?${qs}`);
     const d = await r.json();
-    if (r.ok) setRoutes(d.routes); else setError(d.error);
+    if (r.ok) setRoutes(d.routes); else setNotice("Couldn't plan a route. You can still open it in Amap.");
     setBusy("");
   }
 
-  const taxiCard = (p: Place) => ["师傅您好，请带我去：", p.name, `地址：${p.address}`];
-
   return (
-    <>
-      <h1>Get around</h1>
-      <p className="muted">Search in English, pinyin or Chinese. Routes come from Amap (高德), the map locals use.</p>
+    <Screen title="Go">
+      <form className="mx-4 mt-1 flex gap-2" onSubmit={(e) => { e.preventDefault(); if (q.trim()) search(q.trim()); }}>
+        <label className="flex h-12 min-w-0 flex-1 items-center gap-2 rounded-2xl border border-line bg-card px-3">
+          <Search className="h-5 w-5 text-muted" aria-hidden />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="The Bund, 豫园, Hongqiao station…" aria-label="Destination" className="h-full w-full min-w-0 flex-1 bg-transparent text-[17px] outline-none placeholder:text-muted" />
+        </label>
+        <button className="h-12 shrink-0 rounded-2xl bg-cobalt px-5 text-[17px] font-semibold text-white dark:text-[#12141c]">Go</button>
+      </form>
 
-      <div className="card stack" style={{ marginTop: 12 }}>
-        <div className="row">
-          <button className="btn" onClick={locate} disabled={busy === "locating"}>📍 {here ? "Update" : "Use my location"}</button>
-          <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="City, e.g. 北京 / Beijing" style={{ flex: 1 }} />
-        </div>
-        {here && <div className="small muted zh">You are near: {here.address}</div>}
-        <form className="row" onSubmit={(e) => { e.preventDefault(); if (q.trim()) search(q.trim()); }}>
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Where to? e.g. The Bund, 豫园, Hongqiao station" />
-          <button className="btn primary">Go</button>
-        </form>
-        <div className="row wrap">
-          {NEARBY.map((n) => (
-            <button key={n.q} className="chip toggle" disabled={!here} onClick={() => search(n.q, true)} title={here ? "" : "Use my location first"}>{n.label}</button>
-          ))}
-        </div>
+      <div className="mx-4 mt-3 flex items-center gap-2 text-[15px]">
+        <button onClick={locate} disabled={busy === "locating"} className="flex min-h-11 items-center gap-1.5 font-semibold text-cobalt">
+          {busy === "locating" ? <Preloader className="h-4! w-4!" /> : <LocateFixed className="h-5 w-5" aria-hidden />}
+          {here ? "Update location" : "Use my location"}
+        </button>
+        <span className="text-muted">· in</span>
+        <input value={city} onChange={(e) => setCity(e.target.value)} aria-label="City" className="zh min-h-11 w-24 rounded-lg bg-transparent font-semibold outline-none" />
+      </div>
+      {here && <p className="zh mx-4 text-[13px] text-muted">Near {here.address}</p>}
+
+      <BlockTitle>Nearby</BlockTitle>
+      <div className="mx-4 grid grid-cols-3 gap-2">
+        {NEARBY.map(({ label, q: k, Icon }) => (
+          <button
+            key={k}
+            onClick={() => (here ? search(k, true) : (locate(), setNotice("Getting your location first — tap again in a moment.")))}
+            className="flex min-h-[64px] flex-col items-center justify-center gap-1 rounded-2xl border border-line bg-card text-[13px] font-semibold"
+          >
+            <Icon className="h-5 w-5 text-cobalt" aria-hidden /> {label}
+          </button>
+        ))}
       </div>
 
-      {error && <div className="banner warn" style={{ marginTop: 12 }}>{error}</div>}
-      {busy === "search" && <p className="muted">Searching…</p>}
-      <div style={{ marginTop: 12 }}><DemoBadge show={demo} what="AMAP_KEY" /></div>
+      {notice && <p className="mx-4 mt-3 rounded-xl bg-warn-soft p-3 text-[15px] text-warn">{notice}</p>}
+      <DemoNote show={demo} what="AMAP_KEY" />
+      {busy === "search" && <div className="flex justify-center py-6"><Preloader /></div>}
 
       {places.length > 0 && (
-        <div className="stack" style={{ marginTop: 12 }}>
+        <List strong inset dividers>
           {places.map((p) => (
-            <button key={p.id} className="card" style={{ textAlign: "left", width: "100%", font: "inherit", color: "inherit", cursor: "pointer" }} onClick={() => choose(p)}>
-              <div className="row spread"><h3 className="zh">{p.name}</h3>{p.distance && <span className="small muted">{p.distance} m</span>}</div>
-              <div className="small">{p.pinyin}</div>
-              <div className="small muted zh">{p.address}</div>
-            </button>
+            <ListItem key={p.id} link title={<span className="zh">{p.name}</span>} subtitle={p.pinyin} text={<span className="zh">{p.address}</span>} after={p.distance ? `${p.distance} m` : undefined} onClick={() => choose(p)} />
           ))}
-        </div>
+        </List>
       )}
 
       {dest && (
-        <div className="card stack" style={{ marginTop: 12 }}>
-          <div>
-            <h2 style={{ margin: 0 }} className="zh">{dest.name}</h2>
-            <div className="small">{dest.pinyin}</div>
-            <div className="small muted zh">{dest.address}</div>
-          </div>
-          <div className="row wrap">
-            <a className="btn primary sm" href={amapNav(dest, "bus")} target="_blank">Open in Amap</a>
-            <a className="btn sm" href={appleNav(dest, "r")} target="_blank">Apple Maps</a>
-            <button className="btn sm" onClick={() => setCard(taxiCard(dest))}>🚕 Show to driver</button>
-          </div>
-          {!here && <p className="small muted">Tap “Use my location” to see metro, walking and taxi options.</p>}
-          {busy === "route" && <p className="muted">Planning routes…</p>}
-          {routes.map((r, i) => (
-            <div key={i} className="card" style={{ boxShadow: "none" }}>
-              <div className="row spread">
-                <b>{MODE_ICON[r.mode]} {r.summary}</b>
-                <span>{r.minutes} min{r.priceCny !== undefined && ` · ¥${r.priceCny}`}</span>
-              </div>
-              {r.steps.length > 0 && (
-                <div style={{ marginTop: 6 }}>
-                  {r.steps.map((s, j) => (
-                    <div key={j} className="step">
-                      <span>{{ walk: "🚶", subway: "🚇", bus: "🚌", rail: "🚄", drive: "🚗" }[s.kind]}</span>
-                      <div>{s.text}{s.zh && <div className="small muted zh">{s.zh}</div>}</div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {r.mode === "driving" && (
-                <p className="small muted">Book via DiDi (English app) or Alipay → DiDi mini-program. Fare is Amap’s estimate.</p>
-              )}
-              <div className="row" style={{ marginTop: 6 }}>
-                <a className="btn sm" target="_blank" href={amapNav(dest, r.mode === "transit" ? "bus" : r.mode === "walking" ? "walk" : "car", { location: here!.location, name: "我的位置" })}>Navigate</a>
-              </div>
+        <>
+          <section className="mx-4 mt-4 rounded-2xl border border-line bg-card p-4">
+            <h2 className="zh text-[22px] font-bold">{dest.name}</h2>
+            <p className="text-[15px]">{dest.pinyin}</p>
+            <p className="zh text-[13px] text-muted">{dest.address}</p>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <button onClick={() => setCard(["师傅您好，请带我去：", dest.name, `地址：${dest.address}`])} className="col-span-2 flex h-12 items-center justify-center gap-2 rounded-xl bg-cobalt text-[17px] font-semibold text-white dark:text-[#12141c]">
+                <CarTaxiFront className="h-5 w-5" aria-hidden /> Show to taxi driver
+              </button>
+              <a href={amapNav(dest, "bus")} target="_blank" className="flex h-11 items-center justify-center gap-1.5 rounded-xl bg-cobalt-soft font-semibold text-cobalt"><Map className="h-4 w-4" aria-hidden /> Amap</a>
+              <a href={appleNav(dest, "r")} target="_blank" className="flex h-11 items-center justify-center gap-1.5 rounded-xl bg-cobalt-soft font-semibold text-cobalt"><Map className="h-4 w-4" aria-hidden /> Apple Maps</a>
             </div>
-          ))}
+          </section>
+
+          {!here && <p className="mx-4 mt-3 text-[15px] text-muted">Use your location to see metro, walking and taxi options.</p>}
+          {busy === "route" && <div className="flex justify-center py-6"><Preloader /></div>}
+          {routes.length > 0 && <BlockTitle>Ways to get there</BlockTitle>}
+          {routes.map((r, i) => {
+            const M = MODE[r.mode];
+            return (
+              <section key={i} className="mx-4 mb-3 rounded-2xl border border-line bg-card p-4">
+                <header className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <M.Icon className="h-5 w-5 text-cobalt" aria-hidden />
+                    <div>
+                      <p className="text-[17px] font-semibold">{M.label}</p>
+                      {r.mode === "transit" && <p className="text-[13px] text-muted">{r.summary}</p>}
+                    </div>
+                  </div>
+                  <p className="text-right text-[17px] font-semibold tabular-nums">{r.minutes} min{r.priceCny !== undefined && <span className="block text-[13px] font-normal text-muted">≈ ¥{r.priceCny}</span>}</p>
+                </header>
+                {r.steps.length > 0 && (
+                  <ol className="mt-3 space-y-2 border-l-2 border-cobalt-soft pl-3">
+                    {r.steps.map((s, j) => {
+                      const S = STEP_ICON[s.kind];
+                      return (
+                        <li key={j} className="flex gap-2 text-[15px]">
+                          <S className="mt-0.5 h-4 w-4 shrink-0 text-muted" aria-hidden />
+                          <span>{s.text}{s.zh && <span className="zh block text-[13px] text-muted">{s.zh}</span>}</span>
+                        </li>
+                      );
+                    })}
+                  </ol>
+                )}
+                {r.mode === "driving" && <p className="mt-2 text-[13px] text-muted">Book in the DiDi app (English) or Alipay → DiDi. Fare is Amap’s estimate.</p>}
+                {here && (
+                  <a target="_blank" href={amapNav(dest, r.mode === "transit" ? "bus" : r.mode === "walking" ? "walk" : "car", { location: here.location, name: "我的位置" })} className="mt-2 flex min-h-11 items-center gap-1 text-[15px] font-semibold text-cobalt">
+                    Start navigation <ChevronRight className="h-4 w-4" aria-hidden />
+                  </a>
+                )}
+              </section>
+            );
+          })}
           {routes.some((r) => r.mode === "transit") && (
-            <p className="small muted">Metro: scan the Alipay / WeChat “Transport code” at the gate — foreign cards work once linked. Some cities (e.g. Shanghai, Beijing) also accept Visa/Mastercard tap at the gate.</p>
+            <p className="mx-4 text-[13px] text-muted">At the metro gate, scan the Alipay or WeChat “Transport code”. Some cities (e.g. Shanghai, Beijing) also take Visa/Mastercard tap.</p>
           )}
-        </div>
+        </>
       )}
       {card && <ShowCard lines={card} sub={dest?.pinyin} onClose={() => setCard(null)} />}
-    </>
+    </Screen>
   );
 }
