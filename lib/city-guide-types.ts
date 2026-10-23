@@ -9,6 +9,8 @@ export const pick = (t: L10n | undefined, lang: string) => (t ? (t as Record<str
 export type GuideSight = {
   id: string; zh: string; en: string; location: string; address: string;
   rating?: number; national: boolean;
+  /** First Amap photo, https. Credited "图片：高德" wherever shown. */
+  photo?: string;
   intro: L10n; bestTime: L10n; hours: number;
   /** Low = the model was unsure; the UI hides the intro and the item is queued for review. */
   confidence: "high" | "low";

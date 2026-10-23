@@ -16,6 +16,7 @@ import { track } from "@/lib/track";
 import { RESERVATIONS } from "@/lib/reservations";
 import { pick, type CityGuide as Guide, type GuideDish, type GuideSight } from "@/lib/city-guide-types";
 import { AwardBadges } from "./AwardBadges";
+import { Photo } from "./Photo";
 import type { AwardRestaurant } from "@/lib/restaurant-awards";
 import type { Place } from "@/lib/amap";
 
@@ -106,6 +107,7 @@ function SightCard({ s, city, cityEn, index }: { s: GuideSight; city: string; ci
   const best = s.confidence === "high" ? pick(s.bestTime, p.lang) : "";
   return (
     <Card>
+      <Photo src={s.photo} alt={s.en} className="mb-3" />
       <h3 className="text-headline">{s.en}</h3>
       <p className="zh text-subhead text-muted">{s.zh}</p>
       {intro && <p className="mt-2 text-body">{intro}</p>}
@@ -203,7 +205,9 @@ export function CityGuide({ adcode, cityEn, initialTab = "see", onFindDish, onPi
             {items.map((x, i) => i !== sel && (
               <li key={i}>
                 <button onClick={() => setSel(i)} className="flex min-h-12 w-full items-center gap-3 px-4 py-2 text-left">
-                  <span className="w-5 shrink-0 text-footnote text-muted tabular-nums">{i + 1}</span>
+                  {tab === "see" && (x as GuideSight).photo
+                    ? <Photo src={(x as GuideSight).photo} alt="" shape="square" />
+                    : <span className="w-5 shrink-0 text-footnote text-muted tabular-nums">{i + 1}</span>}
                   <span className="min-w-0 flex-1">
                     <span className="block text-body">{tab === "see" ? (x as GuideSight).en : pick((x as GuideDish).name, p.lang)}</span>
                     <span className="zh block text-footnote text-muted">{x.zh}</span>

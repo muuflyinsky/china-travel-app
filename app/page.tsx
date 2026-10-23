@@ -10,11 +10,11 @@ import { Section, Card, Group, Row, Button, IconTile } from "@/components/ui";
 import { VisaCheck } from "@/components/VisaCheck";
 import { HotelCard } from "@/components/HotelCard";
 import { useHotelPicks, usePrice } from "@/components/HotelPicks";
-import { PayButtons, PAY_LINKS } from "@/components/PayButtons";
+import { PayButtons, PAY_LINKS, WechatGuide } from "@/components/PayButtons";
 import { AppIcon } from "@/components/AppIcon";
 import { APPS, type AppId } from "@/lib/apps";
 import { openApp } from "@/lib/openApp";
-import { amapNav } from "@/lib/maplinks";
+import { RideButtons } from "@/components/RideButtons";
 import { track } from "@/lib/track";
 import { PriceCheck } from "@/components/PriceCheck";
 import { PaySetup } from "@/components/prep/PaySetup";
@@ -307,16 +307,18 @@ function Tile({ icon, title, sub, onClick, href, primary, apps }: {
 function PayTile({ onConvert }: { onConvert: () => void }) {
   const t = useT();
   const btn = "flex min-h-11 w-full items-center gap-2 rounded-xl border border-line bg-porcelain px-2 text-left text-subhead font-semibold";
+  const [guide, setGuide] = useState(false);
   return (
     <div className="flex min-h-[132px] flex-col gap-2 rounded-2xl border border-line bg-card p-3">
       <span className="px-1 text-headline">{t.today.tilePay}</span>
       <button className={btn} onClick={() => openApp("alipay", PAY_LINKS.alipayPay)} aria-label={t.pay.openAlipay}>
         <AppIcon id="alipay" size={26} /><span className="min-w-0 flex-1 truncate">Alipay</span><QrCode className="h-4 w-4 shrink-0 text-cobalt" aria-hidden />
       </button>
-      <button className={btn} onClick={() => openApp("wechat", PAY_LINKS.wechat)} aria-label={t.pay.openWechat}>
+      <button className={btn} onClick={() => setGuide(true)} aria-label={t.pay.openWechat}>
         <AppIcon id="wechat" size={26} /><span className="min-w-0 flex-1 truncate">WeChat</span><QrCode className="h-4 w-4 shrink-0 text-cobalt" aria-hidden />
       </button>
       <button onClick={onConvert} className="flex min-h-8 items-center gap-1 px-1 text-footnote font-semibold text-cobalt"><Calculator className="h-3.5 w-3.5" aria-hidden />{t.today.priceCheck}</button>
+      {guide && <WechatGuide onClose={() => setGuide(false)} />}
     </div>
   );
 }
@@ -354,16 +356,15 @@ function DriverApps() {
   if (!h) return null;
   return (
     <div className="space-y-2">
-      <div className="grid grid-cols-2 gap-2">
-        {h.location ? (
-          <a href={amapNav({ location: h.location, name: h.name }, "car")} target="_blank" rel="noopener" onClick={() => track("app_open", { app: "amap" })}
-            className="flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-line bg-card text-subhead font-semibold"><AppIcon id="amap" size={24} />{t.today.amapToHotel}</a>
-        ) : (
-          <button onClick={() => openApp("amap")} className="flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-line bg-card text-subhead font-semibold"><AppIcon id="amap" size={24} />Amap</button>
-        )}
-        <button onClick={() => openApp("didi")} className="flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-line bg-card text-subhead font-semibold"><AppIcon id="didi" size={24} />{t.today.openDidi}</button>
-      </div>
-      <p className="px-1 text-footnote text-muted">{t.today.didiHint}</p>
+      {h.location ? <RideButtons to={{ location: h.location, name: h.name }} address={h.address} /> : (
+        <>
+          <div className="grid grid-cols-2 gap-2">
+            <button onClick={() => openApp("amap")} className="flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-line bg-card text-subhead font-semibold"><AppIcon id="amap" size={24} />Amap</button>
+            <button onClick={() => openApp("didi")} className="flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-line bg-card text-subhead font-semibold"><AppIcon id="didi" size={24} />{t.today.openDidi}</button>
+          </div>
+          <p className="px-1 text-footnote text-muted">{t.today.didiHint}</p>
+        </>
+      )}
       <div className="flex items-center gap-2 rounded-2xl bg-porcelain p-3">
         <span className="zh min-w-0 flex-1 text-subhead" lang="zh-CN">{h.address}</span>
         <button onClick={() => { navigator.clipboard?.writeText(h.address).then(() => setCopied(true)).catch(() => {}); }}

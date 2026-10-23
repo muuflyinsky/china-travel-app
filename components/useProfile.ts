@@ -27,13 +27,15 @@ export type Profile = {
   severe: string[]; // allergens where even a trace is dangerous
   /** Destination cities: adcode, English, Chinese short + full name, province; optional dates there. */
   cities: TripCity[];
+  /** Which app "book a ride" opens (SPEC v0.5 P1.6 #24). */
+  rideApp: "amap" | "didi";
 };
 
 const DEFAULT: Profile = {
   lang: "en", allergens: [], diets: [], homeCurrency: "USD", name: "",
   locatedInChina: false, arrival: "", entryDate: "", entryType: "visa_free_30", visaDays: 30,
   departure: "", nationality: "", onwardThird: null, guests: 1, hotel: null, allergiesAsked: false,
-  severe: [], cities: [],
+  severe: [], cities: [], rideApp: "amap",
 };
 const KEY = "ctg.profile";
 const EVENT = "ctg-profile";

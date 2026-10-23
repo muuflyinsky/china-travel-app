@@ -4,6 +4,7 @@ import { Check, Plus, X, Trash2 } from "lucide-react";
 import { Screen } from "@/components/Shell";
 import { Section, Group, Row, Field, Note } from "@/components/ui";
 import { EditSheet } from "@/components/EditSheet";
+import { AppIcon } from "@/components/AppIcon";
 import { CountryPicker, useCountryName } from "@/components/VisaCheck";
 import { CityPicker } from "@/components/CityPicker";
 import { useProfile, type TripCity } from "@/components/useProfile";
@@ -19,7 +20,7 @@ import pkg from "@/package.json";
 
 const CURRENCIES = ["USD", "EUR", "GBP", "JPY", "KRW", "AUD", "CAD", "SGD", "HKD", "CHF", "THB", "MYR", "NZD", "SEK", "INR", "BRL", "MXN", "RUB", "TRY", "IDR", "VND", "PHP"];
 const toggle = (list: string[], id: string) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
-type Sheet = "passport" | "language" | "currency" | "dates" | "entry" | "cities" | "allergies" | "diet" | "earn" | "privacy";
+type Sheet = "passport" | "language" | "currency" | "dates" | "entry" | "cities" | "allergies" | "diet" | "earn" | "privacy" | "ride";
 const SHEETS: Sheet[] = ["passport", "language", "currency", "dates", "entry", "cities", "allergies", "diet", "earn", "privacy"];
 
 /** A row's current value, right-aligned and truncated. */
@@ -88,6 +89,7 @@ export default function SettingsPage() {
           <Row onClick={() => setSheet("entry")} title={t.settings.entryType}
             sub={derived && p.entryType === derived ? t.settings.fromPassport : undefined} after={<Value>{entryValue}</Value>} />
           <Row onClick={() => setSheet("cities")} title={t.settings.cities} after={<Value>{p.cities.length ? list(p.cities.map((c) => c.e)) : t.settings.add}</Value>} />
+          <Row onClick={() => setSheet("ride")} title={t.settings.rideApp} after={<Value>{p.rideApp === "didi" ? "DiDi" : "Amap"}</Value>} />
         </Group>
       </Section>
 
@@ -228,6 +230,16 @@ export default function SettingsPage() {
             </button>
           ))}
         </div>
+      </EditSheet>
+
+      <EditSheet open={sheet === "ride"} title={t.settings.rideApp} onClose={close}>
+        <Group>
+          {(["amap", "didi"] as const).map((id) => (
+            <Row key={id} onClick={() => set({ rideApp: id })} icon={<AppIcon id={id} size={32} />} title={id === "didi" ? "DiDi · 滴滴出行" : "Amap · 高德地图"}
+              after={p.rideApp === id ? <Check className="h-5 w-5 text-cobalt" aria-hidden /> : undefined} chevron={false} />
+          ))}
+        </Group>
+        <p className="px-1 text-footnote text-muted">{t.settings.rideAppNote}</p>
       </EditSheet>
 
       <EditSheet open={sheet === "earn"} title={t.settings.howWeEarn} onClose={close}>

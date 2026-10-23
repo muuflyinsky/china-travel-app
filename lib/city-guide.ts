@@ -50,7 +50,7 @@ export async function basicGuide(adcode: string, cityZh: string, cityEn: string)
     sights: top.map((p) => ({
       // Without the model there is no English name; the reservation data has one for the big sights.
       id: p.id, zh: p.name, en: reservationFor(adcode, p.name)?.en ?? p.pinyin, location: p.location, address: p.address,
-      rating: p.rating ? Number(p.rating) : undefined, national: p.type.includes("国家级"),
+      rating: p.rating ? Number(p.rating) : undefined, national: p.type.includes("国家级"), photo: p.photo,
       intro: { en: "" }, bestTime: { en: "" }, hours: 0, confidence: "low",
       reservation: reservationFor(adcode, p.name)?.id,
     })),
@@ -81,7 +81,7 @@ export async function generateGuide(adcode: string, cityZh: string, cityEn: stri
     const w = text.sights.find((x) => x.zh === p.name);
     return {
       id: p.id, zh: p.name, en: w?.en ?? p.pinyin, location: p.location, address: p.address,
-      rating: p.rating ? Number(p.rating) : undefined, national: p.type.includes("国家级"),
+      rating: p.rating ? Number(p.rating) : undefined, national: p.type.includes("国家级"), photo: p.photo,
       intro: w?.intro ?? { en: "" }, bestTime: w?.best_time ?? { en: "" },
       hours: Math.min(8, Math.max(0.5, Math.round((w?.hours ?? 2) * 2) / 2)),
       confidence: w?.confidence === "high" ? "high" : "low",

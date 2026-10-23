@@ -1,5 +1,5 @@
 // Sample data so the prototype works without API keys (shown with a DEMO badge).
-import type { Place } from "./amap";
+import type { Place, Routes } from "./amap";
 import type { Menu } from "./llm";
 import type { CityPicks, HotelPick } from "./hotel-tiers";
 import type { CityGuide } from "./city-guide-types";
@@ -28,6 +28,17 @@ export function places(keywords?: string, types?: string): Place[] {
   const hits = SIGHTS.filter((p) => p.name.includes(k) || p.pinyin.toLowerCase().includes(k));
   return hits.length ? hits : SIGHTS;
 }
+
+// People's Square → Yu Garden, roughly as Amap answers it. Times and fares are illustrative.
+export const routes: Routes = {
+  transit: [
+    { minutes: 24, cost: 3, walkMeters: 650, steps: [
+      { kind: "walk", meters: 250 }, { kind: "metro", line: "地铁10号线", from: "南京东路", to: "豫园", fromPy: "Nan Jing Dong Lu", toPy: "Yu Yuan", stops: 1 }, { kind: "walk", meters: 400 }] },
+    { minutes: 31, cost: 2, walkMeters: 520, steps: [
+      { kind: "walk", meters: 300 }, { kind: "bus", line: "71路", from: "延安东路西藏中路", to: "延安东路河南南路", fromPy: "Yan An Dong Lu Xi Zang Zhong Lu", toPy: "Yan An Dong Lu He Nan Nan Lu", stops: 4 }, { kind: "walk", meters: 220 }] },
+  ],
+  taxi: { minutes: 12, cost: 18, km: 3.1 },
+};
 
 export const regeo = { address: "上海市黄浦区南京东路街道人民广场", city: "上海市", citycode: "021", adcode: "310101" };
 

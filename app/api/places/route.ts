@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { errorResponse } from "@/lib/errors";
-import { searchPlaces } from "@/lib/amap";
+import { searchPlaces, cleanResults } from "@/lib/amap";
 import { demo } from "@/lib/config";
 import { withAwards } from "@/lib/restaurants";
 
@@ -14,7 +14,10 @@ export async function GET(req: Request) {
       types: q.get("types") ?? undefined,
       page: Number(q.get("page") ?? 1),
     });
-    return NextResponse.json({ places: withAwards(places), demo: demo.maps });
+    // Searches are cleaned and ordered (#21): `sort=rating` for category browsing, otherwise sights,
+    // hotels, food and metro first. "Nearby" (around) keeps everything, nearest first.
+    const list = q.get("around") ? places : cleanResults(places, { byRating: q.get("sort") === "rating" });
+    return NextResponse.json({ places: withAwards(list), demo: demo.maps });
   } catch (e) {
     return errorResponse(e, "places");
   }
