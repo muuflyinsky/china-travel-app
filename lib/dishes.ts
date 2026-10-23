@@ -186,7 +186,7 @@ export type MenuEvent =
   | { type: "meta"; cuisine: string; total: number }
   | { type: "dish"; i: number; dish: ListDish; cached: boolean }
   | { type: "tips"; tips: string[] }
-  | { type: "missing"; i: number[] };
+  | { type: "missing"; i: number[]; reason?: string };
 
 /**
  * Streams a menu: the dish count first, then each dish as soon as it's known (cache hits at
@@ -218,24 +218,24 @@ export async function* readMenu(input: { image?: { data: string; mediaType: stri
 
   // Misses in small batches, a few at a time; each batch is emitted the moment it returns.
   type Facts = z.infer<typeof FactsSchema>;
-  type Done = { id: number; b: number[]; out: Facts | null };
+  type Done = { id: number; b: number[]; out: Facts | null; err?: string };
   const batches: number[][] = [];
   for (let k = 0; k < misses.length; k += CHUNK) batches.push(misses.slice(k, k + CHUNK));
   const running = new Map<number, Promise<Done>>();
   const failed: number[] = [];
-  let next = 0, tipsSent = false;
+  let next = 0, tipsSent = false, lastError = "";
   const launch = () => {
     if (next >= batches.length) return;
     const id = next++, b = batches[id];
     running.set(id, generateFacts(b.map((i) => items[i]), input.lang, input.city, id === 0)
-      .then((out) => ({ id, b, out }), (e) => { console.error("[menu] facts batch failed:", (e as Error).message); return { id, b, out: null }; }));
+      .then((out) => ({ id, b, out }), (e) => { console.error("[menu] facts batch failed:", (e as Error).message); return { id, b, out: null, err: (e as Error).message }; }));
   };
   for (let k = 0; k < PARALLEL; k++) launch();
   while (running.size) {
-    const { id, b, out } = await Promise.race(running.values());
+    const { id, b, out, err } = await Promise.race(running.values());
     running.delete(id);
     launch();
-    if (!out) { failed.push(...b); continue; }
+    if (!out) { failed.push(...b); lastError ||= err ?? ""; continue; }
     if (!cuisine && out.cuisine) { cuisine = out.cuisine; yield { type: "meta", cuisine, total: items.length }; }
     if (!tipsSent && out.tips.length) { tipsSent = true; yield { type: "tips", tips: out.tips.slice(0, 2) }; }
     for (const [j, i] of b.entries()) {
@@ -252,7 +252,8 @@ export async function* readMenu(input: { image?: { data: string; mediaType: stri
       yield { type: "dish", i, dish, cached: false };
     }
   }
-  if (failed.length) yield { type: "missing", i: failed.sort((a, b) => a - b) };
+  // The first upstream error (no secrets in it) helps diagnose from the browser when logs aren't at hand.
+  if (failed.length) yield { type: "missing", i: failed.sort((a, b) => a - b), reason: lastError.slice(0, 200) };
   console.log(`[menu] ${input.image ? "photo" : "text"} dishes=${items.length} read=${tRead - t0}ms cache=${items.length - misses.length}/${items.length} (${tCache - tRead}ms) generate=${Date.now() - tCache}ms failed=${failed.length} total=${Date.now() - t0}ms prompt=${PROMPT_VERSION}`);
 }
 
