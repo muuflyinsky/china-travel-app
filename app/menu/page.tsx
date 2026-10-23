@@ -5,6 +5,7 @@ import { BlockTitle, List, ListInput, Preloader, Segmented, SegmentedButton } fr
 import { Camera, Flame, Info, Leaf, ShieldAlert, ChevronDown, HandPlatter, TriangleAlert } from "lucide-react";
 import { Screen, DemoNote } from "@/components/Shell";
 import { useProfile } from "@/components/useProfile";
+import { useCity } from "@/components/useCity";
 import { ShowCard } from "@/components/ShowCard";
 import { LANGUAGES } from "@/lib/languages";
 import { ALLERGENS, DIETS, staffCardZh } from "@/lib/allergens";
@@ -97,6 +98,7 @@ function DishCard({ d, warn, myAllergens, onOrder }: { d: Dish; warn: string[]; 
 
 export default function MenuPage() {
   const [profile, setProfile] = useProfile();
+  const { city } = useCity();
   const [mode, setMode] = useState<"photo" | "type">("photo");
   const [preview, setPreview] = useState<string>();
   const [text, setText] = useState("");
@@ -110,7 +112,7 @@ export default function MenuPage() {
   async function run(body: object) {
     setLoading(true); setError(undefined); setMenu(null);
     try {
-      const r = await fetch("/api/menu", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...body, lang: profile.lang }) });
+      const r = await fetch("/api/menu", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...body, lang: profile.lang, city: `${city.e} (${city.n}, ${city.p})` }) });
       const d = await r.json();
       if (!r.ok) throw new Error(d.error);
       setMenu(d);

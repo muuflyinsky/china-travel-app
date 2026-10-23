@@ -6,10 +6,10 @@ import {
 } from "lucide-react";
 import { Screen, DemoNote } from "@/components/Shell";
 import { ShowCard } from "@/components/ShowCard";
+import { CityPicker } from "@/components/CityPicker";
+import { useCity, type Here } from "@/components/useCity";
 import { amapNav, appleNav } from "@/lib/maplinks";
 import type { Place, RouteOption } from "@/lib/amap";
-
-type Here = { location: string; city: string; citycode: string; address: string };
 
 const NEARBY = [
   { label: "Metro", q: "地铁站", Icon: TrainFront },
@@ -28,8 +28,8 @@ const MODE = {
 const STEP_ICON = { walk: Footprints, subway: TrainFront, bus: Bus, rail: TrainFront, drive: Car } as const;
 
 export default function GoPage() {
+  const { city, setCity, detect } = useCity();
   const [here, setHere] = useState<Here | null>(null);
-  const [city, setCity] = useState("上海");
   const [q, setQ] = useState("");
   const [places, setPlaces] = useState<Place[]>([]);
   const [dest, setDest] = useState<Place | null>(null);
@@ -39,28 +39,20 @@ export default function GoPage() {
   const [notice, setNotice] = useState<string>();
   const [card, setCard] = useState<string[] | null>(null);
 
-  function locate() {
+  async function locate() {
     setBusy("locating"); setNotice(undefined);
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const r = await fetch(`/api/regeo?lng=${pos.coords.longitude}&lat=${pos.coords.latitude}`);
-        const d = await r.json();
-        if (r.ok) { setHere(d); setCity(d.city.replace(/市$/, "")); } else setNotice("Couldn't look up your address. Search still works.");
-        setBusy("");
-      },
-      () => {
-        setHere({ location: "121.4737,31.2304", city: "上海市", citycode: "021", address: "人民广场 People's Square (approx.)" });
-        setNotice("Location is off, so we're using People's Square, Shanghai. Allow location in your browser settings for accurate routes.");
-        setBusy("");
-      },
-      { enableHighAccuracy: true, timeout: 10000 },
-    );
+    try {
+      setHere(await detect());
+    } catch {
+      setNotice(`Location is off. Search in ${city.e} still works; allow location in your browser settings for routes and “Nearby”.`);
+    }
+    setBusy("");
   }
 
   async function search(keyword: string, nearby = false) {
     setBusy("search"); setNotice(undefined); setDest(null); setRoutes([]);
     const qs = new URLSearchParams({ q: keyword });
-    if (nearby && here) qs.set("around", here.location); else qs.set("city", city);
+    if (nearby && here) qs.set("around", here.location); else qs.set("city", city.a);
     const r = await fetch(`/api/places?${qs}`);
     const d = await r.json();
     if (r.ok) { setPlaces(d.places); setDemo(d.demo); if (!d.places.length) setNotice(`Nothing found for “${keyword}”. Try the Chinese name or a nearby landmark.`); }
@@ -84,18 +76,17 @@ export default function GoPage() {
       <form className="mx-4 mt-1 flex gap-2" onSubmit={(e) => { e.preventDefault(); if (q.trim()) search(q.trim()); }}>
         <label className="flex h-12 min-w-0 flex-1 items-center gap-2 rounded-2xl border border-line bg-card px-3">
           <Search className="h-5 w-5 text-muted" aria-hidden />
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="The Bund, 豫园, Hongqiao station…" aria-label="Destination" className="h-full w-full min-w-0 flex-1 bg-transparent text-[17px] outline-none placeholder:text-muted" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="A sight, hotel, station or address" aria-label="Destination" className="h-full w-full min-w-0 flex-1 bg-transparent text-[17px] outline-none placeholder:text-muted" />
         </label>
         <button className="h-12 shrink-0 rounded-2xl bg-cobalt px-5 text-[17px] font-semibold text-white dark:text-[#12141c]">Go</button>
       </form>
 
-      <div className="mx-4 mt-3 flex items-center gap-2 text-[15px]">
+      <div className="mx-4 mt-3 flex flex-wrap items-center gap-x-3 text-[15px]">
+        <div className="flex items-center gap-1 text-muted">Searching in <CityPicker compact value={city} onChange={(c) => { setCity(c); setHere(null); }} onLocate={locate} /></div>
         <button onClick={locate} disabled={busy === "locating"} className="flex min-h-11 items-center gap-1.5 font-semibold text-cobalt">
           {busy === "locating" ? <Preloader className="h-4! w-4!" /> : <LocateFixed className="h-5 w-5" aria-hidden />}
           {here ? "Update location" : "Use my location"}
         </button>
-        <span className="text-muted">· in</span>
-        <input value={city} onChange={(e) => setCity(e.target.value)} aria-label="City" className="zh min-h-11 w-24 rounded-lg bg-transparent font-semibold outline-none" />
       </div>
       {here && <p className="zh mx-4 text-[13px] text-muted">Near {here.address}</p>}
 
@@ -179,7 +170,7 @@ export default function GoPage() {
             );
           })}
           {routes.some((r) => r.mode === "transit") && (
-            <p className="mx-4 text-[13px] text-muted">At the metro gate, scan the Alipay or WeChat “Transport code”. Some cities (e.g. Shanghai, Beijing) also take Visa/Mastercard tap.</p>
+            <p className="mx-4 text-[13px] text-muted">At the metro gate, scan the Alipay or WeChat “Transport code”. In many big cities you can also tap a Visa or Mastercard.</p>
           )}
         </>
       )}

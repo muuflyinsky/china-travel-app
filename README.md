@@ -33,6 +33,12 @@ Every feature works without keys, using sample data (marked with a “Demo data�
 | **Trip guide** (from Today) | Allergy / diet / language profile, Alipay & WeChat Pay setup, currency converter, visa-free rules, eSIM, apps, train & flight search, attraction booking, emergency numbers | |
 | **Today** | Menu-scan hero, “Where to?”, weather, show-to-someone cards, pre-trip checklist | |
 
+## Every city in China
+
+- `lib/data/cities.json` lists all 2,213 cities and counties in mainland China (369 prefecture-level), with adcode, English name and pinyin, built from the [china-division](https://github.com/modood/Administrative-divisions-of-China) dataset by `scripts/build-cities.mjs`. Re-run it when administrative divisions change.
+- The traveller’s city is detected from GPS (Amap reverse geocoding → adcode) or picked from a searchable list (English, pinyin or Chinese), then shared by every screen: weather, place search, nearby, hotels, train/flight origin, attraction tickets, and the menu reader (regional dish versions).
+- Amap search, routing and weather work in every city once `AMAP_KEY` is set. Trip.com links use a city ID for major cities and the English city name as a search keyword elsewhere.
+
 ## Design
 
 - **Palette “Porcelain” (青花瓷)**: cobalt `#2B4ACB` for actions, lantern gold `#F2B705` only on booking / commission buttons, porcelain white background. Red, green and amber are reserved for allergy danger, safe and caution. See [docs/design/COLOR_RESEARCH.md](docs/design/COLOR_RESEARCH.md) for the competitor research and method.

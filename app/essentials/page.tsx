@@ -7,7 +7,12 @@ import { Screen } from "@/components/Shell";
 import { useProfile } from "@/components/useProfile";
 import { LANGUAGES } from "@/lib/languages";
 import { ALLERGENS, DIETS } from "@/lib/allergens";
-import { goLink, CITY_EN } from "@/lib/affiliate";
+import { goLink } from "@/lib/affiliate";
+import { CityPicker } from "@/components/CityPicker";
+import { useCity } from "@/components/useCity";
+import type { City } from "@/lib/cities";
+
+const BEIJING: City = { n: "北京市", s: "北京", a: "110000", p: "Beijing", e: "Beijing", py: "beijing", t: "city" };
 
 const CURRENCIES = ["USD", "EUR", "GBP", "JPY", "KRW", "AUD", "CAD", "SGD", "HKD", "CHF", "THB", "MYR"];
 const toggle = (list: string[], id: string) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
@@ -34,8 +39,10 @@ function Fx({ base }: { base: string }) {
 
 export default function Guide() {
   const [p, set] = useProfile();
-  const [from, setFrom] = useState("上海");
-  const [to, setTo] = useState("北京");
+  const { city: here, detect } = useCity();
+  const [fromPick, setFrom] = useState<City | null>(null);
+  const from = fromPick ?? here; // defaults to the city you're in
+  const [to, setTo] = useState<City>(BEIJING);
   const [date, setDate] = useState(plus(3));
 
   return (
@@ -101,25 +108,23 @@ export default function Guide() {
       </List>
 
       <Section id="trains" title="Trains & flights" />
+      <div className="mx-4 space-y-2">
+        <CityPicker label="From" value={from} onChange={setFrom} onLocate={detect} />
+        <CityPicker label="To" value={to} onChange={setTo} />
+      </div>
       <List strong inset>
-        <ListInput type="select" dropdown label="From" value={from} onChange={(e: Change) => setFrom(e.target.value)}>
-          {Object.entries(CITY_EN).map(([zh, en]) => <option key={zh} value={zh}>{en}</option>)}
-        </ListInput>
-        <ListInput type="select" dropdown label="To" value={to} onChange={(e: Change) => setTo(e.target.value)}>
-          {Object.entries(CITY_EN).map(([zh, en]) => <option key={zh} value={zh}>{en}</option>)}
-        </ListInput>
         <ListInput type="date" label="Date" value={date} onChange={(e: Change) => setDate(e.target.value)} />
       </List>
       <div className="mx-4 grid grid-cols-2 gap-2">
-        <a target="_blank" href={goLink("trip", "train", { from: CITY_EN[from], to: CITY_EN[to], date }, "essentials_train")} className="flex h-12 items-center justify-center rounded-xl bg-cta font-semibold text-cta-ink">Find trains</a>
-        <a target="_blank" href={goLink("trip", "flight", { from: CITY_EN[from], to: CITY_EN[to], date }, "essentials_flight")} className="flex h-12 items-center justify-center rounded-xl bg-cta font-semibold text-cta-ink">Find flights</a>
+        <a target="_blank" href={goLink("trip", "train", { from: from.e, to: to.e, date }, "essentials_train")} className="flex h-12 items-center justify-center rounded-xl bg-cta font-semibold text-cta-ink">Find trains</a>
+        <a target="_blank" href={goLink("trip", "flight", { from: from.e, to: to.e, date }, "essentials_flight")} className="flex h-12 items-center justify-center rounded-xl bg-cta font-semibold text-cta-ink">Find flights</a>
       </div>
       <p className="mx-4 mt-2 text-[13px] text-muted">Book with your passport number — your passport is your ticket at the gate. Holiday routes (1–7 Oct, Spring Festival) sell out; book as soon as sales open, about 15 days ahead.</p>
 
       <Section id="attractions" title="Attractions" />
       <Prose>
         <p>Top sights such as the Forbidden City and the National Museum need a <b>real-name reservation with your passport</b>, often days ahead. Walk-up tickets are rarely available.</p>
-        <a target="_blank" href={goLink("trip", "attraction", { city: from }, "essentials_attraction")} className="mt-1 flex h-12 items-center justify-center gap-2 rounded-xl bg-cta font-semibold text-cta-ink">Tickets in {CITY_EN[from]} <ExternalLink className="h-4 w-4" aria-hidden /></a>
+        <a target="_blank" href={goLink("trip", "attraction", { city: here.s, cityEn: here.e }, "essentials_attraction")} className="mt-1 flex h-12 items-center justify-center gap-2 rounded-xl bg-cta font-semibold text-cta-ink">Tickets in {here.e} <ExternalLink className="h-4 w-4" aria-hidden /></a>
       </Prose>
 
       <Section id="emergency" title="Emergency" />

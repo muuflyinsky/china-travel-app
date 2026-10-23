@@ -34,6 +34,7 @@ export type LinkKind = "hotel_list" | "hotel_search" | "train" | "flight" | "att
 
 export type LinkParams = {
   city?: string; // Chinese city name
+  cityEn?: string; // English name, used when the city has no Trip.com ID in TRIP_CITY_ID
   keyword?: string;
   checkin?: string; // YYYY-MM-DD
   checkout?: string;
@@ -62,7 +63,7 @@ export function buildPartnerUrl(partner: Partner, kind: LinkKind, p: LinkParams,
         const id = TRIP_CITY_ID[city];
         if (id) u.searchParams.set("city", String(id));
         if (kind === "hotel_search" && p.keyword) u.searchParams.set("keyword", p.keyword);
-        else if (!id && city) u.searchParams.set("keyword", CITY_EN[city] ?? city);
+        else if (!id && city) u.searchParams.set("keyword", p.cityEn ?? CITY_EN[city] ?? city);
         if (p.checkin) u.searchParams.set("checkin", p.checkin.replaceAll("-", "/"));
         if (p.checkout) u.searchParams.set("checkout", p.checkout.replaceAll("-", "/"));
         u.searchParams.set("adult", String(p.adults ?? 2));
@@ -83,7 +84,7 @@ export function buildPartnerUrl(partner: Partner, kind: LinkKind, p: LinkParams,
         break;
       case "attraction":
         u = new URL(`${host}/things-to-do/list`);
-        u.searchParams.set("keyword", p.keyword ?? CITY_EN[city] ?? city);
+        u.searchParams.set("keyword", p.keyword ?? p.cityEn ?? CITY_EN[city] ?? city);
         break;
       default:
         u = new URL(host);

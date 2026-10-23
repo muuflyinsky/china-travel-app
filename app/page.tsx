@@ -10,6 +10,8 @@ import {
 import { Screen, DemoNote } from "@/components/Shell";
 import { ShowCard } from "@/components/ShowCard";
 import { useProfile } from "@/components/useProfile";
+import { useCity } from "@/components/useCity";
+import { CityPicker } from "@/components/CityPicker";
 import { staffCardZh } from "@/lib/allergens";
 
 type Weather = { city: string; casts: { date: string; dayweather: string; daytemp: string; nighttemp: string }[] };
@@ -43,13 +45,24 @@ const Tile = ({ Icon, danger }: { Icon: typeof Car; danger?: boolean }) => (
 export default function Home() {
   const [profile] = useProfile();
   const router = useRouter();
+  const { city, setCity, detect, detected } = useCity();
   const [wx, setWx] = useState<Weather | null>(null);
   const [demo, setDemo] = useState(false);
   const [done, setDone] = useState<number[]>([]);
   const [card, setCard] = useState<string[] | null>(null);
 
   useEffect(() => {
-    fetch("/api/weather?adcode=310000").then((r) => r.json()).then(setWx).catch(() => {});
+    setWx(null);
+    fetch(`/api/weather?adcode=${city.a}`).then((r) => r.json()).then((d) => d.casts && setWx(d)).catch(() => {});
+  }, [city.a]);
+
+  // First visit: if location access was already granted, find the city without asking.
+  useEffect(() => {
+    if (detected) return;
+    navigator.permissions?.query({ name: "geolocation" }).then((p) => { if (p.state === "granted") detect().catch(() => {}); }).catch(() => {});
+  }, [detected, detect]);
+
+  useEffect(() => {
     fetch("/api/status").then((r) => r.json()).then((s) => setDemo(s.demoAi || s.demoMaps)).catch(() => {});
     try { setDone(JSON.parse(localStorage.getItem("ctg.check") ?? "[]")); } catch {}
   }, []);
@@ -67,6 +80,7 @@ export default function Home() {
       right={<Link href="/essentials#profile" aria-label="Preferences" className="grid h-11 w-11 place-items-center text-cobalt"><Settings className="h-6 w-6" /></Link>}
     >
       <DemoNote show={demo} what="API keys (see README)" />
+      <div className="mx-4 flex items-center gap-1 text-[15px] text-muted">You’re in <CityPicker compact value={city} onChange={setCity} onLocate={detect} /></div>
 
       <section className="mx-4 mt-2 rounded-3xl bg-cobalt p-5 text-white dark:text-[#12141c]">
         <h2 className="text-[22px] leading-tight font-bold">Read any menu</h2>
@@ -82,7 +96,7 @@ export default function Home() {
 
       {wx?.casts && (
         <div className="mx-4 mt-3 flex items-center justify-between rounded-2xl border border-line bg-card px-4 py-3">
-          <span className="zh text-[15px] font-semibold">{wx.city}</span>
+          <span className="text-[15px] font-semibold">{city.e}</span>
           {wx.casts.slice(0, 4).map((c) => (
             <span key={c.date} className="flex flex-col items-center gap-0.5 text-[13px]">
               <span className="text-muted">{new Date(c.date).toLocaleDateString("en", { weekday: "short" })}</span>

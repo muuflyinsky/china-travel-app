@@ -14,7 +14,7 @@ export async function GET(req: Request) {
   if (!PARTNERS.includes(partner) || !KINDS.includes(kind)) return NextResponse.json({ error: "bad partner/kind" }, { status: 400 });
 
   const p: LinkParams = {
-    city: q.get("city") ?? undefined, keyword: q.get("keyword") ?? undefined,
+    city: q.get("city") ?? undefined, cityEn: q.get("cityEn") ?? undefined, keyword: q.get("keyword") ?? undefined,
     checkin: q.get("checkin") ?? undefined, checkout: q.get("checkout") ?? undefined,
     adults: q.get("adults") ? Number(q.get("adults")) : undefined,
     from: q.get("from") ?? undefined, to: q.get("to") ?? undefined, date: q.get("date") ?? undefined,

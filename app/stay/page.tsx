@@ -3,7 +3,9 @@ import { useEffect, useState } from "react";
 import { BlockTitle, List, ListInput, Preloader } from "konsta/react";
 import { BedDouble, Star, Map, IdCard, ExternalLink } from "lucide-react";
 import { Screen, DemoNote } from "@/components/Shell";
-import { goLink, CITY_EN } from "@/lib/affiliate";
+import { goLink } from "@/lib/affiliate";
+import { CityPicker } from "@/components/CityPicker";
+import { useCity } from "@/components/useCity";
 import { amapNav } from "@/lib/maplinks";
 import type { Place } from "@/lib/amap";
 
@@ -13,7 +15,7 @@ const plus = (days: number) => iso(new Date(Date.now() + days * 864e5));
 type Change = React.ChangeEvent<HTMLInputElement & HTMLSelectElement>;
 
 export default function StayPage() {
-  const [city, setCity] = useState("上海");
+  const { city, setCity, detect } = useCity();
   const [checkin, setCheckin] = useState(plus(7));
   const [checkout, setCheckout] = useState(plus(9));
   const [adults, setAdults] = useState(2);
@@ -24,22 +26,20 @@ export default function StayPage() {
 
   async function load() {
     setLoading(true);
-    const qs = new URLSearchParams({ q: area ? `${area} 酒店` : "酒店", city, types: "100100" });
+    const qs = new URLSearchParams({ q: area ? `${area} 酒店` : "酒店", city: city.a, types: "100100" });
     const r = await fetch(`/api/places?${qs}`);
     const d = await r.json();
     setHotels(d.places ?? []); setDemo(d.demo); setLoading(false);
   }
-  useEffect(() => { load(); }, [city]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { load(); }, [city.a]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const nights = Math.max(1, Math.round((+new Date(checkout) - +new Date(checkin)) / 864e5));
-  const base = { city, checkin, checkout, adults };
+  const base = { city: city.s, cityEn: city.e, checkin, checkout, adults };
 
   return (
     <Screen title="Stay">
       <List strong inset className="mt-1!">
-        <ListInput type="select" dropdown label="City" value={city} onChange={(e: Change) => setCity(e.target.value)}>
-          {Object.entries(CITY_EN).map(([zh, en]) => <option key={zh} value={zh}>{en} · {zh}</option>)}
-        </ListInput>
+        <li className="p-2"><CityPicker value={city} onChange={setCity} onLocate={detect} label="City" /></li>
         <ListInput type="date" label="Check-in" value={checkin} onChange={(e: Change) => setCheckin(e.target.value)} />
         <ListInput type="date" label={`Check-out · ${nights} night${nights > 1 ? "s" : ""}`} value={checkout} onChange={(e: Change) => setCheckout(e.target.value)} />
         <ListInput type="number" label="Guests" value={adults} min={1} max={8} onChange={(e: Change) => setAdults(+e.target.value)} />
@@ -60,7 +60,7 @@ export default function StayPage() {
         <span>Hotels register foreign guests with the police at check-in, so bring your passport. Some budget guesthouses can’t host foreigners — Trip.com marks the ones that can.</span>
       </p>
 
-      <BlockTitle>Hotels in {CITY_EN[city] ?? city}{area && ` near ${area}`}</BlockTitle>
+      <BlockTitle>Hotels in {city.e}{area && ` near ${area}`}</BlockTitle>
       <DemoNote show={demo} what="AMAP_KEY" />
       {loading && <div className="flex justify-center py-6"><Preloader /></div>}
       {!loading && hotels.length === 0 && <p className="mx-4 text-[15px] text-muted">No hotels found here. Try a different area, or search Trip.com directly.</p>}

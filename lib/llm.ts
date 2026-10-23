@@ -54,7 +54,7 @@ Extract every dish on the menu (or every dish name the user typed). For each dis
 - If the menu is not a food menu or is unreadable, return an empty dishes array and explain in tips.
 Write every free-text field except "original", "pinyin" and ingredient "zh" in the target language.`;
 
-export async function analyzeMenu(input: { imageBase64?: string; mediaType?: string; text?: string; lang: string }) {
+export async function analyzeMenu(input: { imageBase64?: string; mediaType?: string; text?: string; lang: string; city?: string }) {
   const content: Anthropic.Beta.BetaContentBlockParam[] = [];
   if (input.imageBase64) {
     content.push({
@@ -66,6 +66,8 @@ export async function analyzeMenu(input: { imageBase64?: string; mediaType?: str
     type: "text",
     text:
       `Target language: ${langName(input.lang)}.\n` +
+      // Regional context: the same dish name differs between, say, Chengdu and Guangzhou.
+      (input.city ? `The restaurant is in ${input.city}; prefer that region's version of each dish.\n` : "") +
       (input.text ? `Dish names typed by the traveller:\n${input.text}` : "Read the menu in the photo."),
   });
 
