@@ -1,16 +1,16 @@
 "use client";
 // Layout primitives. One spacing system for every screen:
-// screen padding 16px · 28px between sections · 12px inside a section · 16px card padding ·
+// screen padding 16px · 32px between sections · 12px inside a section · 16px card padding ·
 // 44px minimum touch target · 16px radius.
 import NextLink from "next/link";
 import { ChevronRight, Info, TriangleAlert } from "lucide-react";
 
 export function Section({ title, id, aside, children, className = "" }: { title?: React.ReactNode; id?: string; aside?: React.ReactNode; children: React.ReactNode; className?: string }) {
   return (
-    <section id={id} className={`mt-7 scroll-mt-4 first:mt-2 ${className}`}>
+    <section id={id} className={`mt-8 scroll-mt-4 first:mt-2 ${className}`}>
       {(title || aside) && (
         <div className="mb-2 flex items-baseline justify-between gap-3 px-1">
-          {title && <h2 className="text-[15px] font-semibold text-muted">{title}</h2>}
+          {title && <h2 className="text-subhead font-semibold text-muted">{title}</h2>}
           {aside}
         </div>
       )}
@@ -44,8 +44,8 @@ export function Row({
     <>
       {icon && <span className="shrink-0">{icon}</span>}
       <span className="min-w-0 flex-1">
-        <span className="block text-[17px] leading-snug">{title}</span>
-        {sub && <span className="mt-0.5 block text-[13px] leading-snug text-muted">{sub}</span>}
+        <span className="block text-body">{title}</span>
+        {sub && <span className="mt-0.5 block text-footnote text-muted">{sub}</span>}
       </span>
       {after}
       {(chevron ?? Boolean(href || onClick)) && <ChevronRight className="h-5 w-5 shrink-0 text-muted opacity-60" aria-hidden />}
@@ -74,7 +74,7 @@ export function Button({ children, variant = "primary", href, external, onClick,
     ink: "bg-ink text-porcelain",
     ghost: "text-cobalt",
   }[variant];
-  const cls = `inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl px-4 text-[17px] font-semibold disabled:bg-line disabled:text-muted ${v} ${className}`;
+  const cls = `inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl px-4 text-headline disabled:bg-line disabled:text-muted ${v} ${className}`;
   if (href) return external ? <a href={href} target="_blank" rel="noopener" className={cls} aria-label={ariaLabel}>{children}</a> : <NextLink href={href} className={cls} aria-label={ariaLabel}>{children}</NextLink>;
   return <button type={type} onClick={onClick} disabled={disabled} className={cls} aria-label={ariaLabel}>{children}</button>;
 }
@@ -83,7 +83,7 @@ export function Note({ children, tone = "info" }: { children: React.ReactNode; t
   const t = { info: "bg-cobalt-soft text-ink", warn: "bg-warn-soft text-warn", danger: "bg-danger-soft text-danger" }[tone];
   const Icon = tone === "info" ? Info : TriangleAlert;
   return (
-    <p role={tone === "info" ? undefined : "alert"} className={`flex gap-2 rounded-2xl p-3 text-[15px] leading-relaxed ${t}`}>
+    <p role={tone === "info" ? undefined : "alert"} className={`flex gap-2 rounded-2xl p-3 text-subhead ${t}`}>
       <Icon className={`mt-0.5 h-4 w-4 shrink-0 ${tone === "info" ? "text-cobalt" : ""}`} aria-hidden />
       <span>{children}</span>
     </p>
@@ -95,8 +95,8 @@ export function Field({ label, children }: { label: React.ReactNode; children: R
   return (
     <li className="px-4 py-2.5">
       <label className="block">
-        <span className="block text-[13px] text-muted">{label}</span>
-        <span className="mt-0.5 block [&>input]:w-full [&>input]:bg-transparent [&>input]:py-1 [&>input]:text-[17px] [&>input]:outline-none [&>select]:w-full [&>select]:bg-transparent [&>select]:py-1 [&>select]:text-[17px] [&>select]:outline-none [&>textarea]:w-full [&>textarea]:bg-transparent [&>textarea]:text-[17px] [&>textarea]:outline-none">
+        <span className="block text-footnote text-muted">{label}</span>
+        <span className="mt-0.5 block [&>input]:w-full [&>input]:bg-transparent [&>input]:py-1 [&>input]:text-body [&>input]:outline-none [&>select]:w-full [&>select]:bg-transparent [&>select]:py-1 [&>select]:text-body [&>select]:outline-none [&>textarea]:w-full [&>textarea]:bg-transparent [&>textarea]:text-body [&>textarea]:outline-none">
           {children}
         </span>
       </label>
@@ -116,7 +116,7 @@ export function Seg<T extends string>({ value, options, onChange, label }: { val
     <div className="grid rounded-2xl bg-line/60 p-1" style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }} role="tablist" aria-label={label}>
       {options.map((o) => (
         <button key={o.value} role="tab" aria-selected={value === o.value} onClick={() => onChange(o.value)}
-          className={`min-h-10 rounded-xl px-2 text-[15px] font-semibold ${value === o.value ? "bg-card shadow-sm" : "text-muted"}`}>
+          className={`min-h-10 rounded-xl px-2 text-subhead font-semibold ${value === o.value ? "bg-card shadow-sm" : "text-muted"}`}>
           {o.label}
         </button>
       ))}

@@ -1,10 +1,13 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { pinyin } from "pinyin-pro";
 import { Preloader } from "konsta/react";
-import { Mic, Volume2, Maximize2, ArrowLeftRight } from "lucide-react";
+import { Mic, Volume2, Maximize2, ArrowLeftRight, CarTaxiFront, ShieldAlert, Siren } from "lucide-react";
 import { Screen, DemoNote } from "@/components/Shell";
-import { Section, Card, Group, Note } from "@/components/ui";
+import { Section, Card, Group, Row, Note, IconTile } from "@/components/ui";
+import { HotelCard } from "@/components/HotelCard";
+import { staffCardZh } from "@/lib/allergens";
 import { useProfile } from "@/components/useProfile";
 import { useT } from "@/components/useT";
 import { ShowCard } from "@/components/ShowCard";
@@ -40,11 +43,14 @@ export default function TalkPage() {
   const [listening, setListening] = useState(false);
   const [group, setGroup] = useState<(typeof PHRASES)[number]["group"]>("basics");
   const [card, setCard] = useState<string[] | null>(null);
+  const router = useRouter();
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const hasRestrictions = profile.allergens.length + profile.diets.length > 0;
   const me = profile.lang;
   const from = toZh ? me : "zh", to = toZh ? "zh" : me;
 
   async function go(input = text) {
-    if (!input.trim()) return;
+    if (!input.trim()) { setError(t.talk.typeFirst); inputRef.current?.focus(); return; }
     setLoading(true); setRes(null); setError(undefined);
     try {
       const r = await fetch("/api/translate", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text: input, from, to }) });
@@ -78,28 +84,28 @@ export default function TalkPage() {
       <Section>
         <Card>
           <div className="flex items-center justify-between">
-            <span className="text-[15px] font-semibold">{toZh ? langName(me) : "中文"}</span>
+            <span className="text-subhead font-semibold">{toZh ? langName(me) : "中文"}</span>
             <button onClick={() => { setToZh(!toZh); setRes(null); setText(""); }} aria-label={t.talk.swap} className="grid h-11 w-11 place-items-center rounded-full bg-cobalt-soft text-cobalt">
               <ArrowLeftRight className="h-5 w-5" />
             </button>
-            <span className="text-[15px] font-semibold">{toZh ? "中文" : langName(me)}</span>
+            <span className="text-subhead font-semibold">{toZh ? "中文" : langName(me)}</span>
           </div>
-          <textarea value={text} onChange={(e) => setText(e.target.value)} placeholder={toZh ? t.talk.placeholderMe : t.talk.placeholderZh} aria-label={t.talk.translate}
-            className="mt-3 min-h-24 w-full resize-none rounded-2xl bg-porcelain p-3 text-[17px] outline-none placeholder:text-muted" />
+          <textarea ref={inputRef} value={text} onChange={(e) => { setText(e.target.value); if (error === t.talk.typeFirst) setError(undefined); }} placeholder={toZh ? t.talk.placeholderMe : t.talk.placeholderZh} aria-label={t.talk.translate}
+            className="mt-3 min-h-24 w-full resize-none rounded-2xl bg-porcelain p-3 text-body outline-none placeholder:text-muted" />
           <div className="mt-3 flex gap-2">
             <button onClick={listen} disabled={listening} aria-label={t.talk.speak} className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl ${listening ? "bg-danger text-white" : "bg-cobalt-soft text-cobalt"}`}>
               <Mic className="h-5 w-5" />
             </button>
-            <button onClick={() => go()} disabled={loading || !text.trim()} className="flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl bg-cobalt text-[17px] font-semibold text-white disabled:bg-line disabled:text-muted dark:text-[#12141c] dark:disabled:text-muted">
+            <button onClick={() => go()} disabled={loading} className="flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl bg-cobalt text-headline text-white dark:text-porcelain">
               {loading ? <Preloader className="h-5! w-5!" /> : t.talk.translate}
             </button>
           </div>
           {res && (
             <div className="mt-4 space-y-2 border-t border-line pt-4">
               <DemoNote show={res.demo} what={t.common.aiKey} />
-              <p className="zh text-[26px] leading-snug font-bold">{res.translation}</p>
-              {res.pinyin && <p className="text-[15px] text-muted">{res.pinyin}</p>}
-              {res.note && <p className="text-[13px] text-muted">{res.note}</p>}
+              <p className="zh text-title">{res.translation}</p>
+              {res.pinyin && <p className="text-subhead text-muted">{res.pinyin}</p>}
+              {res.note && <p className="text-footnote text-muted">{res.note}</p>}
               <div className="flex gap-2 pt-1">
                 <button onClick={() => speak(res.translation, to)} className="flex h-11 items-center gap-1.5 rounded-xl bg-cobalt-soft px-4 font-semibold text-cobalt"><Volume2 className="h-4 w-4" aria-hidden /> {t.talk.play}</button>
                 {toZh && <button onClick={() => setCard([res.translation])} className="flex h-11 items-center gap-1.5 rounded-xl bg-cobalt-soft px-4 font-semibold text-cobalt"><Maximize2 className="h-4 w-4" aria-hidden /> {t.talk.fullScreen}</button>}
@@ -108,6 +114,20 @@ export default function TalkPage() {
           )}
         </Card>
         {error && <Note tone="warn">{error}</Note>}
+      </Section>
+
+      <Section title={t.today.showTo}>
+        <Group>
+          <Row href="/explore" icon={<IconTile><CarTaxiFront className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.taxiCard} sub={t.today.taxiCardSub} />
+          <Row
+            icon={<IconTile tone="danger"><ShieldAlert className="h-5 w-5" aria-hidden /></IconTile>}
+            title={t.today.allergyCard}
+            sub={hasRestrictions ? t.today.allergyCardSub : t.today.allergyCardEmpty}
+            onClick={() => (hasRestrictions ? setCard(staffCardZh(profile.allergens, profile.diets, profile.severe)) : router.push("/settings#allergies"))}
+          />
+          <HotelCard bare />
+          <Row href="/sos" icon={<IconTile tone="danger"><Siren className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.help} sub={t.today.helpSub} />
+        </Group>
       </Section>
 
       <Section title={t.talk.phrasebook}>
@@ -122,9 +142,9 @@ export default function TalkPage() {
           {phrases.map((zh) => (
             <li key={zh} className="flex items-center gap-2 py-2 pr-2 pl-4">
               <div className="min-w-0 flex-1 py-1">
-                <p className="zh text-[17px] font-semibold">{zh}</p>
-                <p className="text-[13px] text-muted">{pinyin(zh)}</p>
-                <p className="text-[15px]">{t.phrases[zh] ?? ""}</p>
+                <p className="zh text-headline">{zh}</p>
+                <p className="text-footnote text-muted">{pinyin(zh)}</p>
+                <p className="text-subhead">{t.phrases[zh] ?? ""}</p>
               </div>
               <button onClick={() => speak(zh, "zh")} aria-label={`${t.talk.play}: ${t.phrases[zh]}`} className="grid h-11 w-11 place-items-center rounded-full text-cobalt"><Volume2 className="h-5 w-5" /></button>
               <button onClick={() => setCard([zh])} aria-label={`${t.talk.fullScreen}: ${t.phrases[zh]}`} className="grid h-11 w-11 place-items-center rounded-full text-cobalt"><Maximize2 className="h-5 w-5" /></button>

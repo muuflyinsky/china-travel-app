@@ -23,7 +23,7 @@ export default function SosPage() {
         <Group>
           {NUMBERS.map(([n, key, zh]) => (
             <Row key={n} href={`tel:${n}`} external icon={<Phone className="h-5 w-5 text-danger" aria-hidden />}
-              title={<span className="text-[22px] font-bold tabular-nums">{n}</span>}
+              title={<span className="text-title tabular-nums">{n}</span>}
               sub={<>{t.sos.numbers[key]} · <span className="zh">{zh}</span></>} />
           ))}
         </Group>
@@ -34,7 +34,7 @@ export default function SosPage() {
       </Section>
 
       <Section title={t.sos.lost}>
-        <Card><p className="text-[15px] leading-relaxed">{t.sos.lostBody}</p></Card>
+        <Card><p className="text-subhead">{t.sos.lostBody}</p></Card>
       </Section>
       {card && <ShowCard lines={card} onClose={() => setCard(null)} />}
     </Screen>

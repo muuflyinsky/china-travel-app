@@ -23,6 +23,28 @@
   --color-warn: var(--warn);
   --color-warn-soft: var(--warn-soft);
 
+  /* Type scale (SPEC v0.4). Components use only these: text-display-zh … text-footnote.
+     Never write a pixel font size in a component. Weights: 400 / 600 / 700 (700 = large title
+     and the Chinese display cards only). */
+  --text-display-zh: 36px;
+  --text-display-zh--line-height: 46px;
+  --text-display-zh--font-weight: 700;
+  --text-large-title: 34px;
+  --text-large-title--line-height: 41px;
+  --text-large-title--font-weight: 700;
+  --text-title: 22px;
+  --text-title--line-height: 28px;
+  --text-title--font-weight: 600;
+  --text-headline: 17px;
+  --text-headline--line-height: 24px;
+  --text-headline--font-weight: 600;
+  --text-body: 17px;
+  --text-body--line-height: 26px;
+  --text-subhead: 15px;
+  --text-subhead--line-height: 22px;
+  --text-footnote: 13px;
+  --text-footnote--line-height: 18px;
+
   --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "PingFang SC", "Noto Sans SC", sans-serif;
 }
 
@@ -74,6 +96,10 @@ body { -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transpa
 ::selection { background: color-mix(in srgb, var(--cobalt) 25%, transparent); }
 :focus-visible { outline: 2px solid var(--cobalt); outline-offset: 2px; border-radius: 6px; }
 .zh { font-family: "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif; }
+/* Japanese and Korean UI text needs its own system fonts, or Han characters render as Chinese forms. */
+:lang(ja) { font-family: -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; }
+:lang(ko) { font-family: -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif; }
+:lang(ja) .zh, :lang(ko) .zh, [lang="zh-CN"] { font-family: "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif; }
 
 /* One centred app column on every screen size: navbar, content and tab bar share its width.
    On phones it is simply full width; on tablets/desktop it reads like a phone app. */
@@ -87,13 +113,13 @@ body { -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transpa
 .sticky-bottom { position: fixed; bottom: calc(92px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: 100%; max-width: 600px; padding: 0 16px 8px; z-index: 10; }
 
 /* Status chips: compact labels, not controls */
-.tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font-size: 13px; font-weight: 600; line-height: 1.4; background: var(--porcelain); color: var(--ink); border: 1px solid var(--line); }
+.tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font-size: var(--text-footnote); font-weight: 600; line-height: var(--text-footnote--line-height); background: var(--porcelain); color: var(--ink); border: 1px solid var(--line); }
 .tag-danger { background: var(--danger-soft); color: var(--danger); border-color: transparent; }
 .tag-ok { background: var(--ok-soft); color: var(--ok); border-color: transparent; }
 .tag-warn { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
 
 /* Toggle pills meet the 44px touch target */
-.pill { min-height: 44px; padding: 0 16px; border-radius: 999px; font-size: 15px; font-weight: 600; border: 1px solid var(--line); background: var(--card); color: var(--ink); display: inline-flex; align-items: center; gap: 6px; }
+.pill { min-height: 44px; padding: 0 16px; border-radius: 999px; font-size: var(--text-subhead); font-weight: 600; border: 1px solid var(--line); background: var(--card); color: var(--ink); display: inline-flex; align-items: center; gap: 6px; }
 .pill[aria-pressed="true"] { background: var(--cobalt); border-color: var(--cobalt); color: #fff; }
 .dark .pill[aria-pressed="true"] { color: #12141c; }
 

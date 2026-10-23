@@ -45,13 +45,13 @@ function DishCard({ d, c, line, onChange, homePrice }: { d: Dish; c: Conflict; l
     <Card tone={flagged ? "danger" : "plain"}>
       <header className="flex justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="text-[17px] leading-snug font-semibold">{d.translated}</h3>
-          <p className="zh text-[15px]">{d.original} <span className="text-[13px] text-muted">{d.pinyin}</span></p>
-          {d.literal && d.literal !== d.translated && <p className="text-[13px] text-muted italic">“{d.literal}”</p>}
+          <h3 className="text-body font-semibold">{d.translated}</h3>
+          <p className="zh text-subhead">{d.original} <span className="text-footnote text-muted">{d.pinyin}</span></p>
+          {d.literal && d.literal !== d.translated && <p className="text-footnote text-muted italic">“{d.literal}”</p>}
         </div>
         <div className="shrink-0 text-right">
-          {d.price && <p className="text-[17px] font-semibold tabular-nums">{d.price}</p>}
-          {homePrice && <p className="text-[13px] text-muted tabular-nums">{fmt(t.eat.approx, { amount: homePrice })}</p>}
+          {d.price && <p className="text-headline tabular-nums">{d.price}</p>}
+          {homePrice && <p className="text-footnote text-muted tabular-nums">{fmt(t.eat.approx, { amount: homePrice })}</p>}
           {d.spice_level > 0 && (
             // Spice uses ink, not red: red is reserved for allergy danger.
             <p className="mt-1 flex justify-end text-ink" aria-label={fmt(t.eat.spice, { n: d.spice_level })}>
@@ -62,12 +62,12 @@ function DishCard({ d, c, line, onChange, homePrice }: { d: Dish; c: Conflict; l
       </header>
 
       {flagged && (
-        <p className="mt-3 flex items-start gap-2 rounded-xl bg-danger-soft px-3 py-2 text-[15px] font-semibold text-danger">
+        <p className="mt-3 flex items-start gap-2 rounded-xl bg-danger-soft px-3 py-2 text-subhead font-semibold text-danger">
           <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" aria-hidden /> {warn.join(" · ")}
         </p>
       )}
 
-      <p className="mt-3 text-[15px] leading-relaxed">{d.description}</p>
+      <p className="mt-3 text-subhead">{d.description}</p>
 
       <div className="mt-3 flex flex-wrap gap-1.5">
         {d.vegetarian && <span className="tag"><Leaf className="h-3.5 w-3.5" aria-hidden /> {t.eat.vegetarian}</span>}
@@ -76,11 +76,11 @@ function DishCard({ d, c, line, onChange, homePrice }: { d: Dish; c: Conflict; l
         {d.confidence !== "high" && <span className="tag tag-warn">{d.confidence === "low" ? t.eat.unsure : t.eat.varies}</span>}
       </div>
 
-      <button onClick={() => setOpen(!open)} aria-expanded={open} className="mt-2 flex min-h-11 items-center gap-1 text-[15px] font-semibold text-cobalt">
+      <button onClick={() => setOpen(!open)} aria-expanded={open} className="mt-2 flex min-h-11 items-center gap-1 text-subhead font-semibold text-cobalt">
         {t.eat.ingredients} <ChevronDown className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} aria-hidden />
       </button>
       {open && (
-        <ul className="mb-2 space-y-1 text-[15px]">
+        <ul className="mb-2 space-y-1 text-subhead">
           {d.ingredients.map((ing, j) => (
             <li key={j} className="flex justify-between gap-3 border-b border-line pb-1 last:border-0">
               <span>{ing.name}{ing.source === "standard_recipe" && <span className="text-muted"> · {t.eat.typical}</span>}</span>
@@ -89,21 +89,21 @@ function DishCard({ d, c, line, onChange, homePrice }: { d: Dish; c: Conflict; l
           ))}
         </ul>
       )}
-      {d.notes && <p className="flex gap-2 text-[13px] text-muted"><Info className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />{d.notes}</p>}
+      {d.notes && <p className="flex gap-2 text-footnote text-muted"><Info className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />{d.notes}</p>}
 
       {line ? (
         <div className="mt-3 flex items-center justify-between rounded-xl bg-cobalt-soft p-1">
           <button onClick={() => onChange(line.qty > 1 ? { ...line, qty: line.qty - 1 } : undefined)} aria-label="−" className="grid h-11 w-11 place-items-center rounded-lg text-cobalt"><Minus className="h-5 w-5" /></button>
-          <span className="text-[15px] font-semibold text-cobalt">{t.eat.inOrder} · ×{line.qty}</span>
+          <span className="text-subhead font-semibold text-cobalt">{t.eat.inOrder} · ×{line.qty}</span>
           <button onClick={() => onChange({ ...line, qty: line.qty + 1 })} aria-label="+" className="grid h-11 w-11 place-items-center rounded-lg text-cobalt"><Plus className="h-5 w-5" /></button>
         </div>
       ) : c.allergens.length > 0 ? (
         // Don't nudge people to order a dish with their allergen; offer to ask for it without.
-        <Button variant="ghost" className="mt-2 w-full border border-line text-[15px]!" onClick={() => onChange({ qty: 1, without: true })}>
+        <Button variant="ghost" className="mt-2 w-full border border-line text-subhead!" onClick={() => onChange({ qty: 1, without: true })}>
           <Plus className="h-4 w-4" aria-hidden />{fmt(t.eat.askWithout, { x: c.allergens.map((a) => t.allergens[a as AllergenId].toLowerCase()).join(", ") })}
         </Button>
       ) : (
-        <Button variant={flagged ? "ghost" : "soft"} className={`mt-3 w-full text-[15px]! ${flagged ? "border border-line" : ""}`} onClick={() => onChange({ qty: 1, without: false })}>
+        <Button variant={flagged ? "ghost" : "soft"} className={`mt-3 w-full text-subhead! ${flagged ? "border border-line" : ""}`} onClick={() => onChange({ qty: 1, without: false })}>
           <Plus className="h-4 w-4" aria-hidden />{t.eat.add}
         </Button>
       )}
@@ -121,14 +121,14 @@ function AllergySheet({ onDone }: { onDone: () => void }) {
   return (
     <Popup opened onBackdropClick={() => finish(a, d)}>
       <div className="flex h-full flex-col overflow-auto bg-porcelain px-4 pt-[calc(16px+env(safe-area-inset-top))] pb-8 text-ink">
-        <h2 className="text-[24px] font-bold">{t.eat.allergyAsk}</h2>
-        <p className="mt-1 text-[15px] text-muted">{t.eat.allergyAskSub}</p>
+        <h2 className="text-title">{t.eat.allergyAsk}</h2>
+        <p className="mt-1 text-subhead text-muted">{t.eat.allergyAskSub}</p>
         <Button className="mt-4 w-full" onClick={() => finish([], d)}>{t.eat.noAllergy}</Button>
-        <p className="mt-6 mb-2 text-[15px] font-semibold text-muted">{t.settings.allergies}</p>
+        <p className="mt-6 mb-2 text-subhead font-semibold text-muted">{t.settings.allergies}</p>
         <div className="flex flex-wrap gap-2">
           {ALLERGENS.map((x) => <button key={x.id} className="pill" aria-pressed={a.includes(x.id)} onClick={() => setA(toggle(a, x.id))}>{t.allergens[x.id]}</button>)}
         </div>
-        <p className="mt-6 mb-2 text-[15px] font-semibold text-muted">{t.settings.diet}</p>
+        <p className="mt-6 mb-2 text-subhead font-semibold text-muted">{t.settings.diet}</p>
         <div className="flex flex-wrap gap-2">
           {DIETS.map((x) => <button key={x.id} className="pill" aria-pressed={d.includes(x.id)} onClick={() => setD(toggle(d, x.id))}>{t.diets[x.id]}</button>)}
         </div>
@@ -207,7 +207,7 @@ export default function MenuPage() {
     const lines = [
       "你好，我要点：",
       ...orderLines.map(({ d, l }) => `${d.original} ×${l.qty}${l.without ? without : ""}`),
-      ...(profile.allergens.length || profile.diets.length ? staffCardZh(profile.allergens, profile.diets).slice(1, -1) : []),
+      ...(profile.allergens.length || profile.diets.length ? staffCardZh(profile.allergens, profile.diets, profile.severe).slice(1, -1) : []),
     ];
     const dishes = orderLines.map(({ d, l }) => `${d.translated} ×${l.qty}`).join(", ");
     setCard({ lines, explain: [fmt(t.eat.orderExplain, { dishes }), allergyExplain].filter(Boolean).join(" "), replies: replies(true) });
@@ -236,8 +236,8 @@ export default function MenuPage() {
               style={preview ? { backgroundImage: `linear-gradient(rgb(0 0 0/.45),rgb(0 0 0/.45)),url(${preview})`, backgroundSize: "cover", color: "#fff", borderStyle: "solid" } : undefined}
             >
               <Camera className="h-9 w-9" aria-hidden />
-              <span className="text-[17px] font-semibold">{preview ? t.eat.scanAnother : t.eat.takePhoto}</span>
-              <span className="text-[13px] opacity-80">{t.eat.handwritten}</span>
+              <span className="text-headline">{preview ? t.eat.scanAnother : t.eat.takePhoto}</span>
+              <span className="text-footnote opacity-80">{t.eat.handwritten}</span>
             </button>
           ) : (
             <>
@@ -256,7 +256,7 @@ export default function MenuPage() {
               </select>
             </Field>
             <li>
-              <button onClick={() => setAskAllergies(true)} className="flex min-h-12 w-full items-center gap-2 px-4 py-2 text-left text-[15px]">
+              <button onClick={() => setAskAllergies(true)} className="flex min-h-12 w-full items-center gap-2 px-4 py-2 text-left text-subhead">
                 <ShieldAlert className={`h-4 w-4 shrink-0 ${restrictions.length ? "text-danger" : "text-muted"}`} aria-hidden />
                 <span className="flex-1">{restrictions.length ? <>{t.eat.checkingFor} <b>{restrictions.join(", ")}</b></> : t.eat.addRestrictions}</span>
                 <span className="text-cobalt">{t.common.edit}</span>
@@ -278,7 +278,7 @@ export default function MenuPage() {
           <Section>
             <Card>
               <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <p className="text-[17px] font-semibold">{fmt(t.eat.dishes, { type: menu.restaurant_type, n: menu.dishes.length })}</p>
+                <p className="text-headline">{fmt(t.eat.dishes, { type: menu.restaurant_type, n: menu.dishes.length })}</p>
                 {flagged > 0 && <span className="tag tag-danger">{fmt(t.eat.notForYou, { n: flagged })}</span>}
               </div>
               {restrictions.length > 0 && (
@@ -291,7 +291,7 @@ export default function MenuPage() {
               <DishCard key={i} d={d} c={c} line={order[i]} homePrice={homePrice(d.price)}
                 onChange={(l) => setOrder((o) => { const n = { ...o }; if (l) n[i] = l; else delete n[i]; return n; })} />
             ))}
-            <p className="px-1 text-[13px] text-muted">{t.eat.disclaimer}</p>
+            <p className="px-1 text-footnote text-muted">{t.eat.disclaimer}</p>
             <div className="h-16" aria-hidden />
           </Section>
         </div>
@@ -306,7 +306,7 @@ export default function MenuPage() {
           )}
           {restrictions.length > 0 && (
             <button aria-label={t.eat.showAllergyCard}
-              onClick={() => setCard({ lines: staffCardZh(profile.allergens, profile.diets), explain: allergyExplain, replies: replies(false) })}
+              onClick={() => setCard({ lines: staffCardZh(profile.allergens, profile.diets, profile.severe), explain: allergyExplain, replies: replies(false) })}
               className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-card text-danger shadow-[0_6px_20px_rgb(0_0_0/0.18)] ring-1 ring-line">
               <ShieldAlert className="h-6 w-6" />
             </button>

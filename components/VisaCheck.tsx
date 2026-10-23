@@ -9,7 +9,7 @@ import { fmt } from "@/lib/i18n";
 import { COUNTRIES, SOURCE, VERIFIED_ON, currencyFor, entryTypeFor, guessCountry, visaRule } from "@/lib/visa";
 import { daysBetween } from "@/lib/stay";
 
-function useCountryName(lang: string) {
+export function useCountryName(lang: string) {
   return useMemo(() => {
     try {
       const dn = new Intl.DisplayNames([lang, "en"], { type: "region" });
@@ -20,7 +20,7 @@ function useCountryName(lang: string) {
   }, [lang]);
 }
 
-function CountryPicker({ open, onClose, onPick }: { open: boolean; onClose: () => void; onPick: (c: string) => void }) {
+export function CountryPicker({ open, onClose, onPick }: { open: boolean; onClose: () => void; onPick: (c: string) => void }) {
   const t = useT();
   const [p] = useProfile();
   const name = useCountryName(p.lang);
@@ -34,14 +34,14 @@ function CountryPicker({ open, onClose, onPick }: { open: boolean; onClose: () =
     <Popup opened={open} onBackdropClick={onClose}>
       <div className="flex h-full flex-col bg-porcelain">
         <div className="flex items-center justify-between px-4 pt-[calc(12px+env(safe-area-inset-top))]">
-          <h2 className="text-[22px] font-bold text-ink">{t.settings.passport}</h2>
+          <h2 className="text-title text-ink">{t.settings.passport}</h2>
           <button onClick={onClose} aria-label={t.common.close} className="grid h-11 w-11 place-items-center rounded-full bg-card"><X className="h-5 w-5" /></button>
         </div>
         <Searchbar value={q} placeholder={t.visa.search} onInput={(e: React.ChangeEvent<HTMLInputElement>) => setQ(e.target.value)} onClear={() => setQ("")} disableButton={false} />
         <ul className="mx-4 mb-8 flex-1 divide-y divide-line overflow-auto rounded-2xl border border-line bg-card">
           {/* Country names come from the browser's ICU data, so only render them on the client. */}
           {open && list.map(({ c, n }) => (
-            <li key={c}><button onClick={() => { onPick(c); onClose(); setQ(""); }} className="flex min-h-12 w-full items-center px-4 text-left text-[17px] text-ink">{n}</button></li>
+            <li key={c}><button onClick={() => { onPick(c); onClose(); setQ(""); }} className="flex min-h-12 w-full items-center px-4 text-left text-body text-ink">{n}</button></li>
           ))}
         </ul>
       </div>
@@ -74,10 +74,10 @@ export function VisaCheck() {
   if (!p.nationality) {
     return (
       <Card>
-        <h3 className="text-[17px] font-semibold">{t.visa.title}</h3>
+        <h3 className="text-headline">{t.visa.title}</h3>
         {guess ? (
           <>
-            <p className="mt-2 text-[17px]">{fmt(t.visa.confirm, { country: name(guess) })}</p>
+            <p className="mt-2 text-body">{fmt(t.visa.confirm, { country: name(guess) })}</p>
             <div className="mt-3 grid grid-cols-2 gap-2">
               <Button onClick={() => choose(guess)}><Check className="h-5 w-5" aria-hidden />{t.visa.yes}</Button>
               <Button variant="soft" onClick={() => setPicker(true)}>{t.visa.change}</Button>
@@ -86,7 +86,7 @@ export function VisaCheck() {
         ) : (
           <Button className="mt-3 w-full" onClick={() => setPicker(true)}>{t.visa.search}</Button>
         )}
-        <p className="mt-2 text-[13px] text-muted">{t.visa.ordinary}</p>
+        <p className="mt-2 text-footnote text-muted">{t.visa.ordinary}</p>
         <CountryPicker open={picker} onClose={() => setPicker(false)} onPick={choose} />
       </Card>
     );
@@ -96,8 +96,8 @@ export function VisaCheck() {
   if (rule!.transitOnly && p.onwardThird === null) {
     return (
       <Card>
-        <h3 className="text-[17px] font-semibold">{t.visa.onwardQ}</h3>
-        <p className="mt-1 text-[15px] text-muted">{t.visa.onwardSub}</p>
+        <h3 className="text-headline">{t.visa.onwardQ}</h3>
+        <p className="mt-1 text-subhead text-muted">{t.visa.onwardSub}</p>
         <div className="mt-3">
           <Seg value={"" as "yes" | "no" | ""} onChange={(v) => set({ onwardThird: v === "yes" })}
             options={[{ value: "yes", label: t.visa.onwardYes }, { value: "no", label: t.visa.onwardNo }]} />
@@ -128,15 +128,15 @@ export function VisaCheck() {
   return (
     <Card>
       <div className="flex items-center justify-between gap-2">
-        <p className="text-[13px] text-muted">{t.visa.title} · {name(p.nationality)}</p>
-        <button onClick={() => setPicker(true)} className="min-h-11 text-[15px] font-semibold text-cobalt">{t.visa.change}</button>
+        <p className="text-footnote text-muted">{t.visa.title} · {name(p.nationality)}</p>
+        <button onClick={() => setPicker(true)} className="min-h-11 text-subhead font-semibold text-cobalt">{t.visa.change}</button>
       </div>
-      <p className={`text-[24px] leading-tight font-bold ${r.kind === "visa" ? "text-ink" : "text-cobalt"}`}>{headline}</p>
-      <ul className="mt-3 space-y-1.5 text-[15px]">
+      <p className={`text-title ${r.kind === "visa" ? "text-ink" : "text-cobalt"}`}>{headline}</p>
+      <ul className="mt-3 space-y-1.5 text-subhead">
         {conditions.slice(0, 3).map((c) => <li key={c} className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-cobalt" aria-hidden />{c}</li>)}
       </ul>
       {(afterExpiry || tooLong) && (
-        <p className="mt-3 flex gap-2 rounded-xl bg-warn-soft p-3 text-[15px] text-warn">
+        <p className="mt-3 flex gap-2 rounded-xl bg-warn-soft p-3 text-subhead text-warn">
           <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
           <span>
             {afterExpiry && fmt(t.visa.expiry, { date: fmtDate(until!) })}
@@ -145,7 +145,7 @@ export function VisaCheck() {
           </span>
         </p>
       )}
-      <a href={SOURCE.url} target="_blank" rel="noopener" className="mt-3 flex min-h-11 items-center gap-1 text-[13px] text-muted">
+      <a href={SOURCE.url} target="_blank" rel="noopener" className="mt-3 flex min-h-11 items-center gap-1 text-footnote text-muted">
         {fmt(t.visa.source, { source: SOURCE.name, date: fmtDate(VERIFIED_ON) })} <ExternalLink className="h-3.5 w-3.5" aria-hidden />
       </a>
       <CountryPicker open={picker} onClose={() => setPicker(false)} onPick={choose} />

@@ -8,8 +8,12 @@ import { fmt } from "@/lib/i18n";
 
 /** Button + full-screen sheet to choose any city or county in mainland China. */
 export function CityPicker({
-  value, onChange, onLocate, label, compact,
-}: { value: City; onChange: (c: City) => void; onLocate?: () => Promise<unknown>; label?: string; compact?: boolean }) {
+  value, onChange, onLocate, label, compact, trigger,
+}: {
+  value: City; onChange: (c: City) => void; onLocate?: () => Promise<unknown>; label?: string; compact?: boolean;
+  /** Custom opener instead of the built-in button (e.g. an "Add a city" row). */
+  trigger?: (open: () => void) => React.ReactNode;
+}) {
   const t = useT();
   const title = label ?? fmt(t.city.choose, { label: t.city.label });
   label ??= t.city.label;
@@ -27,12 +31,12 @@ export function CityPicker({
 
   return (
     <>
-      <button
+      {trigger ? trigger(() => setOpen(true)) : <button
         type="button"
         onClick={() => setOpen(true)}
         aria-label={`${label}: ${value.e}. ${t.common.edit}`}
         className={compact
-          ? "flex min-h-11 items-center gap-1 text-[17px] font-semibold text-cobalt"
+          ? "flex min-h-11 items-center gap-1 text-headline text-cobalt"
           : "flex min-h-14 w-full items-center gap-3 rounded-2xl border border-line bg-card px-4 text-left"}
       >
         {compact ? (
@@ -41,18 +45,18 @@ export function CityPicker({
           <>
             <MapPin className="h-5 w-5 shrink-0 text-cobalt" aria-hidden />
             <span className="flex-1">
-              <span className="block text-[13px] text-muted">{label}</span>
-              <span className="text-[17px]">{value.e} <span className="zh text-muted">· {value.s}</span></span>
+              <span className="block text-footnote text-muted">{label}</span>
+              <span className="text-body">{value.e} <span className="zh text-muted">· {value.s}</span></span>
             </span>
             <ChevronDown className="h-5 w-5 text-muted" aria-hidden />
           </>
         )}
-      </button>
+      </button>}
 
       <Popup opened={open} onBackdropClick={() => setOpen(false)}>
         <div className="flex h-full flex-col bg-porcelain">
           <div className="flex items-center justify-between px-4 pt-[calc(12px+env(safe-area-inset-top))]">
-            <h2 className="text-[22px] font-bold text-ink">{title}</h2>
+            <h2 className="text-title text-ink">{title}</h2>
             <button onClick={() => setOpen(false)} aria-label={t.common.close} className="grid h-11 w-11 place-items-center rounded-full bg-card"><X className="h-5 w-5" /></button>
           </div>
           <Searchbar
@@ -79,7 +83,7 @@ export function CityPicker({
                 />
               </List>
             )}
-            {error && <p className="mx-4 rounded-xl bg-warn-soft p-3 text-[15px] text-warn">{error}</p>}
+            {error && <p className="mx-4 rounded-xl bg-warn-soft p-3 text-subhead text-warn">{error}</p>}
 
             {!q && popular.length > 0 && (
               <>
@@ -87,7 +91,7 @@ export function CityPicker({
                 <div className="mx-4 grid grid-cols-2 gap-2">
                   {popular.map((c) => (
                     <button key={c.a} onClick={() => pick(c)} className="flex min-h-12 items-center justify-between rounded-xl border border-line bg-card px-3 text-left">
-                      <span className="text-[15px] font-semibold">{c.e}</span><span className="zh text-[13px] text-muted">{c.s}</span>
+                      <span className="text-subhead font-semibold">{c.e}</span><span className="zh text-footnote text-muted">{c.s}</span>
                     </button>
                   ))}
                 </div>

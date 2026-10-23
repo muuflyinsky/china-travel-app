@@ -32,23 +32,23 @@ export function PayButtons({ compact }: { compact?: boolean }) {
       <div className={compact ? "grid grid-cols-2 gap-2" : "space-y-2"}>
         <button className={btn} onClick={() => openApp(LINKS.alipayPay, "alipay")}>
           <AppIcon id="alipay" size={36} />
-          <span className="min-w-0 flex-1 text-[15px] leading-tight font-semibold">{compact ? "Alipay" : t.pay.openAlipay}</span>
+          <span className="min-w-0 flex-1 text-subhead font-semibold">{compact ? "Alipay" : t.pay.openAlipay}</span>
           <QrCode className="h-5 w-5 shrink-0 text-cobalt" aria-hidden />
         </button>
         {!compact && (
           <button className={btn} onClick={() => openApp(LINKS.alipayScan, "alipay")}>
             <AppIcon id="alipay" size={36} />
-            <span className="flex-1 text-[15px] font-semibold">{t.pay.scanAlipay}</span>
+            <span className="flex-1 text-subhead font-semibold">{t.pay.scanAlipay}</span>
             <ScanLine className="h-5 w-5 text-cobalt" aria-hidden />
           </button>
         )}
         <button className={btn} onClick={() => openApp(LINKS.wechat, "wechat")}>
           <AppIcon id="wechat" size={36} />
-          <span className="min-w-0 flex-1 text-[15px] leading-tight font-semibold">{compact ? "WeChat Pay" : t.pay.openWechat}</span>
+          <span className="min-w-0 flex-1 text-subhead font-semibold">{compact ? "WeChat Pay" : t.pay.openWechat}</span>
           <QrCode className="h-5 w-5 shrink-0 text-cobalt" aria-hidden />
         </button>
       </div>
-      {!compact && <p className="px-1 text-[13px] text-muted">{t.pay.wechatHint} {t.pay.notInstalled}</p>}
+      {!compact && <p className="px-1 text-footnote text-muted">{t.pay.wechatHint} {t.pay.notInstalled}</p>}
     </div>
   );
 }

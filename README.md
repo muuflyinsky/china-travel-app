@@ -60,7 +60,6 @@ app/                 Next.js App Router pages (client components)
 app/api/menu         POST photo/text → structured menu (Claude)
 app/api/translate    POST text → translation + pinyin (Claude)
 app/api/places       GET Amap POI text / around search
-app/api/route        GET transit + walking + driving options
 app/api/regeo        GET browser GPS → GCJ-02 + city
 app/api/weather      GET Amap 4-day forecast
 app/api/fx           GET exchange rate (ECB via frankfurter, offline fallback)

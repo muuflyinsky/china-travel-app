@@ -9,7 +9,7 @@ import { useT } from "./useT";
 import { compressImage } from "@/lib/image";
 
 /** "Back to my hotel": one photo of the booking, then a one-tap taxi card forever after. */
-export function HotelCard() {
+export function HotelCard({ bare }: { bare?: boolean } = {}) {
   const t = useT();
   const [p, set] = useProfile();
   const [busy, setBusy] = useState(false);
@@ -34,23 +34,35 @@ export function HotelCard() {
     }
   }
 
+  const input = <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => onFile(e.target.files?.[0])} />;
+  const show = card && p.hotel && <ShowCard lines={["师傅您好，请带我回酒店：", p.hotel.name, `地址：${p.hotel.address}`]} sub={p.hotel.nameEn} onClose={() => setCard(false)} />;
+  const rows = p.hotel ? (
+    <>
+      <Row onClick={() => setCard(true)} icon={<IconTile><BedDouble className="h-5 w-5" aria-hidden /></IconTile>}
+        title={t.hotel.back} sub={<span className="zh">{p.hotel.nameEn ? `${p.hotel.nameEn} · ` : ""}{p.hotel.name}</span>} />
+      <Row onClick={() => fileRef.current?.click()} icon={<Camera className="h-5 w-5 text-muted" aria-hidden />} title={<span className="text-subhead text-cobalt">{t.hotel.change}</span>} chevron={false} />
+    </>
+  ) : (
+    <Row onClick={() => fileRef.current?.click()} icon={<IconTile>{busy ? <Preloader className="h-5! w-5!" /> : <BedDouble className="h-5 w-5" aria-hidden />}</IconTile>}
+      title={busy ? t.hotel.reading : t.hotel.add} sub={t.hotel.addSub} />
+  );
+
+  // `bare` renders list items only, for use inside another grouped list.
+  if (bare) {
+    return (
+      <>
+        {rows}
+        {error && <li className="px-4 pb-3"><Note tone="warn">{t.hotel.error}</Note></li>}
+        <li className="contents">{input}{show}</li>
+      </>
+    );
+  }
   return (
     <>
-      <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => onFile(e.target.files?.[0])} />
-      <Group>
-        {p.hotel ? (
-          <>
-            <Row onClick={() => setCard(true)} icon={<IconTile><BedDouble className="h-5 w-5" aria-hidden /></IconTile>}
-              title={t.hotel.back} sub={<span className="zh">{p.hotel.nameEn ? `${p.hotel.nameEn} · ` : ""}{p.hotel.name}</span>} />
-            <Row onClick={() => fileRef.current?.click()} icon={<Camera className="h-5 w-5 text-muted" aria-hidden />} title={<span className="text-[15px] text-cobalt">{t.hotel.change}</span>} chevron={false} />
-          </>
-        ) : (
-          <Row onClick={() => fileRef.current?.click()} icon={<IconTile>{busy ? <Preloader className="h-5! w-5!" /> : <BedDouble className="h-5 w-5" aria-hidden />}</IconTile>}
-            title={busy ? t.hotel.reading : t.hotel.add} sub={t.hotel.addSub} />
-        )}
-      </Group>
+      {input}
+      <Group>{rows}</Group>
       {error && <Note tone="warn">{t.hotel.error}</Note>}
-      {card && p.hotel && <ShowCard lines={["师傅您好，请带我回酒店：", p.hotel.name, `地址：${p.hotel.address}`]} sub={p.hotel.nameEn} onClose={() => setCard(false)} />}
+      {show}
     </>
   );
 }

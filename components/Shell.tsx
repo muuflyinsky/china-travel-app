@@ -2,23 +2,27 @@
 import NextLink from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { App, Page, Navbar, Tabbar, TabbarLink } from "konsta/react";
-import { House, UtensilsCrossed, Navigation, BedDouble, Languages, ChevronLeft, Settings } from "lucide-react";
+import { House, UtensilsCrossed, Compass, BedDouble, Languages, ChevronLeft, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useT } from "./useT";
-import { fmt } from "@/lib/i18n";
+import { useProfile } from "./useProfile";
+import { fmt, UI_DICTS } from "@/lib/i18n";
 
-// Five top-level sections (iOS HIG: 2–5 tabs). Settings, Pay, Mobile data, Before you go and
-// Emergency are pushed screens with a back button.
+// Five top-level sections (iOS HIG: 2–5 tabs, always visible). Settings and Emergency are pushed
+// screens with a back button; Pay, Mobile data and Before you go live inside Today.
 const TABS = [
   { href: "/", key: "today", Icon: House },
   { href: "/menu", key: "eat", Icon: UtensilsCrossed },
-  { href: "/go", key: "go", Icon: Navigation },
+  { href: "/explore", key: "go", Icon: Compass },
   { href: "/stay", key: "stay", Icon: BedDouble },
   { href: "/talk", key: "talk", Icon: Languages },
 ] as const;
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [dark, setDark] = useState(false);
+  const [profile] = useProfile();
+  // <html lang> follows the UI language, so screen readers, hyphenation and CJK fonts are right.
+  useEffect(() => { document.documentElement.lang = profile.lang in UI_DICTS ? profile.lang : "en"; }, [profile.lang]);
   useEffect(() => {
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
     const apply = () => { setDark(mq.matches); document.documentElement.classList.toggle("dark", mq.matches); };
@@ -55,7 +59,7 @@ export function Screen({ title, right, children, back }: { title: string; right?
         centerTitle
         title={title}
         left={back ? (
-          <button onClick={() => (history.length > 1 ? router.back() : router.push("/"))} className="flex min-h-11 items-center pr-2 text-[17px] text-cobalt">
+          <button onClick={() => (history.length > 1 ? router.back() : router.push("/"))} className="flex min-h-11 items-center pr-2 text-body text-cobalt">
             <ChevronLeft className="h-6 w-6" aria-hidden />{t.common.back}
           </button>
         ) : undefined}
@@ -90,5 +94,5 @@ export function Screen({ title, right, children, back }: { title: string; right?
 export function DemoNote({ show, what }: { show?: boolean; what: string }) {
   const t = useT();
   if (!show) return null;
-  return <p className="rounded-xl bg-cobalt-soft px-3 py-2 text-[13px] text-cobalt">{fmt(t.common.sampleData, { what })}</p>;
+  return <p className="rounded-xl bg-cobalt-soft px-3 py-2 text-footnote text-cobalt">{fmt(t.common.sampleData, { what })}</p>;
 }

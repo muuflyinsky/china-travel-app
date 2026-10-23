@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-// Old URL: preferences moved to /settings, the trip guide to /prepare.
-export default function Essentials() {
-  redirect("/prepare");
+// Merged in SPEC v0.4; kept so old links and bookmarks still land somewhere useful.
+export default function Moved() {
+  redirect("/");
 }

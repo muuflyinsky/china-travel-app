@@ -67,10 +67,10 @@ export default function StayPage() {
           <Field label={t.stay.guests}><input type="number" inputMode="numeric" min={1} max={8} value={adults} onChange={(e) => setAdults(Number(e.target.value) || 1)} /></Field>
           <Field label={t.stay.near}><input type="text" placeholder={t.stay.nearPlaceholder} value={area} onChange={(e) => setArea(e.target.value)} onBlur={load} /></Field>
         </Group>
-        <a href={goLink("trip", "hotel_list", base, "stay_search")} target="_blank" rel="noopener" className="flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-cta px-4 text-[17px] font-semibold text-cta-ink">
+        <a href={goLink("trip", "hotel_list", base, "stay_search")} target="_blank" rel="noopener" className="flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-cta px-4 text-headline text-cta-ink">
           <AppIcon id="tripcom" size={28} /> {t.stay.searchTrip} <ExternalLink className="h-4 w-4" aria-hidden />
         </a>
-        <a href={goLink("fliggy", "hotel_list", { ...base, keyword: area }, "stay_search")} target="_blank" rel="noopener" className="flex min-h-11 items-center justify-center gap-2 text-[15px] font-semibold text-cobalt">
+        <a href={goLink("fliggy", "hotel_list", { ...base, keyword: area }, "stay_search")} target="_blank" rel="noopener" className="flex min-h-11 items-center justify-center gap-2 text-subhead font-semibold text-cobalt">
           <AppIcon id="fliggy" size={22} /> {t.stay.searchFliggy}
         </a>
         <Note>{t.stay.passportNote}</Note>
@@ -79,27 +79,27 @@ export default function StayPage() {
       <Section title={<>{fmt(t.stay.hotelsIn, { city: city.e })}{area && ` · ${area}`}</>}>
         <DemoNote show={demo} what={t.common.mapKey} />
         {loading && <div className="flex justify-center py-6"><Preloader /></div>}
-        {!loading && hotels.length === 0 && <p className="px-1 text-[15px] text-muted">{t.stay.none}</p>}
+        {!loading && hotels.length === 0 && <p className="px-1 text-subhead text-muted">{t.stay.none}</p>}
         {hotels.map((h) => (
           <div key={h.id} className="flex gap-3 rounded-2xl border border-line bg-card p-3">
             {h.photo
               ? <img className="h-20 w-20 shrink-0 rounded-xl object-cover" src={h.photo} alt="" />
               : <span className="grid h-20 w-20 shrink-0 place-items-center rounded-xl bg-cobalt-soft text-cobalt"><BedDouble className="h-7 w-7" aria-hidden /></span>}
             <div className="min-w-0 flex-1">
-              <h3 className="zh text-[17px] leading-snug font-semibold">{h.name}</h3>
-              <p className="truncate text-[13px] text-muted">{h.pinyin}</p>
-              <p className="mt-1 flex flex-wrap items-center gap-1 text-[13px]">
+              <h3 className="zh text-body font-semibold">{h.name}</h3>
+              <p className="truncate text-footnote text-muted">{h.pinyin}</p>
+              <p className="mt-1 flex flex-wrap items-center gap-1 text-footnote">
                 {h.rating && <><Star className="h-3.5 w-3.5 fill-current text-ink" aria-hidden /><b>{h.rating}</b></>}
                 {h.cost && <span className="text-muted">· {price(h.cost)}</span>}
               </p>
               <div className="mt-2 flex gap-2">
-                <a target="_blank" rel="noopener" href={goLink("trip", "hotel_search", { ...base, keyword: h.name }, "stay_card")} className="flex min-h-11 flex-1 items-center justify-center rounded-xl bg-cobalt-soft text-[15px] font-semibold text-cobalt">{t.stay.checkPrice}</a>
+                <a target="_blank" rel="noopener" href={goLink("trip", "hotel_search", { ...base, keyword: h.name }, "stay_card")} className="flex min-h-11 flex-1 items-center justify-center rounded-xl bg-cobalt-soft text-subhead font-semibold text-cobalt">{t.stay.checkPrice}</a>
                 <a target="_blank" rel="noopener" href={amapNav(h, "car")} aria-label={fmt(t.stay.onMap, { name: h.name })} className="grid min-h-11 w-11 place-items-center rounded-xl bg-cobalt-soft"><AppIcon id="amap" size={24} /></a>
               </div>
             </div>
           </div>
         ))}
-        <p className="px-1 text-[13px] text-muted">{t.common.commission}</p>
+        <p className="px-1 text-footnote text-muted">{t.common.commission}</p>
       </Section>
     </Screen>
   );

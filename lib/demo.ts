@@ -1,5 +1,5 @@
 // Sample data so the prototype works without API keys (shown with a DEMO badge).
-import type { Place, RouteOption } from "./amap";
+import type { Place } from "./amap";
 import type { Menu } from "./llm";
 
 const P = (id: string, name: string, pinyin: string, address: string, location: string, type: string, extra: Partial<Place> = {}): Place => ({
@@ -28,20 +28,6 @@ export function places(keywords?: string, types?: string): Place[] {
 }
 
 export const regeo = { address: "上海市黄浦区南京东路街道人民广场", city: "上海市", citycode: "021", adcode: "310101" };
-
-export const routes: RouteOption[] = [
-  {
-    mode: "transit", minutes: 24, meters: 4300, priceCny: 3,
-    steps: [
-      { kind: "walk", meters: 350 },
-      { kind: "subway", metro: "2", from: "Ren Min Guang Chang", to: "Nan Jing Dong Lu", stops: 1, zh: "地铁2号线：人民广场 → 南京东路" },
-      { kind: "subway", metro: "10", from: "Nan Jing Dong Lu", to: "Yu Yuan", stops: 1, zh: "地铁10号线：南京东路 → 豫园" },
-      { kind: "walk", meters: 420 },
-    ],
-  },
-  { mode: "walking", minutes: 38, meters: 2900, steps: [] },
-  { mode: "driving", minutes: 14, meters: 3800, priceCny: 18, steps: [] },
-];
 
 export const weather = {
   city: "上海市",

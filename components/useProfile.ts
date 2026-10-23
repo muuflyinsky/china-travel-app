@@ -4,16 +4,14 @@ import type { EntryType } from "@/lib/stay";
 import { LANGUAGES } from "@/lib/languages";
 import { currencyFor, guessCountry } from "@/lib/visa";
 
-export type Mode = "planning" | "in_china";
-
 export type Profile = {
   lang: string;
   allergens: string[];
   diets: string[];
   homeCurrency: string;
   name: string;
-  /** null until the traveller answers "planning or already in China?" */
-  mode: Mode | null;
+  /** Set once the browser's location has been seen inside mainland China. */
+  locatedInChina: boolean;
   arrival: string; // planned arrival date, YYYY-MM-DD
   entryDate: string; // actual entry date, YYYY-MM-DD
   entryType: EntryType;
@@ -24,12 +22,15 @@ export type Profile = {
   guests: number; // remembered for hotel search
   hotel: { name: string; address: string; nameEn?: string } | null; // "back to my hotel" card
   allergiesAsked: boolean; // the first-visit allergy sheet on Eat has been answered
+  severe: string[]; // allergens where even a trace is dangerous
+  cities: { a: string; e: string; s: string }[]; // destination cities: adcode, English, Chinese short name
 };
 
 const DEFAULT: Profile = {
   lang: "en", allergens: [], diets: [], homeCurrency: "USD", name: "",
-  mode: null, arrival: "", entryDate: "", entryType: "visa_free_30", visaDays: 30,
+  locatedInChina: false, arrival: "", entryDate: "", entryType: "visa_free_30", visaDays: 30,
   departure: "", nationality: "", onwardThird: null, guests: 1, hotel: null, allergiesAsked: false,
+  severe: [], cities: [],
 };
 const KEY = "ctg.profile";
 const EVENT = "ctg-profile";
