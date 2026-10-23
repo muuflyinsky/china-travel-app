@@ -8,7 +8,11 @@ import { langName } from "./languages";
 const client = () => new Anthropic({ apiKey: config.anthropicKey });
 
 // Server-side refusal fallback: the API reroutes a declined request inside the same call.
-const FALLBACK = { betas: ["server-side-fallback-2026-07-01"], fallbacks: "default" as const };
+// Only Fable / Opus 5+ / Sonnet 5.5 accept it; Haiku (the low-cost option) has no fallback.
+const FALLBACK_MODELS = ["claude-fable-5-1", "claude-fable-5", "claude-opus-5-5", "claude-opus-5", "claude-sonnet-5-5"];
+const FALLBACK = FALLBACK_MODELS.includes(config.model)
+  ? { betas: ["server-side-fallback-2026-07-01"], fallbacks: "default" as const }
+  : {};
 
 const allergenIds = ALLERGENS.map((a) => a.id) as [string, ...string[]];
 
