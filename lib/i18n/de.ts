@@ -473,6 +473,17 @@ export const de: Dict = {
     "reminders": "Ticket-Wecker",
     "reminderLine": "Für den {date} · ab {when}"
   },
+  awards: {
+    "title": "Ausgezeichnete Restaurants",
+    "michelin": "MICHELIN {stars}",
+    "bib": "MICHELIN Bib Gourmand",
+    "selected": "MICHELIN-Empfehlung",
+    "blackPearl": "Black Pearl 黑珍珠 {d}",
+    "mustEat": "Dianping Must-Eat 必吃榜 {year}",
+    "checked": "geprüft am {date}",
+    "note": "Auszeichnungen so, wie der jeweilige Guide sie veröffentlicht. Wir sind mit keinem Guide verbunden, und kein Restaurant zahlt für die Aufnahme.",
+    "sample": "Beispielrestaurants mit erfundenen Namen. Die echten Michelin-, Black-Pearl- und Must-Eat-Listen erscheinen nach dem Import."
+  },
   phrases: {
     "你好": "Hallo",
     "谢谢": "Danke",

@@ -9,6 +9,8 @@ import { AppIcon } from "@/components/AppIcon";
 import { ShowCard } from "@/components/ShowCard";
 import { CityPicker } from "@/components/CityPicker";
 import { CityGuide } from "@/components/CityGuide";
+import { AwardBadges } from "@/components/AwardBadges";
+import { awardScore } from "@/lib/restaurant-awards";
 import { isHotCity } from "@/lib/hot-cities";
 import { useCity, type Here } from "@/components/useCity";
 import { useT } from "@/components/useT";
@@ -58,7 +60,8 @@ function Explore() {
     const r = await fetch(`/api/places?${qs}`);
     const d = await r.json();
     const list: Place[] = r.ok ? d.places : [];
-    if (byRating) list.sort((a, b) => Number(b.rating ?? 0) - Number(a.rating ?? 0) || Number(a.distance ?? 0) - Number(b.distance ?? 0));
+    // "Where to eat it": guide-listed restaurants first (Michelin, Black Pearl, Must-Eat), then rating, then distance.
+    if (byRating) list.sort((a, b) => awardScore(b.awards) - awardScore(a.awards) || Number(b.rating ?? 0) - Number(a.rating ?? 0) || Number(a.distance ?? 0) - Number(b.distance ?? 0));
     if (r.ok) { setPlaces(list); setDemo(d.demo); if (!d.places.length) setNotice(fmt(t.go.nothing, { q: keyword })); }
     else setNotice(t.go.searchDown);
     setBusy("");
@@ -96,6 +99,7 @@ function Explore() {
         <Section>
           <Card>
             <h2 className="zh text-title">{dest.name}</h2>
+            <AwardBadges awards={dest.awards} />
             <p className="text-subhead">{dest.pinyin}</p>
             <p className="zh text-footnote text-muted">{dest.address}</p>
             <a href={amapNav(dest, "bus", from)} target="_blank" rel="noopener" className="mt-3 flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-cobalt px-4 text-headline text-white dark:text-porcelain">
@@ -135,7 +139,7 @@ function Explore() {
             <Group>
               {places.map((p) => (
                 <Row key={p.id} onClick={() => setDest(p)} title={<span className="zh">{p.name}</span>}
-                  sub={<>{p.pinyin}<span className="zh block">{p.address}</span></>}
+                  sub={<>{p.pinyin}<span className="zh block">{p.address}</span><AwardBadges awards={p.awards} /></>}
                   after={p.distance ? <span className="text-footnote text-muted tabular-nums">{p.distance} m</span> : undefined} />
               ))}
             </Group>
@@ -146,7 +150,8 @@ function Explore() {
       {!dest && places.length === 0 && busy !== "search" && isHotCity(city.a) && (
         <Section title={fmt(t.guide.title, { city: city.e })}>
           <CityGuide adcode={city.a} cityEn={city.e} initialTab={params.get("tab") === "eat" ? "eat" : "see"}
-            onFindDish={(zh) => { setQ(zh); search(zh, Boolean(here), true); window.scrollTo({ top: 0 }); }} />
+            onFindDish={(zh) => { setQ(zh); search(zh, Boolean(here), true); window.scrollTo({ top: 0 }); }}
+            onPickPlace={(x) => { if (typeof x === "string") { setQ(x); search(x); } else setDest(x); window.scrollTo({ top: 0 }); }} />
         </Section>
       )}
       {!dest && places.length === 0 && busy !== "search" && !isHotCity(city.a) && (

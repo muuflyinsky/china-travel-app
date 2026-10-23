@@ -1,0 +1,8 @@
+{
+  "lists": {
+    "michelin": { "name": "MICHELIN Guide", "edition": "", "source": "https://guide.michelin.com", "checked": "" },
+    "black_pearl": { "name": "Black Pearl Restaurant Guide (黑珍珠餐厅指南)", "edition": "", "source": "Meituan / Dianping app", "checked": "" },
+    "dianping": { "name": "Dianping Must-Eat List (大众点评必吃榜)", "edition": "", "source": "Dianping app", "checked": "" }
+  },
+  "restaurants": []
+}

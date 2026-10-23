@@ -473,6 +473,17 @@ export const ko: Dict = {
     "reminders": "티켓 알람",
     "reminderLine": "{date} 방문분 · {when} 오픈"
   },
+  awards: {
+    "title": "수상 레스토랑",
+    "michelin": "미쉐린 {stars}",
+    "bib": "미쉐린 빕 구르망",
+    "selected": "미쉐린 셀렉티드",
+    "blackPearl": "블랙펄 黑珍珠 {d}",
+    "mustEat": "다중뎬핑 必吃榜 {year}",
+    "checked": "{date} 확인",
+    "note": "각 가이드가 발표한 그대로 표시합니다. 어떤 가이드와도 제휴하지 않으며, 돈을 내고 오른 식당은 없습니다.",
+    "sample": "가상의 이름을 쓴 예시 식당입니다. 실제 미쉐린·블랙펄·必吃榜 목록은 데이터를 가져오면 표시됩니다."
+  },
   phrases: {
     "你好": "안녕하세요",
     "谢谢": "감사합니다",

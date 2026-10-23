@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { searchPlaces } from "@/lib/amap";
 import { demo } from "@/lib/config";
+import { withAwards } from "@/lib/restaurants";
 
 export async function GET(req: Request) {
   const q = new URL(req.url).searchParams;
@@ -12,7 +13,7 @@ export async function GET(req: Request) {
       types: q.get("types") ?? undefined,
       page: Number(q.get("page") ?? 1),
     });
-    return NextResponse.json({ places, demo: demo.maps });
+    return NextResponse.json({ places: withAwards(places), demo: demo.maps });
   } catch (e) {
     return NextResponse.json({ error: (e as Error).message }, { status: 502 });
   }

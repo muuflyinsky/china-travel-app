@@ -20,6 +20,8 @@ export type Place = {
   photo?: string;
   distance?: string;
   district?: string;
+  adcode?: string; // district adcode
+  awards?: import("./restaurant-awards").Award[];
 };
 
 async function amap<T>(path: string, params: Record<string, string | undefined>): Promise<T> {
@@ -40,7 +42,7 @@ export function py(s: string) {
 
 type RawPoi = {
   id: string; name: string; address: string | []; location: string; type: string;
-  cityname: string; citycode: string; adname: string; distance?: string;
+  cityname: string; citycode: string; adname: string; adcode?: string; distance?: string;
   business?: { tel?: string; rating?: string; cost?: string };
   photos?: { url: string }[];
 };
@@ -62,6 +64,7 @@ function toPlace(p: RawPoi): Place {
     photo: p.photos?.[0]?.url,
     distance: p.distance,
     district: p.adname,
+    adcode: p.adcode,
   };
 }
 

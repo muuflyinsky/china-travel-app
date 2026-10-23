@@ -14,6 +14,45 @@ import { amapNav } from "@/lib/maplinks";
 import { ALLERGENS, staffCardZh } from "@/lib/allergens";
 import { RESERVATIONS } from "@/lib/reservations";
 import { pick, type CityGuide as Guide, type GuideDish, type GuideSight } from "@/lib/city-guide-types";
+import { AwardBadges } from "./AwardBadges";
+import type { AwardRestaurant } from "@/lib/restaurant-awards";
+import type { Place } from "@/lib/amap";
+
+type Listed = AwardRestaurant & { poi: Place | null };
+type Lists = Record<string, { name: string; edition: string; checked: string }>;
+
+/** Restaurants on the Michelin / Black Pearl / Must-Eat lists. Hidden when we have no list for the city. */
+function AwardRestaurants({ adcode, onPick }: { adcode: string; onPick: (p: Place | string) => void }) {
+  const t = useT();
+  const [p] = useProfile();
+  const [d, setD] = useState<{ restaurants: Listed[]; lists: Lists; demo: boolean } | null>(null);
+  useEffect(() => { setD(null); fetch(`/api/restaurants?city=${adcode}`).then((r) => r.json()).then(setD).catch(() => {}); }, [adcode]);
+  if (!d?.restaurants.length) return null;
+  const used = [...new Set(d.restaurants.flatMap((r) => r.awards.map((a) => a.list)))];
+  const fmtDate = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString(p.lang, { timeZone: "UTC", day: "numeric", month: "short", year: "numeric" });
+  return (
+    <>
+      <h3 className="mt-2 px-1 text-subhead font-semibold text-muted">{t.awards.title}</h3>
+      <Group>
+        {d.restaurants.map((r) => (
+          <li key={r.zh}>
+            <button onClick={() => onPick(r.poi ?? r.zh)} className="flex min-h-14 w-full items-center gap-3 px-4 py-3 text-left">
+              <span className="min-w-0 flex-1">
+                <span className="zh block text-body">{r.zh}</span>
+                {(r.en || r.cuisine) && <span className="block text-footnote text-muted">{[r.en, r.cuisine && <span key="c" className="zh">{r.cuisine}</span>].filter(Boolean).reduce<React.ReactNode[]>((a, x, i) => (i ? [...a, " · ", x] : [x]), [])}</span>}
+                <AwardBadges awards={r.awards} />
+              </span>
+              <ChevronRight className="h-5 w-5 shrink-0 text-muted opacity-60" aria-hidden />
+            </button>
+          </li>
+        ))}
+      </Group>
+      <p className="px-1 text-footnote text-muted">
+        {d.demo ? t.awards.sample : <>{used.map((l) => `${d.lists[l].name} ${d.lists[l].edition}${d.lists[l].checked ? ` (${fmt(t.awards.checked, { date: fmtDate(d.lists[l].checked) })})` : ""}`).join(" · ")}. {t.awards.note}</>}
+      </p>
+    </>
+  );
+}
 
 type Tab = "see" | "eat";
 
@@ -118,7 +157,9 @@ function DishCard({ d, city, onFind }: { d: GuideDish; city: string; onFind: (zh
 }
 
 /** "See" and "Eat" picks for a city: the first one big, the rest as rows that swap into the card. */
-export function CityGuide({ adcode, cityEn, initialTab = "see", onFindDish }: { adcode: string; cityEn: string; initialTab?: Tab; onFindDish: (zh: string) => void }) {
+export function CityGuide({ adcode, cityEn, initialTab = "see", onFindDish, onPickPlace }: {
+  adcode: string; cityEn: string; initialTab?: Tab; onFindDish: (zh: string) => void; onPickPlace: (p: Place | string) => void;
+}) {
   const t = useT();
   const [p] = useProfile();
   const { g, state } = useGuide(adcode);
@@ -158,6 +199,7 @@ export function CityGuide({ adcode, cityEn, initialTab = "see", onFindDish }: { 
           </Group>
         </>
       )}
+      {tab === "eat" && <AwardRestaurants adcode={adcode} onPick={onPickPlace} />}
       <a href={goLink("trip", "attraction", { cityEn }, "explore_top", "explore-top")} target="_blank" rel="noopener" className="flex min-h-11 items-center gap-1 px-1 text-subhead font-semibold text-cobalt">
         {fmt(t.guide.topTrip, { city: cityEn })}<ExternalLink className="h-3.5 w-3.5" aria-hidden />
       </a>

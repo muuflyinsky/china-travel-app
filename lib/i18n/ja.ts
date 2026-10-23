@@ -473,6 +473,17 @@ export const ja: Dict = {
     "reminders": "チケットのアラーム",
     "reminderLine": "{date}分 · {when}販売開始"
   },
+  awards: {
+    "title": "受賞レストラン",
+    "michelin": "ミシュラン {stars}",
+    "bib": "ミシュラン ビブグルマン",
+    "selected": "ミシュラン セレクテッド",
+    "blackPearl": "黒珍珠（Black Pearl）{d}",
+    "mustEat": "大衆点評 必吃榜 {year}",
+    "checked": "{date}確認",
+    "note": "各ガイドの発表どおりに掲載しています。当サービスはどのガイドとも提携しておらず、掲載料を払っている店はありません。",
+    "sample": "架空の名前のサンプル店です。実際のミシュラン・黒珍珠・必吃榜はデータを取り込むと表示されます。"
+  },
   phrases: {
     "你好": "こんにちは",
     "谢谢": "ありがとう",

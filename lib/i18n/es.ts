@@ -473,6 +473,17 @@ export const es: Dict = {
     "reminders": "Alarmas de entradas",
     "reminderLine": "Para el {date} · salen {when}"
   },
+  awards: {
+    "title": "Restaurantes premiados",
+    "michelin": "MICHELIN {stars}",
+    "bib": "MICHELIN Bib Gourmand",
+    "selected": "Recomendado MICHELIN",
+    "blackPearl": "Black Pearl 黑珍珠 {d}",
+    "mustEat": "Dianping Must-Eat 必吃榜 {year}",
+    "checked": "comprobado el {date}",
+    "note": "Distinciones tal como las publica cada guía. No tenemos relación con ellas y ningún restaurante paga por aparecer.",
+    "sample": "Restaurantes de ejemplo con nombres inventados. Las listas reales de Michelin, Black Pearl y Must-Eat aparecerán cuando se importen."
+  },
   phrases: {
     "你好": "Hola",
     "谢谢": "Gracias",

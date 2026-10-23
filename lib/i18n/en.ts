@@ -476,6 +476,17 @@ export const en = {
     "reminders": "Ticket alarms",
     "reminderLine": "For {date} · opens {when}"
   },
+  awards: {
+    "title": "Award-winning restaurants",
+    "michelin": "MICHELIN {stars}",
+    "bib": "MICHELIN Bib Gourmand",
+    "selected": "MICHELIN Selected",
+    "blackPearl": "Black Pearl 黑珍珠 {d}",
+    "mustEat": "Dianping Must-Eat 必吃榜 {year}",
+    "checked": "checked {date}",
+    "note": "Awards as published by each guide. We’re not affiliated with them, and no restaurant pays to be listed.",
+    "sample": "Sample restaurants with made-up names. Real Michelin, Black Pearl and Must-Eat lists appear once they are imported."
+  },
   phrases: {
     "你好": "Hello",
     "谢谢": "Thank you",
