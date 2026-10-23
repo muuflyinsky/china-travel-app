@@ -95,8 +95,19 @@ export type RouteOption = {
   minutes: number;
   meters: number;
   priceCny?: number;
-  summary: string;
-  steps: { kind: "walk" | "subway" | "bus" | "rail" | "drive"; text: string; zh?: string }[];
+  /** Structured so the client can word it in the traveller's language. */
+  steps: RouteStep[];
+};
+
+export type RouteStep = {
+  kind: "walk" | "subway" | "bus" | "rail";
+  meters?: number; // walk
+  metro?: string; // metro line number, e.g. "2"
+  line?: string; // other lines / trains, in pinyin or train number
+  from?: string; // pinyin
+  to?: string;
+  stops?: number;
+  zh?: string; // original Chinese, to show staff
 };
 
 type Transit = {
@@ -108,12 +119,6 @@ type Transit = {
   }[];
 };
 
-function lineLabel(name: string) {
-  // "地铁2号线(浦东国际机场--徐泾东)" -> "Metro Line 2"
-  const m = name.match(/地铁(\d+)号线/);
-  if (m) return `Metro Line ${m[1]}`;
-  return py(name.replace(/\(.*\)/, ""));
-}
 
 export async function planRoutes(o: { origin: string; destination: string; citycode: string; destCitycode?: string }): Promise<RouteOption[]> {
   if (demo.maps) return mock.routes;
@@ -134,17 +139,22 @@ export async function planRoutes(o: { origin: string; destination: string; cityc
     for (const t of transit.value.route.transits.slice(0, 3)) {
       const steps: RouteOption["steps"] = [];
       for (const s of t.segments) {
-        if (s.walking && +s.walking.distance > 0) steps.push({ kind: "walk", text: `Walk ${s.walking.distance} m` });
+        if (s.walking && +s.walking.distance > 0) steps.push({ kind: "walk", meters: +s.walking.distance });
         for (const b of s.bus?.buslines.slice(0, 1) ?? []) {
-          const subway = b.type.includes("地铁");
+          const name = b.name.replace(/\(.*\)/, ""); // "地铁2号线(浦东国际机场--徐泾东)" → "地铁2号线"
+          const metro = name.match(/地铁(\d+)号线/)?.[1];
           steps.push({
-            kind: subway ? "subway" : "bus",
-            text: `${lineLabel(b.name)}: ${py(b.departure_stop.name)} → ${py(b.arrival_stop.name)} (${+b.via_num + 1} stops)`,
-            zh: `${b.name.replace(/\(.*\)/, "")}：${b.departure_stop.name} → ${b.arrival_stop.name}`,
+            kind: b.type.includes("地铁") ? "subway" : "bus",
+            metro,
+            line: metro ? undefined : py(name),
+            from: py(b.departure_stop.name),
+            to: py(b.arrival_stop.name),
+            stops: +b.via_num + 1,
+            zh: `${name}：${b.departure_stop.name} → ${b.arrival_stop.name}`,
           });
         }
         if (s.railway?.name) {
-          steps.push({ kind: "rail", text: `Train ${s.railway.name}: ${py(s.railway.departure_stop.name)} → ${py(s.railway.arrival_stop.name)}`, zh: s.railway.name });
+          steps.push({ kind: "rail", line: s.railway.name, from: py(s.railway.departure_stop.name), to: py(s.railway.arrival_stop.name), zh: s.railway.name });
         }
       }
       out.push({
@@ -152,21 +162,20 @@ export async function planRoutes(o: { origin: string; destination: string; cityc
         minutes: Math.round(+t.cost.duration / 60),
         meters: +t.distance,
         priceCny: t.cost.transit_fee ? +t.cost.transit_fee : undefined,
-        summary: steps.filter((x) => x.kind !== "walk").map((x) => x.text.split(":")[0]).join(" → ") || "Walk",
         steps,
       });
     }
   }
   if (walking.status === "fulfilled" && walking.value.route.paths[0]) {
     const p = walking.value.route.paths[0];
-    if (+p.distance < 5000) out.push({ mode: "walking", minutes: Math.round(+p.cost.duration / 60), meters: +p.distance, summary: "Walk", steps: [] });
+    if (+p.distance < 5000) out.push({ mode: "walking", minutes: Math.round(+p.cost.duration / 60), meters: +p.distance, steps: [] });
   }
   if (driving.status === "fulfilled" && driving.value.route.paths[0]) {
     const p = driving.value.route.paths[0];
     out.push({
       mode: "driving", minutes: Math.round(+p.cost.duration / 60), meters: +p.distance,
       priceCny: driving.value.route.taxi_cost ? Math.round(+driving.value.route.taxi_cost) : undefined,
-      summary: "Taxi / DiDi", steps: [],
+      steps: [],
     });
   }
   return out;

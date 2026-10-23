@@ -19,19 +19,26 @@ Every feature works without keys, using sample data (marked with a “Demo data�
 | `ANTHROPIC_API_KEY` | Menu photo recognition, dish knowledge, translation | console.anthropic.com |
 | `AMAP_KEY` | POI search, transit / walk / drive routes, hotels, weather | console.amap.com → 应用管理 → **Web服务** Key |
 | `TRIP_ALLIANCE_ID`, `TRIP_SID` | Commission on Trip.com bookings | Trip.com Affiliate program |
+| `TRIP_SUB3` | Placement id from your Trip.com link (`trip_sub3=`) | Trip.com Affiliate dashboard |
 | `FLIGGY_PID` | Commission on Fliggy | 淘宝联盟 pub.alimama.com |
-| `AIRALO_REF` | eSIM commission | Airalo partner program |
+| `ESIM_AIRALO_URL`, `ESIM_HOLAFLY_URL`, `ESIM_SAILY_URL`, `ESIM_NOMAD_URL`, `ESIM_KLOOK_URL` | eSIM commission: paste the tracking link each programme gives you | Each provider’s affiliate programme (Impact, CJ, PartnerStack…) |
 
-## Features
+## Screens
 
-| Screen | What it does | Tech |
-|---|---|---|
-| **Eat** | Photo / typed dish names → translation into 15 languages, pinyin, description, ingredients (labelled “menu” vs “typical recipe”), allergens (EU 14 + MSG), meat / alcohol / spice flags, conflicts with *your* allergies and diet highlighted, “safe for me only” filter, full-screen Chinese allergy card and “order this” card with TTS | Claude vision + structured outputs (`lib/llm.ts`) |
-| **Go** | Search places in any script, current location with WGS-84→GCJ-02 correction, metro / bus / walk / taxi options with English line names + Chinese, deep links to Amap & Apple Maps, “show to driver” card, nearby metro / toilet / pharmacy / ATM / hospital | Amap Web Service v5 (`lib/amap.ts`, `lib/coords.ts`) |
-| **Stay** | City / dates / guests → Trip.com and Fliggy search, hotel list from Amap with rating & price, per-hotel “check price” link | `lib/affiliate.ts`, `/api/go` |
-| **Talk** | Two-way translation with voice input & speech output, offline phrasebook | Claude + Web Speech API |
-| **Trip guide** (from Today) | Allergy / diet / language profile, Alipay & WeChat Pay setup, currency converter, visa-free rules, eSIM, apps, train & flight search, attraction booking, emergency numbers | |
-| **Today** | Menu-scan hero, “Where to?”, weather, show-to-someone cards, pre-trip checklist | |
+| Screen | What it does |
+|---|---|
+| **Today** | Asks once whether you're *planning* or *in China*, with a switch at the top. Planning: arrival countdown and a get-ready checklist (visa, payments, eSIM, apps, bookings, allergies). In China: city, menu scan, “Where to?”, weather, Alipay / WeChat Pay shortcuts, a permitted-stay countdown with a calendar reminder, and show-to-someone cards. |
+| **Eat** | Photo or typed dish names → translation, pinyin, ingredients (menu vs typical recipe), allergens and diet conflicts, “safe for me” filter, prices in your home currency, allergy / order cards. |
+| **Go** | Place search in any city, GPS with WGS-84→GCJ-02 correction, metro / bus / walk / taxi routes worded in your language, Amap & Apple Maps hand-off, taxi card, nearby metro / toilet / pharmacy / ATM / hospital. |
+| **Stay** | Trip.com / Fliggy hotel search (affiliate), Amap hotel list with prices converted to your currency. |
+| **Talk** | Two-way translation with voice, offline phrasebook. |
+| **Settings** (gear) | Language, home currency, planning / in China, arrival date, entry date & entry type (visa-free 30 days, 240-h transit, visa), allergies, diet. Stored on the phone only. |
+| **Pay** | Opens the Alipay pay code / scanner and WeChat, price check with the ~3 % foreign-card fee, setup steps. |
+| **Mobile data** | eSIM providers (Holafly, Airalo, Saily, Nomad, Trip.com, Klook) with tracked affiliate links, plus local SIM advice. |
+| **Before you go** | Visa & entry, apps to install (with icons and store links), trains / flights / attraction tickets, good to know. |
+| **Emergency** | One-tap emergency numbers, “I need help” card, lost passport steps. |
+
+App text is available in English, Español, Français, Deutsch, 日本語 and 한국어 (`lib/i18n/`); menus and translation work in all 15 languages. App icons are fetched from the App Store by `/api/app-icon/[id]` and cached, with a brand-coloured monogram fallback.
 
 ## Every city in China
 

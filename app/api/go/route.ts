@@ -3,7 +3,7 @@ import { appendFile, mkdir } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 import { buildPartnerUrl, type LinkKind, type LinkParams } from "@/lib/affiliate";
 
-const PARTNERS = ["trip", "fliggy", "airalo"] as const;
+const PARTNERS = ["trip", "fliggy", "esim"] as const;
 const KINDS: LinkKind[] = ["hotel_list", "hotel_search", "train", "flight", "attraction", "esim"];
 
 // Tracked affiliate redirect. Only builds URLs for known partners, so it is not an open redirect.
@@ -18,6 +18,7 @@ export async function GET(req: Request) {
     checkin: q.get("checkin") ?? undefined, checkout: q.get("checkout") ?? undefined,
     adults: q.get("adults") ? Number(q.get("adults")) : undefined,
     from: q.get("from") ?? undefined, to: q.get("to") ?? undefined, date: q.get("date") ?? undefined,
+    provider: q.get("provider") ?? undefined,
   };
   const clickId = randomUUID().replaceAll("-", "").slice(0, 12);
   const url = buildPartnerUrl(partner, kind, p, clickId);

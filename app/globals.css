@@ -75,8 +75,16 @@ body { -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transpa
 :focus-visible { outline: 2px solid var(--cobalt); outline-offset: 2px; border-radius: 6px; }
 .zh { font-family: "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif; }
 
-/* Page body width on tablets / desktop preview */
-.content { max-width: 640px; margin: 0 auto; padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+/* One centred app column on every screen size: navbar, content and tab bar share its width.
+   On phones it is simply full width; on tablets/desktop it reads like a phone app. */
+.app-column { position: relative; max-width: 600px; margin-inline: auto; height: 100%; }
+@media (min-width: 640px) {
+  .app-column { border-inline: 1px solid var(--line); }
+  body { background: color-mix(in srgb, var(--porcelain) 92%, var(--ink)); }
+}
+.content { padding-bottom: calc(112px + env(safe-area-inset-bottom)); }
+.tabbar-fixed { position: fixed !important; bottom: 0; left: 50% !important; transform: translateX(-50%); width: 100% !important; max-width: 600px; }
+.sticky-bottom { position: fixed; bottom: calc(92px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: 100%; max-width: 600px; padding: 0 16px 8px; z-index: 10; }
 
 /* Status chips: compact labels, not controls */
 .tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font-size: 13px; font-weight: 600; line-height: 1.4; background: var(--porcelain); color: var(--ink); border: 1px solid var(--line); }

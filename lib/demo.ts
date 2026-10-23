@@ -32,16 +32,15 @@ export const regeo = { address: "上海市黄浦区南京东路街道人民广�
 export const routes: RouteOption[] = [
   {
     mode: "transit", minutes: 24, meters: 4300, priceCny: 3,
-    summary: "Metro Line 2 → Metro Line 10",
     steps: [
-      { kind: "walk", text: "Walk 350 m" },
-      { kind: "subway", text: "Metro Line 2: Ren Min Guang Chang → Nan Jing Dong Lu (1 stops)", zh: "地铁2号线：人民广场 → 南京东路" },
-      { kind: "subway", text: "Metro Line 10: Nan Jing Dong Lu → Yu Yuan (1 stops)", zh: "地铁10号线：南京东路 → 豫园" },
-      { kind: "walk", text: "Walk 420 m" },
+      { kind: "walk", meters: 350 },
+      { kind: "subway", metro: "2", from: "Ren Min Guang Chang", to: "Nan Jing Dong Lu", stops: 1, zh: "地铁2号线：人民广场 → 南京东路" },
+      { kind: "subway", metro: "10", from: "Nan Jing Dong Lu", to: "Yu Yuan", stops: 1, zh: "地铁10号线：南京东路 → 豫园" },
+      { kind: "walk", meters: 420 },
     ],
   },
-  { mode: "walking", minutes: 38, meters: 2900, summary: "Walk", steps: [] },
-  { mode: "driving", minutes: 14, meters: 3800, priceCny: 18, summary: "Taxi / DiDi", steps: [] },
+  { mode: "walking", minutes: 38, meters: 2900, steps: [] },
+  { mode: "driving", minutes: 14, meters: 3800, priceCny: 18, steps: [] },
 ];
 
 export const weather = {

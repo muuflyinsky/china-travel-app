@@ -10,7 +10,8 @@ export const config = {
     host: process.env.TRIP_HOST || "www.trip.com",
   },
   fliggyPid: process.env.FLIGGY_PID ?? "",
-  airaloRef: process.env.AIRALO_REF ?? "",
+  /** Affiliate tracking links per eSIM provider, e.g. ESIM_AIRALO_URL=https://airalo.pxf.io/… */
+  esimUrl: (id: string) => process.env[`ESIM_${id.toUpperCase()}_URL`] ?? "",
 };
 
 export const demo = {

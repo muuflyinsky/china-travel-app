@@ -1,4 +1,5 @@
 import { config } from "./config";
+import { ESIM_PROVIDERS } from "./esim";
 
 /**
  * Affiliate deep links. All outbound booking links go through /api/go so every click is
@@ -29,7 +30,7 @@ export const CITY_EN: Record<string, string> = {
 
 const cityKey = (c: string) => c.replace(/市$/, "");
 
-type Partner = "trip" | "fliggy" | "airalo";
+type Partner = "trip" | "fliggy" | "esim";
 export type LinkKind = "hotel_list" | "hotel_search" | "train" | "flight" | "attraction" | "esim";
 
 export type LinkParams = {
@@ -42,6 +43,7 @@ export type LinkParams = {
   from?: string;
   to?: string;
   date?: string;
+  provider?: string; // eSIM provider id
 };
 
 function withTripAffiliate(url: URL, sub: string) {
@@ -105,9 +107,10 @@ export function buildPartnerUrl(partner: Partner, kind: LinkKind, p: LinkParams,
     return u.toString();
   }
 
-  const u = new URL("https://www.airalo.com/china-esim");
-  if (config.airaloRef) u.searchParams.set("ref", config.airaloRef);
-  return u.toString();
+  // eSIM: the provider's own affiliate link if configured, else its public page.
+  const provider = ESIM_PROVIDERS.find((x) => x.id === p.provider) ?? ESIM_PROVIDERS[0];
+  if (provider.id === "tripcom") return withTripAffiliate(new URL(provider.defaultUrl), sub).toString();
+  return config.esimUrl(provider.id) || provider.defaultUrl;
 }
 
 /** Client-side helper: link to our tracked redirect. */
