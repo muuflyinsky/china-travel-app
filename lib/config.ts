@@ -5,6 +5,8 @@ export const config = {
   trip: {
     allianceId: process.env.TRIP_ALLIANCE_ID ?? "",
     sid: process.env.TRIP_SID ?? "",
+    // Placement id from the affiliate dashboard link (e.g. D20512235); sent unchanged on every link.
+    sub3: process.env.TRIP_SUB3 ?? "",
     host: process.env.TRIP_HOST || "www.trip.com",
   },
   fliggyPid: process.env.FLIGGY_PID ?? "",

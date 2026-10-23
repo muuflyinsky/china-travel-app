@@ -48,6 +48,7 @@ function withTripAffiliate(url: URL, sub: string) {
   if (config.trip.allianceId) url.searchParams.set("Allianceid", config.trip.allianceId);
   if (config.trip.sid) url.searchParams.set("SID", config.trip.sid);
   url.searchParams.set("trip_sub1", sub); // our click id → appears in the Trip.com order report
+  if (config.trip.sub3) url.searchParams.set("trip_sub3", config.trip.sub3);
   return url;
 }
 
