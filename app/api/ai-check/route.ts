@@ -19,6 +19,10 @@ export async function GET() {
   return NextResponse.json({
     provider: "openai-compatible",
     endpoints: config.ai.baseUrls.map((u) => new URL(u).host),
+    // Enough to spot a wrong or mangled key without revealing it.
+    key: { length: config.ai.key.length, startsWithSk: config.ai.key.startsWith("sk-") },
+    baseUrlSet: Boolean(process.env.AI_BASE_URL),
+    deployedCommit: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? "local",
     textModel: config.ai.textModel,
     visionModel: config.ai.visionModel,
     ...result,

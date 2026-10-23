@@ -1,12 +1,23 @@
+const DASHSCOPE_INTL = "https://dashscope-intl.aliyuncs.com/compatible-mode/v1";
+const DASHSCOPE_CN = "https://dashscope.aliyuncs.com/compatible-mode/v1";
+
+/** A Model Studio URL for one region also gets the other region as a fallback for the key. */
+function withOtherRegion(urls: string[]) {
+  const out = [...urls];
+  if (urls.includes(DASHSCOPE_INTL) && !urls.includes(DASHSCOPE_CN)) out.push(DASHSCOPE_CN);
+  if (urls.includes(DASHSCOPE_CN) && !urls.includes(DASHSCOPE_INTL)) out.push(DASHSCOPE_INTL);
+  return out;
+}
+
 export const config = {
   // Primary AI: any OpenAI-compatible endpoint (default: Alibaba Cloud Model Studio). Model Studio
   // keys only work in the region they were created in, so without AI_BASE_URL both the
   // international (Singapore) and the mainland (Beijing) endpoints are tried. AI_BASE_URL may list
   // several endpoints, comma-separated.
   ai: {
-    baseUrls: process.env.AI_BASE_URL
+    baseUrls: withOtherRegion(process.env.AI_BASE_URL
       ? process.env.AI_BASE_URL.split(",").map((u) => u.trim().replace(/\/$/, "")).filter(Boolean)
-      : ["https://dashscope-intl.aliyuncs.com/compatible-mode/v1", "https://dashscope.aliyuncs.com/compatible-mode/v1"],
+      : [DASHSCOPE_INTL, DASHSCOPE_CN]),
     // Pasted keys often carry a trailing newline or quotes, which the API rejects as invalid.
     key: (process.env.AI_API_KEY ?? "").trim().replace(/^["']|["']$/g, ""),
     visionModel: process.env.AI_MODEL_VISION || "qwen-vl-max",
