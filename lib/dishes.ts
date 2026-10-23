@@ -79,9 +79,9 @@ For each dish name you get, answer for the dish's standard (most common) recipe,
 - "zh": the dish name exactly as given. "pinyin": Hanyu Pinyin with tone marks.
 - "name": the natural dish name in the target language, as a good bilingual menu would write it. "short": what it is in at most 10 words, target language.
 - "allergens": every allergen likely present, including hidden ones in sauces (soy sauce = soy + gluten, oyster sauce = mollusc, sesame oil = sesame). Be conservative: if a common version contains it, include it; a missed allergen can hurt someone, an extra one only costs a question. Allergen ids: ${ALLERGENS.map((a) => a.id).join(", ")}.
-  For each, "via_zh" is the ingredient that brings it (Chinese), "via" the same ingredient in the target language, and "role": "main" if the dish is defined by it and can't be made without it (peanuts in 宫保鸡丁, shrimp in 虾饺), "sauce" for seasoning, sauce, oil or stock, "garnish" for a topping that can be left off. When unsure, "main".
+  Sichuan pepper (花椒) is a spice, not a nut. For each allergen, "via_zh" is the ingredient that brings it (Chinese) and "via" the same ingredient in the target language: just its name, 1–3 words, no comments or parentheses. "role": "main" if the dish is defined by it and can't be made without it (peanuts in 宫保鸡丁, shrimp in 虾饺), "sauce" for seasoning, sauce, oil or stock, "garnish" for a topping that can be left off. When unsure, "main".
 - "spice" 0–3; "vegetarian" true only if no meat, fish, seafood, animal stock or lard; "meat" lists ${MEAT.join(", ")}; "alcohol" true if cooked with wine or spirits.
-- "confidence": "high" for well-known dishes, "medium" if versions differ a lot, "low" for house specials or names you can't place.
+- "confidence" is about knowing what the dish is, not about every kitchen's recipe: "high" for any established dish with a standard recipe (宫保鸡丁, 麻婆豆腐, 担担面, 回锅肉, 夫妻肺片, 清炒时蔬 are all high), "medium" when the name covers clearly different dishes, "low" only for house specials, poetic names you can't decode, or text that may not be a dish.
 - "cuisine": the kind of restaurant these dishes suggest, in the target language. "tips": 0–2 short ordering tips for these dishes in the target language (e.g. sold by weight, rice is extra); empty if nothing useful.
 Return the dishes in the order given.`;
 
@@ -172,8 +172,8 @@ function repairDetail(raw: unknown) {
 
 // ---- the pipeline ---------------------------------------------------------------------------
 
-const CHUNK = 4;      // dishes per model call: small enough that the first ones arrive in seconds
-const PARALLEL = 4;   // concurrent model calls per menu
+const CHUNK = 2;      // dishes per model call: output length drives latency, so small batches arrive first
+const PARALLEL = 6;   // concurrent model calls per menu
 
 type Item = { zh: string; price: string; printed: string };
 
