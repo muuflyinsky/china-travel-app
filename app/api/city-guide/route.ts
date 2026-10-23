@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { errorResponse } from "@/lib/errors";
 import { cityGuide } from "@/lib/city-guide";
 import { HOT_CITIES } from "@/lib/hot-cities";
@@ -16,8 +16,10 @@ export async function GET(req: Request) {
   const token = process.env.CITY_GUIDE_TOKEN;
   const refresh = q.get("refresh") === "1" && Boolean(token) && req.headers.get("authorization") === `Bearer ${token}`;
   try {
-    const guide = await cityGuide(city.a, city.s, city.e, refresh);
-    return NextResponse.json({ ...guide, demo: demo.maps || demo.ai }, { headers: { "cache-control": "public, max-age=3600" } });
+    const { guide, later } = await cityGuide(city.a, city.s, city.e, refresh);
+    if (later) after(later); // the model's text arrives on a later visit; the page shows map data now
+    const partial = Boolean((guide as { partial?: boolean }).partial);
+    return NextResponse.json({ ...guide, demo: demo.maps }, { headers: { "cache-control": partial ? "no-store" : "public, max-age=3600" } });
   } catch (e) {
     return errorResponse(e, "city-guide");
   }

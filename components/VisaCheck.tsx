@@ -1,13 +1,13 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { Popup, Searchbar } from "konsta/react";
-import { Check, ExternalLink, X, TriangleAlert } from "lucide-react";
+import { Check, ExternalLink, X } from "lucide-react";
 import { Card, Button, Seg } from "./ui";
 import { useProfile } from "./useProfile";
 import { useT } from "./useT";
 import { fmt } from "@/lib/i18n";
 import { COUNTRIES, SOURCE, VERIFIED_ON, currencyFor, entryTypeFor, guessCountry, visaRule } from "@/lib/visa";
-import { daysBetween } from "@/lib/stay";
+import { StayWarning } from "./StayWarning";
 
 export function useCountryName(lang: string) {
   return useMemo(() => {
@@ -118,11 +118,6 @@ export function VisaCheck() {
     : r.kind === "mutual" ? [t.visa.cond.ordinary, t.visa.cond.mutual90]
     : r.kind === "transit240" ? [t.visa.cond.onward, t.visa.cond.ports, t.visa.cond.ordinary]
     : [t.visa.cond.applyVisa, t.visa.cond.transit24];
-  const max = r.kind === "visa" ? null : r.days;
-  const tripDays = p.arrival && p.departure ? daysBetween(p.arrival, p.departure) : null;
-  const tooLong = max !== null && tripDays !== null && tripDays > max;
-  const until = r.kind === "unilateral" ? r.until : null;
-  const afterExpiry = Boolean(until && p.arrival && p.arrival > until);
   const fmtDate = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString(p.lang, { timeZone: "UTC", day: "numeric", month: "long", year: "numeric" });
 
   return (
@@ -135,16 +130,8 @@ export function VisaCheck() {
       <ul className="mt-3 space-y-1.5 text-subhead">
         {conditions.slice(0, 3).map((c) => <li key={c} className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-cobalt" aria-hidden />{c}</li>)}
       </ul>
-      {(afterExpiry || tooLong) && (
-        <p className="mt-3 flex gap-2 rounded-xl bg-warn-soft p-3 text-subhead text-warn">
-          <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-          <span>
-            {afterExpiry && fmt(t.visa.expiry, { date: fmtDate(until!) })}
-            {afterExpiry && tooLong && " "}
-            {tooLong && fmt(t.visa.tooLong, { n: tripDays!, max: max! })}
-          </span>
-        </p>
-      )}
+      {/* Overstay, transit rules and policy end date — shared with Settings and Today. */}
+      <div className="mt-3"><StayWarning transit={false} /></div>
       <a href={SOURCE.url} target="_blank" rel="noopener" className="mt-3 flex min-h-11 items-center gap-1 text-footnote text-muted">
         {fmt(t.visa.source, { source: SOURCE.name, date: fmtDate(VERIFIED_ON) })} <ExternalLink className="h-3.5 w-3.5" aria-hidden />
       </a>

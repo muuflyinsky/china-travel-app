@@ -44,6 +44,15 @@ export const fr: Dict = {
     near: "près de {city}",
   },
   today: {
+    chinaApps: "Vos apps chinoises",
+    amapToHotel: "Amap vers l’hôtel",
+    openDidi: "Ouvrir DiDi",
+    didiHint: "DiDi n’accepte pas de destination venant d’une autre app : montrez l’adresse chinoise ci-dessous au chauffeur, ou collez-la dans DiDi.",
+    copy: "Copier",
+    copied: "Copié",
+    appsTitle: "Apps à installer avant de partir",
+    setupFirst: "À configurer avant le départ",
+    setupNote: "Alipay et WeChat envoient un code par SMS. Configurez-les chez vous avec votre propre numéro et ajoutez-y votre carte.",
     tileMenu: "Scanner un menu",
     tileMenuSub: "Traduit, avec contrôle des allergies",
     tileDriver: "Montrer au chauffeur",
@@ -54,7 +63,7 @@ export const fr: Dict = {
     tileTodaySub: "L’essentiel de {city}",
     tileTodayAlarm: "{name} · billets {when}",
     driverElse: "Ailleurs : un lieu ou une adresse",
-    getReadySub: "Paiement, données mobiles, apps, trains",
+    getReadySub: "Paiement, données mobiles, trains, bon à savoir",
     hotelsFor: "Hôtels à {city}",
     addCities: "Ajoutez les villes que vous visiterez",
     addCitiesSub: "Nous choisirons des hôtels dans chaque gamme de prix pour chaque ville",
@@ -102,6 +111,9 @@ export const fr: Dict = {
     stayTrackSub: "Ajoutez votre date d’entrée pour un rappel de départ",
   },
   stay: {
+    overstayFree: "Vous prévoyez de partir le {planned}, mais votre séjour sans visa se termine le {legal}. Quittez la Chine au plus tard le {legal}, ou obtenez un visa avant de partir.",
+    overstayVisa: "Vous prévoyez de partir le {planned}, mais votre visa vous permet de rester jusqu’au {legal}. Quittez la Chine au plus tard le {legal}, ou faites d’abord prolonger votre séjour au bureau d’entrée-sortie.",
+    transitRules: "Transit de 240 heures : vous devez continuer vers un pays tiers, sortir par un point désigné et rester dans les provinces autorisées.",
     whereToStay: "Où loger",
     aiPick: "Suggestion IA",
     metroCount: "{n} stations de métro à moins de 1 km",
@@ -260,6 +272,7 @@ export const fr: Dict = {
     groups: { basics: "Essentiel", eating: "Au restaurant", around: "Se déplacer", hotel: "Hôtel", emergency: "Urgence" },
   },
   settings: {
+    datesOverstay: "Départ après votre limite légale",
     cityFrom: "du",
     cityTo: "au",
     cityDatesNote: "Facultatif : vos dates dans chaque ville. Accueil affichera alors la bonne ville chaque jour.",
@@ -442,6 +455,7 @@ export const fr: Dict = {
     change: "Changer d’hôtel",
   },
   guide: {
+    autoMap: "Sélection automatique à partir des données Amap.",
     "title": "{city} : l’essentiel",
     "see": "Voir",
     "eat": "Manger",
@@ -500,6 +514,10 @@ export const fr: Dict = {
     "reminderLine": "Pour le {date} · ouverture {when}"
   },
   awards: {
+    amapTitle: "Restaurants bien notés",
+    amapRating: "Note Amap {n}",
+    perPerson: "{n} ¥ par personne",
+    amapNote: "Notes et prix par personne d’Amap.",
     "title": "Restaurants distingués",
     "michelin": "MICHELIN {stars}",
     "bib": "MICHELIN Bib Gourmand",

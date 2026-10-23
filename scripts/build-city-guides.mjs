@@ -4,7 +4,8 @@
 //
 //   CITY_GUIDE_TOKEN=… node scripts/build-city-guides.mjs http://localhost:3000 [adcode …]
 //
-// Needs a running app with ANTHROPIC_API_KEY, AMAP_KEY and the same CITY_GUIDE_TOKEN. Run by
+// Needs a running app with AMAP_KEY and the same CITY_GUIDE_TOKEN; with an AI key (AI_API_KEY or
+// ANTHROPIC_API_KEY) guides also get descriptions, dishes and stay areas. Run by
 // .github/workflows/city-guides.yml once a month; it commits the files and Vercel redeploys.
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 
@@ -25,7 +26,7 @@ for (const c of cities) {
   const lowHere = [...g.sights, ...g.dishes].filter((x) => x.confidence === "low").length;
   low += lowHere;
   await writeFile(`public/city-guide/${c.a}.json`, JSON.stringify(g));
-  console.log(`✓ ${c.e}: ${g.sights.length} sights, ${g.dishes.length} dishes${lowHere ? `, ${lowHere} low-confidence` : ""}`);
+  console.log(`✓ ${c.e}: ${g.sights.length} sights, ${g.dishes.length} dishes, ${g.areas?.length ?? 0} areas${g.partial ? " (map data only, no AI text)" : ""}${lowHere && !g.partial ? `, ${lowHere} low-confidence` : ""}`);
 }
 console.log(`\n${cities.length - failed}/${cities.length} cities written · ${low} low-confidence items (see data/review.jsonl on the server)`);
 process.exit(failed === cities.length ? 1 : 0);

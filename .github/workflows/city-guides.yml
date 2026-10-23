@@ -1,5 +1,6 @@
 # Monthly refresh of the automatic city guides (top sights + signature dishes per hot city).
-# Needs repository secrets ANTHROPIC_API_KEY and AMAP_KEY (Settings → Secrets and variables → Actions).
+# Needs the repository secret AMAP_KEY; AI_API_KEY (or ANTHROPIC_API_KEY) adds descriptions,
+# dishes and stay areas (Settings → Secrets and variables → Actions).
 name: City guides
 on:
   schedule:
@@ -19,10 +20,11 @@ jobs:
       - run: npm run build
       - name: Generate guides
         env:
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           AMAP_KEY: ${{ secrets.AMAP_KEY }}
         run: |
-          if [ -z "$ANTHROPIC_API_KEY" ] || [ -z "$AMAP_KEY" ]; then echo "Secrets missing; skipping."; exit 0; fi
+          if [ -z "$AMAP_KEY" ]; then echo "AMAP_KEY secret missing; skipping."; exit 0; fi
           export CITY_GUIDE_TOKEN=$(openssl rand -hex 24)
           npx next start -p 3000 & sleep 8
           node scripts/build-city-guides.mjs http://localhost:3000

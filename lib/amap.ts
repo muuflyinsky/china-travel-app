@@ -4,7 +4,8 @@ import * as mock from "./demo";
 import { Unavailable } from "./errors";
 
 // Amap (高德) Web Service API. Docs: https://lbs.amap.com/api/webservice/summary
-const BASE = "https://restapi.amap.com";
+// AMAP_BASE_URL is for tests against a local mock; production uses the default.
+const BASE = process.env.AMAP_BASE_URL || "https://restapi.amap.com";
 
 export type Place = {
   id: string;
@@ -81,6 +82,13 @@ export async function searchPlaces(q: { keywords?: string; city?: string; around
         keywords: q.keywords, types: q.types, region: q.city, city_limit: q.city ? "true" : undefined, ...fields,
       });
   return data.pois.map(toPlace);
+}
+
+/** Chinese address → "lng,lat" (GCJ-02), or null when Amap can't place it. */
+export async function geocode(address: string): Promise<string | null> {
+  if (demo.maps) return "121.4910,31.2454";
+  const d = await amap<{ geocodes: { location: string }[] }>("/v3/geocode/geo", { address });
+  return d.geocodes?.[0]?.location || null;
 }
 
 export async function reverseGeocode(location: string) {

@@ -22,7 +22,7 @@ export type Profile = {
   nationality: string; // ISO country code, confirmed by the traveller ("" = not yet)
   onwardThird: boolean | null; // only asked when the passport qualifies for transit only
   guests: number; // remembered for hotel search
-  hotel: { name: string; address: string; nameEn?: string } | null; // "back to my hotel" card
+  hotel: { name: string; address: string; nameEn?: string; location?: string } | null; // "back to my hotel" card
   allergiesAsked: boolean; // the first-visit allergy sheet on Eat has been answered
   severe: string[]; // allergens where even a trace is dangerous
   /** Destination cities: adcode, English, Chinese short + full name, province; optional dates there. */

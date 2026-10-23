@@ -8,7 +8,8 @@ export async function GET(req: Request) {
   const city = new URL(req.url).searchParams.get("city") ?? "";
   if (!/^\d{6}$/.test(city)) return NextResponse.json({ error: "city must be an adcode" }, { status: 400 });
   try {
-    return NextResponse.json({ restaurants: await awardRestaurants(city), lists: awardLists(), demo: demo.maps }, { headers: { "cache-control": "public, max-age=3600" } });
+    const { restaurants, source } = await awardRestaurants(city);
+    return NextResponse.json({ restaurants, source, lists: awardLists(), demo: demo.maps }, { headers: { "cache-control": "public, max-age=3600" } });
   } catch (e) {
     return errorResponse(e, "restaurants");
   }

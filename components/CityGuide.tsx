@@ -19,21 +19,21 @@ import { AwardBadges } from "./AwardBadges";
 import type { AwardRestaurant } from "@/lib/restaurant-awards";
 import type { Place } from "@/lib/amap";
 
-type Listed = AwardRestaurant & { poi: Place | null };
+type Listed = AwardRestaurant & { poi: Place | null; rating?: number; cost?: number };
 type Lists = Record<string, { name: string; edition: string; checked: string }>;
 
 /** Restaurants on the Michelin / Black Pearl / Must-Eat lists. Hidden when we have no list for the city. */
 function AwardRestaurants({ adcode, onPick }: { adcode: string; onPick: (p: Place | string) => void }) {
   const t = useT();
   const [p] = useProfile();
-  const [d, setD] = useState<{ restaurants: Listed[]; lists: Lists; demo: boolean } | null>(null);
+  const [d, setD] = useState<{ restaurants: Listed[]; source: "awards" | "mixed" | "amap"; lists: Lists; demo: boolean } | null>(null);
   useEffect(() => { setD(null); fetch(`/api/restaurants?city=${adcode}`).then((r) => r.json()).then(setD).catch(() => {}); }, [adcode]);
   if (!d?.restaurants.length) return null;
   const used = [...new Set(d.restaurants.flatMap((r) => r.awards.map((a) => a.list)))];
   const fmtDate = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString(p.lang, { timeZone: "UTC", day: "numeric", month: "short", year: "numeric" });
   return (
     <>
-      <h3 className="mt-2 px-1 text-subhead font-semibold text-muted">{t.awards.title}</h3>
+      <h3 className="mt-2 px-1 text-subhead font-semibold text-muted">{d.source === "amap" ? t.awards.amapTitle : t.awards.title}</h3>
       <Group>
         {d.restaurants.map((r) => (
           <li key={r.zh}>
@@ -41,6 +41,12 @@ function AwardRestaurants({ adcode, onPick }: { adcode: string; onPick: (p: Plac
               <span className="min-w-0 flex-1">
                 <span className="zh block text-body">{r.zh}</span>
                 {(r.en || r.cuisine) && <span className="block text-footnote text-muted">{[r.en, r.cuisine && <span key="c" className="zh">{r.cuisine}</span>].filter(Boolean).reduce<React.ReactNode[]>((a, x, i) => (i ? [...a, " · ", x] : [x]), [])}</span>}
+                {(r.rating || r.cost) && (
+                  <span className="flex items-center gap-1 text-footnote text-muted tabular-nums">
+                    {r.rating && <><Star className="h-3.5 w-3.5 fill-current text-ink" aria-hidden />{fmt(t.awards.amapRating, { n: r.rating.toFixed(1) })}</>}
+                    {r.rating && r.cost ? " · " : ""}{r.cost ? fmt(t.awards.perPerson, { n: r.cost }) : ""}
+                  </span>
+                )}
                 <AwardBadges awards={r.awards} />
               </span>
               <ChevronRight className="h-5 w-5 shrink-0 text-muted opacity-60" aria-hidden />
@@ -49,7 +55,10 @@ function AwardRestaurants({ adcode, onPick }: { adcode: string; onPick: (p: Plac
         ))}
       </Group>
       <p className="px-1 text-footnote text-muted">
-        {d.demo ? t.awards.sample : <>{used.map((l) => `${d.lists[l].name} ${d.lists[l].edition}${d.lists[l].checked ? ` (${fmt(t.awards.checked, { date: fmtDate(d.lists[l].checked) })})` : ""}`).join(" · ")}. {t.awards.note}</>}
+        {d.demo ? t.awards.sample : <>
+          {used.length > 0 && <>{used.map((l) => `${d.lists[l].name} ${d.lists[l].edition}${d.lists[l].checked ? ` (${fmt(t.awards.checked, { date: fmtDate(d.lists[l].checked) })})` : ""}`).join(" · ")}. {t.awards.note} </>}
+          {d.source !== "awards" && t.awards.amapNote}
+        </>}
       </p>
     </>
   );
@@ -101,7 +110,7 @@ function SightCard({ s, city, cityEn, index }: { s: GuideSight; city: string; ci
       <p className="zh text-subhead text-muted">{s.zh}</p>
       {intro && <p className="mt-2 text-body">{intro}</p>}
       <ul className="mt-2 space-y-1 text-footnote text-muted">
-        <li className="flex gap-1.5"><Clock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-cobalt" aria-hidden />{fmt(t.guide.hours, { n: s.hours })}</li>
+        {s.hours > 0 && <li className="flex gap-1.5"><Clock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-cobalt" aria-hidden />{fmt(t.guide.hours, { n: s.hours })}</li>}
         {best && <li className="flex gap-1.5"><Sun className="mt-0.5 h-3.5 w-3.5 shrink-0 text-cobalt" aria-hidden />{fmt(t.guide.best, { t: best })}</li>}
         {s.rating !== undefined && <li className="flex gap-1.5"><Star className="mt-0.5 h-3.5 w-3.5 shrink-0 fill-current text-ink" aria-hidden />{s.rating.toFixed(1)}</li>}
       </ul>
@@ -183,7 +192,8 @@ export function CityGuide({ adcode, cityEn, initialTab = "see", onFindDish, onPi
     <>
       <Seg value={tab} onChange={setTab} label={fmt(t.guide.title, { city: cityEn })} options={[{ value: "see", label: t.guide.see }, { value: "eat", label: t.guide.eat }]} />
       {items.length === 0 ? (
-        <p className="px-1 text-subhead text-muted">{state === "none" ? t.guide.notYet : t.guide.empty}</p>
+        // No dishes without the model: Eat then shows just the restaurants below.
+        tab === "see" ? <p className="px-1 text-subhead text-muted">{state === "none" ? t.guide.notYet : t.guide.empty}</p> : null
       ) : (
         <>
           {tab === "see"
@@ -210,7 +220,7 @@ export function CityGuide({ adcode, cityEn, initialTab = "see", onFindDish, onPi
       <a href={goLink("trip", "attraction", { cityEn }, "explore_top", "explore-top")} target="_blank" rel="noopener" className="flex min-h-11 items-center gap-1 px-1 text-subhead font-semibold text-cobalt">
         {fmt(t.guide.topTrip, { city: cityEn })}<ExternalLink className="h-3.5 w-3.5" aria-hidden />
       </a>
-      <p className="px-1 text-footnote text-muted">{t.guide.auto}{updated && ` · ${fmt(t.guide.updated, { date: updated })}`}</p>
+      <p className="px-1 text-footnote text-muted">{(g as { partial?: boolean } | null)?.partial ? t.guide.autoMap : t.guide.auto}{updated && ` · ${fmt(t.guide.updated, { date: updated })}`}</p>
     </>
   );
 }

@@ -44,6 +44,15 @@ export const es: Dict = {
     near: "cerca de {city}",
   },
   today: {
+    chinaApps: "Tus apps chinas",
+    amapToHotel: "Amap al hotel",
+    openDidi: "Abrir DiDi",
+    didiHint: "DiDi no acepta un destino desde otra app: enseña al taxista la dirección en chino de abajo o pégala en DiDi.",
+    copy: "Copiar",
+    copied: "Copiado",
+    appsTitle: "Apps que instalar antes de volar",
+    setupFirst: "Configúrala antes de volar",
+    setupNote: "Alipay y WeChat envían un código por SMS. Configúralas en casa con tu propio número y añade allí tu tarjeta.",
     tileMenu: "Escanear menú",
     tileMenuSub: "Traducido y revisado por alergias",
     tileDriver: "Mostrar al taxista",
@@ -54,7 +63,7 @@ export const es: Dict = {
     tileTodaySub: "Lo mejor de {city}",
     tileTodayAlarm: "{name} · entradas {when}",
     driverElse: "Otro destino: lugar o dirección",
-    getReadySub: "Pagos, datos móviles, apps, trenes",
+    getReadySub: "Pagos, datos móviles, trenes, conviene saber",
     hotelsFor: "Hoteles en {city}",
     addCities: "Añade las ciudades que visitarás",
     addCitiesSub: "Elegiremos hoteles de cada rango de precio en cada ciudad",
@@ -102,6 +111,9 @@ export const es: Dict = {
     stayTrackSub: "Añade tu fecha de entrada y te recordaremos cuándo salir",
   },
   stay: {
+    overstayFree: "Piensas salir el {planned}, pero tu estancia sin visado termina el {legal}. Sal de China antes del {legal} o tramita un visado antes de viajar.",
+    overstayVisa: "Piensas salir el {planned}, pero tu visado permite quedarte hasta el {legal}. Sal de China antes del {legal} o prorroga la estancia en la oficina de entrada y salida.",
+    transitRules: "Tránsito de 240 horas: debes seguir a un tercer país, salir por un puerto designado y no salir de las provincias permitidas.",
     whereToStay: "Dónde alojarse",
     aiPick: "Recomendado por IA",
     metroCount: "{n} estaciones de metro a menos de 1 km",
@@ -260,6 +272,7 @@ export const es: Dict = {
     groups: { basics: "Básico", eating: "Comer", around: "Moverse", hotel: "Hotel", emergency: "Emergencia" },
   },
   settings: {
+    datesOverstay: "La salida supera tu límite legal",
     cityFrom: "desde",
     cityTo: "hasta",
     cityDatesNote: "Opcional: los días en cada ciudad. Así Hoy muestra la ciudad correcta cada día.",
@@ -442,6 +455,7 @@ export const es: Dict = {
     change: "Cambiar hotel",
   },
   guide: {
+    autoMap: "Elegido automáticamente con datos de Amap.",
     "title": "{city}: lo mejor",
     "see": "Ver",
     "eat": "Comer",
@@ -500,6 +514,10 @@ export const es: Dict = {
     "reminderLine": "Para el {date} · salen {when}"
   },
   awards: {
+    amapTitle: "Restaurantes bien valorados",
+    amapRating: "Valoración Amap {n}",
+    perPerson: "¥{n} por persona",
+    amapNote: "Valoraciones y precios por persona de Amap.",
     "title": "Restaurantes premiados",
     "michelin": "MICHELIN {stars}",
     "bib": "MICHELIN Bib Gourmand",

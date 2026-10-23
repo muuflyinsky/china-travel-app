@@ -44,6 +44,15 @@ export const ja: Dict = {
     near: "{city}近郊",
   },
   today: {
+    chinaApps: "中国で使うアプリ",
+    amapToHotel: "Amapでホテルへ",
+    openDidi: "DiDiを開く",
+    didiHint: "DiDiはほかのアプリから行き先を受け取れません。下の中国語の住所を運転手に見せるか、DiDiに貼り付けてください。",
+    copy: "コピー",
+    copied: "コピーしました",
+    appsTitle: "出発前に入れておくアプリ",
+    setupFirst: "出発前に設定",
+    setupNote: "AlipayとWeChatはSMSで確認コードが届きます。出発前に自分の電話番号で設定し、カードも登録しておきましょう。",
     tileMenu: "メニューを読む",
     tileMenuSub: "翻訳とアレルギーチェック",
     tileDriver: "運転手に見せる",
@@ -54,7 +63,7 @@ export const ja: Dict = {
     tileTodaySub: "{city}のおすすめ5選",
     tileTodayAlarm: "{name} · {when}販売開始",
     driverElse: "ほかの行き先：場所や住所",
-    getReadySub: "支払い、モバイルデータ、アプリ、列車",
+    getReadySub: "支払い、モバイルデータ、列車、知っておくと便利",
     hotelsFor: "{city}のホテル",
     addCities: "訪れる都市を追加",
     addCitiesSub: "都市ごとに各価格帯のホテルを選びます",
@@ -102,6 +111,9 @@ export const ja: Dict = {
     stayTrackSub: "入国日を登録すると出国期限をお知らせします",
   },
   stay: {
+    overstayFree: "{planned}に出国する予定ですが、ビザなし滞在は{legal}までです。{legal}までに出国するか、出発前にビザを取得してください。",
+    overstayVisa: "{planned}に出国する予定ですが、ビザで滞在できるのは{legal}までです。{legal}までに出国するか、先に出入国管理局で滞在延長を申請してください。",
+    transitRules: "240時間トランジット：第三国へ向かうこと、指定の出入国地点から出国すること、許可された省内に滞在することが必要です。",
     whereToStay: "泊まるエリア",
     aiPick: "AIのおすすめ",
     metroCount: "1 km以内に地下鉄駅{n}つ",
@@ -260,6 +272,7 @@ export const ja: Dict = {
     groups: { basics: "基本", eating: "食事", around: "移動", hotel: "ホテル", emergency: "緊急" },
   },
   settings: {
+    datesOverstay: "出国日が滞在期限を過ぎています",
     cityFrom: "から",
     cityTo: "まで",
     cityDatesNote: "任意：各都市に滞在する日。「今日」に毎日その日の都市が表示されます。",
@@ -442,6 +455,7 @@ export const ja: Dict = {
     change: "ホテルを変更",
   },
   guide: {
+    autoMap: "Amapの地図データから自動選定。",
     "title": "{city}のおすすめ",
     "see": "見る",
     "eat": "食べる",
@@ -500,6 +514,10 @@ export const ja: Dict = {
     "reminderLine": "{date}分 · {when}販売開始"
   },
   awards: {
+    amapTitle: "評価の高いレストラン",
+    amapRating: "Amap評価 {n}",
+    perPerson: "1人 ¥{n}",
+    amapNote: "評価と1人あたりの価格はAmapのデータです。",
     "title": "受賞レストラン",
     "michelin": "ミシュラン {stars}",
     "bib": "ミシュラン ビブグルマン",

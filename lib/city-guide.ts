@@ -1,7 +1,8 @@
 import { readFile, writeFile, mkdir, appendFile } from "node:fs/promises";
 import { searchPlaces, py, type Place } from "./amap";
 import { analyzeMenu, writeCityGuide } from "./llm";
-import { config, demo } from "./config";
+import { aiProvider, config, demo } from "./config";
+import { Unavailable } from "./errors";
 import { RESERVATION_SOURCE, reservationFor } from "./reservations";
 import * as mock from "./demo";
 import type { CityGuide, GuideArea, GuideDish, GuideSight } from "./city-guide-types";
@@ -37,17 +38,44 @@ async function spendFor(dish: string, adcode: string): Promise<[number, number] 
   return [Math.max(10, q(0.25)), Math.max(10, q(0.75))];
 }
 
-export async function generateGuide(adcode: string, cityZh: string, cityEn: string): Promise<CityGuide> {
+/**
+ * The part that needs only Amap: the top 5 sights with real names, ratings, addresses and
+ * reservation rules. Fast (three map calls), so the page never waits for the model.
+ */
+export async function basicGuide(adcode: string, cityZh: string, cityEn: string): Promise<CityGuide & { partial: true }> {
+  const top = await topSights(adcode);
+  return {
+    city: cityZh, cityEn, adcode, generatedAt: new Date().toISOString(), model: "", partial: true,
+    sources: ["Amap (高德) POI data", `${RESERVATION_SOURCE.name}, ${RESERVATION_SOURCE.license}`],
+    sights: top.map((p) => ({
+      // Without the model there is no English name; the reservation data has one for the big sights.
+      id: p.id, zh: p.name, en: reservationFor(adcode, p.name)?.en ?? p.pinyin, location: p.location, address: p.address,
+      rating: p.rating ? Number(p.rating) : undefined, national: p.type.includes("国家级"),
+      intro: { en: "" }, bestTime: { en: "" }, hours: 0, confidence: "low",
+      reservation: reservationFor(adcode, p.name)?.id,
+    })),
+    dishes: [], areas: [],
+  };
+}
+
+async function topSights(adcode: string) {
   const pages = await Promise.all([
     searchPlaces({ keywords: "景点", types: "110000", city: adcode, page: 1 }),
     searchPlaces({ keywords: "景点", types: "110000", city: adcode, page: 2 }).catch(() => []),
     searchPlaces({ keywords: "博物馆", types: "140100", city: adcode, page: 1 }).catch(() => []),
   ]);
-  const top = rankSights(pages.flat());
+  return rankSights(pages.flat());
+}
+
+/** Full guide: Amap facts plus the model's text, dishes and areas. Falls back to the basic guide if the model fails. */
+export async function generateGuide(adcode: string, cityZh: string, cityEn: string): Promise<CityGuide> {
+  if (!aiProvider) return basicGuide(adcode, cityZh, cityEn);
+  const top = await topSights(adcode);
   const text = await writeCityGuide({
     cityZh, cityEn,
     sights: top.map((p) => ({ zh: p.name, type: p.type, address: p.address, rating: p.rating ? Number(p.rating) : undefined })),
-  });
+  }).catch((e) => { console.error("[city-guide] model failed, keeping map data only:", (e as Error).message); return null; });
+  if (!text) return basicGuide(adcode, cityZh, cityEn);
 
   const sights: GuideSight[] = top.map((p) => {
     const w = text.sights.find((x) => x.zh === p.name);
@@ -97,28 +125,47 @@ const memory = new Map<string, CityGuide>();
 const inflight = new Map<string, Promise<CityGuide>>();
 const file = (adcode: string) => `data/city-guide/${adcode}.json`;
 
-/** Cached guide; generated on first request. `refresh` forces a new one (monthly job). */
-export async function cityGuide(adcode: string, cityZh: string, cityEn: string, refresh = false): Promise<CityGuide> {
-  if (demo.maps || demo.ai) return adcode === "310000" ? mock.cityGuide : { ...mock.cityGuide, city: cityZh, cityEn, adcode, sights: [], dishes: [] };
-  const fresh = (g?: CityGuide) => !refresh && g && Date.now() - Date.parse(g.generatedAt) < TTL;
-  if (fresh(memory.get(adcode))) return memory.get(adcode)!;
-  try {
-    const disk = JSON.parse(await readFile(file(adcode), "utf8")) as CityGuide;
-    if (fresh(disk)) { memory.set(adcode, disk); return disk; }
-  } catch {}
-  if (!inflight.has(adcode)) {
-    inflight.set(adcode, generateGuide(adcode, cityZh, cityEn).then(async (g) => {
-      memory.set(adcode, g);
-      try { await mkdir("data/city-guide", { recursive: true }); await writeFile(file(adcode), JSON.stringify(g, null, 2)); } catch {}
-      await review(g);
-      return g;
-    }).finally(() => inflight.delete(adcode)));
+const save = async (g: CityGuide) => {
+  memory.set(g.adcode, g);
+  try { await mkdir("data/city-guide", { recursive: true }); await writeFile(file(g.adcode), JSON.stringify(g, null, 2)); } catch {}
+};
+
+/**
+ * Cached guide. A cache miss answers at once with the map-only guide and returns `later`, the
+ * full generation, for the route to run after the response (next/server `after`). With
+ * `refresh` (the monthly job) the full guide is generated and awaited.
+ */
+export async function cityGuide(adcode: string, cityZh: string, cityEn: string, refresh = false): Promise<{ guide: CityGuide; later?: () => Promise<void> }> {
+  if (demo.maps) return { guide: adcode === "310000" ? mock.cityGuide : { ...mock.cityGuide, city: cityZh, cityEn, adcode, sights: [], dishes: [], areas: [] } };
+  if (!config.amapKey) throw new Unavailable("map");
+  if (refresh) {
+    const g = await generateGuide(adcode, cityZh, cityEn);
+    await save(g);
+    await review(g);
+    return { guide: g };
   }
-  return inflight.get(adcode)!;
+  const fresh = (g?: CityGuide) => g && Date.now() - Date.parse(g.generatedAt) < TTL;
+  let cached = memory.get(adcode);
+  if (!fresh(cached)) {
+    try { const disk = JSON.parse(await readFile(file(adcode), "utf8")) as CityGuide; if (fresh(disk)) { cached = disk; memory.set(adcode, disk); } } catch {}
+  }
+  const complete = (g?: CityGuide) => fresh(g) && !(g as { partial?: boolean }).partial;
+  if (complete(cached)) return { guide: cached! };
+
+  // Map data now; the model's part in the background, once per city at a time.
+  const guide = fresh(cached) ? cached! : await basicGuide(adcode, cityZh, cityEn);
+  if (guide !== cached) memory.set(adcode, guide);
+  const later = aiProvider && !inflight.has(adcode) ? async () => {
+    const job = generateGuide(adcode, cityZh, cityEn).then(async (g) => { await save(g); await review(g); return g; }).finally(() => inflight.delete(adcode));
+    inflight.set(adcode, job);
+    await job.catch((e) => console.error("[city-guide] background generation failed:", e));
+  } : undefined;
+  return { guide, later };
 }
 
 /** Passive review queue: low-confidence items and user 👎 go to data/review.jsonl (or the log). */
 export async function review(g: CityGuide | null, extra?: Record<string, unknown>) {
+  if (g && (g as { partial?: boolean }).partial) return; // map-only guide: nothing written by the model
   const rows = extra ? [extra] : [
     ...g!.sights.filter((s) => s.confidence === "low").map((s) => ({ kind: "sight", id: s.id, name: s.zh })),
     ...g!.dishes.filter((d) => d.confidence === "low").map((d) => ({ kind: "dish", name: d.zh })),

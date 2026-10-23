@@ -44,6 +44,15 @@ export const ko: Dict = {
     near: "{city} 근처",
   },
   today: {
+    chinaApps: "중국에서 쓸 앱",
+    amapToHotel: "Amap으로 호텔까지",
+    openDidi: "DiDi 열기",
+    didiHint: "DiDi는 다른 앱에서 목적지를 받지 못합니다. 아래 중국어 주소를 기사에게 보여 주거나 DiDi에 붙여 넣으세요.",
+    copy: "복사",
+    copied: "복사됨",
+    appsTitle: "출발 전에 설치할 앱",
+    setupFirst: "출발 전에 설정",
+    setupNote: "Alipay와 WeChat은 SMS로 인증 코드를 보냅니다. 출발 전에 내 번호로 가입하고 카드도 등록해 두세요.",
     tileMenu: "메뉴 스캔",
     tileMenuSub: "번역과 알레르기 확인",
     tileDriver: "기사에게 보여주기",
@@ -54,7 +63,7 @@ export const ko: Dict = {
     tileTodaySub: "{city} 추천 5곳",
     tileTodayAlarm: "{name} · {when} 티켓 오픈",
     driverElse: "다른 목적지: 장소나 주소",
-    getReadySub: "결제, 모바일 데이터, 앱, 기차",
+    getReadySub: "결제, 모바일 데이터, 기차, 알아 두면 좋은 것",
     hotelsFor: "{city} 호텔",
     addCities: "방문할 도시 추가",
     addCitiesSub: "도시마다 가격대별 호텔을 골라 드립니다",
@@ -102,6 +111,9 @@ export const ko: Dict = {
     stayTrackSub: "입국일을 등록하면 출국 기한을 알려 드려요",
   },
   stay: {
+    overstayFree: "{planned}에 출국할 계획이지만 무비자 체류는 {legal}까지입니다. {legal}까지 출국하거나 출발 전에 비자를 받으세요.",
+    overstayVisa: "{planned}에 출국할 계획이지만 비자로 머물 수 있는 기간은 {legal}까지입니다. {legal}까지 출국하거나 먼저 출입국관리국에서 체류를 연장하세요.",
+    transitRules: "240시간 경유: 제3국으로 가야 하고, 지정된 출입국 지점으로 나가야 하며, 허용된 성 안에서만 머물러야 합니다.",
     whereToStay: "어디에 묵을까",
     aiPick: "AI 추천",
     metroCount: "1 km 안에 지하철역 {n}곳",
@@ -260,6 +272,7 @@ export const ko: Dict = {
     groups: { basics: "기본", eating: "식사", around: "이동", hotel: "호텔", emergency: "긴급" },
   },
   settings: {
+    datesOverstay: "출국일이 체류 기한을 넘습니다",
     cityFrom: "부터",
     cityTo: "까지",
     cityDatesNote: "선택: 각 도시에 머무는 날짜. ‘오늘’에 날마다 맞는 도시가 나옵니다.",
@@ -442,6 +455,7 @@ export const ko: Dict = {
     change: "호텔 변경",
   },
   guide: {
+    autoMap: "Amap 지도 데이터로 자동 선정.",
     "title": "{city} 추천",
     "see": "볼거리",
     "eat": "먹거리",
@@ -500,6 +514,10 @@ export const ko: Dict = {
     "reminderLine": "{date} 방문분 · {when} 오픈"
   },
   awards: {
+    amapTitle: "평점 높은 식당",
+    amapRating: "Amap 평점 {n}",
+    perPerson: "1인 ¥{n}",
+    amapNote: "평점과 1인 가격은 Amap 데이터입니다.",
     "title": "수상 레스토랑",
     "michelin": "미쉐린 {stars}",
     "bib": "미쉐린 빕 구르망",

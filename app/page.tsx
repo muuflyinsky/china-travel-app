@@ -2,19 +2,24 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
-  Camera, Search, Siren, Check, CalendarClock, CalendarPlus, Plane, Smartphone, Wallet, LayoutGrid, Ticket, Lightbulb, BedDouble, CarTaxiFront,
-  Sun, CloudSun, Cloud, CloudRain, CloudLightning, Snowflake, CloudFog, ChevronRight, ChevronDown, LogIn, Receipt, PlaneTakeoff, ListChecks,
+  Camera, Search, Siren, Check, CalendarClock, CalendarPlus, Plane, Smartphone, Wallet, Ticket, Lightbulb, BedDouble, CarTaxiFront,
+  Sun, CloudSun, Cloud, CloudRain, CloudLightning, Snowflake, CloudFog, ChevronRight, ChevronDown, LogIn, Receipt, PlaneTakeoff, ListChecks, QrCode, Calculator, Copy,
 } from "lucide-react";
 import { Screen, DemoNote } from "@/components/Shell";
 import { Section, Card, Group, Row, Button, IconTile } from "@/components/ui";
 import { VisaCheck } from "@/components/VisaCheck";
 import { HotelCard } from "@/components/HotelCard";
 import { useHotelPicks, usePrice } from "@/components/HotelPicks";
-import { PayButtons } from "@/components/PayButtons";
+import { PayButtons, PAY_LINKS } from "@/components/PayButtons";
+import { AppIcon } from "@/components/AppIcon";
+import { APPS, type AppId } from "@/lib/apps";
+import { openApp } from "@/lib/openApp";
+import { amapNav } from "@/lib/maplinks";
+import { track } from "@/lib/track";
 import { PriceCheck } from "@/components/PriceCheck";
 import { PaySetup } from "@/components/prep/PaySetup";
 import { EsimPicker } from "@/components/prep/EsimPicker";
-import { AppList } from "@/components/prep/AppList";
+import { AppList, AppSetupNote } from "@/components/prep/AppList";
 import { TrainBooking } from "@/components/prep/TrainBooking";
 import { GoodToKnow } from "@/components/prep/GoodToKnow";
 import { useProfile } from "@/components/useProfile";
@@ -24,7 +29,8 @@ import { CityPicker } from "@/components/CityPicker";
 import { EditSheet } from "@/components/EditSheet";
 import { ReservationSheet } from "@/components/ReservationSheet";
 import { useRouter } from "next/navigation";
-import { stayStatus, stayReminderIcs, todayIso, daysBetween } from "@/lib/stay";
+import { stayWindow, stayReminderIcs, todayIso, daysBetween } from "@/lib/stay";
+import { StayWarning } from "@/components/StayWarning";
 import { tripPhase } from "@/lib/phase";
 import { upcomingReminders, type Reminder } from "@/lib/reminders";
 import { RESERVATIONS, type Reservation } from "@/lib/reservations";
@@ -118,7 +124,6 @@ function CityHotels() {
 const PREP = [
   { key: "pay", Icon: Wallet, Body: PaySetup },
   { key: "data", Icon: Smartphone, Body: EsimPicker },
-  { key: "apps", Icon: LayoutGrid, Body: AppList },
   { key: "book", Icon: Ticket, Body: TrainBooking },
   { key: "good", Icon: Lightbulb, Body: GoodToKnow },
 ] as const;
@@ -196,6 +201,11 @@ function BeforeTrip() {
         <CityHotels />
       </Section>
       <Alarms suggest />
+      {/* Not folded (SPEC v0.5 P1.5): knowing which Chinese app to install is the point. */}
+      <Section title={t.today.appsTitle}>
+        <div className="rounded-2xl border border-line bg-card px-4"><AppList /></div>
+        <AppSetupNote />
+      </Section>
       <Checklist />
     </>
   );
@@ -222,8 +232,9 @@ function EntryConfirm() {
 function StayCard() {
   const t = useT();
   const [p] = useProfile();
-  const s = stayStatus(p.entryDate, p.entryType, p.visaDays);
-  if (!s) return null;
+  // Counts down to the earlier of the planned departure and the latest legal exit day.
+  const s = stayWindow(p);
+  if (!s?.entered) return null;
   const download = () => {
     const blob = new Blob([stayReminderIcs(s.lastDay, t.stay.reminderTitle, t.stay.reminderBody)], { type: "text/calendar" });
     const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: "leave-china-reminder.ics" });
@@ -240,6 +251,7 @@ function StayCard() {
       </div>
       <p className="text-title">{fmt(t.stay.leaveBy, { date: fmtDay(s.lastDay, p.lang) })}</p>
       {s.overdue && <p className="mt-2 text-subhead text-danger">{fmt(t.stay.overdue, { n: -s.daysLeft })}</p>}
+      <div className="mt-3"><StayWarning policy={false} /></div>
       <div className="mt-3 flex gap-2">
         <Button variant="soft" onClick={download} className="flex-1 text-subhead!"><CalendarPlus className="h-4 w-4" aria-hidden />{t.stay.reminder}</Button>
         <Button variant="ghost" href="/settings#entry" className="text-subhead!">{t.common.edit}</Button>
@@ -272,18 +284,95 @@ function CityLine() {
 }
 
 /** One of the four first-screen actions in China. */
-function Tile({ icon, title, sub, onClick, href, primary }: {
+function Tile({ icon, title, sub, onClick, href, primary, apps }: {
   icon: React.ReactNode; title: string; sub: React.ReactNode; onClick?: () => void; href?: string; primary?: boolean;
+  /** Brand icons of the Chinese apps this moment uses — the only colour besides allergy colours. */
+  apps?: AppId[];
 }) {
   const cls = `flex min-h-[132px] flex-col items-start gap-2 rounded-2xl p-4 text-left ${primary ? "bg-cobalt text-white dark:text-porcelain" : "border border-line bg-card"}`;
   const body = (
     <>
-      <span className={`grid h-10 w-10 place-items-center rounded-xl ${primary ? "bg-white/20" : "bg-cobalt-soft text-cobalt"}`}>{icon}</span>
+      <span className="flex w-full items-center justify-between">
+        <span className={`grid h-10 w-10 place-items-center rounded-xl ${primary ? "bg-white/20" : "bg-cobalt-soft text-cobalt"}`}>{icon}</span>
+        {apps && <span className="flex -space-x-1.5">{apps.map((a) => <AppIcon key={a} id={a} size={24} />)}</span>}
+      </span>
       <span className="text-headline">{title}</span>
       <span className={`line-clamp-2 text-footnote ${primary ? "opacity-90" : "text-muted"}`}>{sub}</span>
     </>
   );
   return href ? <Link href={href} className={cls}>{body}</Link> : <button onClick={onClick} className={cls}>{body}</button>;
+}
+
+/** Pay: Alipay's pay code and WeChat, one tap each; the converter is a small link. */
+function PayTile({ onConvert }: { onConvert: () => void }) {
+  const t = useT();
+  const btn = "flex min-h-11 w-full items-center gap-2 rounded-xl border border-line bg-porcelain px-2 text-left text-subhead font-semibold";
+  return (
+    <div className="flex min-h-[132px] flex-col gap-2 rounded-2xl border border-line bg-card p-3">
+      <span className="px-1 text-headline">{t.today.tilePay}</span>
+      <button className={btn} onClick={() => openApp("alipay", PAY_LINKS.alipayPay)} aria-label={t.pay.openAlipay}>
+        <AppIcon id="alipay" size={26} /><span className="min-w-0 flex-1 truncate">Alipay</span><QrCode className="h-4 w-4 shrink-0 text-cobalt" aria-hidden />
+      </button>
+      <button className={btn} onClick={() => openApp("wechat", PAY_LINKS.wechat)} aria-label={t.pay.openWechat}>
+        <AppIcon id="wechat" size={26} /><span className="min-w-0 flex-1 truncate">WeChat</span><QrCode className="h-4 w-4 shrink-0 text-cobalt" aria-hidden />
+      </button>
+      <button onClick={onConvert} className="flex min-h-8 items-center gap-1 px-1 text-footnote font-semibold text-cobalt"><Calculator className="h-3.5 w-3.5" aria-hidden />{t.today.priceCheck}</button>
+    </div>
+  );
+}
+
+const CHINA_APPS: AppId[] = ["alipay", "wechat", "amap", "didi", "tripcom", "rail12306"];
+
+/** "Your China apps": one tap opens each app, or its store page if it isn't installed. */
+function ChinaApps() {
+  const t = useT();
+  return (
+    <Section title={t.today.chinaApps}>
+      <div className="grid grid-cols-6 gap-1">
+        {CHINA_APPS.map((a) => (
+          <button key={a} onClick={() => openApp(a)} className="flex min-h-[72px] flex-col items-center gap-1 rounded-xl py-1">
+            <AppIcon id={a} size={44} />
+            <span className="w-full truncate text-center text-footnote text-muted">{APPS[a].name.replace("Railway ", "")}</span>
+          </button>
+        ))}
+      </div>
+    </Section>
+  );
+}
+
+/** Driver sheet: hotel card, Amap navigation, DiDi with the address to paste. */
+function DriverApps() {
+  const t = useT();
+  const [p, set] = useProfile();
+  const [copied, setCopied] = useState(false);
+  const h = p.hotel;
+  // Hotels saved before v0.5 have no coordinates: look them up once.
+  useEffect(() => {
+    if (!h || h.location) return;
+    fetch(`/api/geocode?address=${encodeURIComponent(h.address)}`).then((r) => r.json()).then((d) => d.location && set({ hotel: { ...h, location: d.location } })).catch(() => {});
+  }, [h, set]);
+  if (!h) return null;
+  return (
+    <div className="space-y-2">
+      <div className="grid grid-cols-2 gap-2">
+        {h.location ? (
+          <a href={amapNav({ location: h.location, name: h.name }, "car")} target="_blank" rel="noopener" onClick={() => track("app_open", { app: "amap" })}
+            className="flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-line bg-card text-subhead font-semibold"><AppIcon id="amap" size={24} />{t.today.amapToHotel}</a>
+        ) : (
+          <button onClick={() => openApp("amap")} className="flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-line bg-card text-subhead font-semibold"><AppIcon id="amap" size={24} />Amap</button>
+        )}
+        <button onClick={() => openApp("didi")} className="flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-line bg-card text-subhead font-semibold"><AppIcon id="didi" size={24} />{t.today.openDidi}</button>
+      </div>
+      <p className="px-1 text-footnote text-muted">{t.today.didiHint}</p>
+      <div className="flex items-center gap-2 rounded-2xl bg-porcelain p-3">
+        <span className="zh min-w-0 flex-1 text-subhead" lang="zh-CN">{h.address}</span>
+        <button onClick={() => { navigator.clipboard?.writeText(h.address).then(() => setCopied(true)).catch(() => {}); }}
+          className="flex min-h-11 shrink-0 items-center gap-1 px-2 text-subhead font-semibold text-cobalt">
+          {copied ? <Check className="h-4 w-4" aria-hidden /> : <Copy className="h-4 w-4" aria-hidden />}{copied ? t.today.copied : t.today.copy}
+        </button>
+      </div>
+    </div>
+  );
 }
 
 /**
@@ -301,15 +390,16 @@ function Moments() {
   useEffect(() => setAlarms(upcomingReminders()), [sheet]);
   const next = alarms[0] && RESERVATIONS.find((r) => r.id === alarms[0].id);
   const nextWhen = alarms[0] && new Date(alarms[0].at).toLocaleTimeString(p.lang, { hour: "2-digit", minute: "2-digit" });
-  const s = stayStatus(p.entryDate, p.entryType, p.visaDays);
+  const w = stayWindow(p);
+  const s = w?.entered ? w : null;
 
   return (
     <>
       <div className="grid grid-cols-2 gap-3">
         <Tile primary href="/menu" icon={<Camera className="h-5 w-5" aria-hidden />} title={t.today.tileMenu} sub={t.today.tileMenuSub} />
-        <Tile onClick={() => setSheet("driver")} icon={<CarTaxiFront className="h-5 w-5" aria-hidden />} title={t.today.tileDriver}
+        <Tile onClick={() => setSheet("driver")} icon={<CarTaxiFront className="h-5 w-5" aria-hidden />} title={t.today.tileDriver} apps={["didi", "amap"]}
           sub={p.hotel ? <span className="zh">{p.hotel.name}</span> : t.today.tileDriverAdd} />
-        <Tile onClick={() => setSheet("pay")} icon={<Wallet className="h-5 w-5" aria-hidden />} title={t.today.tilePay} sub={t.today.tilePaySub} />
+        <PayTile onConvert={() => setSheet("pay")} />
         <Tile onClick={() => (alarms.length ? setSheet("today") : router.push("/explore"))} icon={<CalendarClock className="h-5 w-5" aria-hidden />}
           title={t.today.tileToday} sub={next ? fmt(t.today.tileTodayAlarm, { name: next.en, when: nextWhen! }) : fmt(t.today.tileTodaySub, { city: city.e })} />
       </div>
@@ -317,7 +407,7 @@ function Moments() {
         {s ? (
           <Row onClick={() => setSheet("stay")} icon={<IconTile><CalendarClock className="h-5 w-5" aria-hidden /></IconTile>}
             title={fmt(t.stay.leaveBy, { date: fmtDay(s.lastDay, p.lang) })}
-            sub={`${fmt(t.stay.dayOf, { day: Math.max(1, s.dayOfStay), total: s.allowed })} · ${s.overdue ? fmt(t.stay.overdue, { n: -s.daysLeft }) : fmt(t.stay.daysLeft, { n: s.daysLeft })}`}
+            sub={`${fmt(t.stay.dayOf, { day: Math.max(1, s.dayOfStay), total: s.allowed })} · ${s.overdue ? fmt(t.stay.overdue, { n: -daysBetween(s.legal, todayIso()) }) : fmt(t.stay.daysLeft, { n: s.daysLeft })}`}
             // Only a red badge when it's urgent; otherwise the count sits in the subtitle.
             after={s.overdue || s.daysLeft <= 3 ? <span className="shrink-0 rounded-full bg-danger-soft px-2.5 py-0.5 text-footnote font-semibold text-danger tabular-nums">{s.overdue ? "!" : s.daysLeft}</span> : undefined} />
         ) : (
@@ -325,9 +415,12 @@ function Moments() {
         )}
         <Row href="/sos" icon={<IconTile tone="danger"><Siren className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.help} sub={t.today.helpSub} />
       </Group>
+      <StayWarning policy={false} />
+      <ChinaApps />
 
       <EditSheet open={sheet === "driver"} title={t.today.tileDriver} onClose={() => setSheet(null)}>
         <HotelCard />
+        <DriverApps />
         <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); if (dest.trim()) router.push(`/explore?q=${encodeURIComponent(dest.trim())}`); }}>
           <label className="flex h-12 min-w-0 flex-1 items-center gap-2 rounded-2xl border border-line bg-card px-3">
             <Search className="h-5 w-5 shrink-0 text-muted" aria-hidden />
@@ -336,9 +429,9 @@ function Moments() {
           <Button type="submit" className="shrink-0 px-5">{t.go.go}</Button>
         </form>
       </EditSheet>
-      <EditSheet open={sheet === "pay"} title={t.today.tilePay} onClose={() => setSheet(null)}>
-        <PayButtons />
+      <EditSheet open={sheet === "pay"} title={t.today.priceCheck} onClose={() => setSheet(null)}>
         <Card><PriceCheck /></Card>
+        <PayButtons />
       </EditSheet>
       <EditSheet open={sheet === "today"} title={t.today.tileToday} onClose={() => setSheet(null)}>
         <Alarms suggest={false} />

@@ -23,6 +23,33 @@ export const todayIso = (now = new Date()) =>
 export const addDays = (iso: string, n: number) => fromDayNum(dayNum(iso) + n);
 export const daysBetween = (from: string, to: string) => dayNum(to) - dayNum(from);
 
+export const allowedDays = (type: EntryType, visaDays: number) => (type === "visa" ? Math.max(1, visaDays) : ENTRY_DAYS[type]);
+
+type TripDates = { entryDate: string; arrival: string; departure: string; entryType: EntryType; visaDays: number };
+
+/**
+ * The stay that counts (SPEC v0.5 · P0-6). `legal` is the latest legal exit day, from the entry
+ * date — or the planned arrival before entry. `lastDay` is the earlier of `legal` and the
+ * planned departure: countdowns, the "leaving" phase and calendar reminders use it, never the
+ * departure date alone. `overstay` = the planned departure is after the legal limit.
+ */
+export function stayWindow(p: TripDates, today = new Date()) {
+  const base = p.entryDate || p.arrival;
+  if (!base) return null;
+  const allowed = allowedDays(p.entryType, p.visaDays);
+  const legal = addDays(base, allowed);
+  const overstay = Boolean(p.departure && p.departure > legal);
+  const lastDay = p.departure && p.departure < legal ? p.departure : legal;
+  const now = todayIso(today);
+  return {
+    base, allowed, legal, lastDay, overstay, planned: p.departure,
+    entered: Boolean(p.entryDate),
+    daysLeft: daysBetween(now, lastDay),
+    dayOfStay: daysBetween(base, now) + 1,
+    overdue: daysBetween(now, legal) < 0,
+  };
+}
+
 export function stayStatus(entryDate: string, type: EntryType, visaDays: number, today = new Date()) {
   if (!entryDate) return null;
   const days = type === "visa" ? Math.max(1, visaDays) : ENTRY_DAYS[type];

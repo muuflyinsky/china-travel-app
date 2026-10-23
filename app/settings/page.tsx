@@ -12,7 +12,8 @@ import { LANGUAGES, langName } from "@/lib/languages";
 import { ALLERGENS, COMMON_ALLERGENS, DIETS } from "@/lib/allergens";
 import { DEFAULT_CITY } from "@/lib/cities";
 import { fmt } from "@/lib/i18n";
-import type { EntryType } from "@/lib/stay";
+import { stayWindow, type EntryType } from "@/lib/stay";
+import { StayWarning } from "@/components/StayWarning";
 import { currencyFor, entryTypeFor, visaRule } from "@/lib/visa";
 import pkg from "@/package.json";
 
@@ -55,6 +56,7 @@ export default function SettingsPage() {
   const list = (xs: string[]) => { try { return new Intl.ListFormat(p.lang, { type: "unit" }).format(xs); } catch { return xs.join(", "); } };
   const fmtDate = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString(p.lang, { timeZone: "UTC", day: "numeric", month: "short" });
   const dates = p.arrival ? `${fmtDate(p.arrival)} – ${p.departure ? fmtDate(p.departure) : "…"}` : t.settings.add;
+  const overstay = Boolean(stayWindow(p)?.overstay);
   const derived = p.nationality ? entryTypeFor(visaRule(p.nationality, p.onwardThird)) : null;
   const entryValue = t.settings.entryTypes[p.entryType];
   const allergyValue = p.allergens.length
@@ -81,7 +83,8 @@ export default function SettingsPage() {
 
       <Section title={t.settings.trip}>
         <Group>
-          <Row onClick={() => setSheet("dates")} title={t.settings.dates} after={<Value>{dates}</Value>} />
+          <Row onClick={() => setSheet("dates")} title={t.settings.dates} after={<Value>{dates}</Value>}
+            sub={overstay ? <span className="font-semibold text-danger">{t.settings.datesOverstay}</span> : undefined} />
           <Row onClick={() => setSheet("entry")} title={t.settings.entryType}
             sub={derived && p.entryType === derived ? t.settings.fromPassport : undefined} after={<Value>{entryValue}</Value>} />
           <Row onClick={() => setSheet("cities")} title={t.settings.cities} after={<Value>{p.cities.length ? list(p.cities.map((c) => c.e)) : t.settings.add}</Value>} />
@@ -134,6 +137,8 @@ export default function SettingsPage() {
           <Field label={t.settings.departure}><input type="date" value={p.departure} min={p.arrival || undefined} onChange={(e) => set({ departure: e.target.value })} /></Field>
         </Group>
         <p className="px-1 text-footnote text-muted">{t.settings.datesNote}</p>
+        {/* Shown as soon as the departure date is past the legal limit, not later on Today. */}
+        <StayWarning />
       </EditSheet>
 
       <EditSheet open={sheet === "entry"} title={t.settings.entryType} onClose={close}>
@@ -151,6 +156,7 @@ export default function SettingsPage() {
           </Field>
         </Group>
         <p className="px-1 text-footnote text-muted">{t.stay.checkStamp}</p>
+        <StayWarning policy={false} />
       </EditSheet>
 
       <EditSheet open={sheet === "cities"} title={t.settings.cities} onClose={close}>

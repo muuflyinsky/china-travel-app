@@ -44,6 +44,15 @@ export const en = {
     near: "near {city}",
   },
   today: {
+    chinaApps: "Your China apps",
+    amapToHotel: "Amap to hotel",
+    openDidi: "Open DiDi",
+    didiHint: "DiDi can’t take a destination from another app: show the driver the Chinese address below, or paste it into DiDi.",
+    copy: "Copy",
+    copied: "Copied",
+    appsTitle: "Apps to install before you fly",
+    setupFirst: "Set up before you fly",
+    setupNote: "Alipay and WeChat send a verification code by SMS. Set them up at home with your own number and add your card there.",
     tileMenu: "Scan a menu",
     tileMenuSub: "Translated, with an allergy check",
     tileDriver: "Show the driver",
@@ -54,7 +63,7 @@ export const en = {
     tileTodaySub: "Top 5 in {city}",
     tileTodayAlarm: "{name} · tickets {when}",
     driverElse: "Somewhere else: a place or address",
-    getReadySub: "Payments, mobile data, apps, trains",
+    getReadySub: "Payments, mobile data, trains, good to know",
     hotelsFor: "Hotels in {city}",
     addCities: "Add the cities you’ll visit",
     addCitiesSub: "We’ll pick hotels in every price range for each city",
@@ -104,6 +113,9 @@ export const en = {
     stayTrackSub: "Add your entry date to get a leave-by reminder",
   },
   stay: {
+    overstayFree: "You plan to leave on {planned}, but your visa-free stay ends on {legal}. Leave China by {legal}, or get a visa before you travel.",
+    overstayVisa: "You plan to leave on {planned}, but your visa allows you to stay until {legal}. Leave China by {legal}, or extend your stay at the exit-entry bureau first.",
+    transitRules: "240-hour transit: you must fly on to a third country, leave from a designated port, and stay within the permitted provinces.",
     whereToStay: "Where to stay",
     aiPick: "AI recommended",
     metroCount: "{n} metro stations within 1 km",
@@ -263,6 +275,7 @@ export const en = {
     groups: { basics: "Basics", eating: "Eating", around: "Getting around", hotel: "Hotel", emergency: "Emergency" },
   },
   settings: {
+    datesOverstay: "Departure is after your legal limit",
     cityFrom: "from",
     cityTo: "to",
     cityDatesNote: "Optional: the days you’ll be in each city. Today then shows the right city each day.",
@@ -445,6 +458,7 @@ export const en = {
     change: "Change hotel",
   },
   guide: {
+    autoMap: "Picked automatically from Amap map data.",
     "title": "{city}: top picks",
     "see": "See",
     "eat": "Eat",
@@ -503,6 +517,10 @@ export const en = {
     "reminderLine": "For {date} · opens {when}"
   },
   awards: {
+    amapTitle: "Well-rated restaurants",
+    amapRating: "Amap rating {n}",
+    perPerson: "¥{n} per person",
+    amapNote: "Ratings and prices per person from Amap.",
     "title": "Award-winning restaurants",
     "michelin": "MICHELIN {stars}",
     "bib": "MICHELIN Bib Gourmand",

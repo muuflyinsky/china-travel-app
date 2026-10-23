@@ -44,6 +44,15 @@ export const de: Dict = {
     near: "bei {city}",
   },
   today: {
+    chinaApps: "Deine China-Apps",
+    amapToHotel: "Amap zum Hotel",
+    openDidi: "DiDi öffnen",
+    didiHint: "DiDi übernimmt kein Ziel aus anderen Apps: Zeig dem Fahrer die chinesische Adresse unten oder füge sie in DiDi ein.",
+    copy: "Kopieren",
+    copied: "Kopiert",
+    appsTitle: "Apps vor dem Abflug installieren",
+    setupFirst: "Vor dem Abflug einrichten",
+    setupNote: "Alipay und WeChat schicken einen Bestätigungscode per SMS. Richte sie zu Hause mit deiner eigenen Nummer ein und hinterlege dort deine Karte.",
     tileMenu: "Speisekarte scannen",
     tileMenuSub: "Übersetzt, mit Allergie-Check",
     tileDriver: "Dem Fahrer zeigen",
@@ -54,7 +63,7 @@ export const de: Dict = {
     tileTodaySub: "Top 5 in {city}",
     tileTodayAlarm: "{name} · Tickets {when}",
     driverElse: "Anderes Ziel: Ort oder Adresse",
-    getReadySub: "Bezahlen, mobile Daten, Apps, Züge",
+    getReadySub: "Bezahlen, mobile Daten, Züge, gut zu wissen",
     hotelsFor: "Hotels in {city}",
     addCities: "Füge die Städte deiner Reise hinzu",
     addCitiesSub: "Wir suchen für jede Stadt Hotels in jeder Preisklasse aus",
@@ -102,6 +111,9 @@ export const de: Dict = {
     stayTrackSub: "Trage dein Einreisedatum ein und erhalte eine Ausreise-Erinnerung",
   },
   stay: {
+    overstayFree: "Du willst am {planned} abreisen, aber dein visumfreier Aufenthalt endet am {legal}. Verlasse China bis zum {legal} oder beantrage vor der Reise ein Visum.",
+    overstayVisa: "Du willst am {planned} abreisen, aber dein Visum erlaubt den Aufenthalt bis zum {legal}. Verlasse China bis zum {legal} oder lass den Aufenthalt vorher bei der Ein- und Ausreisebehörde verlängern.",
+    transitRules: "240-Stunden-Transit: Du musst in ein Drittland weiterreisen, über einen dafür zugelassenen Grenzübergang ausreisen und in den erlaubten Provinzen bleiben.",
     whereToStay: "Wo übernachten",
     aiPick: "KI-Empfehlung",
     metroCount: "{n} U-Bahn-Stationen im Umkreis von 1 km",
@@ -260,6 +272,7 @@ export const de: Dict = {
     groups: { basics: "Grundlagen", eating: "Essen", around: "Unterwegs", hotel: "Hotel", emergency: "Notfall" },
   },
   settings: {
+    datesOverstay: "Abreise liegt nach deiner Frist",
     cityFrom: "von",
     cityTo: "bis",
     cityDatesNote: "Optional: deine Tage in jeder Stadt. Dann zeigt Heute jeden Tag die richtige Stadt.",
@@ -442,6 +455,7 @@ export const de: Dict = {
     change: "Hotel ändern",
   },
   guide: {
+    autoMap: "Automatisch aus Amap-Kartendaten ausgewählt.",
     "title": "{city}: Top-Tipps",
     "see": "Sehen",
     "eat": "Essen",
@@ -500,6 +514,10 @@ export const de: Dict = {
     "reminderLine": "Für den {date} · ab {when}"
   },
   awards: {
+    amapTitle: "Gut bewertete Restaurants",
+    amapRating: "Amap-Bewertung {n}",
+    perPerson: "¥{n} pro Person",
+    amapNote: "Bewertungen und Preise pro Person von Amap.",
     "title": "Ausgezeichnete Restaurants",
     "michelin": "MICHELIN {stars}",
     "bib": "MICHELIN Bib Gourmand",

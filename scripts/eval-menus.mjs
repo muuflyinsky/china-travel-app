@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Allergen check on real menus: sends each photo to /api/menu and compares the allergens the
 // model reports with the ones you expect. Missed allergens (false negatives) are what matter.
+// Each matched dish must also have a translated name, pinyin and at least 3 ingredients.
 //
 //   node scripts/eval-menus.mjs http://localhost:3000 eval/menus
 //
@@ -19,8 +20,8 @@ const expected = (await readFile(join(dir, "expected.csv"), "utf8")).trim().spli
 });
 const files = [...new Set(expected.map((e) => e.file))];
 const known = new Set(await readdir(dir));
-const rows = [["file", "dish", "found", "expected", "reported", "missed", "extra"]];
-let missed = 0, notFound = 0, failed = 0;
+const rows = [["file", "dish", "found", "translated", "pinyin", "ingredients", "complete", "expected", "reported", "missed", "extra"]];
+let missed = 0, notFound = 0, failed = 0, incomplete = 0;
 
 for (const file of files) {
   if (!known.has(file)) { console.error(`✗ ${file}: not in ${dir}`); failed++; continue; }
@@ -34,12 +35,17 @@ for (const file of files) {
     const got = d?.allergens ?? [];
     const miss = e.allergens.filter((a) => !got.includes(a));
     const extra = got.filter((a) => !e.allergens.includes(a));
+    // Completeness: a dish the traveller can't name or check isn't useful even if allergens match.
+    const gaps = d ? [!d.translated?.trim() && "name", !d.pinyin?.trim() && "pinyin", (d.ingredients?.length ?? 0) < 3 && "ingredients<3"].filter(Boolean) : [];
     if (!d) notFound++;
+    if (gaps.length) incomplete++;
     missed += miss.length;
-    rows.push([file, e.dish, d ? "yes" : "no", e.allergens.join(";"), got.join(";"), miss.join(";"), extra.join(";")]);
-    console.log(`${d ? (miss.length ? "!" : "✓") : "?"} ${file} · ${e.dish}${miss.length ? ` · missed: ${miss.join(", ")}` : ""}${d ? "" : " · dish not found"}`);
+    const cell = (v) => `"${String(v ?? "").replaceAll('"', '""')}"`;
+    rows.push([file, e.dish, d ? "yes" : "no", cell(d?.translated), cell(d?.pinyin), d?.ingredients?.length ?? 0, gaps.length ? gaps.join(";") : d ? "yes" : "",
+      e.allergens.join(";"), got.join(";"), miss.join(";"), extra.join(";")]);
+    console.log(`${d ? (miss.length || gaps.length ? "!" : "✓") : "?"} ${file} · ${e.dish}${miss.length ? ` · missed: ${miss.join(", ")}` : ""}${gaps.length ? ` · missing: ${gaps.join(", ")}` : ""}${d ? "" : " · dish not found"}`);
   }
 }
 const out = join(dir, `report-${new Date().toISOString().slice(0, 10)}.csv`);
 await writeFile(out, rows.map((r) => r.join(",")).join("\n") + "\n");
-console.log(`\n${expected.length} dishes · ${missed} missed allergens · ${notFound} dishes not found · ${failed} menus failed\nReport: ${out}`);
+console.log(`\n${expected.length} dishes · ${missed} missed allergens · ${incomplete} incomplete (name/pinyin/≥3 ingredients) · ${notFound} dishes not found · ${failed} menus failed\nReport: ${out}`);
