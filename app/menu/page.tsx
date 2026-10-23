@@ -1,8 +1,8 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Popup, Preloader } from "konsta/react";
-import { Camera, Flame, Info, Leaf, ShieldAlert, ChevronDown, Plus, Minus, TriangleAlert, ReceiptText, Keyboard, UtensilsCrossed } from "lucide-react";
+import { Popup, Preloader, Sheet } from "konsta/react";
+import { Camera, Flame, Info, Leaf, ShieldAlert, ChevronRight, Plus, Minus, ReceiptText, Keyboard, UtensilsCrossed, Volume2, X, Flag, Lightbulb } from "lucide-react";
 import { Screen, DemoNote } from "@/components/Shell";
 import { Section, Card, Group, Row, Field, Button, Note, Seg, IconTile } from "@/components/ui";
 import { isHotCity } from "@/lib/hot-cities";
@@ -12,115 +12,212 @@ import { useFx, parseCny, formatMoney } from "@/components/useFx";
 import { useT } from "@/components/useT";
 import { ShowCard, type StaffReply } from "@/components/ShowCard";
 import { LANGUAGES } from "@/lib/languages";
-import { ALLERGENS, DIETS, allergyLinesZh, blockedBySevere, type AllergenId, type DietId } from "@/lib/allergens";
+import { ALLERGENS, DIETS, allergyLinesZh, type AllergenId, type DietId } from "@/lib/allergens";
 import { track } from "@/lib/track";
 import { compressImage } from "@/lib/image";
 import { fmt, type Dict } from "@/lib/i18n";
-import type { Dish, Menu } from "@/lib/llm";
+import type { ListDish, DishDetail, MenuEvent } from "@/lib/dishes";
+import { verdict, withDetailAllergens, type Verdict, type VerdictKind, type Reason } from "@/lib/verdict";
 
-const allergenZh = (id: string) => ALLERGENS.find((a) => a.id === id)?.zh.split("（")[0] ?? id;
+/** The menu as it streams in. `dishes` is indexed by position on the menu; gaps are still coming. */
+type Menu = { cuisine: string; total: number; dishes: (ListDish | undefined)[]; tips: string[]; missing: number; streaming: boolean; demo?: boolean };
+
 const toggle = (list: string[], id: string) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
 
-/** `blocked`: severe allergens that are a main ingredient — the dish can't be ordered safely. */
-type Conflict = { allergens: string[]; diet: string[]; blocked: string[] };
+/** Order line: how many, and which sauce/garnish ingredients (Chinese) to leave out. */
+type Line = { qty: number; without: string[] };
+type Detail = DishDetail | "loading" | "error";
 
-function conflicts(t: Dict, d: Dish, allergens: string[], diets: string[], severe: string[]): Conflict {
-  const diet: string[] = [];
-  if ((diets.includes("vegetarian") || diets.includes("vegan")) && !d.vegetarian) diet.push(t.eat.notVeg);
-  if ((diets.includes("no_pork") || diets.includes("halal")) && d.meat.includes("pork")) diet.push(t.eat.pork);
-  if (diets.includes("no_beef") && d.meat.includes("beef")) diet.push(t.eat.beef);
-  if ((diets.includes("halal") || diets.includes("no_alcohol")) && d.contains_alcohol) diet.push(t.eat.cookedAlcohol);
-  if (diets.includes("no_spicy") && d.spice_level >= 2) diet.push(t.eat.spicy);
-  return {
-    allergens: d.allergens.filter((a) => allergens.includes(a)),
-    diet,
-    blocked: blockedBySevere(d, severe.filter((a) => allergens.includes(a))),
-  };
+// Details already fetched this session, by dish + language: reopening a dish is instant.
+const detailCache = new Map<string, DishDetail>();
+
+const TONE: Record<VerdictKind, string> = { ok: "tag-ok", ask: "tag-warn", no: "tag-danger" };
+
+function reasonText(t: Dict, r: Reason) {
+  if (r.k === "main") return fmt(t.eat.reasonMain, { x: r.via });
+  if (r.k === "has") return fmt(t.eat.reasonHas, { x: r.via });
+  if (r.k === "unsure") return t.eat.reasonUnsure;
+  return { notVeg: t.eat.notVeg, pork: t.eat.pork, beef: t.eat.beef, alcohol: t.eat.cookedAlcohol, spicy: t.eat.spicy }[r.what];
 }
-const hasConflict = (c: Conflict) => c.allergens.length + c.diet.length > 0;
 
-/** Order line: qty and whether to ask the kitchen to leave out the traveller's allergens. */
-type Line = { qty: number; without: boolean };
-
-function DishCard({ d, c, line, onChange, homePrice }: { d: Dish; c: Conflict; line?: Line; onChange: (l: Line | undefined) => void; homePrice?: string }) {
+function Spice({ n }: { n: number }) {
   const t = useT();
-  const [open, setOpen] = useState(false);
-  const warn = [...c.allergens.map((a) => fmt(t.eat.contains, { x: t.allergens[a as AllergenId].toLowerCase() })), ...c.diet];
-  const others = d.allergens.filter((a) => !c.allergens.includes(a));
-  const flagged = warn.length > 0;
+  if (!n) return null;
+  // Ink, not red: red is reserved for "don't order".
   return (
-    <Card tone={flagged ? "danger" : "plain"}>
-      <header className="flex justify-between gap-3">
-        <div className="min-w-0">
-          <h3 className="text-body font-semibold">{d.translated}</h3>
-          <p className="zh text-subhead">{d.original} <span className="text-footnote text-muted">{d.pinyin}</span></p>
-          {d.literal && d.literal !== d.translated && <p className="text-footnote text-muted italic">“{d.literal}”</p>}
-        </div>
-        <div className="shrink-0 text-right">
-          {d.price && <p className="text-headline tabular-nums">{d.price}</p>}
-          {homePrice && <p className="text-footnote text-muted tabular-nums">{fmt(t.eat.approx, { amount: homePrice })}</p>}
-          {d.spice_level > 0 && (
-            // Spice uses ink, not red: red is reserved for allergy danger.
-            <p className="mt-1 flex justify-end text-ink" aria-label={fmt(t.eat.spice, { n: d.spice_level })}>
-              {Array.from({ length: d.spice_level }, (_, i) => <Flame key={i} className="h-4 w-4" aria-hidden />)}
+    <span className="inline-flex text-ink" aria-label={fmt(t.eat.spice, { n })} role="img">
+      {Array.from({ length: n }, (_, i) => <Flame key={i} className="h-3.5 w-3.5" aria-hidden />)}
+    </span>
+  );
+}
+
+function VerdictTag({ v }: { v: Verdict }) {
+  const t = useT();
+  const label = { ok: t.eat.verdictOk, ask: t.eat.verdictAsk, no: t.eat.verdictNo }[v.kind];
+  const why = v.reasons.slice(0, 2).map((r) => reasonText(t, r)).join(", ");
+  return (
+    // Wraps rather than truncates: the reason is the point of the list (#26).
+    <span className={`tag ${TONE[v.kind]} max-w-full rounded-xl! py-1!`}>
+      <span className="line-clamp-2">{label}{why && ` · ${why}`}</span>
+    </span>
+  );
+}
+
+function Stepper({ line, onChange }: { line: Line; onChange: (l: Line | undefined) => void }) {
+  const t = useT();
+  return (
+    <span className="flex shrink-0 items-center rounded-xl bg-cobalt-soft text-cobalt">
+      <button onClick={() => onChange(line.qty > 1 ? { ...line, qty: line.qty - 1 } : undefined)} aria-label="−" className="grid h-11 w-10 place-items-center"><Minus className="h-4 w-4" /></button>
+      <span className="min-w-6 text-center text-subhead font-semibold tabular-nums" aria-label={t.eat.inOrder}>{line.qty}</span>
+      <button onClick={() => onChange({ ...line, qty: line.qty + 1 })} aria-label="+" className="grid h-11 w-10 place-items-center"><Plus className="h-4 w-4" /></button>
+    </span>
+  );
+}
+
+/** List card: name + price, Chinese + pinyin, one line, one verdict, add. Tap opens the detail. */
+function DishRow({ d, v, restricted, line, onChange, onOpen, homePrice }: {
+  d: ListDish; v: Verdict; restricted: boolean; line?: Line; onChange: (l: Line | undefined) => void; onOpen: () => void; homePrice?: string;
+}) {
+  const t = useT();
+  return (
+    <div className={`rounded-2xl border border-line bg-card ${v.kind === "no" ? "opacity-60" : ""}`}>
+      <button onClick={onOpen} className="block w-full px-4 pt-2.5 text-left">
+        <span className="flex items-baseline justify-between gap-3">
+          <span className="min-w-0 text-body font-semibold">{d.name}</span>
+          {d.price && <span className="shrink-0 text-subhead font-semibold tabular-nums">{d.price}</span>}
+        </span>
+        <span className="flex items-baseline justify-between gap-3">
+          <span className="min-w-0 truncate text-footnote text-muted"><span className="zh" lang="zh-CN">{d.zh}</span> {d.pinyin}</span>
+          {homePrice && <span className="shrink-0 text-footnote text-muted tabular-nums">{fmt(t.eat.approx, { amount: homePrice })}</span>}
+        </span>
+        <span className="mt-1 flex items-center gap-1.5 text-subhead">
+          <span className="min-w-0 truncate">{d.short}</span><Spice n={d.spice} />
+        </span>
+      </button>
+      <div className="flex min-h-11 items-center justify-between gap-2 pr-1.5 pb-1 pl-4">
+        <span className="min-w-0">
+          {restricted ? <VerdictTag v={v} /> : d.vegetarian ? <span className="tag"><Leaf className="h-3.5 w-3.5" aria-hidden />{t.eat.vegetarian}</span> : null}
+        </span>
+        {v.blocked.length ? (
+          <ShieldAlert className="h-5 w-5 shrink-0 text-danger" aria-label={fmt(t.eat.blockedSevere, { x: v.blocked.map((a) => t.allergens[a as AllergenId].toLowerCase()).join(", ") })} />
+        ) : line ? (
+          <Stepper line={line} onChange={onChange} />
+        ) : (
+          <button onClick={() => onChange({ qty: 1, without: v.removable.map((a) => a.via_zh).filter(Boolean) })}
+            className="flex min-h-11 shrink-0 items-center gap-1 rounded-xl px-3 text-subhead font-semibold text-cobalt">
+            <Plus className="h-4 w-4" aria-hidden />{t.eat.add}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function DishSkeleton() {
+  return (
+    <div className="animate-pulse rounded-2xl border border-line bg-card p-4" aria-hidden>
+      <div className="h-4 w-2/3 rounded bg-line" />
+      <div className="mt-2 h-3 w-1/3 rounded bg-line" />
+      <div className="mt-3 h-3 w-5/6 rounded bg-line" />
+    </div>
+  );
+}
+
+/** Bottom sheet for one dish: why, what's usually in it, and the add actions. */
+function DishSheet({ d, v, mine, detail, line, onAdd, onFlag, onClose, homePrice }: {
+  d: ListDish; v: Verdict; mine: string[]; detail?: Detail; line?: Line; onAdd: (without: string[]) => void; onFlag: () => void; onClose: () => void; homePrice?: string;
+}) {
+  const t = useT();
+  const [flagged, setFlagged] = useState(false);
+  const speak = () => {
+    const u = new SpeechSynthesisUtterance(d.zh);
+    u.lang = "zh-CN";
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  };
+  const hit = (ing: { allergens: string[] }) => ing.allergens.some((a) => mine.includes(a));
+  const ings = typeof detail === "object" ? detail.ingredients : [];
+  const groups = [
+    { title: t.eat.detailOnMenu, list: ings.filter((i) => i.source === "menu") },
+    { title: t.eat.detailUsually, list: ings.filter((i) => i.source !== "menu") },
+  ].filter((g) => g.list.length);
+  const removable = v.removable.map((a) => a.via).join(", ");
+
+  return (
+    <Sheet opened onBackdropClick={onClose} className="pb-safe" style={{ maxHeight: "88vh" }}>
+      <div className="flex max-h-[88vh] flex-col bg-card text-ink">
+        <div className="mx-auto mt-2 h-1.5 w-10 shrink-0 rounded-full bg-line" aria-hidden />
+        <div className="flex shrink-0 items-start gap-3 px-4 pt-3">
+          <div className="min-w-0 flex-1">
+            <h2 className="text-title">{d.name}</h2>
+            <p className="mt-0.5 flex flex-wrap items-center gap-x-2">
+              <span className="zh whitespace-nowrap text-headline" lang="zh-CN">{d.zh}</span>
+              <span className="text-subhead text-muted">{d.pinyin}</span>
+              <button onClick={speak} aria-label={t.eat.listen} className="grid h-9 w-9 place-items-center rounded-full bg-cobalt-soft text-cobalt"><Volume2 className="h-4 w-4" /></button>
             </p>
+          </div>
+          <div className="shrink-0 text-right">
+            {d.price && <p className="text-headline tabular-nums">{d.price}</p>}
+            {homePrice && <p className="text-footnote text-muted tabular-nums">{fmt(t.eat.approx, { amount: homePrice })}</p>}
+          </div>
+          <button onClick={onClose} aria-label={t.common.close} className="-mr-1 grid h-11 w-11 shrink-0 place-items-center rounded-full bg-porcelain"><X className="h-5 w-5" /></button>
+        </div>
+
+        <div className="min-h-0 flex-1 space-y-4 overflow-auto px-4 pt-3 pb-3">
+          {typeof detail === "object" && detail.literal && <p className="text-subhead text-muted">{t.eat.detailLiteral}: “{detail.literal}”</p>}
+
+          <div className={`rounded-2xl p-3 text-subhead ${{ ok: "bg-ok-soft text-ok", ask: "bg-warn-soft text-warn", no: "bg-danger-soft text-danger" }[v.kind]}`}>
+            <p className="font-semibold">{{ ok: t.eat.verdictOk, ask: t.eat.verdictAsk, no: t.eat.verdictNo }[v.kind]}</p>
+            {v.blocked.length > 0 ? <p>{fmt(t.eat.blockedSevere, { x: v.blocked.map((a) => t.allergens[a as AllergenId].toLowerCase()).join(", ") })}</p>
+              : v.kind === "ok" ? <p>{t.eat.whyOk}</p>
+              : <p>{[...v.reasons.filter((r) => r.k !== "has" || v.kind === "no").map((r) => reasonText(t, r)), v.kind === "ask" && removable && fmt(t.eat.whyAsk, { x: removable })].filter(Boolean).join(" · ")}</p>}
+          </div>
+
+          {typeof detail === "object" && detail.description && <p className="text-body">{detail.description}</p>}
+          {detail === "loading" && <div className="flex items-center gap-3 text-muted" role="status"><Preloader className="h-5! w-5!" />{t.common.loading}</div>}
+          {detail === "error" && <Note tone="warn">{t.eat.detailDown}</Note>}
+
+          {groups.map((g) => (
+            <div key={g.title}>
+              <p className="mb-1 text-footnote font-semibold text-muted">{g.title}</p>
+              <ul className="divide-y divide-line rounded-2xl border border-line">
+                {g.list.map((ing, j) => (
+                  <li key={j} className={`flex justify-between gap-3 px-3 py-2 text-subhead ${hit(ing) ? "font-semibold text-danger" : ""}`}>
+                    <span>{ing.name}</span><span className="zh text-muted" lang="zh-CN">{ing.zh}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+          {typeof detail === "object" && detail.notes && (
+            <div>
+              <p className="mb-1 text-footnote font-semibold text-muted">{t.eat.detailNotes}</p>
+              <p className="flex gap-2 text-subhead"><Info className="mt-0.5 h-4 w-4 shrink-0 text-cobalt" aria-hidden />{detail.notes}</p>
+            </div>
+          )}
+          <p className="text-footnote text-muted">{t.eat.disclaimer}</p>
+          {flagged ? <p className="text-footnote text-muted" role="status">{t.eat.wrongThanks}</p> : (
+            <button onClick={() => { setFlagged(true); onFlag(); }} className="flex min-h-11 items-center gap-1.5 text-footnote font-semibold text-muted">
+              <Flag className="h-3.5 w-3.5" aria-hidden />{t.eat.wrongInfo}
+            </button>
           )}
         </div>
-      </header>
 
-      {flagged && (
-        <p className="mt-3 flex items-start gap-2 rounded-xl bg-danger-soft px-3 py-2 text-subhead font-semibold text-danger">
-          <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" aria-hidden /> {warn.join(" · ")}
-        </p>
-      )}
-
-      <p className="mt-3 text-subhead">{d.description}</p>
-
-      <div className="mt-3 flex flex-wrap gap-1.5">
-        {d.vegetarian && <span className="tag"><Leaf className="h-3.5 w-3.5" aria-hidden /> {t.eat.vegetarian}</span>}
-        {others.map((a) => <span key={a} className="tag">{t.allergens[a as AllergenId]}</span>)}
-        {d.contains_alcohol && <span className="tag">{t.eat.alcohol}</span>}
-        {d.confidence !== "high" && <span className="tag tag-warn">{d.confidence === "low" ? t.eat.unsure : t.eat.varies}</span>}
+        {/* Severe allergen as a main ingredient: no add button at all. */}
+        {!v.blocked.length && !line && (
+          <div className="flex shrink-0 gap-2 border-t border-line px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom))]">
+            {v.removable.length > 0 && (
+              <Button className="flex-1 text-subhead!" onClick={() => onAdd(v.removable.map((a) => a.via_zh).filter(Boolean))}>
+                {fmt(t.eat.addWithout, { x: removable })}
+              </Button>
+            )}
+            <Button variant={v.removable.length ? "soft" : "primary"} className={`${v.removable.length ? "" : "flex-1"} text-subhead!`} onClick={() => onAdd([])}>
+              <Plus className="h-4 w-4" aria-hidden />{t.eat.add}
+            </Button>
+          </div>
+        )}
       </div>
-
-      <button onClick={() => setOpen(!open)} aria-expanded={open} className="mt-2 flex min-h-11 items-center gap-1 text-subhead font-semibold text-cobalt">
-        {t.eat.ingredients} <ChevronDown className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} aria-hidden />
-      </button>
-      {open && (
-        <ul className="mb-2 space-y-1 text-subhead">
-          {d.ingredients.map((ing, j) => (
-            <li key={j} className="flex justify-between gap-3 border-b border-line pb-1 last:border-0">
-              <span>{ing.name}{ing.source === "standard_recipe" && <span className="text-muted"> · {t.eat.typical}</span>}</span>
-              <span className="zh text-muted">{ing.zh}</span>
-            </li>
-          ))}
-        </ul>
-      )}
-      {d.notes && <p className="flex gap-2 text-footnote text-muted"><Info className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />{d.notes}</p>}
-
-      {c.blocked.length > 0 ? (
-        // Severe allergy and it's a main ingredient: no "add", no "ask without" — it isn't safe to try.
-        <p className="mt-3 flex items-start gap-2 rounded-xl border border-danger px-3 py-2.5 text-subhead font-semibold text-danger" role="note">
-          <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-          {fmt(t.eat.blockedSevere, { x: c.blocked.map((a) => t.allergens[a as AllergenId].toLowerCase()).join(", ") })}
-        </p>
-      ) : line ? (
-        <div className="mt-3 flex items-center justify-between rounded-xl bg-cobalt-soft p-1">
-          <button onClick={() => onChange(line.qty > 1 ? { ...line, qty: line.qty - 1 } : undefined)} aria-label="−" className="grid h-11 w-11 place-items-center rounded-lg text-cobalt"><Minus className="h-5 w-5" /></button>
-          <span className="text-subhead font-semibold text-cobalt">{t.eat.inOrder} · ×{line.qty}</span>
-          <button onClick={() => onChange({ ...line, qty: line.qty + 1 })} aria-label="+" className="grid h-11 w-11 place-items-center rounded-lg text-cobalt"><Plus className="h-5 w-5" /></button>
-        </div>
-      ) : c.allergens.length > 0 ? (
-        // Don't nudge people to order a dish with their allergen; offer to ask for it without.
-        <Button variant="ghost" className="mt-3 w-full border border-line text-subhead!" onClick={() => onChange({ qty: 1, without: true })}>
-          <Plus className="h-4 w-4" aria-hidden />{fmt(t.eat.askWithout, { x: c.allergens.map((a) => t.allergens[a as AllergenId].toLowerCase()).join(", ") })}
-        </Button>
-      ) : (
-        <Button variant={flagged ? "ghost" : "soft"} className={`mt-3 w-full text-subhead! ${flagged ? "border border-line" : ""}`} onClick={() => onChange({ qty: 1, without: false })}>
-          <Plus className="h-4 w-4" aria-hidden />{t.eat.add}
-        </Button>
-      )}
-    </Card>
+    </Sheet>
   );
 }
 
@@ -161,34 +258,75 @@ export default function MenuPage() {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
-  const [menu, setMenu] = useState<(Menu & { demo?: boolean }) | null>(null);
+  const [menu, setMenu] = useState<Menu | null>(null);
   const [inputOpen, setInputOpen] = useState(true);
-  const [filter, setFilter] = useState<"all" | "safe">("all");
+  const [filter, setFilter] = useState<"all" | VerdictKind>("all");
+  const [tipsOpen, setTipsOpen] = useState(false);
   const [order, setOrder] = useState<Record<number, Line>>({});
+  const [opened, setOpened] = useState<number | null>(null);
+  const [details, setDetails] = useState<Record<number, Detail>>({});
   const [card, setCard] = useState<{ kind: string; lead?: string; lines: string[]; rest?: string[]; explain?: string; replies?: StaffReply[] } | null>(null);
   const [askAllergies, setAskAllergies] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
+  const abort = useRef<AbortController | null>(null);
 
   useEffect(() => { if (loaded && !profile.allergiesAsked) setAskAllergies(true); }, [loaded, profile.allergiesAsked]);
+  useEffect(() => () => abort.current?.abort(), []);
 
+  const cityLabel = `${city.e} (${city.n}, ${city.p})`;
+
+  /** Reads the NDJSON stream from /api/menu and renders each dish as it arrives. */
   async function run(body: object) {
     track("menu_scan", { input: "image" in body ? "photo" : "text" });
-    setLoading(true); setError(undefined); setMenu(null); setOrder({});
+    abort.current?.abort();
+    const ctl = (abort.current = new AbortController());
+    const t0 = performance.now();
+    setLoading(true); setError(undefined); setMenu(null); setOrder({}); setDetails({}); setFilter("all"); setTipsOpen(false);
     try {
-      const r = await fetch("/api/menu", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...body, lang: profile.lang, city: `${city.e} (${city.n}, ${city.p})` }) });
-      const d = await r.json();
-      // 503: no AI configured (production) · 422: the model's answer didn't validate → retake ·
-      // anything else: the AI service failed (key, quota, timeout), so retaking won't help.
-      if (!r.ok) throw new Error(r.status === 503 ? "unavailable" : r.status === 422 ? "unreadable" : "down");
-      setMenu(d);
+      const r = await fetch("/api/menu", {
+        method: "POST", signal: ctl.signal, headers: { "content-type": "application/json" },
+        body: JSON.stringify({ ...body, lang: profile.lang, city: cityLabel, adcode: city.a }),
+      });
+      // 503: no AI configured (production) · 422: unreadable → retake · anything else: the AI service failed.
+      if (!r.ok || !r.body) throw new Error(r.status === 503 ? "unavailable" : r.status === 422 ? "unreadable" : "down");
+      let m: Menu = { cuisine: "", total: 0, dishes: [], tips: [], missing: 0, streaming: true };
+      setMenu(m);
       setInputOpen(false);
       setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+      const reader = r.body.pipeThrough(new TextDecoderStream()).getReader();
+      let buf = "", first = true;
+      for (;;) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buf += value;
+        const lines = buf.split("\n");
+        buf = lines.pop() ?? "";
+        for (const l of lines) {
+          if (!l.trim()) continue;
+          const ev = JSON.parse(l) as MenuEvent | { type: "demo" } | { type: "error" } | { type: "done" };
+          if (ev.type === "meta") m = { ...m, cuisine: ev.cuisine || m.cuisine, total: ev.total };
+          else if (ev.type === "dish") {
+            const dishes = [...m.dishes]; dishes[ev.i] = ev.dish; m = { ...m, dishes };
+            if (first) { first = false; track("menu_first_dish", { ms: Math.round(performance.now() - t0), cached: ev.cached }); }
+          }
+          else if (ev.type === "tips") m = { ...m, tips: ev.tips };
+          else if (ev.type === "missing") m = { ...m, missing: ev.i.length };
+          else if (ev.type === "demo") m = { ...m, demo: true };
+          else if (ev.type === "error") m = { ...m, missing: m.total - m.dishes.filter(Boolean).length };
+          else if (ev.type === "done") m = { ...m, streaming: false };
+          setMenu(m);
+        }
+      }
+      setMenu({ ...m, streaming: false });
+      track("menu_done", { ms: Math.round(performance.now() - t0), dishes: m.dishes.filter(Boolean).length, missing: m.missing });
     } catch (e) {
-      const m = (e as Error).message;
-      setError(m === "unavailable" ? t.common.unavailable : m === "unreadable" ? t.eat.error : t.eat.aiDown);
+      if (ctl.signal.aborted) return;
+      const msg = (e as Error).message;
+      setMenu(null); setInputOpen(true);
+      setError(msg === "unavailable" ? t.common.unavailable : msg === "unreadable" ? t.eat.error : t.eat.aiDown);
     } finally {
-      setLoading(false);
+      if (abort.current === ctl) setLoading(false);
     }
   }
 
@@ -199,20 +337,56 @@ export default function MenuPage() {
     run({ image: img.data, mediaType: img.mediaType });
   }
 
-  const rows = useMemo(() => (menu?.dishes ?? []).map((d, i) => ({ d, i, c: conflicts(t, d, profile.allergens, profile.diets, profile.severe) })), [menu, profile, t]);
-  const shown = filter === "safe" ? rows.filter((r) => !hasConflict(r.c)) : rows;
-  const flagged = rows.filter((r) => hasConflict(r.c)).length;
-  const restrictions = [...profile.allergens.map((a) => t.allergens[a as AllergenId]), ...profile.diets.map((d) => t.diets[d as DietId])];
-  const myAllergensZh = profile.allergens.map(allergenZh);
+  const restrictions = { allergens: profile.allergens, diets: profile.diets, severe: profile.severe.filter((a) => profile.allergens.includes(a)) };
+  const restricted = restrictions.allergens.length + restrictions.diets.length > 0;
+  const rows = useMemo(() => (menu?.dishes ?? []).flatMap((d, i) => (d ? [{ d, i, v: verdict(d, restrictions) }] : [])),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [menu, profile.allergens, profile.diets, profile.severe]);
+  const count = (k: VerdictKind) => rows.filter((r) => r.v.kind === k).length;
+  // "Don't order" sinks to the bottom once everything has arrived (not while streaming: no jumps).
+  const rank = { ok: 0, ask: 1, no: 2 };
+  const sorted = menu?.streaming ? rows : [...rows].sort((a, b) => rank[a.v.kind] - rank[b.v.kind] || a.i - b.i);
+  const shown = filter === "all" ? sorted : sorted.filter((r) => r.v.kind === filter);
+  const pending = menu?.streaming ? Math.max(0, menu.total - rows.length - menu.missing) : 0;
+  const restrictionNames = [...profile.allergens.map((a) => t.allergens[a as AllergenId]), ...profile.diets.map((d) => t.diets[d as DietId])];
   const myAllergensMine = profile.allergens.map((a) => t.allergens[a as AllergenId].toLowerCase());
   const homePrice = (price: string) => {
     const cny = parseCny(price);
     return cny && fx && profile.homeCurrency !== "CNY" ? formatMoney(cny / fx.value, profile.homeCurrency, profile.lang) : undefined;
   };
   // A dish added before an allergy was marked severe drops out of the order.
-  const orderLines = Object.entries(order).map(([i, l]) => ({ d: menu!.dishes[Number(i)], l, i: Number(i) }))
-    .filter(({ i }) => !rows[i]?.c.blocked.length);
+  const orderLines = Object.entries(order).map(([i, l]) => ({ row: rows.find((r) => r.i === Number(i)), l }))
+    .filter((x): x is { row: (typeof rows)[number]; l: Line } => Boolean(x.row && !x.row.v.blocked.length));
   const dishCount = orderLines.reduce((n, x) => n + x.l.qty, 0);
+  const setLine = (i: number, l?: Line) => setOrder((o) => { const n = { ...o }; if (l) n[i] = l; else delete n[i]; return n; });
+
+  async function openDish(i: number) {
+    setOpened(i);
+    const d = menu?.dishes[i];
+    if (!d || details[i]) return;
+    const k = `${d.zh}|${profile.lang}|${city.a}`;
+    const got = (detail: Detail) => {
+      setDetails((x) => ({ ...x, [i]: detail }));
+      // Allergens the detail adds make the verdict stricter, never looser.
+      if (typeof detail === "object") setMenu((m) => m && { ...m, dishes: m.dishes.map((x, j) => (j === i && x ? withDetailAllergens(x, detail.ingredients) : x)) });
+    };
+    const hit = detailCache.get(k);
+    if (hit) return got(hit);
+    setDetails((x) => ({ ...x, [i]: "loading" }));
+    try {
+      const r = await fetch("/api/dish", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ zh: d.zh, printed: d.printed, lang: profile.lang, city: cityLabel, adcode: city.a }) });
+      if (!r.ok) throw new Error(String(r.status));
+      const detail = (await r.json()) as DishDetail;
+      detailCache.set(k, detail);
+      got(detail);
+    } catch { got("error"); }
+  }
+
+  function flagDish(d: ListDish) {
+    track("dish_flagged", {});
+    for (const k of detailCache.keys()) if (k.startsWith(`${d.zh}|`)) detailCache.delete(k);
+    fetch("/api/dish/flag", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ zh: d.zh, adcode: city.a, lang: profile.lang }) }).catch(() => {});
+  }
 
   // At most three answers, so they fit under the card without scrolling.
   const replies = (withCant: boolean): StaffReply[] => [
@@ -223,14 +397,13 @@ export default function MenuPage() {
   const allergyExplain = myAllergensMine.length ? fmt(t.eat.orderExplainAllergy, { allergens: myAllergensMine.join(", ") }) : "";
 
   function showOrder() {
-    const without = myAllergensZh.length ? `（不要放${myAllergensZh.join("、")}）` : "";
     const { severe, rest } = allergyLinesZh(profile.allergens, profile.diets, profile.severe);
-    const dishes = orderLines.map(({ d, l }) => `${d.translated} ×${l.qty}`).join(", ");
+    const dishes = orderLines.map(({ row, l }) => `${row.d.name} ×${l.qty}`).join(", ");
     track("order_card_shown", { dishes: orderLines.length, severe: Boolean(severe) });
     setCard({
       kind: "order",
       lead: severe || undefined,
-      lines: ["您好，我要点：", ...orderLines.map(({ d, l }) => `${d.original} ×${l.qty}${l.without ? without : ""}`)],
+      lines: ["您好，我要点：", ...orderLines.map(({ row, l }) => `${row.d.zh} ×${l.qty}${l.without.length ? `（不要放${l.without.join("、")}）` : ""}`)],
       rest,
       explain: [fmt(t.eat.orderExplain, { dishes }), allergyExplain].filter(Boolean).join(" "),
       replies: replies(true),
@@ -242,19 +415,13 @@ export default function MenuPage() {
     setCard({ kind: "allergy", lead: severe || undefined, lines: ["您好！我有饮食限制，麻烦您帮忙确认，谢谢！"], rest, explain: allergyExplain, replies: replies(false) });
   }
 
+  const openRow = opened == null ? undefined : rows.find((r) => r.i === opened);
+
   return (
     <Screen title={t.eat.title}>
-      <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden onChange={(e) => onFile(e.target.files?.[0])} />
+      <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden onChange={(e) => { onFile(e.target.files?.[0]); e.target.value = ""; }} />
 
-      {menu && !inputOpen ? (
-        // After results: the input collapses to one row so the dishes start on the first screen.
-        <Section>
-          <div className="flex gap-2">
-            <Button variant="soft" className="flex-1" onClick={() => fileRef.current?.click()}><Camera className="h-5 w-5" aria-hidden />{t.eat.rescan}</Button>
-            <Button variant="soft" ariaLabel={t.eat.type} onClick={() => { setMode("type"); setInputOpen(true); }}><Keyboard className="h-5 w-5" aria-hidden /></Button>
-          </div>
-        </Section>
-      ) : (
+      {(!menu || inputOpen) && (
         <Section>
           <Seg value={mode} onChange={setMode} options={[{ value: "photo", label: t.eat.photo }, { value: "type", label: t.eat.type }]} />
           {mode === "photo" ? (
@@ -286,8 +453,8 @@ export default function MenuPage() {
             </Field>
             <li>
               <button onClick={() => setAskAllergies(true)} className="flex min-h-12 w-full items-center gap-2 px-4 py-2 text-left text-subhead">
-                <ShieldAlert className={`h-4 w-4 shrink-0 ${restrictions.length ? "text-danger" : "text-muted"}`} aria-hidden />
-                <span className="flex-1">{restrictions.length ? <>{t.eat.checkingFor} <b>{restrictions.join(", ")}</b></> : t.eat.addRestrictions}</span>
+                <ShieldAlert className={`h-4 w-4 shrink-0 ${restrictionNames.length ? "text-danger" : "text-muted"}`} aria-hidden />
+                <span className="flex-1">{restrictionNames.length ? <>{t.eat.checkingFor} <b>{restrictionNames.join(", ")}</b></> : t.eat.addRestrictions}</span>
                 <span className="text-cobalt">{t.common.edit}</span>
               </button>
             </li>
@@ -300,9 +467,9 @@ export default function MenuPage() {
         </Section>
       )}
 
-      {loading && (
+      {loading && !menu && (
         <div className="flex items-center justify-center gap-3 py-6 text-muted" role="status">
-          <Preloader className="h-6! w-6!" /> {t.eat.reading}
+          <Preloader className="h-6! w-6!" /> {t.eat.readingMenu}
         </div>
       )}
       {error && <Section><Note tone="danger">{error}</Note></Section>}
@@ -310,35 +477,70 @@ export default function MenuPage() {
       {menu && (
         <div ref={resultsRef} className="scroll-mt-2">
           <Section>
-            <Card>
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <p className="text-headline">{fmt(t.eat.dishes, { type: menu.restaurant_type, n: menu.dishes.length })}</p>
-                {flagged > 0 && <span className="tag tag-danger">{fmt(t.eat.notForYou, { n: flagged })}</span>}
+            <div className="space-y-2 px-1">
+              <div className="flex items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="text-headline">
+                    {menu.total ? fmt(t.eat.dishes, { type: menu.cuisine, n: menu.total }).replace(/^ · /, "") : t.eat.readingMenu}
+                  </p>
+                  {menu.streaming && menu.total > 0 && (
+                    <p className="text-footnote text-muted tabular-nums" role="status">{fmt(t.eat.progress, { n: rows.length, total: menu.total })}</p>
+                  )}
+                </div>
+                {!inputOpen && (
+                  // Scan again / type instead, folded into the summary line so dishes start higher.
+                  <div className="flex shrink-0 gap-2">
+                    <button onClick={() => fileRef.current?.click()} aria-label={t.eat.rescan} className="grid h-11 w-11 place-items-center rounded-full bg-cobalt-soft text-cobalt"><Camera className="h-5 w-5" /></button>
+                    <button onClick={() => { setMode("type"); setInputOpen(true); }} aria-label={t.eat.type} className="grid h-11 w-11 place-items-center rounded-full bg-cobalt-soft text-cobalt"><Keyboard className="h-5 w-5" /></button>
+                  </div>
+                )}
               </div>
-              {restrictions.length > 0 && (
-                <div className="mt-3"><Seg value={filter} onChange={setFilter} options={[{ value: "all", label: t.eat.all }, { value: "safe", label: t.eat.safe }]} /></div>
+              {menu.streaming && menu.total > 0 && (
+                <div className="h-1 overflow-hidden rounded-full bg-line" aria-hidden>
+                  <div className="h-full rounded-full bg-cobalt transition-[width] duration-300" style={{ width: `${(rows.length / menu.total) * 100}%` }} />
+                </div>
               )}
-            </Card>
+              {restricted && rows.length > 0 && (
+                <div className="-mx-1 flex gap-2 overflow-x-auto px-1 [scrollbar-width:none]">
+                  {([["all", t.eat.all, rows.length], ["ok", t.eat.filterOk, count("ok")], ["ask", t.eat.filterAsk, count("ask")], ["no", t.eat.filterNo, count("no")]] as const)
+                    .filter(([k, , n]) => k === "all" || n > 0)
+                    .map(([k, label, n]) => (
+                      <button key={k} className="pill shrink-0 tabular-nums" aria-pressed={filter === k} onClick={() => setFilter(k)}>{label} {n}</button>
+                    ))}
+                </div>
+              )}
+            </div>
             <DemoNote show={menu.demo} what={t.common.aiKey} />
-            {menu.tips.map((tip, i) => <Note key={i}>{tip}</Note>)}
-            {shown.map(({ d, i, c }) => (
-              <DishCard key={i} d={d} c={c} line={order[i]} homePrice={homePrice(d.price)}
-                onChange={(l) => setOrder((o) => { const n = { ...o }; if (l) n[i] = l; else delete n[i]; return n; })} />
+            {menu.tips.length > 0 && (
+              <div>
+                <button onClick={() => setTipsOpen(!tipsOpen)} aria-expanded={tipsOpen} className="flex min-h-11 items-center gap-1 px-1 text-subhead font-semibold text-cobalt">
+                  <Lightbulb className="h-4 w-4" aria-hidden />{fmt(t.eat.tipsRow, { n: menu.tips.length })}
+                  <ChevronRight className={`h-4 w-4 transition-transform ${tipsOpen ? "rotate-90" : ""}`} aria-hidden />
+                </button>
+                {tipsOpen && <div className="space-y-2">{menu.tips.map((tip, i) => <Note key={i}>{tip}</Note>)}</div>}
+              </div>
+            )}
+            {shown.map(({ d, i, v }) => (
+              <DishRow key={i} d={d} v={v} restricted={restricted} line={order[i]} homePrice={homePrice(d.price)}
+                onOpen={() => openDish(i)} onChange={(l) => setLine(i, l)} />
             ))}
-            <p className="px-1 text-footnote text-muted">{t.eat.disclaimer}</p>
+            {filter === "all" && Array.from({ length: Math.min(pending, 3) }, (_, k) => <DishSkeleton key={`s${k}`} />)}
+            {!menu.streaming && menu.total === 0 && <Note tone="warn">{t.eat.noneRead}</Note>}
+            {menu.missing > 0 && <Note tone="warn">{fmt(t.eat.missing, { n: menu.missing })}</Note>}
+            {rows.length > 0 && <p className="px-1 text-footnote text-muted">{t.eat.disclaimer}</p>}
             <div className="h-16" aria-hidden />
           </Section>
         </div>
       )}
 
-      {menu && (dishCount > 0 || restrictions.length > 0) && (
+      {menu && (dishCount > 0 || restricted) && (
         <div className="sticky-bottom flex items-center justify-end gap-2">
           {dishCount > 0 && (
             <Button variant="ink" className="flex-1 shadow-[0_6px_20px_rgb(0_0_0/0.18)]" onClick={showOrder}>
               <ReceiptText className="h-5 w-5" aria-hidden />{fmt(t.eat.orderBar, { n: dishCount })}
             </Button>
           )}
-          {restrictions.length > 0 && (
+          {profile.allergens.length + profile.diets.length > 0 && (
             <button aria-label={t.eat.showAllergyCard}
               onClick={showAllergyCard}
               className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-card text-danger shadow-[0_6px_20px_rgb(0_0_0/0.18)] ring-1 ring-line">
@@ -346,6 +548,11 @@ export default function MenuPage() {
             </button>
           )}
         </div>
+      )}
+      {openRow && (
+        <DishSheet d={openRow.d} v={openRow.v} mine={profile.allergens} detail={details[openRow.i]} line={order[openRow.i]} homePrice={homePrice(openRow.d.price)}
+          onAdd={(without) => { setLine(openRow.i, { qty: 1, without }); setOpened(null); }}
+          onFlag={() => flagDish(openRow.d)} onClose={() => setOpened(null)} />
       )}
       {card && <ShowCard {...card} onClose={() => setCard(null)} />}
       {askAllergies && <AllergySheet onDone={() => setAskAllergies(false)} />}

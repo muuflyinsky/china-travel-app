@@ -8,14 +8,18 @@ import { langName } from "./languages";
 
 const client = () => new Anthropic({ apiKey: config.anthropicKey });
 
-type Ask = { system: string; text: string; image?: { data: string; mediaType: string }; maxTokens: number; repair?: (raw: unknown) => unknown };
+type Ask = {
+  system: string; text: string; image?: { data: string; mediaType: string }; maxTokens: number; repair?: (raw: unknown) => unknown;
+  /** A compact sample answer. When given, OpenAI-compatible models see it instead of the full JSON Schema (shorter prompt, faster). */
+  example?: unknown;
+};
 
 /**
  * One structured call to whichever model is configured. The answer is always validated
  * against the zod schema; anything that doesn't match throws Unreadable, so the UI says
  * "couldn't read it, try again" instead of showing half a result.
  */
-async function structured<T extends z.ZodType>(schema: T, ask: Ask): Promise<z.infer<T>> {
+export async function structured<T extends z.ZodType>(schema: T, ask: Ask): Promise<z.infer<T>> {
   if (aiProvider === "openai") return openaiCompatible(schema, ask);
   if (aiProvider === "anthropic") {
     const content: Anthropic.Beta.BetaContentBlockParam[] = [];
@@ -41,7 +45,10 @@ async function structured<T extends z.ZodType>(schema: T, ask: Ask): Promise<z.i
  */
 async function openaiCompatible<T extends z.ZodType>(schema: T, ask: Ask): Promise<z.infer<T>> {
   const vision = Boolean(ask.image);
-  const system = `${ask.system}\n\nReply with one JSON object only, no prose, matching this JSON Schema:\n${JSON.stringify(z.toJSONSchema(schema))}`;
+  const shape = ask.example
+    ? `shaped exactly like this example (same keys and value types):\n${JSON.stringify(ask.example)}`
+    : `matching this JSON Schema:\n${JSON.stringify(z.toJSONSchema(schema))}`;
+  const system = `${ask.system}\n\nReply with one JSON object only, no prose, ${shape}`;
   const user = vision
     ? [{ type: "image_url", image_url: { url: `data:${ask.image!.mediaType};base64,${ask.image!.data}` } }, { type: "text", text: ask.text }]
     : ask.text;
@@ -140,6 +147,8 @@ const FALLBACK = FALLBACK_MODELS.includes(config.model)
   : {};
 
 const allergenIds = ALLERGENS.map((a) => a.id) as [string, ...string[]];
+
+export const allergenEnum = z.enum(allergenIds);
 
 export const DishSchema = z.object({
   original: z.string().describe("Dish name exactly as printed, in Chinese"),

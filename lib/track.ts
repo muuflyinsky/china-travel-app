@@ -3,7 +3,7 @@
 // beyond the browser tab. Nothing about allergies, dates or locations is sent.
 export const EVENTS = [
   "menu_scan", "order_card_shown", "staff_reply", "taxi_card_shown", "hotel_card_shown",
-  "hotel_pick_click", "resv_alarm_added", "app_open",
+  "hotel_pick_click", "resv_alarm_added", "app_open", "menu_first_dish", "menu_done", "dish_flagged",
 ] as const;
 export type EventName = (typeof EVENTS)[number];
 
