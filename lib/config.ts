@@ -7,7 +7,8 @@ export const config = {
     baseUrls: process.env.AI_BASE_URL
       ? process.env.AI_BASE_URL.split(",").map((u) => u.trim().replace(/\/$/, "")).filter(Boolean)
       : ["https://dashscope-intl.aliyuncs.com/compatible-mode/v1", "https://dashscope.aliyuncs.com/compatible-mode/v1"],
-    key: process.env.AI_API_KEY ?? "",
+    // Pasted keys often carry a trailing newline or quotes, which the API rejects as invalid.
+    key: (process.env.AI_API_KEY ?? "").trim().replace(/^["']|["']$/g, ""),
     visionModel: process.env.AI_MODEL_VISION || "qwen-vl-max",
     textModel: process.env.AI_MODEL_TEXT || "qwen-plus",
   },
