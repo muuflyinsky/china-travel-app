@@ -1,6 +1,7 @@
 // Sample data so the prototype works without API keys (shown with a DEMO badge).
 import type { Place } from "./amap";
 import type { Menu } from "./llm";
+import type { CityPicks, HotelPick } from "./hotel-tiers";
 
 const P = (id: string, name: string, pinyin: string, address: string, location: string, type: string, extra: Partial<Place> = {}): Place => ({
   id, name, pinyin, address, city: "上海市", citycode: "021", location, type, ...extra,
@@ -102,4 +103,36 @@ export const menu: Menu = {
       spice_level: 0, confidence: "medium", notes: "Some kitchens use lard or chicken powder; ask for 不放猪油和鸡精 if strict vegetarian.",
     },
   ],
+};
+
+// Sample hotel picks (Shanghai). Prices and distances are illustrative, not live data.
+const H = (id: string, name: string, pinyin: string, district: string, cny: number, rating: number, stars: number,
+  chain: HotelPick["chain"], brand: string | undefined, metro: [string, number] | null, tier: HotelPick["tier"]): HotelPick => ({
+  id, name, pinyin, address: `上海市${district}`, district, location: "121.4737,31.2304", rating, cny, tier, stars, chain, brand,
+  metro: metro && { name: metro[0], meters: metro[1] },
+});
+export const hotelPicks: CityPicks = {
+  city: "上海", generatedAt: "2026-10-23T00:00:00.000Z", source: "amap",
+  tiers: {
+    economy: [
+      H("D1", "宜必思酒店(上海人民广场店)", "Yi Bi Si Jiu Dian (Shang Hai Ren Min Guang Chang Dian)", "黄浦区", 329, 4.5, 0, "international", "ibis", ["人民广场", 380], "economy"),
+      H("D2", "汉庭酒店(上海南京东路步行街店)", "Han Ting Jiu Dian (Shang Hai Nan Jing Dong Lu Bu Xing Jie Dian)", "黄浦区", 299, 4.6, 0, "domestic", "Hanting", ["南京东路", 450], "economy"),
+      H("D3", "锦江之星(上海静安寺店)", "Jin Jiang Zhi Xing (Shang Hai Jing An Si Dian)", "静安区", 279, 4.4, 0, "domestic", "Jinjiang Inn", ["静安寺", 700], "economy"),
+    ],
+    comfort: [
+      H("D4", "上海外滩英迪格酒店", "Shang Hai Wai Tan Ying Di Ge Jiu Dian", "黄浦区", 760, 4.7, 0, "international", "Indigo", ["豫园", 650], "comfort"),
+      H("D5", "全季酒店(上海人民广场店)", "Quan Ji Jiu Dian (Shang Hai Ren Min Guang Chang Dian)", "黄浦区", 520, 4.7, 0, "domestic", "Ji Hotel", ["人民广场", 300], "comfort"),
+      H("D6", "亚朵酒店(上海静安寺店)", "Ya Duo Jiu Dian (Shang Hai Jing An Si Dian)", "静安区", 640, 4.8, 0, "domestic", "Atour", ["静安寺", 420], "comfort"),
+    ],
+    upscale: [
+      H("D7", "上海外滩茂悦大酒店", "Shang Hai Wai Tan Mao Yue Da Jiu Dian", "虹口区", 1450, 4.8, 5, "international", "Hyatt", ["北外滩", 600], "upscale"),
+      H("D8", "上海静安洲际酒店", "Shang Hai Jing An Zhou Ji Jiu Dian", "静安区", 1180, 4.7, 5, "international", "InterContinental", ["汉中路", 350], "upscale"),
+      H("D9", "上海虹桥英迪格酒店", "Shang Hai Hong Qiao Ying Di Ge Jiu Dian", "长宁区", 860, 4.6, 0, "international", "Indigo", ["娄山关路", 900], "upscale"),
+    ],
+    luxury: [
+      H("D10", "上海静安香格里拉大酒店", "Shang Hai Jing An Xiang Ge Li La Da Jiu Dian", "静安区", 1680, 4.8, 5, "international", "Shangri-La", ["静安寺", 200], "luxury"),
+      H("D11", "上海浦东丽思卡尔顿酒店", "Shang Hai Pu Dong Li Si Ka Er Dun Jiu Dian", "浦东新区", 3200, 4.9, 5, "international", "Ritz-Carlton", ["陆家嘴", 400], "luxury"),
+      H("D12", "上海和平饭店", "Shang Hai He Ping Fan Dian", "黄浦区", 2100, 4.8, 5, null, undefined, ["南京东路", 500], "luxury"),
+    ],
+  },
 };

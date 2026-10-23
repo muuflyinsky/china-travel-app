@@ -20,11 +20,14 @@ export async function GET(req: Request) {
     from: q.get("from") ?? undefined, to: q.get("to") ?? undefined, date: q.get("date") ?? undefined,
     provider: q.get("provider") ?? undefined,
   };
-  const clickId = randomUUID().replaceAll("-", "").slice(0, 12);
+  const tag = q.get("tag") ?? "";
+  const id = randomUUID().replaceAll("-", "").slice(0, 12);
+  // trip_sub1 = "<placement tag>-<random id>", e.g. stay-comfort-1-3f9a0c2b7d1e
+  const clickId = /^[a-z0-9-]{1,24}$/.test(tag) ? `${tag}-${id}` : id;
   const url = buildPartnerUrl(partner, kind, p, clickId);
 
   // Click log for commission reconciliation. Swap for a database / analytics in production.
-  const row = { ts: new Date().toISOString(), clickId, partner, kind, src: q.get("src"), ...p, ua: req.headers.get("user-agent") };
+  const row = { ts: new Date().toISOString(), clickId, tag: tag || undefined, partner, kind, src: q.get("src"), ...p, ua: req.headers.get("user-agent") };
   try {
     await mkdir("data", { recursive: true });
     await appendFile("data/clicks.jsonl", JSON.stringify(row) + "\n");

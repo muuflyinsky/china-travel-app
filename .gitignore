@@ -5,3 +5,4 @@ node_modules
 data/clicks.jsonl
 next-env.d.ts
 *.tsbuildinfo
+data/hotels/

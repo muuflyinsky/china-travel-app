@@ -19,6 +19,7 @@ export type Place = {
   cost?: string;
   photo?: string;
   distance?: string;
+  district?: string;
 };
 
 async function amap<T>(path: string, params: Record<string, string | undefined>): Promise<T> {
@@ -60,15 +61,16 @@ function toPlace(p: RawPoi): Place {
     cost: p.business?.cost,
     photo: p.photos?.[0]?.url,
     distance: p.distance,
+    district: p.adname,
   };
 }
 
-export async function searchPlaces(q: { keywords?: string; city?: string; around?: string; types?: string; page?: number }) {
+export async function searchPlaces(q: { keywords?: string; city?: string; around?: string; types?: string; page?: number; radius?: number; pageSize?: number }) {
   if (demo.maps) return mock.places(q.keywords, q.types);
-  const fields = { show_fields: "business,photos", page_size: "20", page_num: String(q.page ?? 1) };
+  const fields = { show_fields: "business,photos", page_size: String(q.pageSize ?? 20), page_num: String(q.page ?? 1) };
   const data = q.around
     ? await amap<{ pois: RawPoi[] }>("/v5/place/around", {
-        location: q.around, keywords: q.keywords, types: q.types, radius: "5000", sortrule: "distance", ...fields,
+        location: q.around, keywords: q.keywords, types: q.types, radius: String(q.radius ?? 5000), sortrule: "distance", ...fields,
       })
     : await amap<{ pois: RawPoi[] }>("/v5/place/text", {
         keywords: q.keywords, types: q.types, region: q.city, city_limit: q.city ? "true" : undefined, ...fields,

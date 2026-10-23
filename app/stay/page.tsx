@@ -1,106 +1,124 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Preloader } from "konsta/react";
-import { BedDouble, Star, ExternalLink } from "lucide-react";
+import { MapPin, Minus, Plus, ExternalLink } from "lucide-react";
 import { Screen, DemoNote } from "@/components/Shell";
-import { Section, Group, Field, Note } from "@/components/ui";
-import { AppIcon } from "@/components/AppIcon";
+import { Section, Group, Field, Note, Seg } from "@/components/ui";
+import { EditSheet } from "@/components/EditSheet";
 import { CityPicker } from "@/components/CityPicker";
+import { FeaturedHotel, HotelRow, useHotelPicks } from "@/components/HotelPicks";
 import { useCity } from "@/components/useCity";
 import { useProfile } from "@/components/useProfile";
 import { useFx, formatMoney } from "@/components/useFx";
 import { useT } from "@/components/useT";
 import { goLink } from "@/lib/affiliate";
-import { amapNav } from "@/lib/maplinks";
 import { fmt } from "@/lib/i18n";
 import { addDays, daysBetween, todayIso } from "@/lib/stay";
-import type { Place } from "@/lib/amap";
+import { TIER_IDS, type TierId } from "@/lib/hotel-tiers";
+import type { City } from "@/lib/cities";
 
-const plus = (days: number) => addDays(todayIso(), days);
+type CityLite = { a: string; e: string; s: string };
+const asCity = (c: CityLite): City => ({ n: c.s, s: c.s, a: c.a, e: c.e, p: "", py: "", t: "city" });
 
-export default function StayPage() {
+function Stay() {
   const t = useT();
+  const params = useSearchParams();
   const [profile, setProfile, loaded] = useProfile();
+  const { city: here } = useCity();
   const fx = useFx(profile.homeCurrency);
-  const { city, setCity, detect } = useCity();
-  const [checkin, setCheckin] = useState(plus(7));
-  const [checkout, setCheckout] = useState(plus(9));
-  const adults = profile.guests;
-  const setAdults = (n: number) => setProfile({ guests: n });
-  const [area, setArea] = useState("");
-  const [hotels, setHotels] = useState<Place[]>([]);
-  const [demo, setDemo] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  async function load() {
-    setLoading(true);
-    const qs = new URLSearchParams({ q: area ? `${area} 酒店` : "酒店", city: city.a, types: "100100" });
-    const r = await fetch(`/api/places?${qs}`);
-    const d = await r.json();
-    setHotels(d.places ?? []); setDemo(d.demo); setLoading(false);
-  }
-  useEffect(() => { load(); }, [city.a]); // eslint-disable-line react-hooks/exhaustive-deps
-  // Default to the trip dates the traveller already gave us, if they are still ahead.
+  // City: a link from Today (?city=) → the first trip city → where the traveller is now.
+  const [city, setCity] = useState<CityLite | null>(null);
+  const [checkin, setCheckin] = useState(addDays(todayIso(), 7));
+  const [checkout, setCheckout] = useState(addDays(todayIso(), 9));
+  const [tier, setTier] = useState<TierId>("comfort");
+  const [edit, setEdit] = useState(false);
   useEffect(() => {
     if (!loaded) return;
-    const today = todayIso();
-    if (profile.arrival && profile.arrival >= today) {
+    const a = params.get("city");
+    setCity(a ? { a, s: params.get("name") ?? "", e: params.get("en") ?? "" } : profile.cities[0] ?? { a: here.a, e: here.e, s: here.s });
+    if (profile.arrival && profile.arrival >= todayIso()) {
       setCheckin(profile.arrival);
       setCheckout(profile.departure > profile.arrival ? profile.departure : addDays(profile.arrival, 2));
     }
   }, [loaded]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const c = city ?? { a: here.a, e: here.e, s: here.s };
+  const { data, error } = useHotelPicks(c.a, c.s);
   const nights = Math.max(1, daysBetween(checkin, checkout));
-  const base = { city: city.s, cityEn: city.e, checkin, checkout, adults };
-  const price = (cny: string) => {
-    const home = fx && profile.homeCurrency !== "CNY" ? ` (≈ ${formatMoney(Number(cny) / fx.value, profile.homeCurrency, profile.lang)})` : "";
-    return fmt(t.stay.from, { price: `¥${cny}${home}` });
-  };
+  const guests = profile.guests;
+  const link = { city: c.s, cityEn: c.e, checkin, checkout, adults: guests };
+  const fmtDay = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString(profile.lang, { timeZone: "UTC", day: "numeric", month: "short" });
+
+  const range = useMemo(() => {
+    const b = data?.bounds ?? [400, 800, 1500];
+    const [lo, hi] = { economy: [0, b[0]], comfort: [b[0], b[1]], upscale: [b[1], b[2]], luxury: [b[2], null] }[tier] as [number, number | null];
+    const n = (x: number) => x.toLocaleString(profile.lang);
+    const cny = hi === null ? `¥${n(lo)}+` : `¥${n(lo)}–${n(hi)}`;
+    if (!fx || profile.homeCurrency === "CNY") return cny;
+    const home = (x: number) => formatMoney(x / fx.value, profile.homeCurrency, profile.lang);
+    return `${cny} · ≈ ${hi === null ? `${home(lo)}+` : `${home(lo)}–${home(hi)}`}`;
+  }, [data, tier, fx, profile.homeCurrency, profile.lang]);
+
+  const picks = data?.tiers[tier] ?? [];
+  const [top, ...rest] = picks;
 
   return (
     <Screen title={t.stay.title}>
       <Section>
-        <CityPicker value={city} onChange={setCity} onLocate={detect} label={t.stay.city} />
-        <Group>
-          <Field label={t.stay.checkIn}><input type="date" value={checkin} onChange={(e) => setCheckin(e.target.value)} /></Field>
-          <Field label={fmt(t.stay.checkOut, { n: nights })}><input type="date" value={checkout} onChange={(e) => setCheckout(e.target.value)} /></Field>
-          <Field label={t.stay.guests}><input type="number" inputMode="numeric" min={1} max={8} value={adults} onChange={(e) => setAdults(Number(e.target.value) || 1)} /></Field>
-          <Field label={t.stay.near}><input type="text" placeholder={t.stay.nearPlaceholder} value={area} onChange={(e) => setArea(e.target.value)} onBlur={load} /></Field>
-        </Group>
-        <a href={goLink("trip", "hotel_list", base, "stay_search")} target="_blank" rel="noopener" className="flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-cta px-4 text-headline text-cta-ink">
-          <AppIcon id="tripcom" size={28} /> {t.stay.searchTrip} <ExternalLink className="h-4 w-4" aria-hidden />
+        <button onClick={() => setEdit(true)} className="flex min-h-14 w-full items-center gap-3 rounded-2xl border border-line bg-card px-4 py-2 text-left">
+          <MapPin className="h-5 w-5 shrink-0 text-cobalt" aria-hidden />
+          <span className="min-w-0 flex-1">
+            <span className="block text-headline">{c.e} <span className="zh font-normal text-muted">{c.s}</span></span>
+            <span className="block text-footnote text-muted">
+              {fmtDay(checkin)} – {fmtDay(checkout)} · {nights === 1 ? t.stay.night1 : fmt(t.stay.nightsN, { n: nights })} · {guests === 1 ? t.stay.guest1 : fmt(t.stay.guestsN, { n: guests })}
+            </span>
+          </span>
+          <span className="text-subhead font-semibold text-cobalt">{t.common.edit}</span>
+        </button>
+      </Section>
+
+      <Section>
+        <Seg value={tier} onChange={setTier} label={t.stay.priceRange} options={TIER_IDS.map((id) => ({ value: id, label: t.stay.tiers[id] }))} />
+        <p className="px-1 text-footnote text-muted tabular-nums">{fmt(t.stay.perNight, { price: range })}</p>
+        <DemoNote show={data?.demo} what={t.common.mapKey} />
+        {!data && !error && <div className="flex justify-center py-8"><Preloader /></div>}
+        {error && <Note tone="warn">{t.stay.picksDown}</Note>}
+        {data && !top && <p className="px-1 text-subhead text-muted">{t.stay.noneTier}</p>}
+        {top && <FeaturedHotel h={top} label={fmt(t.stay.pick, { tier: t.stay.tiers[tier] })} link={link} tag={`stay-${tier}-1`} />}
+        {rest.length > 0 && <Group>{rest.map((h, i) => <HotelRow key={h.id} h={h} link={link} tag={`stay-${tier}-${i + 2}`} />)}</Group>}
+      </Section>
+
+      <Section>
+        <a href={goLink("trip", "hotel_list", link, "stay_all", "stay-all")} target="_blank" rel="noopener" className="flex min-h-11 items-center gap-1 px-1 text-subhead font-semibold text-cobalt">
+          {fmt(t.stay.allTrip, { city: c.e })} <ExternalLink className="h-4 w-4" aria-hidden />
         </a>
-        <a href={goLink("fliggy", "hotel_list", { ...base, keyword: area }, "stay_search")} target="_blank" rel="noopener" className="flex min-h-11 items-center justify-center gap-2 text-subhead font-semibold text-cobalt">
-          <AppIcon id="fliggy" size={22} /> {t.stay.searchFliggy}
-        </a>
+        <p className="px-1 text-footnote text-muted">
+          {t.stay.howWePick}
+          {data && !data.demo && <> {fmt(t.stay.updated, { date: fmtDay(data.generatedAt.slice(0, 10)) })}</>}
+        </p>
+        <p className="px-1 text-footnote text-muted">{t.common.commission}</p>
         <Note>{t.stay.passportNote}</Note>
       </Section>
 
-      <Section title={<>{fmt(t.stay.hotelsIn, { city: city.e })}{area && ` · ${area}`}</>}>
-        <DemoNote show={demo} what={t.common.mapKey} />
-        {loading && <div className="flex justify-center py-6"><Preloader /></div>}
-        {!loading && hotels.length === 0 && <p className="px-1 text-subhead text-muted">{t.stay.none}</p>}
-        {hotels.map((h) => (
-          <div key={h.id} className="flex gap-3 rounded-2xl border border-line bg-card p-3">
-            {h.photo
-              ? <img className="h-20 w-20 shrink-0 rounded-xl object-cover" src={h.photo} alt="" />
-              : <span className="grid h-20 w-20 shrink-0 place-items-center rounded-xl bg-cobalt-soft text-cobalt"><BedDouble className="h-7 w-7" aria-hidden /></span>}
-            <div className="min-w-0 flex-1">
-              <h3 className="zh text-body font-semibold">{h.name}</h3>
-              <p className="truncate text-footnote text-muted">{h.pinyin}</p>
-              <p className="mt-1 flex flex-wrap items-center gap-1 text-footnote">
-                {h.rating && <><Star className="h-3.5 w-3.5 fill-current text-ink" aria-hidden /><b>{h.rating}</b></>}
-                {h.cost && <span className="text-muted">· {price(h.cost)}</span>}
-              </p>
-              <div className="mt-2 flex gap-2">
-                <a target="_blank" rel="noopener" href={goLink("trip", "hotel_search", { ...base, keyword: h.name }, "stay_card")} className="flex min-h-11 flex-1 items-center justify-center rounded-xl bg-cobalt-soft text-subhead font-semibold text-cobalt">{t.stay.checkPrice}</a>
-                <a target="_blank" rel="noopener" href={amapNav(h, "car")} aria-label={fmt(t.stay.onMap, { name: h.name })} className="grid min-h-11 w-11 place-items-center rounded-xl bg-cobalt-soft"><AppIcon id="amap" size={24} /></a>
-              </div>
-            </div>
-          </div>
-        ))}
-        <p className="px-1 text-footnote text-muted">{t.common.commission}</p>
-      </Section>
+      <EditSheet open={edit} title={t.stay.trip} onClose={() => setEdit(false)}>
+        <CityPicker value={asCity(c)} label={t.stay.city} onChange={(x) => setCity({ a: x.a, e: x.e, s: x.s })} />
+        <Group>
+          <Field label={t.stay.checkIn}><input type="date" value={checkin} onChange={(e) => setCheckin(e.target.value)} /></Field>
+          <Field label={fmt(t.stay.checkOut, { n: nights })}><input type="date" value={checkout} min={checkin} onChange={(e) => setCheckout(e.target.value)} /></Field>
+          <li className="flex min-h-14 items-center gap-3 px-4">
+            <span className="flex-1 text-body">{t.stay.guests}</span>
+            <button onClick={() => setProfile({ guests: Math.max(1, guests - 1) })} aria-label={t.stay.guestLess} className="grid h-11 w-11 place-items-center rounded-full bg-cobalt-soft text-cobalt"><Minus className="h-5 w-5" /></button>
+            <span className="w-6 text-center text-headline tabular-nums" aria-live="polite">{guests}</span>
+            <button onClick={() => setProfile({ guests: Math.min(8, guests + 1) })} aria-label={t.stay.guestMore} className="grid h-11 w-11 place-items-center rounded-full bg-cobalt-soft text-cobalt"><Plus className="h-5 w-5" /></button>
+          </li>
+        </Group>
+      </EditSheet>
     </Screen>
   );
+}
+
+export default function StayPage() {
+  return <Suspense><Stay /></Suspense>;
 }

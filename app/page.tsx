@@ -9,6 +9,7 @@ import { Screen, DemoNote } from "@/components/Shell";
 import { Section, Card, Group, Row, Button, IconTile } from "@/components/ui";
 import { VisaCheck } from "@/components/VisaCheck";
 import { HotelCard } from "@/components/HotelCard";
+import { useHotelPicks, usePrice } from "@/components/HotelPicks";
 import { PayButtons } from "@/components/PayButtons";
 import { PriceCheck } from "@/components/PriceCheck";
 import { PaySetup } from "@/components/prep/PaySetup";
@@ -41,6 +42,31 @@ const fmtDay = (iso: string, lang: string, month: "short" | "long" = "short") =>
   new Date(`${iso}T00:00:00Z`).toLocaleDateString(lang, { timeZone: "UTC", day: "numeric", month });
 
 // ---- before the trip ---------------------------------------------------------------------
+
+/** One row per destination city with its comfort-tier pick: the highest-earning spot in the app. */
+function CityHotelRow({ c }: { c: { a: string; e: string; s: string } }) {
+  const t = useT();
+  const price = usePrice();
+  const { data } = useHotelPicks(c.a, c.s);
+  const pick = data?.tiers.comfort[0] ?? data?.tiers.economy[0];
+  return (
+    <Row href={`/stay?${new URLSearchParams({ city: c.a, name: c.s, en: c.e })}`}
+      icon={<IconTile><BedDouble className="h-5 w-5" aria-hidden /></IconTile>}
+      title={fmt(t.today.hotelsFor, { city: c.e })}
+      sub={pick ? <><span className="zh">{pick.name}</span> · {price(pick.cny)}</> : t.prepare.hotelsBody} />
+  );
+}
+
+function CityHotels() {
+  const t = useT();
+  const [p] = useProfile();
+  return (
+    <Group>
+      {p.cities.map((c) => <CityHotelRow key={c.a} c={c} />)}
+      {p.cities.length === 0 && <Row href="/settings#cities" icon={<IconTile><BedDouble className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.addCities} sub={t.today.addCitiesSub} />}
+    </Group>
+  );
+}
 
 /** What used to be the Pay, Mobile data and Before-you-go pages, as one expandable checklist. */
 const PREP = [
@@ -111,9 +137,7 @@ function BeforeTrip() {
           </span>
           <ChevronRight className="h-5 w-5 opacity-80" aria-hidden />
         </Link>
-        <Group>
-          <Row href="/stay" icon={<IconTile><BedDouble className="h-5 w-5" aria-hidden /></IconTile>} title={t.prepare.hotelsLink} sub={t.prepare.hotelsBody} />
-        </Group>
+        <CityHotels />
       </Section>
       <Checklist />
       <Section>

@@ -113,9 +113,14 @@ export function buildPartnerUrl(partner: Partner, kind: LinkKind, p: LinkParams,
   return config.esimUrl(provider.id) || provider.defaultUrl;
 }
 
-/** Client-side helper: link to our tracked redirect. */
-export function goLink(partner: Partner, kind: LinkKind, p: LinkParams, src: string) {
+/**
+ * Client-side helper: link to our tracked redirect. `tag` (a-z, 0-9, "-", ≤ 24 chars) is put at
+ * the front of trip_sub1, e.g. "stay-comfort-1" = Stay page, comfort tier, first card, so the
+ * partner's order report shows which placement converted.
+ */
+export function goLink(partner: Partner, kind: LinkKind, p: LinkParams, src: string, tag?: string) {
   const qs = new URLSearchParams({ partner, kind, src });
+  if (tag) qs.set("tag", tag);
   for (const [k, v] of Object.entries(p)) if (v !== undefined && v !== "") qs.set(k, String(v));
   return `/api/go?${qs}`;
 }
