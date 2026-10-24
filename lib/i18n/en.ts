@@ -282,6 +282,7 @@ export const en = {
     approx: "≈ {amount}",
   },
   go: {
+    restaurants: "Restaurants",
     // v0.6
     placeholderShort: "Place or address",
     clear: "Clear search",
@@ -607,6 +608,11 @@ export const en = {
     "reminderLine": "For {date} · opens {when}"
   },
   awards: {
+    withLists: "Cities with lists:",
+    noneCity: "No restaurant picks for {city} yet",
+    starsShort: "Michelin stars",
+    noListsHere: "No award lists for {city} yet. Cities with lists:",
+    eatEntry: "Where to eat in {city}",
     amapTitle: "Well-rated restaurants",
     amapRating: "Amap rating {n}",
     perPerson: "¥{n} per person",

@@ -279,6 +279,7 @@ export const ko: Dict = {
     approx: "≈ {amount}",
   },
   go: {
+    restaurants: "식당",
     // v0.6
     placeholderShort: "장소 또는 주소",
     clear: "검색어 지우기",
@@ -604,6 +605,11 @@ export const ko: Dict = {
     "reminderLine": "{date} 방문분 · {when} 오픈"
   },
   awards: {
+    withLists: "목록이 있는 도시:",
+    noneCity: "{city} 추천 식당이 아직 없어요",
+    starsShort: "미쉐린 스타",
+    noListsHere: "{city}는 아직 수상 목록이 없어요. 목록이 있는 도시:",
+    eatEntry: "{city} 맛집",
     amapTitle: "평점 높은 식당",
     amapRating: "Amap 평점 {n}",
     perPerson: "1인 ¥{n}",

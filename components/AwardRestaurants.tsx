@@ -1,10 +1,11 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import { Star, ChevronRight } from "lucide-react";
-import { Group, Button } from "./ui";
+import { useEffect, useState } from "react";
+import { Star, ChevronRight, UtensilsCrossed } from "lucide-react";
+import { Preloader } from "konsta/react";
+import { Group, Button, EmptyState } from "./ui";
 import { SourceLine } from "./SourceLine";
 import { AwardBadges } from "./AwardBadges";
-import { AwardIcon, BibGourmand, MichelinPlate } from "./AwardIcon";
+import { BibGourmand, MichelinStar } from "./AwardIcon";
 import { AppIcon } from "./AppIcon";
 import { Photo } from "./Photo";
 import { useCity } from "./useCity";
@@ -18,28 +19,27 @@ type Listed = AwardRestaurant & { poi: Place | null; rating?: number; cost?: num
 type Lists = Record<string, { name: string; edition: string; checked: string }>;
 type Data = { restaurants: Listed[]; source: "awards" | "mixed" | "amap"; lists: Lists; cities: { city: City; n: number }[] };
 
-// One filter per award, best first; a filter shows only when the city has a restaurant with it.
+// One choice of four (plus Black Pearl once it has data): all, Michelin stars, Bib Gourmand,
+// Must-Eat. "Selected" has no filter of its own; those restaurants are under "All".
+// A filter shows only when the city has a restaurant with it.
 const FILTERS = [
-  { id: "m3", list: "michelin", level: "3" },
-  { id: "m2", list: "michelin", level: "2" },
-  { id: "m1", list: "michelin", level: "1" },
-  { id: "bib", list: "michelin", level: "bib" },
-  { id: "selected", list: "michelin", level: "selected" },
-  { id: "bp", list: "black_pearl", level: "" },
-  { id: "must_eat", list: "dianping", level: "must_eat" },
+  { id: "stars", list: "michelin", levels: ["3", "2", "1"] },
+  { id: "bib", list: "michelin", levels: ["bib"] },
+  { id: "bp", list: "black_pearl", levels: ["3", "2", "1"] },
+  { id: "must_eat", list: "dianping", levels: ["must_eat"] },
 ] as const;
 type FilterId = (typeof FILTERS)[number]["id"] | "all";
 const PAGE = 20;
 
 const has = (r: Listed, id: FilterId) => {
   const f = FILTERS.find((x) => x.id === id);
-  return !f || r.awards.some((a) => a.list === f.list && (!f.level || a.level === f.level));
+  return !f || r.awards.some((a) => a.list === f.list && (f.levels as readonly string[]).includes(a.level));
 };
 
 /**
- * Restaurants on the Michelin / Black Pearl / Must-Eat lists for one city, with a switcher for every
- * city we have lists for and a filter per award. Hidden when the city has none (`listedOnly`), or
- * filled with well-rated Amap restaurants otherwise.
+ * Restaurants on the Michelin / Black Pearl / Must-Eat lists for one city, with one filter row.
+ * The city comes from Explore's search bar. A city with no lists: hidden (`listedOnly`), or
+ * well-rated Amap restaurants under a line naming the cities that do have lists.
  */
 export function AwardRestaurants({ adcode, cityEn, listedOnly, onPick }: {
   adcode: string; cityEn: string; listedOnly?: boolean; onPick: (p: Place | string) => void;
@@ -49,30 +49,35 @@ export function AwardRestaurants({ adcode, cityEn, listedOnly, onPick }: {
   const [d, setD] = useState<Data | null>(null);
   const [filter, setFilter] = useState<FilterId>("all");
   const [shown, setShown] = useState(PAGE);
-  const cityRow = useRef<HTMLDivElement>(null);
   useEffect(() => {
     setD(null); setFilter("all"); setShown(PAGE);
     fetch(`/api/restaurants?city=${adcode}${listedOnly ? "&listed=1" : ""}`).then((r) => r.json()).then(setD).catch(() => {});
   }, [adcode, listedOnly]);
-  // Keep the current city's chip in view (it may be far along the row).
-  useEffect(() => {
-    const row = cityRow.current, on = row?.querySelector<HTMLElement>("[aria-pressed=true]");
-    if (!row || !on) return;
-    const r = row.getBoundingClientRect(), c = on.getBoundingClientRect();
-    row.scrollLeft += c.left - r.left - (r.width - c.width) / 2;
-  }, [d]);
-  if (!d?.restaurants.length) return null;
+  // As a section of another page (`listedOnly`) it stays out of the way; as Explore's
+  // Restaurants view it is the page, so it never goes blank.
+  if (listedOnly && !d?.restaurants.length) return null;
+  if (!d) return <div className="flex justify-center py-6"><Preloader /></div>;
+  const cityLinks = (cs: Data["cities"]) => cs.map(({ city, n }, i) => (
+    <span key={city.a}>{i > 0 && " · "}<button onClick={() => setCity(city)} className="font-semibold text-cobalt">{city.e}</button> <span className="tabular-nums">{n}</span></span>
+  ));
+  if (!d.restaurants.length) {
+    return (
+      <EmptyState icon={<UtensilsCrossed className="h-6 w-6" aria-hidden />} title={fmt(t.awards.noneCity, { city: cityEn })}
+        body={<>{t.awards.withLists} {cityLinks(d.cities.filter((c) => c.city.a !== adcode).slice(0, 6))}</>} />
+    );
+  }
 
   const awarded = d.source !== "amap";
   const list = d.restaurants.filter((r) => has(r, filter));
   const filters = FILTERS.map((f) => ({ ...f, n: d.restaurants.filter((r) => has(r, f.id)).length })).filter((f) => f.n > 0);
   const used = [...new Set(d.restaurants.flatMap((r) => r.awards.map((a) => a.list)))];
   const chip = (f: (typeof filters)[number]) =>
-    f.id === "bib" ? <><BibGourmand />{t.awards.bibShort}</>
-    : f.id === "selected" ? <><MichelinPlate />{t.awards.selectedShort}</>
+    f.id === "stars" ? <><MichelinStar />{t.awards.starsShort}</>
+    : f.id === "bib" ? <><BibGourmand />{t.awards.bibShort}</>
     : f.id === "must_eat" ? <><AppIcon id="dianping" size={16} className="border-0" />{t.awards.mustEatShort}</>
-    : f.id === "bp" ? <>{fmt(t.awards.blackPearl, { d: "" }).trim()}</>
-    : <span className="inline-flex" aria-label={fmt(t.awards.stars, { n: f.level })}><AwardIcon a={{ list: "michelin", level: f.level, edition: "" }} /></span>;
+    : <>{fmt(t.awards.blackPearl, { d: "" }).trim()}</>;
+  // Cities that do have lists, for a city that has none (most first, a handful).
+  const others = d.cities.filter((c) => c.city.a !== adcode).slice(0, 6);
 
   return (
     <>
@@ -80,14 +85,11 @@ export function AwardRestaurants({ adcode, cityEn, listedOnly, onPick }: {
         <span>{awarded ? t.awards.title : t.awards.amapTitle}</span>
         {awarded && <span className="text-footnote font-normal tabular-nums">{fmt(t.awards.inCity, { n: d.restaurants.length, city: cityEn })}</span>}
       </h3>
-      {d.cities.length > 1 && (
-        <div ref={cityRow} className="chip-row" role="group" aria-label={t.awards.cities}>
-          {d.cities.map(({ city, n }) => (
-            <button key={city.a} className="pill" aria-pressed={city.a === adcode} onClick={() => city.a !== adcode && setCity(city)}>
-              {city.e}<span className="tabular-nums opacity-70">{n}</span>
-            </button>
-          ))}
-        </div>
+      {!awarded && others.length > 0 && (
+        <p className="px-1 text-footnote text-muted">
+          {fmt(t.awards.noListsHere, { city: cityEn })}{" "}
+          {cityLinks(others)}
+        </p>
       )}
       {awarded && filters.length > 1 && (
         <div className="chip-row" role="group" aria-label={t.awards.filter}>

@@ -2,7 +2,7 @@
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Preloader } from "konsta/react";
-import { LocateFixed, Search, X, MapPin, ChevronDown, Sparkles, TrainFront, Bath, Pill, Landmark, Store, Hospital, CarTaxiFront, ExternalLink, Church, Trees, MoonStar, UtensilsCrossed, ShoppingBag, Star } from "lucide-react";
+import { LocateFixed, Search, X, MapPin, ChevronDown, Sparkles, Soup, TrainFront, Bath, Pill, Landmark, Store, Hospital, CarTaxiFront, ExternalLink, Church, Trees, MoonStar, UtensilsCrossed, ShoppingBag, Star } from "lucide-react";
 import { Screen, DemoNote } from "@/components/Shell";
 import { Section, Card, Group, Row, Button, Note } from "@/components/ui";
 import { AppIcon } from "@/components/AppIcon";
@@ -37,8 +37,8 @@ const NEARBY = [
 // Browse by category (SPEC v0.5 P1.6 #21), best rated first. Keywords live in
 // lib/data/categories.json, shared with scripts/build-category-lists.mjs, which pre-generates the
 // first page for hot cities into public/categories/; later pages and other cities are live.
-type CategoryKey = "museum" | "temple" | "park" | "night" | "food" | "shopping";
-const ICONS: Record<CategoryKey, typeof Landmark> = { museum: Landmark, temple: Church, park: Trees, night: MoonStar, food: UtensilsCrossed, shopping: ShoppingBag };
+type CategoryKey = "museum" | "temple" | "park" | "night" | "shopping";
+const ICONS: Record<CategoryKey, typeof Landmark> = { museum: Landmark, temple: Church, park: Trees, night: MoonStar, shopping: ShoppingBag };
 const CATEGORIES = (categoryDefs as { key: CategoryKey; q: string; types: string }[]).map((c) => ({ ...c, Icon: ICONS[c.key] }));
 
 type StaticCategories = { generatedAt: string; cats: Partial<Record<CategoryKey, Place[]>> };
@@ -74,7 +74,10 @@ function Explore() {
   const [busy, setBusy] = useState("");
   const [notice, setNotice] = useState<string>();
   const [card, setCard] = useState<string[] | null>(null);
-  const [guideTab, setGuideTab] = useState<GuideTab>(params.get("tab") === "eat" ? "eat" : "see");
+  // What the page shows with no search: the guide's sights or dishes, or the restaurant list
+  // (award lists from the database; well-rated Amap places where a city has none).
+  type View = GuideTab | "restaurants";
+  const [view, setView] = useState<View>(() => { const v = params.get("tab"); return v === "eat" || v === "restaurants" ? v : "see"; });
   const moreRef = useRef<HTMLDivElement>(null);
 
   async function locate() {
@@ -146,7 +149,8 @@ function Explore() {
   const tripCities = p.cities.map((c) => ({ n: c.n ?? c.s, s: c.s, a: c.a, e: c.e, p: c.p ?? "", py: "", t: "city" as const }));
   const reset = () => { setPlaces([]); setQ(""); setQuery(null); setMore(false); setNotice(undefined); };
   const hot = isHotCity(city.a);
-  const showGuide = (tab: GuideTab) => { reset(); setDest(null); setGuideTab(tab); };
+  const show = (v: View) => { reset(); setDest(null); setView(v); };
+  const pickPlace = (x: Place | string) => { if (typeof x === "string") { setQ(x); search(x); } else setDest(x); scrollTop(); };
 
   const finder = (
     <Section>
@@ -170,13 +174,16 @@ function Explore() {
           </button>
         </form>
       </div>
-      {/* One filter row: the city's picks (when we have a guide), then live categories. */}
+      {/* One filter row: the city's picks (when we have a guide), restaurants, then live categories. */}
       <div className="chip-row" role="group" aria-label={t.go.findPlace}>
         {hot && (["see", "eat"] as const).map((tab) => (
-          <button key={tab} aria-pressed={!query && guideTab === tab} className="pill" onClick={() => showGuide(tab)}>
-            {tab === "see" ? <Sparkles className="h-4 w-4" aria-hidden /> : <UtensilsCrossed className="h-4 w-4" aria-hidden />}{tab === "see" ? t.go.topPicks : t.go.mustEat}
+          <button key={tab} aria-pressed={!query && view === tab} className="pill" onClick={() => show(tab)}>
+            {tab === "see" ? <Sparkles className="h-4 w-4" aria-hidden /> : <Soup className="h-4 w-4" aria-hidden />}{tab === "see" ? t.go.topPicks : t.go.mustEat}
           </button>
         ))}
+        <button aria-pressed={!query && view === "restaurants"} className="pill" onClick={() => show("restaurants")}>
+          <UtensilsCrossed className="h-4 w-4" aria-hidden />{t.go.restaurants}
+        </button>
         {CATEGORIES.map(({ key, q: k, types, Icon }) => (
           <button key={key} aria-pressed={query?.cat === key} className="pill"
             onClick={() => (query?.cat === key ? reset() : (setQ(""), run({ keyword: k, types, cat: key, page: 1 })))}>
@@ -265,17 +272,19 @@ function Explore() {
       ) : (
         <>
           {finder}
-          {hot ? (
+          {view === "restaurants" ? (
             <Section>
-              <CityGuide adcode={city.a} cityEn={city.e} tab={guideTab}
-                onFindDish={(zh) => { setQ(zh); search(zh, Boolean(here), true); scrollTop(); }}
-                onPickPlace={(x) => { if (typeof x === "string") { setQ(x); search(x); } else setDest(x); scrollTop(); }} />
+              <AwardRestaurants adcode={city.a} cityEn={city.e} onPick={pickPlace} />
+            </Section>
+          ) : hot ? (
+            <Section>
+              <CityGuide adcode={city.a} cityEn={city.e} tab={view}
+                onFindDish={(zh) => { setQ(zh); search(zh, Boolean(here), true); scrollTop(); }} onRestaurants={() => show("restaurants")} />
             </Section>
           ) : (
             <Section>
               {/* No city guide here, but the city may still have Michelin / Must-Eat restaurants. */}
-              <AwardRestaurants adcode={city.a} cityEn={city.e} listedOnly
-                onPick={(x) => { if (typeof x === "string") { setQ(x); search(x); } else setDest(x); scrollTop(); }} />
+              <AwardRestaurants adcode={city.a} cityEn={city.e} listedOnly onPick={pickPlace} />
               <a href={goLink("trip", "attraction", { cityEn: city.e, city: city.s }, "explore_top", "explore-top")} target="_blank" rel="noopener" className="flex min-h-11 items-center gap-1 px-1 text-subhead font-semibold text-cobalt">
                 {fmt(t.guide.topTrip, { city: city.e })}<ExternalLink className="h-3.5 w-3.5" aria-hidden />
               </a>

@@ -5,7 +5,6 @@ import { Popup, Preloader, Sheet } from "konsta/react";
 import { Camera, Flame, Info, Leaf, ShieldAlert, ShieldCheck, ShieldOff, ChevronRight, ChevronDown, Plus, Minus, ReceiptText, Keyboard, UtensilsCrossed, Volume2, X, Lightbulb, Images, ScanText } from "lucide-react";
 import { Screen, DemoNote } from "@/components/Shell";
 import { Section, Card, Group, Row, Field, Button, Note, IconTile, IconButton } from "@/components/ui";
-import { isHotCity } from "@/lib/hot-cities";
 import { useProfile } from "@/components/useProfile";
 import { useCity } from "@/components/useCity";
 import { useFx, parseCny, formatMoney } from "@/components/useFx";
@@ -522,9 +521,10 @@ export default function MenuPage() {
             </div>
           </Card>
           <AllergyStatus onEdit={() => setAskAllergies(true)} onCard={showAllergyCard} />
-          {!menu && isHotCity(city.a) && (
+          {/* Where to eat: Explore's restaurant list (award lists, or well-rated places). */}
+          {!menu && (
             <Group>
-              <Row href="/explore?tab=eat" icon={<IconTile><UtensilsCrossed className="h-5 w-5" aria-hidden /></IconTile>} title={fmt(t.guide.mustEat, { city: city.e })} />
+              <Row href="/explore?tab=restaurants" icon={<IconTile><UtensilsCrossed className="h-5 w-5" aria-hidden /></IconTile>} title={fmt(t.awards.eatEntry, { city: city.e })} />
             </Group>
           )}
         </Section>

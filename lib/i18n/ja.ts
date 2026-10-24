@@ -279,6 +279,7 @@ export const ja: Dict = {
     approx: "≈ {amount}",
   },
   go: {
+    restaurants: "レストラン",
     // v0.6
     placeholderShort: "場所・住所",
     clear: "検索をクリア",
@@ -604,6 +605,11 @@ export const ja: Dict = {
     "reminderLine": "{date}分 · {when}販売開始"
   },
   awards: {
+    withLists: "掲載のある都市：",
+    noneCity: "{city}のおすすめレストランはまだありません",
+    starsShort: "ミシュランの星",
+    noListsHere: "{city}の掲載リストはまだありません。掲載のある都市：",
+    eatEntry: "{city}のおすすめレストラン",
     amapTitle: "評価の高いレストラン",
     amapRating: "Amap評価 {n}",
     perPerson: "1人 ¥{n}",

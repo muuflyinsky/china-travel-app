@@ -279,6 +279,7 @@ export const fr: Dict = {
     approx: "≈ {amount}",
   },
   go: {
+    restaurants: "Restaurants",
     // v0.6
     placeholderShort: "Lieu ou adresse",
     clear: "Effacer la recherche",
@@ -604,6 +605,11 @@ export const fr: Dict = {
     "reminderLine": "Pour le {date} · ouverture {when}"
   },
   awards: {
+    withLists: "Villes couvertes :",
+    noneCity: "Pas encore de restaurants sélectionnés à {city}",
+    starsShort: "Étoiles Michelin",
+    noListsHere: "Pas encore de palmarès pour {city}. Villes couvertes :",
+    eatEntry: "Où manger à {city}",
     amapTitle: "Restaurants bien notés",
     amapRating: "Note Amap {n}",
     perPerson: "{n} ¥ par personne",

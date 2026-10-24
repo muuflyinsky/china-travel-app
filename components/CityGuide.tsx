@@ -17,7 +17,6 @@ import { ALLERGENS, allergyLinesZh, blockedBySevere } from "@/lib/allergens";
 import { track } from "@/lib/track";
 import { RESERVATIONS } from "@/lib/reservations";
 import { pick, type CityGuide as Guide, type GuideDish, type GuideSight } from "@/lib/city-guide-types";
-import { AwardRestaurants } from "./AwardRestaurants";
 import { Photo } from "./Photo";
 import type { Place } from "@/lib/amap";
 
@@ -128,11 +127,13 @@ function DishCard({ d, city, onFind, version }: { d: GuideDish; city: string; on
 /** "See" and "Eat" picks for a city: the first one big, the rest as rows that swap into the card. */
 export type GuideTab = Tab;
 
-export function CityGuide({ adcode, cityEn, initialTab = "see", tab: controlled, onFindDish, onPickPlace }: {
+export function CityGuide({ adcode, cityEn, initialTab = "see", tab: controlled, onFindDish, onRestaurants }: {
   adcode: string; cityEn: string; initialTab?: Tab;
   /** Set by a parent that shows its own See/Eat switch (Explore's filter row); hides the built-in one. */
   tab?: Tab;
-  onFindDish: (zh: string) => void; onPickPlace: (p: Place | string) => void;
+  onFindDish: (zh: string) => void;
+  /** No dishes yet (they need the model): offer the restaurant list instead of a dead end. */
+  onRestaurants?: () => void;
 }) {
   const t = useT();
   const [p] = useProfile();
@@ -158,8 +159,11 @@ export function CityGuide({ adcode, cityEn, initialTab = "see", tab: controlled,
     <>
       {!controlled && <Seg value={tab} onChange={setTab} label={fmt(t.guide.title, { city: cityEn })} options={[{ value: "see", label: t.guide.see }, { value: "eat", label: t.guide.eat }]} />}
       {items.length === 0 ? (
-        // No dishes without the model: Eat then shows just the restaurants below.
-        tab === "see" ? <p className="px-1 text-subhead text-muted">{state === "none" ? t.guide.notYet : t.guide.empty}</p> : null
+        // Dishes need the model; restaurants have their own view in Explore now.
+        <>
+          <p className="px-1 text-subhead text-muted">{state === "none" ? t.guide.notYet : t.guide.empty}</p>
+          {tab === "eat" && onRestaurants && <Button variant="soft" className="w-full text-subhead!" onClick={onRestaurants}>{fmt(t.awards.eatEntry, { city: cityEn })}</Button>}
+        </>
       ) : (
         <>
           {tab === "see"
@@ -184,7 +188,6 @@ export function CityGuide({ adcode, cityEn, initialTab = "see", tab: controlled,
           </Group>
         </>
       )}
-      {tab === "eat" && <AwardRestaurants adcode={adcode} cityEn={cityEn} onPick={onPickPlace} />}
       <a href={goLink("trip", "attraction", { cityEn }, "explore_top", "explore-top")} target="_blank" rel="noopener" className="flex min-h-11 items-center gap-1 px-1 text-subhead font-semibold text-cobalt">
         {fmt(t.guide.topTrip, { city: cityEn })}<ExternalLink className="h-3.5 w-3.5" aria-hidden />
       </a>
