@@ -12,6 +12,7 @@ import { CityGuide, type GuideTab } from "@/components/CityGuide";
 import { Photo } from "@/components/Photo";
 import { RoutePanel } from "@/components/RoutePanel";
 import { AwardBadges } from "@/components/AwardBadges";
+import { AwardRestaurants } from "@/components/AwardRestaurants";
 import { awardScore } from "@/lib/restaurant-awards";
 import { isHotCity } from "@/lib/hot-cities";
 import { useCity, type Here } from "@/components/useCity";
@@ -272,6 +273,9 @@ function Explore() {
             </Section>
           ) : (
             <Section>
+              {/* No city guide here, but the city may still have Michelin / Must-Eat restaurants. */}
+              <AwardRestaurants adcode={city.a} cityEn={city.e} listedOnly
+                onPick={(x) => { if (typeof x === "string") { setQ(x); search(x); } else setDest(x); scrollTop(); }} />
               <a href={goLink("trip", "attraction", { cityEn: city.e, city: city.s }, "explore_top", "explore-top")} target="_blank" rel="noopener" className="flex min-h-11 items-center gap-1 px-1 text-subhead font-semibold text-cobalt">
                 {fmt(t.guide.topTrip, { city: city.e })}<ExternalLink className="h-3.5 w-3.5" aria-hidden />
               </a>

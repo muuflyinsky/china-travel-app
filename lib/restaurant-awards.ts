@@ -1,9 +1,10 @@
 // Restaurant awards from published guides: Michelin Guide, Black Pearl (黑珍珠, Meituan) and the
 // Dianping Must-Eat List (大众点评必吃榜). Shared types, ranking and name matching; the data lives
-// in lib/data/restaurant-awards.json (server only) and is imported with scripts/import-awards.mjs.
+// in Supabase (read by lib/restaurants.ts), with lib/data/restaurant-awards.json as the bundled
+// fallback, imported with scripts/import-awards.mjs and synced with scripts/sync-awards.mjs.
 //
-// We never infer an award: a restaurant shows a badge only if it is in the data file, which records
-// the edition and where it was checked. Badges are plain text, not the guides' logos.
+// We never infer an award: a restaurant shows a badge only if it is in the data, which records the
+// edition and where it was checked. Badges show the guide's symbol (components/AwardIcon.tsx).
 
 export type AwardList = "michelin" | "black_pearl" | "dianping";
 export type Award = { list: AwardList; level: string; edition: string };

@@ -18,7 +18,7 @@ export async function GET(req: Request) {
     // Searches are cleaned and ordered (#21): `sort=rating` for category browsing, otherwise sights,
     // hotels, food and metro first. "Nearby" (around) keeps everything, nearest first.
     const list = q.get("around") ? places : cleanResults(places, { byRating: q.get("sort") === "rating" });
-    return NextResponse.json({ places: withAwards(list), demo: demo.maps });
+    return NextResponse.json({ places: await withAwards(list), demo: demo.maps });
   } catch (e) {
     return errorResponse(e, "places");
   }

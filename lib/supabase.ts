@@ -1,16 +1,21 @@
 // Server-side Supabase access over REST with the service role key (never sent to browsers).
 // Optional: everything that uses it has a fallback when SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY
-// are unset. Tables have RLS on and no policies, so the anon/public keys can read nothing.
+// are unset. Log tables have RLS on and no policies, so the anon/public keys can read nothing;
+// the restaurant award tables are public-read, so SUPABASE_ANON_KEY alone is enough to read them.
 const sb = {
   url: (process.env.SUPABASE_URL ?? "").replace(/\/$/, ""),
   key: (process.env.SUPABASE_SERVICE_ROLE_KEY ?? "").trim(),
+  anon: (process.env.SUPABASE_ANON_KEY ?? "").trim(),
 };
 export const supabaseOn = Boolean(sb.url && sb.key);
+/** Public-read tables (restaurant awards) work with either key. */
+export const supabaseReadOn = Boolean(sb.url && (sb.key || sb.anon));
 
 export async function rest(path: string, init: RequestInit = {}) {
+  const key = sb.key || sb.anon;
   const res = await fetch(`${sb.url}/rest/v1/${path}`, {
     ...init,
-    headers: { apikey: sb.key, authorization: `Bearer ${sb.key}`, "content-type": "application/json", ...init.headers },
+    headers: { apikey: key, authorization: `Bearer ${key}`, "content-type": "application/json", ...init.headers },
     signal: AbortSignal.timeout(4000),
     cache: "no-store",
   });

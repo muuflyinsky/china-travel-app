@@ -616,7 +616,15 @@ export const es: Dict = {
     "mustEat": "Dianping Must-Eat 必吃榜 {year}",
     "checked": "comprobado el {date}",
     "note": "Distinciones tal como las publica cada guía. No tenemos relación con ellas y ningún restaurante paga por aparecer.",
-    "sample": "Restaurantes de ejemplo con nombres inventados. Las listas reales de Michelin, Black Pearl y Must-Eat aparecerán cuando se importen."
+    "stars": "MICHELIN, {n} estrella(s)",
+    "all": "Todos",
+    "bibShort": "Bib Gourmand",
+    "selectedShort": "Selected",
+    "mustEatShort": "Must-Eat",
+    "inCity": "{n} en {city}",
+    "cities": "Ciudades con restaurantes premiados",
+    "filter": "Filtrar por premio",
+    "noneHere": "Ninguno de esta lista en {city}."
   },
   phrases: {
     "你好": "Hola",

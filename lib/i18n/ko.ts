@@ -616,7 +616,15 @@ export const ko: Dict = {
     "mustEat": "다중뎬핑 必吃榜 {year}",
     "checked": "{date} 확인",
     "note": "각 가이드가 발표한 그대로 표시합니다. 어떤 가이드와도 제휴하지 않으며, 돈을 내고 오른 식당은 없습니다.",
-    "sample": "가상의 이름을 쓴 예시 식당입니다. 실제 미쉐린·블랙펄·必吃榜 목록은 데이터를 가져오면 표시됩니다."
+    "stars": "미쉐린 {n}스타",
+    "all": "전체",
+    "bibShort": "빕 구르망",
+    "selectedShort": "셀렉티드",
+    "mustEatShort": "필먹 리스트",
+    "inCity": "{city} {n}곳",
+    "cities": "수상 레스토랑이 있는 도시",
+    "filter": "수상별로 보기",
+    "noneHere": "{city}에는 이 목록의 식당이 없습니다."
   },
   phrases: {
     "你好": "안녕하세요",

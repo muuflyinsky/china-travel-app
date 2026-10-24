@@ -17,54 +17,9 @@ import { ALLERGENS, allergyLinesZh, blockedBySevere } from "@/lib/allergens";
 import { track } from "@/lib/track";
 import { RESERVATIONS } from "@/lib/reservations";
 import { pick, type CityGuide as Guide, type GuideDish, type GuideSight } from "@/lib/city-guide-types";
-import { AwardBadges } from "./AwardBadges";
+import { AwardRestaurants } from "./AwardRestaurants";
 import { Photo } from "./Photo";
-import type { AwardRestaurant } from "@/lib/restaurant-awards";
 import type { Place } from "@/lib/amap";
-
-type Listed = AwardRestaurant & { poi: Place | null; rating?: number; cost?: number };
-type Lists = Record<string, { name: string; edition: string; checked: string }>;
-
-/** Restaurants on the Michelin / Black Pearl / Must-Eat lists. Hidden when we have no list for the city. */
-function AwardRestaurants({ adcode, onPick }: { adcode: string; onPick: (p: Place | string) => void }) {
-  const t = useT();
-  const [p] = useProfile();
-  const [d, setD] = useState<{ restaurants: Listed[]; source: "awards" | "mixed" | "amap"; lists: Lists; demo: boolean } | null>(null);
-  useEffect(() => { setD(null); fetch(`/api/restaurants?city=${adcode}`).then((r) => r.json()).then(setD).catch(() => {}); }, [adcode]);
-  if (!d?.restaurants.length) return null;
-  const used = [...new Set(d.restaurants.flatMap((r) => r.awards.map((a) => a.list)))];
-  return (
-    <>
-      <h3 className="mt-2 px-1 text-subhead font-semibold text-muted">{d.source === "amap" ? t.awards.amapTitle : t.awards.title}</h3>
-      <Group>
-        {d.restaurants.map((r) => (
-          <li key={r.zh}>
-            <button onClick={() => onPick(r.poi ?? r.zh)} className="flex min-h-14 w-full items-center gap-3 px-4 py-3 text-left">
-              {r.poi?.photo && <Photo src={r.poi.photo} alt="" shape="square" />}
-              <span className="min-w-0 flex-1">
-                <span className="zh block text-body">{r.zh}</span>
-                {(r.en || r.cuisine) && <span className="block text-footnote text-muted">{[r.en, r.cuisine && <span key="c" className="zh">{r.cuisine}</span>].filter(Boolean).reduce<React.ReactNode[]>((a, x, i) => (i ? [...a, " · ", x] : [x]), [])}</span>}
-                {(r.rating || r.cost) && (
-                  <span className="flex items-center gap-1 text-footnote text-muted tabular-nums">
-                    {r.rating && <><Star className="h-3.5 w-3.5 fill-current text-ink" aria-hidden />{fmt(t.awards.amapRating, { n: r.rating.toFixed(1) })}</>}
-                    {r.rating && r.cost ? " · " : ""}{r.cost ? fmt(t.awards.perPerson, { n: r.cost }) : ""}
-                  </span>
-                )}
-                <AwardBadges awards={r.awards} />
-              </span>
-              <ChevronRight className="h-5 w-5 shrink-0 text-muted opacity-60" aria-hidden />
-            </button>
-          </li>
-        ))}
-      </Group>
-      {d.demo ? <p className="px-1 text-footnote text-muted">{t.awards.sample}</p> : <>
-        {used.map((l) => <SourceLine key={l} name={`${d.lists[l].name} ${d.lists[l].edition}`} date={d.lists[l].checked || undefined} />)}
-        {d.source !== "awards" && <SourceLine name="Amap" extra={t.awards.amapNote} />}
-        {used.length > 0 && <p className="px-1 text-footnote text-muted">{t.awards.note}</p>}
-      </>}
-    </>
-  );
-}
 
 type Tab = "see" | "eat";
 
@@ -229,7 +184,7 @@ export function CityGuide({ adcode, cityEn, initialTab = "see", tab: controlled,
           </Group>
         </>
       )}
-      {tab === "eat" && <AwardRestaurants adcode={adcode} onPick={onPickPlace} />}
+      {tab === "eat" && <AwardRestaurants adcode={adcode} cityEn={cityEn} onPick={onPickPlace} />}
       <a href={goLink("trip", "attraction", { cityEn }, "explore_top", "explore-top")} target="_blank" rel="noopener" className="flex min-h-11 items-center gap-1 px-1 text-subhead font-semibold text-cobalt">
         {fmt(t.guide.topTrip, { city: cityEn })}<ExternalLink className="h-3.5 w-3.5" aria-hidden />
       </a>

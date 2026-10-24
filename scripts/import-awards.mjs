@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Imports one award list into lib/data/restaurant-awards.json from a CSV you compile from the
 // official publication. A new edition replaces that list's previous entries; other lists stay.
+// Then run scripts/sync-awards.mjs to copy the file into Supabase, which the app reads.
 //
 //   node scripts/import-awards.mjs <file.csv> --list michelin --edition 2026 \
 //        --source https://guide.michelin.com/... --checked 2026-10-23

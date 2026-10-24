@@ -619,7 +619,15 @@ export const en = {
     "mustEat": "Dianping Must-Eat 必吃榜 {year}",
     "checked": "checked {date}",
     "note": "Awards as published by each guide. We’re not affiliated with them, and no restaurant pays to be listed.",
-    "sample": "Sample restaurants with made-up names. Real Michelin, Black Pearl and Must-Eat lists appear once they are imported."
+    "stars": "MICHELIN, {n} Star(s)",
+    "all": "All",
+    "bibShort": "Bib Gourmand",
+    "selectedShort": "Selected",
+    "mustEatShort": "Must-Eat",
+    "inCity": "{n} in {city}",
+    "cities": "Cities with award-winning restaurants",
+    "filter": "Filter by award",
+    "noneHere": "None on this list in {city}."
   },
   phrases: {
     "你好": "Hello",

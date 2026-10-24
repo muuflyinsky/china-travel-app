@@ -20,6 +20,7 @@ export const APPS = {
   tripcom: { id: "tripcom", name: "Trip.com", color: "#287dfa", mono: "T", ios: { term: "Trip.com travel", country: "us" }, android: "ctrip.english", web: "https://www.trip.com" },
   rail12306: { id: "rail12306", name: "Railway 12306", zh: "铁路12306", color: "#2b6cb0", mono: "12", ios: { term: "铁路12306", country: "cn" }, web: "https://www.12306.cn/en/" },
   fliggy: { id: "fliggy", name: "Fliggy", zh: "飞猪", color: "#ffc300", mono: "飞", ios: { term: "飞猪旅行", country: "cn" } },
+  dianping: { id: "dianping", name: "Dianping", zh: "大众点评", color: "#ff6633", mono: "点", ios: { bundleId: "com.dianping.dpscope", country: "cn" }, android: "com.dianping.v1" },
   applemaps: { id: "applemaps", name: "Apple Maps", color: "#34c759", mono: "M", ios: { term: "Apple Maps", country: "us" } },
   airalo: { id: "airalo", name: "Airalo", color: "#1b1e3d", mono: "A", ios: { term: "Airalo eSIM", country: "us" }, web: "https://www.airalo.com" },
   holafly: { id: "holafly", name: "Holafly", color: "#e8467c", mono: "H", ios: { term: "Holafly eSIM", country: "us" }, web: "https://esim.holafly.com" },
