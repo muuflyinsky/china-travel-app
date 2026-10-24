@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { DEFAULT_CITY, cityFromAdcode, loadCities, type City } from "@/lib/cities";
 import { todayIso } from "@/lib/stay";
 import { useProfile, type TripCity } from "./useProfile";
+import { currentPosition } from "@/lib/location";
 
 const KEY = "ctg.city";
 const EVENT = "ctg-city";
@@ -55,27 +56,15 @@ export function useCity() {
   const detected = Boolean(stored && stored.day === today);
 
   /** GPS → Amap reverse geocode → city. Resolves with the raw position too, for routing. */
-  const detect = useCallback(
-    () =>
-      new Promise<Here>((resolve, reject) => {
-        if (!navigator.geolocation) return reject(new Error("no-geolocation"));
-        navigator.geolocation.getCurrentPosition(
-          async (pos) => {
-            try {
-              const r = await fetch(`/api/regeo?lng=${pos.coords.longitude}&lat=${pos.coords.latitude}`);
-              const d = await r.json();
-              if (!r.ok) throw new Error(d.error);
-              const match = cityFromAdcode(await loadCities(), d.adcode);
-              if (match) save(match, "gps");
-              resolve(d);
-            } catch (e) { reject(e); }
-          },
-          (e) => reject(e),
-          { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 },
-        );
-      }),
-    [save],
-  );
+  const detect = useCallback(async (): Promise<Here> => {
+    const pos = await currentPosition({ highAccuracy: true });
+    const r = await fetch(`/api/regeo?lng=${pos.longitude}&lat=${pos.latitude}`);
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error);
+    const match = cityFromAdcode(await loadCities(), d.adcode);
+    if (match) save(match, "gps");
+    return d;
+  }, [save]);
 
   return { city, setCity, detect, detected };
 }

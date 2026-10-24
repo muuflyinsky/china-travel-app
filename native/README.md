@@ -16,6 +16,11 @@ native/make-icon.swift     renders native/assets/icon-1024.png (the App Store ic
 
 The web app can tell it's inside the iOS app: the user agent ends with `ChinaTravelBuddy-iOS`.
 
+Location inside the app goes through the native `@capacitor/geolocation` plugin (`lib/location.ts` calls it
+via the injected `window.Capacitor` bridge; the website uses the browser API). That way iOS asks once with
+the Info.plist text, and WebKit's "this website would like to use your location" prompt never appears, which
+App Review would read as a web wrapper. New native plugins need `npx cap sync ios` and a new app build.
+
 ## Run in the simulator
 
 ```bash

@@ -35,6 +35,7 @@ import { tripPhase } from "@/lib/phase";
 import { upcomingReminders, type Reminder } from "@/lib/reminders";
 import { RESERVATIONS, type Reservation } from "@/lib/reservations";
 import { fmt } from "@/lib/i18n";
+import { currentPosition, locationAllowed } from "@/lib/location";
 
 type Weather = { casts: { date: string; dayweather: string; daytemp: string; nighttemp: string }[] };
 
@@ -272,7 +273,7 @@ function CityLine() {
   // If location access was already granted, find the city without asking.
   useEffect(() => {
     if (detected) return;
-    navigator.permissions?.query({ name: "geolocation" }).then((p) => { if (p.state === "granted") detect().catch(() => {}); }).catch(() => {});
+    locationAllowed().then((ok) => { if (ok) detect().catch(() => {}); });
   }, [detected, detect]);
   const today = wx?.casts?.[0];
   return (
@@ -521,15 +522,14 @@ export default function Home() {
   // it moves Today to the in-China cards even without dates.
   useEffect(() => {
     if (!loaded || profile.locatedInChina) return;
-    navigator.permissions?.query({ name: "geolocation" }).then((perm) => {
-      if (perm.state !== "granted") return;
-      navigator.geolocation.getCurrentPosition(async ({ coords: { longitude: lng, latitude: lat } }) => {
-        if (lng < 73 || lng > 135 || lat < 18 || lat > 54) return; // rough box first; Amap has the final say
-        const r = await fetch(`/api/regeo?lng=${lng}&lat=${lat}`).catch(() => null);
-        const d = r?.ok ? await r.json() : null;
-        if (typeof d?.adcode === "string" && d.adcode) set({ locatedInChina: true });
-      }, () => {}, { maximumAge: 600000, timeout: 10000 });
-    }).catch(() => {});
+    (async () => {
+      if (!(await locationAllowed())) return;
+      const { longitude: lng, latitude: lat } = await currentPosition({ maxAgeMs: 600000 });
+      if (lng < 73 || lng > 135 || lat < 18 || lat > 54) return; // rough box first; Amap has the final say
+      const r = await fetch(`/api/regeo?lng=${lng}&lat=${lat}`).catch(() => null);
+      const d = r?.ok ? await r.json() : null;
+      if (typeof d?.adcode === "string" && d.adcode) set({ locatedInChina: true });
+    })().catch(() => {});
   }, [loaded, profile.locatedInChina, set]);
 
   const phase = tripPhase(profile);
