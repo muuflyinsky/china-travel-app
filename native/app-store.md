@@ -103,13 +103,16 @@ Declaring location and photos is the conservative choice: Apple exempts data tha
 
 ## Screenshots
 
-Required: 6.9" iPhone (1320 × 2868 portrait). Taken from the iPhone 18 Pro Max simulator. Suggested order:
-1. Eat: menu results with verdicts
-2. Dish detail sheet
-3. Order card for the waiter (Chinese)
-4. Explore: route with metro steps and taxi estimate
-5. Today in China (menu, driver, pay, today)
-6. Talk / phrasebook
+Required: 6.9" iPhone (1320 × 2868 portrait). Ready in [screenshots/](screenshots/), taken from the iPhone 18
+Pro Max simulator against https://haodego.com with live AI and map data (allergies set to peanuts and sesame,
+location People's Square, Shanghai). Upload in this order:
+
+1. `01-menu-results.png`: 8 dishes, each with one verdict (OK / ask first / don't order)
+2. `02-dish-detail.png`: Mapo tofu: literal meaning, why to ask, usual ingredients, "Add, without sesame oil"
+3. `03-order-card.png`: the large Chinese order card for the waiter, with one-tap replies
+4. `04-explore.png`: Shanghai top picks with an Amap photo
+5. `05-route.png`: bus routes with fares, station pinyin and Chinese, plus the taxi estimate
+6. `06-talk.png`: English → Chinese translation with pinyin
 
 ## Export compliance
 
