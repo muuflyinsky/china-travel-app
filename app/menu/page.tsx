@@ -146,6 +146,7 @@ function DishSheet({ d, v, mine, detail, line, onAdd, onFlag, onClose, homePrice
     { title: t.eat.detailUsually, list: ings.filter((i) => i.source !== "menu") },
   ].filter((g) => g.list.length);
   const removable = v.removable.map((a) => a.via).join(", ");
+  const withoutOffer = v.kind === "ask" && v.removable.length > 0;
 
   return (
     <Sheet opened onBackdropClick={onClose} className="pb-safe" style={{ maxHeight: "88vh" }}>
@@ -203,15 +204,17 @@ function DishSheet({ d, v, mine, detail, line, onAdd, onFlag, onClose, homePrice
           <Feedback kind="menu_dish" id={d.zh} version={DISH_FEEDBACK_VERSION} reportLabel={t.eat.wrongInfo} onReport={onFlag} />
         </div>
 
-        {/* Severe allergen as a main ingredient: no add button at all. */}
+        {/* Severe allergen as a main ingredient: no add button at all. "Don't order" for another reason
+            (an allergen is a main ingredient, diet): only a plain, secondary Add — leaving out a sauce
+            wouldn't fix it, so "add, without X" is offered only for "ask first". */}
         {!v.blocked.length && !line && (
           <div className="flex shrink-0 gap-2 border-t border-line px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom))]">
-            {v.removable.length > 0 && (
+            {withoutOffer && (
               <Button className="flex-1 text-subhead!" onClick={() => onAdd(v.removable.map((a) => a.via_zh).filter(Boolean))}>
                 {fmt(t.eat.addWithout, { x: removable })}
               </Button>
             )}
-            <Button variant={v.removable.length ? "soft" : "primary"} className={`${v.removable.length ? "" : "flex-1"} text-subhead!`} onClick={() => onAdd([])}>
+            <Button variant={withoutOffer || v.kind === "no" ? "soft" : "primary"} className={`${withoutOffer ? "" : "flex-1"} text-subhead!`} onClick={() => onAdd(v.kind === "no" ? v.removable.map((a) => a.via_zh).filter(Boolean) : [])}>
               <Plus className="h-4 w-4" aria-hidden />{t.eat.add}
             </Button>
           </div>
