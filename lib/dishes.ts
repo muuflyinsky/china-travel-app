@@ -150,7 +150,7 @@ const DetailSchema = z.object({
 });
 
 const DETAIL_SYSTEM = `You are a Chinese cuisine expert explaining one dish to a foreign traveller in mainland China, in the target language.
-- "literal": the word-by-word meaning of the Chinese name (useful for poetic names); empty if it equals the plain name.
+- "literal": what the Chinese characters of the name literally say, word by word, even when that sounds odd: 麻婆豆腐 → "pockmarked old woman's tofu", 蚂蚁上树 → "ants climbing a tree", 宫保鸡丁 → "palace-guardian chicken cubes". Not a description of the dish. Empty if it equals the plain name.
 - "description": 1–2 sentences: what it is, how it's cooked, how it tastes.
 - "ingredients": the standard recipe for this region, main ingredients first, including seasonings that matter for allergies or diet (soy sauce, oyster sauce, sesame oil, peanuts, lard, fish sauce, cooking wine, MSG). "source" is "menu" only for ingredients the menu text mentions, otherwise "standard_recipe". "role" as: main = the dish can't be made without it; sauce = seasoning, sauce, oil, stock; garnish = can be left off. "allergens" per ingredient, conservative. Allergen ids: ${ALLERGENS.map((a) => a.id).join(", ")}.
 - "notes": what to watch for: served cold, sold by weight (斤), big regional differences, usually very spicy, can be made without X. Empty if nothing.`;
@@ -266,12 +266,14 @@ export async function dishDetail(input: { zh: string; printed?: string; lang: st
     console.log(`[dish] cache hit ${normalizeName(input.zh)} ${Date.now() - t0}ms`);
     return { ...hit.detail, cached: true };
   }
-  const d = await structured(DetailSchema, {
+  const raw = await structured(DetailSchema, {
     system: DETAIL_SYSTEM, maxTokens: 1500, repair: repairDetail,
     example: { literal: "Palace-guardian chicken cubes", description: "…", notes: "", ingredients: [{ zh: "花生米", name: "roasted peanuts", role: "main", source: "standard_recipe", allergens: ["peanut"] }] },
     text: `Target language: ${langName(input.lang)}.\n` + (input.city ? `Region: ${input.city}.\n` : "") +
       `Dish: ${input.zh}` + (input.printed ? `\nThe menu says: ${input.printed}` : ""),
   });
+  // Without menu text nothing can be "on the menu"; models still say so sometimes.
+  const d = input.printed ? raw : { ...raw, ingredients: raw.ingredients.map((i) => ({ ...i, source: "standard_recipe" as const })) };
   if (!input.printed && hit) cachePut(input.zh, region, input.lang, { ...hit, detail: d }).catch((e) => console.error("[dish-cache] write:", (e as Error).message));
   console.log(`[dish] generated ${normalizeName(input.zh)} ${Date.now() - t0}ms`);
   return { ...d, cached: false };
