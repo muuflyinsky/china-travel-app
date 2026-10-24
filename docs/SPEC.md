@@ -272,7 +272,7 @@ iOS 分组列表，每行 = 名称 + 当前值 + “›”，点进去是编辑�
 | 大模型 | Anthropic Claude（`lib/llm.ts`，结构化输出），模型可通过 `CLAUDE_MODEL` 配置 |
 | 地图 | 高德 Web 服务 API v3/v5（`lib/amap.ts`） |
 | 部署 | Vercel（`vercel.json` 固定香港 `hkg1`）或 Docker（`Dockerfile`，standalone 输出） |
-| 数据存储 | 无数据库。用户数据在浏览器 localStorage；点击日志写 `data/clicks.jsonl`（Vercel 上只进日志） |
+| 数据存储 | 用户数据只在浏览器 localStorage。服务器端用 Supabase（新加坡，项目 china-travel-buddy）：菜品知识库（dishes、dish_texts、dish_feedback）、匿名事件（events）、内容反馈（content_feedback）、预订点击（clicks，trip_sub1 = click_id，用于佣金对账）。表结构见 `supabase/migrations/`，均开启 RLS、只用服务端密钥访问。未配置时写 `data/*.jsonl` 或服务器日志 |
 
 ### 6.1 API 一览
 | 路由 | 作用 |

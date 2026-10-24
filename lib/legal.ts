@@ -1,7 +1,7 @@
 // Privacy policy and support page text (App Store requires both URLs). Describes what the code
 // actually does — keep it in step with lib/track.ts, app/api/go, app/api/t, lib/dish-cache.ts
 // and docs/SPEC.md §8 when data handling changes, and bump UPDATED.
-export const UPDATED = "2026-10-24";
+export const UPDATED = "2026-10-25";
 export const SUPPORT_EMAIL = "support@haodego.com";
 
 type Section = { h: string; items: string[] };
@@ -28,7 +28,7 @@ const PRIVACY: Record<string, Privacy> = {
         "General facts about dishes (names, usual ingredients, allergens), so the next lookup is faster. They are never linked to you.",
         "Anonymous usage events, such as “menu scanned” and how long it took, with a random id that changes every session. No name, location, allergies or dates.",
         "Feedback you send on content (helpful, outdated or wrong), without anything about you.",
-        "Booking link clicks: when you tap a partner link (Trip.com, eSIM providers) we record the time, partner, page, city and any travel dates in the link, and your browser type, to match commissions. The partner’s own privacy policy then applies.",
+        "Booking link clicks: when you tap a partner link (Trip.com, eSIM providers) we record the time, partner, page, city and any travel dates in the link, and your device type (iPhone app, phone or computer), to match commissions. The partner’s own privacy policy then applies.",
         "Our hosting provider keeps standard server logs, including IP addresses, for a short time for security and troubleshooting.",
       ] },
       { h: "Service providers", items: [
@@ -61,7 +61,7 @@ const PRIVACY: Record<string, Privacy> = {
         "Datos generales sobre platos (nombres, ingredientes habituales, alérgenos) para responder más rápido la próxima vez. Nunca se vinculan contigo.",
         "Eventos de uso anónimos, como «carta escaneada» y cuánto tardó, con un identificador aleatorio que cambia en cada sesión. Sin nombre, ubicación, alergias ni fechas.",
         "Las valoraciones que envías sobre el contenido (útil, desactualizado o incorrecto), sin nada sobre ti.",
-        "Clics en enlaces de reserva: al tocar un enlace de un socio (Trip.com, proveedores de eSIM) registramos la hora, el socio, la página, la ciudad, las fechas del enlace y el tipo de navegador, para cuadrar comisiones. Después se aplica la política de privacidad del socio.",
+        "Clics en enlaces de reserva: al tocar un enlace de un socio (Trip.com, proveedores de eSIM) registramos la hora, el socio, la página, la ciudad, las fechas del enlace y el tipo de dispositivo, para cuadrar comisiones. Después se aplica la política de privacidad del socio.",
         "Nuestro proveedor de alojamiento guarda registros estándar del servidor, incluidas direcciones IP, durante poco tiempo por seguridad y para resolver problemas.",
       ] },
       { h: "Proveedores de servicios", items: [
@@ -94,7 +94,7 @@ const PRIVACY: Record<string, Privacy> = {
         "Des informations générales sur les plats (noms, ingrédients habituels, allergènes), pour répondre plus vite la fois suivante. Elles ne sont jamais liées à vous.",
         "Des événements d’utilisation anonymes, comme « menu scanné » et sa durée, avec un identifiant aléatoire qui change à chaque session. Ni nom, ni position, ni allergies, ni dates.",
         "Vos avis sur le contenu (utile, obsolète ou faux), sans rien vous concernant.",
-        "Les clics sur les liens de réservation : quand vous touchez un lien partenaire (Trip.com, fournisseurs d’eSIM), nous enregistrons l’heure, le partenaire, la page, la ville, les dates éventuelles du lien et le type de navigateur, pour rapprocher les commissions. La politique de confidentialité du partenaire s’applique ensuite.",
+        "Les clics sur les liens de réservation : quand vous touchez un lien partenaire (Trip.com, fournisseurs d’eSIM), nous enregistrons l’heure, le partenaire, la page, la ville, les dates éventuelles du lien et le type d’appareil, pour rapprocher les commissions. La politique de confidentialité du partenaire s’applique ensuite.",
         "Notre hébergeur conserve brièvement des journaux serveur standard, adresses IP comprises, pour la sécurité et le dépannage.",
       ] },
       { h: "Prestataires", items: [
@@ -127,7 +127,7 @@ const PRIVACY: Record<string, Privacy> = {
         "Allgemeine Angaben zu Gerichten (Namen, übliche Zutaten, Allergene), damit die nächste Abfrage schneller geht. Sie sind nie mit dir verknüpft.",
         "Anonyme Nutzungsereignisse wie „Speisekarte gescannt“ und die Dauer, mit einer zufälligen ID, die sich jede Sitzung ändert. Kein Name, kein Standort, keine Allergien, keine Daten.",
         "Rückmeldungen zu Inhalten (hilfreich, veraltet oder falsch), ohne Angaben zu dir.",
-        "Klicks auf Buchungslinks: Wenn du einen Partnerlink (Trip.com, eSIM-Anbieter) antippst, speichern wir Zeit, Partner, Seite, Stadt, eventuelle Reisedaten im Link und den Browsertyp, um Provisionen abzugleichen. Danach gilt die Datenschutzerklärung des Partners.",
+        "Klicks auf Buchungslinks: Wenn du einen Partnerlink (Trip.com, eSIM-Anbieter) antippst, speichern wir Zeit, Partner, Seite, Stadt, eventuelle Reisedaten im Link und den Gerätetyp, um Provisionen abzugleichen. Danach gilt die Datenschutzerklärung des Partners.",
         "Unser Hosting-Anbieter speichert übliche Serverprotokolle einschließlich IP-Adressen für kurze Zeit für Sicherheit und Fehlersuche.",
       ] },
       { h: "Dienstleister", items: [
@@ -160,7 +160,7 @@ const PRIVACY: Record<string, Privacy> = {
         "次回すばやく答えるための、料理に関する一般的な情報（名前、通常の材料、アレルゲン）。あなたと結びつけられることはありません。",
         "「メニューを読み取った」とその所要時間などの匿名の利用イベント。セッションごとに変わるランダムなIDのみで、名前・位置・アレルギー・日付は含みません。",
         "コンテンツへのフィードバック（役に立った・古い・間違い）。あなたに関する情報は含みません。",
-        "予約リンクのクリック：提携先のリンク（Trip.com、eSIM事業者）をタップすると、手数料の照合のため、日時・提携先・ページ・都市・リンク内の日程・ブラウザの種類を記録します。その後は提携先のプライバシーポリシーが適用されます。",
+        "予約リンクのクリック：提携先のリンク（Trip.com、eSIM事業者）をタップすると、手数料の照合のため、日時・提携先・ページ・都市・リンク内の日程・端末の種類を記録します。その後は提携先のプライバシーポリシーが適用されます。",
         "ホスティング事業者は、セキュリティと障害対応のため、IPアドレスを含む標準的なサーバーログを短期間保存します。",
       ] },
       { h: "委託先", items: [
@@ -193,7 +193,7 @@ const PRIVACY: Record<string, Privacy> = {
         "다음 조회를 빠르게 하기 위한 요리에 관한 일반 정보(이름, 보통 들어가는 재료, 알레르기 유발 성분). 사용자와 연결되지 않습니다.",
         "'메뉴 스캔'과 걸린 시간 같은 익명 사용 이벤트. 세션마다 바뀌는 무작위 ID만 있고 이름·위치·알레르기·날짜는 없습니다.",
         "콘텐츠에 대한 피드백(도움 됨, 오래됨, 틀림). 사용자에 관한 정보는 없습니다.",
-        "예약 링크 클릭: 제휴 링크(Trip.com, eSIM 업체)를 누르면 수수료 정산을 위해 시간·제휴사·페이지·도시·링크의 여행 날짜·브라우저 종류를 기록합니다. 이후에는 제휴사의 개인정보 처리방침이 적용됩니다.",
+        "예약 링크 클릭: 제휴 링크(Trip.com, eSIM 업체)를 누르면 수수료 정산을 위해 시간·제휴사·페이지·도시·링크의 여행 날짜·기기 종류를 기록합니다. 이후에는 제휴사의 개인정보 처리방침이 적용됩니다.",
         "호스팅 업체는 보안과 문제 해결을 위해 IP 주소를 포함한 일반 서버 로그를 짧은 기간 보관합니다.",
       ] },
       { h: "서비스 제공업체", items: [

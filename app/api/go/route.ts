@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
-import { appendFile, mkdir } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 import { buildPartnerUrl, type LinkKind, type LinkParams } from "@/lib/affiliate";
+import { logRow } from "@/lib/supabase";
+
+const clientType = (ua: string) =>
+  /ChinaTravelBuddy-iOS/.test(ua) ? "ios-app" : /iPhone|iPad|iPod/.test(ua) ? "ios" : /Android/.test(ua) ? "android" : "desktop";
 
 const PARTNERS = ["trip", "fliggy", "esim"] as const;
 const KINDS: LinkKind[] = ["hotel_list", "hotel_search", "train", "flight", "attraction", "esim"];
@@ -26,13 +29,9 @@ export async function GET(req: Request) {
   const clickId = /^[a-z0-9-]{1,24}$/.test(tag) ? `${tag}-${id}` : id;
   const url = buildPartnerUrl(partner, kind, p, clickId);
 
-  // Click log for commission reconciliation. Swap for a database / analytics in production.
-  const row = { ts: new Date().toISOString(), clickId, tag: tag || undefined, partner, kind, src: q.get("src"), ...p, ua: req.headers.get("user-agent") };
-  try {
-    await mkdir("data", { recursive: true });
-    await appendFile("data/clicks.jsonl", JSON.stringify(row) + "\n");
-  } catch {
-    console.log("click", row);
-  }
+  // Click log for commission reconciliation (Supabase `clicks`, else data/clicks.jsonl or the server
+  // log). Link parameters only, and a coarse client type instead of the user agent.
+  const params = Object.fromEntries(Object.entries(p).filter(([, v]) => v !== undefined && v !== ""));
+  await logRow("clicks", { click_id: clickId, tag: tag || null, partner, kind, src: q.get("src")?.slice(0, 40) ?? null, params, client: clientType(req.headers.get("user-agent") ?? "") });
   return NextResponse.redirect(url, 302);
 }

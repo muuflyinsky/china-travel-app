@@ -63,7 +63,7 @@ app/api/places       GET Amap POI text / around search
 app/api/regeo        GET browser GPS → GCJ-02 + city
 app/api/weather      GET Amap 4-day forecast
 app/api/fx           GET exchange rate (ECB via frankfurter, offline fallback)
-app/api/go           GET tracked affiliate redirect → logs clicks to data/clicks.jsonl
+app/api/go           GET tracked affiliate redirect → logs clicks to Supabase `clicks` (data/clicks.jsonl without it)
 lib/                 API clients, affiliate URL builder, allergens, demo data
 ```
 
@@ -77,7 +77,7 @@ lib/                 API clients, affiliate URL builder, allergens, demo data
 1. Check every URL template in `lib/affiliate.ts` against the partner’s link generator; convert Fliggy links through the 淘宝联盟 API.
 2. Buy an Amap commercial licence and IP-whitelist the server.
 3. Deploy the backend in Hong Kong / Singapore with your own domain (see BRAINSTORM.md §三).
-4. Replace `data/clicks.jsonl` with a database; add privacy policy and analytics.
+4. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY so dishes, events, feedback and clicks are stored (supabase/migrations/).
 5. Wrap as a native app (Capacitor) once the PWA is validated.
 
 ## Not verified in this prototype
