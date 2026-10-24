@@ -11,7 +11,7 @@ export function Photo({ src, alt, shape = "wide", className = "" }: { src?: stri
   const [failed, setFailed] = useState(false);
   if (!src || failed) return null;
   return (
-    <span className={`relative block shrink-0 overflow-hidden bg-line ${shape === "wide" ? "aspect-video rounded-2xl" : "h-12 w-12 rounded-xl"} ${className}`}>
+    <span className={`relative block shrink-0 overflow-hidden bg-line ${shape === "wide" ? "aspect-video rounded-control" : "h-12 w-12 rounded-control"} ${className}`}>
       {/* Remote images from Amap's CDN: plain <img>, not next/image (no remote patterns needed, no proxying). */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={src} alt={alt} loading="lazy" referrerPolicy="no-referrer" onError={() => setFailed(true)} className="h-full w-full object-cover" />

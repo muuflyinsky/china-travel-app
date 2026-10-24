@@ -2,13 +2,13 @@
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Preloader } from "konsta/react";
-import { LocateFixed, Search, TrainFront, Bath, Pill, Landmark, Store, Hospital, CarTaxiFront, ExternalLink, Church, Trees, MoonStar, UtensilsCrossed, ShoppingBag, Star } from "lucide-react";
+import { LocateFixed, Search, X, MapPin, ChevronDown, Sparkles, TrainFront, Bath, Pill, Landmark, Store, Hospital, CarTaxiFront, ExternalLink, Church, Trees, MoonStar, UtensilsCrossed, ShoppingBag, Star } from "lucide-react";
 import { Screen, DemoNote } from "@/components/Shell";
 import { Section, Card, Group, Row, Button, Note } from "@/components/ui";
 import { AppIcon } from "@/components/AppIcon";
 import { ShowCard } from "@/components/ShowCard";
 import { CityPicker } from "@/components/CityPicker";
-import { CityGuide } from "@/components/CityGuide";
+import { CityGuide, type GuideTab } from "@/components/CityGuide";
 import { Photo } from "@/components/Photo";
 import { RoutePanel } from "@/components/RoutePanel";
 import { AwardBadges } from "@/components/AwardBadges";
@@ -43,9 +43,16 @@ const CATEGORIES = [
 ] as const;
 type CategoryKey = (typeof CATEGORIES)[number]["key"];
 
+/** Screens scroll inside Konsta's Page element, not the window. */
+const scrollTop = () => document.querySelector(".k-page")?.scrollTo({ top: 0, behavior: "smooth" });
+
 type Query = { keyword: string; nearby?: boolean; byRating?: boolean; types?: string; cat?: CategoryKey; page: number };
 
-/** Search → categories → city picks → nearby. A chosen place shows metro, bus and taxi routes in the app. */
+/**
+ * Two rows before content (v0.6): a search bar scoped to a city (city button inside it, location
+ * at its end), then one filter row — the city's top picks and must-eat dishes, then live
+ * categories. A chosen place shows metro, bus and taxi routes in the app; Nearby sits at the end.
+ */
 function Explore() {
   const t = useT();
   const params = useSearchParams();
@@ -61,6 +68,7 @@ function Explore() {
   const [busy, setBusy] = useState("");
   const [notice, setNotice] = useState<string>();
   const [card, setCard] = useState<string[] | null>(null);
+  const [guideTab, setGuideTab] = useState<GuideTab>(params.get("tab") === "eat" ? "eat" : "see");
   const moreRef = useRef<HTMLDivElement>(null);
 
   async function locate() {
@@ -121,21 +129,42 @@ function Explore() {
     : p.hotel?.location ? { location: p.hotel.location, label: "hotel" as const } : null;
 
   const searching = places.length > 0 || busy === "search";
-  const tripCities = p.cities.length ? p.cities : [];
+  const tripCities = p.cities.map((c) => ({ n: c.n ?? c.s, s: c.s, a: c.a, e: c.e, p: c.p ?? "", py: "", t: "city" as const }));
   const reset = () => { setPlaces([]); setQ(""); setQuery(null); setMore(false); setNotice(undefined); };
+  const hot = isHotCity(city.a);
+  const showGuide = (tab: GuideTab) => { reset(); setDest(null); setGuideTab(tab); };
 
   const finder = (
     <Section>
-      <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); if (q.trim()) search(q.trim()); }}>
-        <label className="flex h-12 min-w-0 flex-1 items-center gap-2 rounded-2xl border border-line bg-card px-3">
-          <Search className="h-5 w-5 shrink-0 text-muted" aria-hidden />
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t.go.placeholder} aria-label={t.go.destination} className="h-full w-full min-w-0 flex-1 bg-transparent text-body outline-none placeholder:text-muted" />
-        </label>
-        <Button type="submit" className="shrink-0 px-5">{t.go.go}</Button>
-      </form>
-      <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4" role="group" aria-label={t.go.findPlace}>
+      <div className="flex h-control items-center rounded-control border border-line bg-card">
+        {/* The city the search runs in, inside the bar; trip cities are listed first in the picker.
+            Kept outside the <form>: the picker's sheet renders here and its buttons must not submit. */}
+        <CityPicker value={city} trip={tripCities} onChange={(c) => { setCity(c); setHere(null); reset(); setDest(null); }} onLocate={locate}
+          trigger={(open) => (
+            <button type="button" onClick={open} aria-label={`${t.city.searchingIn} ${city.e}. ${t.common.edit}`}
+              className="flex h-full max-w-[42%] shrink-0 items-center gap-1 border-r border-line pr-2 pl-3 text-subhead font-semibold text-cobalt">
+              <MapPin className="h-4 w-4 shrink-0 max-[359px]:hidden" aria-hidden /><span className="truncate">{city.e}</span><ChevronDown className="h-4 w-4 shrink-0" aria-hidden />
+            </button>
+          )} />
+        <form role="search" className="flex h-full min-w-0 flex-1 items-center" onSubmit={(e) => { e.preventDefault(); (document.activeElement as HTMLElement | null)?.blur(); if (q.trim()) search(q.trim()); }}>
+          <Search className="ml-2.5 h-4 w-4 shrink-0 text-muted max-[359px]:hidden" aria-hidden />
+          <input type="search" enterKeyHint="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t.go.placeholderShort} aria-label={t.go.destination}
+            className="h-full min-w-0 flex-1 bg-transparent pl-2 text-body max-[359px]:pl-2.5 outline-none placeholder:text-muted [&::-webkit-search-cancel-button]:hidden" />
+          {q && <button type="button" onClick={reset} aria-label={t.go.clear} className="grid h-full w-9 shrink-0 place-items-center text-muted"><X className="h-4 w-4" aria-hidden /></button>}
+          <button type="button" onClick={locate} disabled={busy === "locating"} aria-label={here ? t.go.updateLocation : t.go.useLocation} className={`grid h-full w-touch shrink-0 place-items-center ${here ? "text-cobalt" : "text-muted"}`}>
+            {busy === "locating" ? <Preloader className="h-4! w-4!" /> : <LocateFixed className="h-5 w-5" aria-hidden />}
+          </button>
+        </form>
+      </div>
+      {/* One filter row: the city's picks (when we have a guide), then live categories. */}
+      <div className="chip-row" role="group" aria-label={t.go.findPlace}>
+        {hot && (["see", "eat"] as const).map((tab) => (
+          <button key={tab} aria-pressed={!query && guideTab === tab} className="pill" onClick={() => showGuide(tab)}>
+            {tab === "see" ? <Sparkles className="h-4 w-4" aria-hidden /> : <UtensilsCrossed className="h-4 w-4" aria-hidden />}{tab === "see" ? t.go.topPicks : t.go.mustEat}
+          </button>
+        ))}
         {CATEGORIES.map(({ key, q: k, types, Icon }) => (
-          <button key={key} aria-pressed={query?.cat === key} className="pill shrink-0 whitespace-nowrap"
+          <button key={key} aria-pressed={query?.cat === key} className="pill"
             onClick={() => (query?.cat === key ? reset() : (setQ(""), run({ keyword: k, types, cat: key, page: 1 })))}>
             <Icon className="h-4 w-4" aria-hidden />{t.go.cats[key]}
           </button>
@@ -149,9 +178,9 @@ function Explore() {
   const nearby = (
     <Section title={t.go.nearby}>
       {/* Nearby: one row of small buttons; needs the traveller's location. */}
-      <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4" role="group" aria-label={t.go.nearby}>
+      <div className="chip-row" role="group" aria-label={t.go.nearby}>
         {NEARBY.map(({ key, q: k, Icon }) => (
-          <button key={k} onClick={() => (here ? (search(k, true), window.scrollTo({ top: 0 })) : (locate(), setNotice(t.go.locateFirst)))} className="pill shrink-0 whitespace-nowrap">
+          <button key={k} onClick={() => (here ? (search(k, true), scrollTop()) : (locate(), setNotice(t.go.locateFirst)))} className="pill">
             <Icon className="h-4 w-4 text-cobalt" aria-hidden />{t.go.nearbyItems[key]}
           </button>
         ))}
@@ -162,24 +191,6 @@ function Explore() {
 
   return (
     <Screen title={t.go.title}>
-      <Section>
-        {/* Trip cities as a switch; any other city through the picker. */}
-        <div className="no-scrollbar -mx-4 flex items-center gap-2 overflow-x-auto px-4" role="group" aria-label={t.city.label}>
-          {tripCities.map((c) => (
-            <button key={c.a} aria-pressed={c.a === city.a} className="pill shrink-0 whitespace-nowrap"
-              onClick={() => { setCity({ n: c.n ?? c.s, s: c.s, a: c.a, e: c.e, p: c.p ?? "", py: "", t: "city" }); setHere(null); reset(); setDest(null); }}>
-              {c.e}
-            </button>
-          ))}
-          {!tripCities.some((c) => c.a === city.a) && <span className="pill shrink-0 whitespace-nowrap" aria-pressed="true">{city.e}</span>}
-          <CityPicker value={city} onChange={(c) => { setCity(c); setHere(null); reset(); setDest(null); }} onLocate={locate}
-            trigger={(open) => <button onClick={open} className="flex min-h-11 shrink-0 items-center px-2 text-subhead font-semibold whitespace-nowrap text-cobalt">{t.go.otherCity}</button>} />
-          <button onClick={locate} disabled={busy === "locating"} aria-label={here ? t.go.updateLocation : t.go.useLocation} className="grid h-11 w-11 shrink-0 place-items-center text-cobalt">
-            {busy === "locating" ? <Preloader className="h-4! w-4!" /> : <LocateFixed className="h-5 w-5" aria-hidden />}
-          </button>
-        </div>
-      </Section>
-
       {dest ? (
         <>
           <Section>
@@ -194,7 +205,7 @@ function Explore() {
                 <Button variant="soft" className="text-subhead!" onClick={() => { setCard(["师傅您好，请带我去：", dest.name, `地址：${dest.address}`]); track("taxi_card_shown", { source: "explore" }); }}>
                   <CarTaxiFront className="h-5 w-5" aria-hidden /> {t.go.showDriver}
                 </Button>
-                <a href={amapNav(dest, "bus", from)} target="_blank" rel="noopener" className="flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-cobalt-soft text-subhead font-semibold text-cobalt">
+                <a href={amapNav(dest, "bus", from)} target="_blank" rel="noopener" className="flex min-h-control items-center justify-center gap-2 rounded-control bg-cobalt-soft text-subhead font-semibold text-cobalt">
                   <AppIcon id="amap" size={22} /> {t.go.start}
                 </a>
               </div>
@@ -219,7 +230,7 @@ function Explore() {
                 <button onClick={reset} className="flex min-h-11 items-center px-1 text-subhead font-semibold text-cobalt">{t.guide.backToPicks}</button>
                 <Group>
                   {places.map((x) => (
-                    <Row key={x.id} onClick={() => { setDest(x); window.scrollTo({ top: 0 }); }}
+                    <Row key={x.id} onClick={() => { setDest(x); scrollTop(); }}
                       icon={x.photo ? <Photo src={x.photo} alt="" shape="square" /> : undefined}
                       title={<span className="zh">{x.name}</span>}
                       sub={<>{x.pinyin}<span className="zh block">{x.address}</span>
@@ -240,11 +251,11 @@ function Explore() {
       ) : (
         <>
           {finder}
-          {isHotCity(city.a) ? (
-            <Section title={fmt(t.guide.title, { city: city.e })}>
-              <CityGuide adcode={city.a} cityEn={city.e} initialTab={params.get("tab") === "eat" ? "eat" : "see"}
-                onFindDish={(zh) => { setQ(zh); search(zh, Boolean(here), true); window.scrollTo({ top: 0 }); }}
-                onPickPlace={(x) => { if (typeof x === "string") { setQ(x); search(x); } else setDest(x); window.scrollTo({ top: 0 }); }} />
+          {hot ? (
+            <Section>
+              <CityGuide adcode={city.a} cityEn={city.e} tab={guideTab}
+                onFindDish={(zh) => { setQ(zh); search(zh, Boolean(here), true); scrollTop(); }}
+                onPickPlace={(x) => { if (typeof x === "string") { setQ(x); search(x); } else setDest(x); scrollTop(); }} />
             </Section>
           ) : (
             <Section>

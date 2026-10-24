@@ -29,6 +29,8 @@ export const de: Dict = {
     switchToInChina: "In China",
   },
   city: {
+    // v0.6
+    trip: "Deine Reise",
     youreIn: "Du bist in",
     searchingIn: "Suche in",
     choose: "{label} wählen",
@@ -44,6 +46,9 @@ export const de: Dict = {
     near: "bei {city}",
   },
   today: {
+    // v0.6
+    quickActions: "Schnellzugriff",
+    essentials: "Wichtig für die Reise",
     chinaApps: "Deine China-Apps",
     amapToHotel: "Amap zum Hotel",
     openDidi: "DiDi öffnen",
@@ -111,6 +116,13 @@ export const de: Dict = {
     stayTrackSub: "Trage dein Einreisedatum ein und erhalte eine Ausreise-Erinnerung",
   },
   stay: {
+    // v0.6
+    emptyTitle: "Noch keine Hotel-Tipps für {city}",
+    emptyBody: "Wir empfehlen nur Hotels, die zuverlässig ausländische Gäste aufnehmen – für diese Stadt haben wir noch keine. Trip.com zeigt alle Hotels und markiert die, die Ausländer aufnehmen.",
+    picksDownTitle: "Hotel-Tipps konnten nicht geladen werden",
+    picksIn: "Hotel-Tipps in {city}",
+    changeCityDates: "Stadt oder Daten ändern",
+    howWePickTitle: "So wählen wir Hotels aus",
     overstayFree: "Du willst am {planned} abreisen, aber dein visumfreier Aufenthalt endet am {legal}. Verlasse China bis zum {legal} oder beantrage vor der Reise ein Visum.",
     overstayVisa: "Du willst am {planned} abreisen, aber dein Visum erlaubt den Aufenthalt bis zum {legal}. Verlasse China bis zum {legal} oder lass den Aufenthalt vorher bei der Ein- und Ausreisebehörde verlängern.",
     transitRules: "240-Stunden-Transit: Du musst in ein Drittland weiterreisen, über einen dafür zugelassenen Grenzübergang ausreisen und in den erlaubten Provinzen bleiben.",
@@ -167,6 +179,19 @@ export const de: Dict = {
     onMap: "{name} auf der Karte",
   },
   eat: {
+    // v0.6
+    checkOn: "Allergie-Check ist an",
+    checkOff: "Allergie-Check ist aus",
+    checkOffBody: "Trag deine Allergien oder Ernährungsweise ein, dann bekommt jedes Gericht eine Einschätzung: OK, erst fragen oder nicht bestellen.",
+    checkScope: "Jedes Gericht auf der Karte wird darauf geprüft – Hauptzutaten, Soßen und Garnituren im üblichen Rezept. Küchen kochen unterschiedlich; zeig bei einer schweren Allergie zusätzlich deine Allergiekarte.",
+    takePhotoBtn: "Foto aufnehmen",
+    choosePhoto: "Foto auswählen",
+    typeInstead: "Gerichte eintippen",
+    photoInstead: "Foto verwenden",
+    checkedFor: "Geprüft auf {list}",
+    notChecked: "Kein Allergie-Check",
+    turnOn: "Einschalten",
+    allergyCardShort: "Allergiekarte",
     verdictOk: "Passt für dich",
     verdictAsk: "Erst fragen",
     verdictNo: "Nicht bestellen",
@@ -249,6 +274,11 @@ export const de: Dict = {
     approx: "≈ {amount}",
   },
   go: {
+    // v0.6
+    placeholderShort: "Ort oder Adresse",
+    clear: "Suche löschen",
+    topPicks: "Top-Tipps",
+    mustEat: "Typische Gerichte",
     cats: { museum: "Museen", temple: "Tempel", park: "Parks", night: "Nachtblick", food: "Essen", shopping: "Shopping" },
     showMore: "Mehr anzeigen",
     photoBy: "Foto: Amap",
@@ -298,6 +328,12 @@ export const de: Dict = {
     metroNote: "Scanne an der U-Bahn-Sperre den „Verkehrscode“ in Alipay oder WeChat. In vielen Großstädten kannst du auch kontaktlos mit Visa oder Mastercard zahlen.",
   },
   talk: {
+    // v0.6
+    listening: "Ich höre zu … sprich jetzt",
+    stop: "Stopp",
+    stopListening: "Zuhören beenden",
+    clear: "Text löschen",
+    micBlocked: "Kein Zugriff aufs Mikrofon. Erlaube ihn in den Einstellungen oder tippe den Text.",
     typeFirst: "Gib zuerst etwas ein oder sprich.",
     title: "Sprechen",
     placeholderMe: "Schreib, was du sagen möchtest…",

@@ -117,17 +117,17 @@ function SightCard({ s, city, cityEn, index }: { s: GuideSight; city: string; ci
         {s.rating !== undefined && <li className="flex gap-1.5"><Star className="mt-0.5 h-3.5 w-3.5 shrink-0 fill-current text-ink" aria-hidden />{s.rating.toFixed(1)}</li>}
       </ul>
       {r && (
-        <button onClick={() => setResv(true)} className="mt-3 flex w-full items-center gap-2 rounded-2xl bg-warn-soft p-3 text-left text-subhead text-warn">
+        <button onClick={() => setResv(true)} className="mt-3 flex w-full items-center gap-2 rounded-card bg-warn-soft p-3 text-left text-subhead text-warn">
           <CalendarClock className="h-5 w-5 shrink-0" aria-hidden /><span className="flex-1">{t.guide.needsBooking}</span><ChevronRight className="h-4 w-4" aria-hidden />
         </button>
       )}
       <a href={goLink("trip", "attraction", { keyword: s.en, city, cityEn }, "explore_sight", `explore-sight-${index + 1}`)} target="_blank" rel="noopener"
-        className="mt-3 flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-cta px-4 text-headline text-cta-ink">
+        className="mt-3 flex min-h-control items-center justify-center gap-2 rounded-control bg-cta px-4 text-headline text-cta-ink">
         <Ticket className="h-5 w-5" aria-hidden />{t.guide.tickets}<ExternalLink className="h-4 w-4" aria-hidden />
       </a>
       <div className="mt-2 grid grid-cols-2 gap-2">
         <Button variant="soft" className="text-subhead!" onClick={() => { setCard(true); track("taxi_card_shown", { source: "guide" }); }}><CarTaxiFront className="h-5 w-5" aria-hidden />{t.guide.taxi}</Button>
-        <a href={amapNav({ location: s.location, name: s.zh }, "bus")} target="_blank" rel="noopener" className="flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-cobalt-soft text-subhead font-semibold text-cobalt"><AppIcon id="amap" size={22} />{t.guide.route}</a>
+        <a href={amapNav({ location: s.location, name: s.zh }, "bus")} target="_blank" rel="noopener" className="flex min-h-control items-center justify-center gap-2 rounded-control bg-cobalt-soft text-subhead font-semibold text-cobalt"><AppIcon id="amap" size={22} />{t.guide.route}</a>
       </div>
       <Feedback city={city} kind="sight" name={s.zh} />
       {card && <ShowCard kind="taxi" lines={["师傅您好，请带我去：", s.zh, `地址：${s.address}`]} sub={s.en} onClose={() => setCard(false)} />}
@@ -158,7 +158,7 @@ function DishCard({ d, city, onFind }: { d: GuideDish; city: string; onFind: (zh
       </div>
       {d.spend && <p className="mt-2 text-footnote text-muted">{fmt(t.guide.spend, { range: `¥${d.spend[0]}–${d.spend[1]}` })}</p>}
       {blocked.length > 0 && (
-        <p className="mt-3 rounded-xl border border-danger px-3 py-2.5 text-subhead font-semibold text-danger" role="note">
+        <p className="mt-3 rounded-control border border-danger px-3 py-2.5 text-subhead font-semibold text-danger" role="note">
           {fmt(t.eat.blockedSevere, { x: blocked.map((a) => (t.allergens[a as keyof typeof t.allergens] ?? a).toLowerCase()).join(", ") })}
         </p>
       )}
@@ -175,13 +175,19 @@ function DishCard({ d, city, onFind }: { d: GuideDish; city: string; onFind: (zh
 }
 
 /** "See" and "Eat" picks for a city: the first one big, the rest as rows that swap into the card. */
-export function CityGuide({ adcode, cityEn, initialTab = "see", onFindDish, onPickPlace }: {
-  adcode: string; cityEn: string; initialTab?: Tab; onFindDish: (zh: string) => void; onPickPlace: (p: Place | string) => void;
+export type GuideTab = Tab;
+
+export function CityGuide({ adcode, cityEn, initialTab = "see", tab: controlled, onFindDish, onPickPlace }: {
+  adcode: string; cityEn: string; initialTab?: Tab;
+  /** Set by a parent that shows its own See/Eat switch (Explore's filter row); hides the built-in one. */
+  tab?: Tab;
+  onFindDish: (zh: string) => void; onPickPlace: (p: Place | string) => void;
 }) {
   const t = useT();
   const [p] = useProfile();
   const { g, state } = useGuide(adcode);
-  const [tab, setTab] = useState<Tab>(initialTab);
+  const [own, setTab] = useState<Tab>(initialTab);
+  const tab = controlled ?? own;
   const [sel, setSel] = useState(0);
   useEffect(() => setSel(0), [tab, adcode]);
 
@@ -192,7 +198,7 @@ export function CityGuide({ adcode, cityEn, initialTab = "see", onFindDish, onPi
 
   return (
     <>
-      <Seg value={tab} onChange={setTab} label={fmt(t.guide.title, { city: cityEn })} options={[{ value: "see", label: t.guide.see }, { value: "eat", label: t.guide.eat }]} />
+      {!controlled && <Seg value={tab} onChange={setTab} label={fmt(t.guide.title, { city: cityEn })} options={[{ value: "see", label: t.guide.see }, { value: "eat", label: t.guide.eat }]} />}
       {items.length === 0 ? (
         // No dishes without the model: Eat then shows just the restaurants below.
         tab === "see" ? <p className="px-1 text-subhead text-muted">{state === "none" ? t.guide.notYet : t.guide.empty}</p> : null
@@ -204,7 +210,7 @@ export function CityGuide({ adcode, cityEn, initialTab = "see", onFindDish, onPi
           <Group>
             {items.map((x, i) => i !== sel && (
               <li key={i}>
-                <button onClick={() => setSel(i)} className="flex min-h-12 w-full items-center gap-3 px-4 py-2 text-left">
+                <button onClick={() => setSel(i)} className="flex min-h-control w-full items-center gap-3 px-4 py-2 text-left">
                   {tab === "see" && (x as GuideSight).photo
                     ? <Photo src={(x as GuideSight).photo} alt="" shape="square" />
                     : <span className="w-5 shrink-0 text-footnote text-muted tabular-nums">{i + 1}</span>}

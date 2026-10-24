@@ -63,7 +63,7 @@ export function ShowCard({ lead, lines, rest = [], sub, explain, replies, kind =
             <button onClick={() => setOpen(!open)} aria-expanded={open} className="flex min-h-11 items-center gap-1 text-subhead font-semibold text-cobalt">
               {t.show.whatItSays}<ChevronDown className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} aria-hidden />
             </button>
-            {open && <p className="rounded-xl bg-porcelain p-3 text-subhead text-muted">{explain}</p>}
+            {open && <p className="rounded-control bg-porcelain p-3 text-subhead text-muted">{explain}</p>}
           </div>
         )}
       </div>
@@ -71,7 +71,7 @@ export function ShowCard({ lead, lines, rest = [], sub, explain, replies, kind =
       {replies && replies.length > 0 && (
         <div className="mt-3 shrink-0 border-t border-line pt-3">
           {answer ? (
-            <button onClick={() => setAnswer(null)} className="block w-full rounded-2xl bg-cobalt-soft p-3 text-left" role="status">
+            <button onClick={() => setAnswer(null)} className="block w-full rounded-card bg-cobalt-soft p-3 text-left" role="status">
               <span className="block text-footnote font-semibold text-cobalt">{t.eat.staffSays}</span>
               <span className="block text-title">{answer.mine}</span>
               <span className="zh block text-subhead text-muted" lang="zh-CN">{answer.zh}</span>
@@ -84,7 +84,7 @@ export function ShowCard({ lead, lines, rest = [], sub, explain, replies, kind =
               <div className="grid grid-cols-2 gap-2">
                 {replies.map((r, i) => (
                   <button key={r.zh} lang="zh-CN" onClick={() => { setAnswer(r); track("staff_reply", { card: kind, reply: i }); }}
-                    className={`zh min-h-12 rounded-2xl border-2 border-line px-3 text-left text-headline ${replies.length % 2 && i === replies.length - 1 ? "col-span-2" : ""}`}>
+                    className={`zh min-h-control rounded-control border-2 border-line px-3 text-left text-headline ${replies.length % 2 && i === replies.length - 1 ? "col-span-2" : ""}`}>
                     {r.zh}
                   </button>
                 ))}

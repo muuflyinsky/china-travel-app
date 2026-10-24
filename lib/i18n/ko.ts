@@ -29,6 +29,8 @@ export const ko: Dict = {
     switchToInChina: "중국에서",
   },
   city: {
+    // v0.6
+    trip: "내 여행",
     youreIn: "현재 위치:",
     searchingIn: "검색 지역:",
     choose: "{label} 선택",
@@ -44,6 +46,9 @@ export const ko: Dict = {
     near: "{city} 근처",
   },
   today: {
+    // v0.6
+    quickActions: "빠른 실행",
+    essentials: "여행 필수 정보",
     chinaApps: "중국에서 쓸 앱",
     amapToHotel: "Amap으로 호텔까지",
     openDidi: "DiDi 열기",
@@ -111,6 +116,13 @@ export const ko: Dict = {
     stayTrackSub: "입국일을 등록하면 출국 기한을 알려 드려요",
   },
   stay: {
+    // v0.6
+    emptyTitle: "{city} 추천 호텔이 아직 없어요",
+    emptyBody: "외국인 투숙객을 확실히 받는 호텔만 추천하는데, 이 도시는 아직 없어요. Trip.com에서는 모든 호텔을 보여 주고 외국인이 묵을 수 있는 곳을 표시해요.",
+    picksDownTitle: "호텔 정보를 불러오지 못했어요",
+    picksIn: "{city} 추천 호텔",
+    changeCityDates: "도시나 날짜 변경",
+    howWePickTitle: "호텔 선정 방법",
     overstayFree: "{planned}에 출국할 계획이지만 무비자 체류는 {legal}까지입니다. {legal}까지 출국하거나 출발 전에 비자를 받으세요.",
     overstayVisa: "{planned}에 출국할 계획이지만 비자로 머물 수 있는 기간은 {legal}까지입니다. {legal}까지 출국하거나 먼저 출입국관리국에서 체류를 연장하세요.",
     transitRules: "240시간 경유: 제3국으로 가야 하고, 지정된 출입국 지점으로 나가야 하며, 허용된 성 안에서만 머물러야 합니다.",
@@ -167,6 +179,19 @@ export const ko: Dict = {
     onMap: "지도에서 {name} 보기",
   },
   eat: {
+    // v0.6
+    checkOn: "알레르기 확인 켜짐",
+    checkOff: "알레르기 확인 꺼짐",
+    checkOffBody: "알레르기나 식단을 추가하면 요리마다 ‘괜찮음’, ‘먼저 물어보기’, ‘주문 금지’로 알려 드려요.",
+    checkScope: "메뉴의 모든 요리를 일반 레시피의 주재료, 소스, 고명까지 확인해요. 식당마다 조리법이 다르니, 심한 알레르기가 있다면 알레르기 카드도 보여 주세요.",
+    takePhotoBtn: "사진 찍기",
+    choosePhoto: "사진 선택",
+    typeInstead: "요리 이름 입력",
+    photoInstead: "사진 사용",
+    checkedFor: "확인 항목: {list}",
+    notChecked: "알레르기 확인 안 함",
+    turnOn: "켜기",
+    allergyCardShort: "알레르기 카드",
     verdictOk: "먹어도 돼요",
     verdictAsk: "먼저 물어보세요",
     verdictNo: "주문하지 마세요",
@@ -249,6 +274,11 @@ export const ko: Dict = {
     approx: "≈ {amount}",
   },
   go: {
+    // v0.6
+    placeholderShort: "장소 또는 주소",
+    clear: "검색어 지우기",
+    topPicks: "추천 명소",
+    mustEat: "꼭 먹어볼 요리",
     cats: { museum: "박물관", temple: "사찰", park: "공원", night: "야경", food: "맛집", shopping: "쇼핑" },
     showMore: "더 보기",
     photoBy: "사진: Amap",
@@ -298,6 +328,12 @@ export const ko: Dict = {
     metroNote: "지하철 개찰구에서는 Alipay나 WeChat의 ‘교통 코드’를 스캔하세요. 대도시 상당수에서는 Visa나 Mastercard 비접촉 결제도 됩니다.",
   },
   talk: {
+    // v0.6
+    listening: "듣는 중… 말씀하세요",
+    stop: "중지",
+    stopListening: "듣기 중지",
+    clear: "텍스트 지우기",
+    micBlocked: "마이크 접근이 꺼져 있어요. 설정에서 허용하거나 직접 입력하세요.",
     typeFirst: "먼저 입력하거나 말해 주세요.",
     title: "대화",
     placeholderMe: "하고 싶은 말을 입력하세요…",

@@ -29,6 +29,8 @@ export const es: Dict = {
     switchToInChina: "En China",
   },
   city: {
+    // v0.6
+    trip: "Tu viaje",
     youreIn: "Estás en",
     searchingIn: "Buscando en",
     choose: "Elige {label}",
@@ -44,6 +46,9 @@ export const es: Dict = {
     near: "cerca de {city}",
   },
   today: {
+    // v0.6
+    quickActions: "Acciones rápidas",
+    essentials: "Lo esencial del viaje",
     chinaApps: "Tus apps chinas",
     amapToHotel: "Amap al hotel",
     openDidi: "Abrir DiDi",
@@ -111,6 +116,13 @@ export const es: Dict = {
     stayTrackSub: "Añade tu fecha de entrada y te recordaremos cuándo salir",
   },
   stay: {
+    // v0.6
+    emptyTitle: "Aún no hay hoteles recomendados en {city}",
+    emptyBody: "Solo recomendamos hoteles que aceptan huéspedes extranjeros sin problemas, y todavía no tenemos ninguno en esta ciudad. Trip.com muestra todos los hoteles y marca los que aceptan extranjeros.",
+    picksDownTitle: "No se han podido cargar los hoteles",
+    picksIn: "Hoteles recomendados en {city}",
+    changeCityDates: "Cambiar ciudad o fechas",
+    howWePickTitle: "Cómo elegimos los hoteles",
     overstayFree: "Piensas salir el {planned}, pero tu estancia sin visado termina el {legal}. Sal de China antes del {legal} o tramita un visado antes de viajar.",
     overstayVisa: "Piensas salir el {planned}, pero tu visado permite quedarte hasta el {legal}. Sal de China antes del {legal} o prorroga la estancia en la oficina de entrada y salida.",
     transitRules: "Tránsito de 240 horas: debes seguir a un tercer país, salir por un puerto designado y no salir de las provincias permitidas.",
@@ -167,6 +179,19 @@ export const es: Dict = {
     onMap: "{name} en el mapa",
   },
   eat: {
+    // v0.6
+    checkOn: "Control de alergias activado",
+    checkOff: "Control de alergias desactivado",
+    checkOffBody: "Añade tus alergias o tu dieta y cada plato tendrá un veredicto: apto, pregunta antes o no lo pidas.",
+    checkScope: "Revisamos cada plato del menú: ingredientes principales, salsas y guarniciones de la receta habitual. Cada cocina es distinta; con una alergia grave, muestra también tu tarjeta de alergias.",
+    takePhotoBtn: "Hacer foto",
+    choosePhoto: "Elegir foto",
+    typeInstead: "Escribir los platos",
+    photoInstead: "Usar una foto",
+    checkedFor: "Revisado para: {list}",
+    notChecked: "Sin control de alergias",
+    turnOn: "Activar",
+    allergyCardShort: "Tarjeta de alergias",
     verdictOk: "Apto para ti",
     verdictAsk: "Pregunta antes",
     verdictNo: "No lo pidas",
@@ -249,6 +274,11 @@ export const es: Dict = {
     approx: "≈ {amount}",
   },
   go: {
+    // v0.6
+    placeholderShort: "Lugar o dirección",
+    clear: "Borrar búsqueda",
+    topPicks: "Imprescindibles",
+    mustEat: "Platos típicos",
     cats: { museum: "Museos", temple: "Templos", park: "Parques", night: "Vistas nocturnas", food: "Comida", shopping: "Compras" },
     showMore: "Ver más",
     photoBy: "Foto: Amap",
@@ -298,6 +328,12 @@ export const es: Dict = {
     metroNote: "En los tornos del metro, escanea el «código de transporte» de Alipay o WeChat. En muchas ciudades grandes también puedes pagar con Visa o Mastercard sin contacto.",
   },
   talk: {
+    // v0.6
+    listening: "Escuchando… habla ahora",
+    stop: "Detener",
+    stopListening: "Dejar de escuchar",
+    clear: "Borrar texto",
+    micBlocked: "El micrófono no tiene permiso. Actívalo en Ajustes o escribe el texto.",
     typeFirst: "Escribe o di algo primero.",
     title: "Hablar",
     placeholderMe: "Escribe lo que quieres decir…",

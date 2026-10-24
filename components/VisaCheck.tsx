@@ -38,10 +38,10 @@ export function CountryPicker({ open, onClose, onPick }: { open: boolean; onClos
           <button onClick={onClose} aria-label={t.common.close} className="grid h-11 w-11 place-items-center rounded-full bg-card"><X className="h-5 w-5" /></button>
         </div>
         <Searchbar value={q} placeholder={t.visa.search} onInput={(e: React.ChangeEvent<HTMLInputElement>) => setQ(e.target.value)} onClear={() => setQ("")} disableButton={false} />
-        <ul className="mx-4 mb-8 flex-1 divide-y divide-line overflow-auto rounded-2xl border border-line bg-card">
+        <ul className="mx-4 mb-8 flex-1 divide-y divide-line overflow-auto rounded-card border border-line bg-card">
           {/* Country names come from the browser's ICU data, so only render them on the client. */}
           {open && list.map(({ c, n }) => (
-            <li key={c}><button onClick={() => { onPick(c); onClose(); setQ(""); }} className="flex min-h-12 w-full items-center px-4 text-left text-body text-ink">{n}</button></li>
+            <li key={c}><button onClick={() => { onPick(c); onClose(); setQ(""); }} className="flex min-h-control w-full items-center px-4 text-left text-body text-ink">{n}</button></li>
           ))}
         </ul>
       </div>

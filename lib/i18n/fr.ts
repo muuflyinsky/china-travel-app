@@ -29,6 +29,8 @@ export const fr: Dict = {
     switchToInChina: "En Chine",
   },
   city: {
+    // v0.6
+    trip: "Votre voyage",
     youreIn: "Vous êtes à",
     searchingIn: "Recherche à",
     choose: "Choisir la {label}",
@@ -44,6 +46,9 @@ export const fr: Dict = {
     near: "près de {city}",
   },
   today: {
+    // v0.6
+    quickActions: "Actions rapides",
+    essentials: "L’essentiel du voyage",
     chinaApps: "Vos apps chinoises",
     amapToHotel: "Amap vers l’hôtel",
     openDidi: "Ouvrir DiDi",
@@ -111,6 +116,13 @@ export const fr: Dict = {
     stayTrackSub: "Ajoutez votre date d’entrée pour un rappel de départ",
   },
   stay: {
+    // v0.6
+    emptyTitle: "Pas encore d’hôtels sélectionnés à {city}",
+    emptyBody: "Nous ne retenons que les hôtels qui acceptent sans souci les clients étrangers, et nous n’en avons pas encore pour cette ville. Trip.com liste tous les hôtels et indique ceux qui acceptent les étrangers.",
+    picksDownTitle: "Les hôtels n’ont pas pu être chargés",
+    picksIn: "Hôtels sélectionnés à {city}",
+    changeCityDates: "Changer de ville ou de dates",
+    howWePickTitle: "Comment nous choisissons les hôtels",
     overstayFree: "Vous prévoyez de partir le {planned}, mais votre séjour sans visa se termine le {legal}. Quittez la Chine au plus tard le {legal}, ou obtenez un visa avant de partir.",
     overstayVisa: "Vous prévoyez de partir le {planned}, mais votre visa vous permet de rester jusqu’au {legal}. Quittez la Chine au plus tard le {legal}, ou faites d’abord prolonger votre séjour au bureau d’entrée-sortie.",
     transitRules: "Transit de 240 heures : vous devez continuer vers un pays tiers, sortir par un point désigné et rester dans les provinces autorisées.",
@@ -167,6 +179,19 @@ export const fr: Dict = {
     onMap: "{name} sur la carte",
   },
   eat: {
+    // v0.6
+    checkOn: "Contrôle des allergies activé",
+    checkOff: "Contrôle des allergies désactivé",
+    checkOffBody: "Ajoutez vos allergies ou votre régime : chaque plat reçoit un verdict — OK, à demander ou à éviter.",
+    checkScope: "Chaque plat du menu est vérifié : ingrédients principaux, sauces et garnitures de la recette habituelle. Les cuisines varient ; en cas d’allergie grave, montrez aussi votre carte d’allergies.",
+    takePhotoBtn: "Prendre une photo",
+    choosePhoto: "Choisir une photo",
+    typeInstead: "Saisir les plats",
+    photoInstead: "Utiliser une photo",
+    checkedFor: "Vérifié pour : {list}",
+    notChecked: "Aucun contrôle des allergies",
+    turnOn: "Activer",
+    allergyCardShort: "Carte d’allergies",
     verdictOk: "OK pour vous",
     verdictAsk: "Demandez d’abord",
     verdictNo: "À éviter",
@@ -249,6 +274,11 @@ export const fr: Dict = {
     approx: "≈ {amount}",
   },
   go: {
+    // v0.6
+    placeholderShort: "Lieu ou adresse",
+    clear: "Effacer la recherche",
+    topPicks: "Incontournables",
+    mustEat: "Plats à goûter",
     cats: { museum: "Musées", temple: "Temples", park: "Parcs", night: "Vues de nuit", food: "Cuisine", shopping: "Shopping" },
     showMore: "Voir plus",
     photoBy: "Photo : Amap",
@@ -298,6 +328,12 @@ export const fr: Dict = {
     metroNote: "Aux portiques du métro, scannez le « code transport » d’Alipay ou de WeChat. Dans beaucoup de grandes villes, une carte Visa ou Mastercard sans contact fonctionne aussi.",
   },
   talk: {
+    // v0.6
+    listening: "À l’écoute… parlez maintenant",
+    stop: "Arrêter",
+    stopListening: "Arrêter l’écoute",
+    clear: "Effacer le texte",
+    micBlocked: "L’accès au micro est désactivé. Autorisez-le dans Réglages, ou tapez le texte.",
     typeFirst: "Tapez ou dites d’abord quelque chose.",
     title: "Parler",
     placeholderMe: "Écrivez ce que vous voulez dire…",

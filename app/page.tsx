@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
   Camera, Search, Siren, Check, CalendarClock, CalendarPlus, Plane, Smartphone, Wallet, Ticket, Lightbulb, BedDouble, CarTaxiFront,
-  Sun, CloudSun, Cloud, CloudRain, CloudLightning, Snowflake, CloudFog, ChevronRight, ChevronDown, LogIn, Receipt, PlaneTakeoff, ListChecks, QrCode, Calculator, Copy,
+  Sun, CloudSun, Cloud, CloudRain, CloudLightning, Snowflake, CloudFog, ChevronRight, ChevronDown, LogIn, Receipt, PlaneTakeoff, ListChecks, QrCode, Calculator, Copy, ShieldCheck,
 } from "lucide-react";
 import { Screen, DemoNote } from "@/components/Shell";
 import { Section, Card, Group, Row, Button, IconTile } from "@/components/ui";
@@ -157,7 +157,7 @@ function Checklist() {
   }
   return (
     <Section title={fmt(t.today.getReady, { done: count, total: PREP.length })}>
-      <ul className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-card">
+      <ul className="divide-y divide-line overflow-hidden rounded-card border border-line bg-card">
         {PREP.map(({ key, Icon, Body }) => {
           const isOpen = open === key, isDone = done.includes(key);
           return (
@@ -203,7 +203,7 @@ function BeforeTrip() {
       <Alarms suggest />
       {/* Not folded (SPEC v0.5 P1.5): knowing which Chinese app to install is the point. */}
       <Section title={t.today.appsTitle}>
-        <div className="rounded-2xl border border-line bg-card px-4"><AppList /></div>
+        <div className="rounded-card border border-line bg-card px-4"><AppList /></div>
         <AppSetupNote />
       </Section>
       <Checklist />
@@ -283,41 +283,68 @@ function CityLine() {
   );
 }
 
-/** One of the four first-screen actions in China. */
-function Tile({ icon, title, sub, onClick, href, primary, apps }: {
-  icon: React.ReactNode; title: string; sub: React.ReactNode; onClick?: () => void; href?: string; primary?: boolean;
+/** Tier 1 — the primary action in China: scan a menu, with the allergy check it will apply. */
+function MenuHero() {
+  const t = useT();
+  const [p] = useProfile();
+  const checks = [
+    ...p.allergens.map((a) => `${t.allergens[a as keyof typeof t.allergens]}${p.severe.includes(a) ? ` (${t.settings.severeShort})` : ""}`),
+    ...p.diets.map((d) => t.diets[d as keyof typeof t.diets]),
+  ];
+  return (
+    <Link href="/menu" className="block rounded-card bg-cobalt p-card text-white dark:text-porcelain">
+      <span className="flex items-center gap-3">
+        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-control bg-white/20"><Camera className="h-6 w-6" aria-hidden /></span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-title">{t.today.tileMenu}</span>
+          <span className="block text-subhead opacity-90">{t.today.tileMenuSub}</span>
+        </span>
+        <ChevronRight className="h-5 w-5 shrink-0 opacity-80" aria-hidden />
+      </span>
+      <span className="mt-3 flex items-start gap-1.5 border-t border-white/20 pt-3 text-footnote opacity-95">
+        <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+        <span className="min-w-0">{checks.length ? <>{t.eat.checkingFor} {checks.join(", ")}</> : t.eat.addRestrictions}</span>
+      </span>
+    </Link>
+  );
+}
+
+/** Tier 2 — a quick action: icon, title, one line of context. */
+function Tile({ icon, title, sub, onClick, href, apps }: {
+  icon: React.ReactNode; title: string; sub: React.ReactNode; onClick?: () => void; href?: string;
   /** Brand icons of the Chinese apps this moment uses — the only colour besides allergy colours. */
   apps?: AppId[];
 }) {
-  const cls = `flex min-h-[132px] flex-col items-start gap-2 rounded-2xl p-4 text-left ${primary ? "bg-cobalt text-white dark:text-porcelain" : "border border-line bg-card"}`;
+  const cls = "flex min-h-[108px] flex-col items-start gap-1.5 rounded-card border border-line bg-card p-3.5 text-left";
   const body = (
     <>
       <span className="flex w-full items-center justify-between">
-        <span className={`grid h-10 w-10 place-items-center rounded-xl ${primary ? "bg-white/20" : "bg-cobalt-soft text-cobalt"}`}>{icon}</span>
-        {apps && <span className="flex -space-x-1.5">{apps.map((a) => <AppIcon key={a} id={a} size={24} />)}</span>}
+        <span className="grid h-9 w-9 place-items-center rounded-[10px] bg-cobalt-soft text-cobalt">{icon}</span>
+        {apps && <span className="flex -space-x-1.5">{apps.map((a) => <AppIcon key={a} id={a} size={22} />)}</span>}
       </span>
       <span className="text-headline">{title}</span>
-      <span className={`line-clamp-2 text-footnote ${primary ? "opacity-90" : "text-muted"}`}>{sub}</span>
+      <span className="line-clamp-2 text-footnote text-muted">{sub}</span>
     </>
   );
   return href ? <Link href={href} className={cls}>{body}</Link> : <button onClick={onClick} className={cls}>{body}</button>;
 }
 
-/** Pay: Alipay's pay code and WeChat, one tap each; the converter is a small link. */
-function PayTile({ onConvert }: { onConvert: () => void }) {
+/** Pay, compressed to one row: Alipay's pay code and WeChat Pay one tap each; the converter is an icon. */
+function PayStrip({ onConvert }: { onConvert: () => void }) {
   const t = useT();
-  const btn = "flex min-h-11 w-full items-center gap-2 rounded-xl border border-line bg-porcelain px-2 text-left text-subhead font-semibold";
+  const btn = "flex min-h-control min-w-0 items-center gap-2 rounded-control border border-line bg-card px-2.5 text-left text-subhead font-semibold";
   const [guide, setGuide] = useState(false);
   return (
-    <div className="flex min-h-[132px] flex-col gap-2 rounded-2xl border border-line bg-card p-3">
-      <span className="px-1 text-headline">{t.today.tilePay}</span>
+    <div className="grid grid-cols-[1fr_1fr_auto] gap-2" role="group" aria-label={t.today.tilePay}>
       <button className={btn} onClick={() => openApp("alipay", PAY_LINKS.alipayPay)} aria-label={t.pay.openAlipay}>
         <AppIcon id="alipay" size={26} /><span className="min-w-0 flex-1 truncate">Alipay</span><QrCode className="h-4 w-4 shrink-0 text-cobalt" aria-hidden />
       </button>
       <button className={btn} onClick={() => setGuide(true)} aria-label={t.pay.openWechat}>
         <AppIcon id="wechat" size={26} /><span className="min-w-0 flex-1 truncate">WeChat</span><QrCode className="h-4 w-4 shrink-0 text-cobalt" aria-hidden />
       </button>
-      <button onClick={onConvert} className="flex min-h-8 items-center gap-1 px-1 text-footnote font-semibold text-cobalt"><Calculator className="h-3.5 w-3.5" aria-hidden />{t.today.priceCheck}</button>
+      <button onClick={onConvert} aria-label={t.today.priceCheck} className="grid min-h-control w-control place-items-center rounded-control border border-line bg-card text-cobalt">
+        <Calculator className="h-5 w-5" aria-hidden />
+      </button>
       {guide && <WechatGuide onClose={() => setGuide(false)} />}
     </div>
   );
@@ -329,16 +356,17 @@ const CHINA_APPS: AppId[] = ["alipay", "wechat", "amap", "didi", "tripcom", "rai
 function ChinaApps() {
   const t = useT();
   return (
-    <Section title={t.today.chinaApps}>
-      <div className="grid grid-cols-6 gap-1">
+    <div className="rounded-card border border-line bg-card px-2 pt-3 pb-1">
+      <p className="px-2 text-footnote font-semibold text-muted">{t.today.chinaApps}</p>
+      <div className="mt-1 grid grid-cols-6 gap-0.5">
         {CHINA_APPS.map((a) => (
-          <button key={a} onClick={() => openApp(a)} className="flex min-h-[72px] flex-col items-center gap-1 rounded-xl py-1">
-            <AppIcon id={a} size={44} />
+          <button key={a} onClick={() => openApp(a)} className="flex min-h-[68px] min-w-0 flex-col items-center justify-center gap-1 rounded-control">
+            <AppIcon id={a} size={40} />
             <span className="w-full truncate text-center text-footnote text-muted">{APPS[a].name.replace("Railway ", "")}</span>
           </button>
         ))}
       </div>
-    </Section>
+    </div>
   );
 }
 
@@ -359,13 +387,13 @@ function DriverApps() {
       {h.location ? <RideButtons to={{ location: h.location, name: h.name }} address={h.address} /> : (
         <>
           <div className="grid grid-cols-2 gap-2">
-            <button onClick={() => openApp("amap")} className="flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-line bg-card text-subhead font-semibold"><AppIcon id="amap" size={24} />Amap</button>
-            <button onClick={() => openApp("didi")} className="flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-line bg-card text-subhead font-semibold"><AppIcon id="didi" size={24} />{t.today.openDidi}</button>
+            <button onClick={() => openApp("amap")} className="flex min-h-control items-center justify-center gap-2 rounded-control border border-line bg-card text-subhead font-semibold"><AppIcon id="amap" size={24} />Amap</button>
+            <button onClick={() => openApp("didi")} className="flex min-h-control items-center justify-center gap-2 rounded-control border border-line bg-card text-subhead font-semibold"><AppIcon id="didi" size={24} />{t.today.openDidi}</button>
           </div>
           <p className="px-1 text-footnote text-muted">{t.today.didiHint}</p>
         </>
       )}
-      <div className="flex items-center gap-2 rounded-2xl bg-porcelain p-3">
+      <div className="flex items-center gap-2 rounded-card bg-porcelain p-3">
         <span className="zh min-w-0 flex-1 text-subhead" lang="zh-CN">{h.address}</span>
         <button onClick={() => { navigator.clipboard?.writeText(h.address).then(() => setCopied(true)).catch(() => {}); }}
           className="flex min-h-11 shrink-0 items-center gap-1 px-2 text-subhead font-semibold text-cobalt">
@@ -377,8 +405,9 @@ function DriverApps() {
 }
 
 /**
- * First screen in China (SPEC v0.5): scan a menu · show the driver · pay · today, as a 2×2
- * grid that fits above the fold, then the stay countdown and emergency help.
+ * First screen in China (v0.6), in three tiers: the primary action (scan a menu, in InChina),
+ * quick actions (driver · today · a one-row pay strip), then travel essentials (stay countdown,
+ * emergency help, the Chinese apps).
  */
 function Moments() {
   const t = useT();
@@ -396,34 +425,38 @@ function Moments() {
 
   return (
     <>
-      <div className="grid grid-cols-2 gap-3">
-        <Tile primary href="/menu" icon={<Camera className="h-5 w-5" aria-hidden />} title={t.today.tileMenu} sub={t.today.tileMenuSub} />
-        <Tile onClick={() => setSheet("driver")} icon={<CarTaxiFront className="h-5 w-5" aria-hidden />} title={t.today.tileDriver} apps={["didi", "amap"]}
-          sub={p.hotel ? <span className="zh">{p.hotel.name}</span> : t.today.tileDriverAdd} />
-        <PayTile onConvert={() => setSheet("pay")} />
-        <Tile onClick={() => (alarms.length ? setSheet("today") : router.push("/explore"))} icon={<CalendarClock className="h-5 w-5" aria-hidden />}
-          title={t.today.tileToday} sub={next ? fmt(t.today.tileTodayAlarm, { name: next.en, when: nextWhen! }) : fmt(t.today.tileTodaySub, { city: city.e })} />
-      </div>
-      <Group>
-        {s ? (
-          <Row onClick={() => setSheet("stay")} icon={<IconTile><CalendarClock className="h-5 w-5" aria-hidden /></IconTile>}
-            title={fmt(t.stay.leaveBy, { date: fmtDay(s.lastDay, p.lang) })}
-            sub={`${fmt(t.stay.dayOf, { day: Math.max(1, s.dayOfStay), total: s.allowed })} · ${s.overdue ? fmt(t.stay.overdue, { n: -daysBetween(s.legal, todayIso()) }) : fmt(t.stay.daysLeft, { n: s.daysLeft })}`}
-            // Only a red badge when it's urgent; otherwise the count sits in the subtitle.
-            after={s.overdue || s.daysLeft <= 3 ? <span className="shrink-0 rounded-full bg-danger-soft px-2.5 py-0.5 text-footnote font-semibold text-danger tabular-nums">{s.overdue ? "!" : s.daysLeft}</span> : undefined} />
-        ) : (
-          <Row href="/settings#entry" icon={<IconTile><CalendarClock className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.stayTrack} sub={t.today.stayTrackSub} />
-        )}
-        <Row href="/sos" icon={<IconTile tone="danger"><Siren className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.help} sub={t.today.helpSub} />
-      </Group>
-      <StayWarning policy={false} />
-      <ChinaApps />
+      <Section title={t.today.quickActions}>
+        <div className="grid grid-cols-2 gap-stack">
+          <Tile onClick={() => setSheet("driver")} icon={<CarTaxiFront className="h-5 w-5" aria-hidden />} title={t.today.tileDriver} apps={["didi", "amap"]}
+            sub={p.hotel ? <span className="zh">{p.hotel.name}</span> : t.today.tileDriverAdd} />
+          <Tile onClick={() => (alarms.length ? setSheet("today") : router.push("/explore"))} icon={<CalendarClock className="h-5 w-5" aria-hidden />}
+            title={t.today.tileToday} sub={next ? fmt(t.today.tileTodayAlarm, { name: next.en, when: nextWhen! }) : fmt(t.today.tileTodaySub, { city: city.e })} />
+        </div>
+        <PayStrip onConvert={() => setSheet("pay")} />
+      </Section>
+
+      <Section title={t.today.essentials}>
+        <StayWarning policy={false} />
+        <Group>
+          {s ? (
+            <Row onClick={() => setSheet("stay")} icon={<IconTile><CalendarClock className="h-5 w-5" aria-hidden /></IconTile>}
+              title={fmt(t.stay.leaveBy, { date: fmtDay(s.lastDay, p.lang) })}
+              sub={`${fmt(t.stay.dayOf, { day: Math.max(1, s.dayOfStay), total: s.allowed })} · ${s.overdue ? fmt(t.stay.overdue, { n: -daysBetween(s.legal, todayIso()) }) : fmt(t.stay.daysLeft, { n: s.daysLeft })}`}
+              // Only a red badge when it's urgent; otherwise the count sits in the subtitle.
+              after={s.overdue || s.daysLeft <= 3 ? <span className="shrink-0 rounded-full bg-danger-soft px-2.5 py-0.5 text-footnote font-semibold text-danger tabular-nums">{s.overdue ? "!" : s.daysLeft}</span> : undefined} />
+          ) : (
+            <Row href="/settings#entry" icon={<IconTile><CalendarClock className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.stayTrack} sub={t.today.stayTrackSub} />
+          )}
+          <Row href="/sos" icon={<IconTile tone="danger"><Siren className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.help} sub={t.today.helpSub} />
+        </Group>
+        <ChinaApps />
+      </Section>
 
       <EditSheet open={sheet === "driver"} title={t.today.tileDriver} onClose={() => setSheet(null)}>
         <HotelCard />
         <DriverApps />
         <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); if (dest.trim()) router.push(`/explore?q=${encodeURIComponent(dest.trim())}`); }}>
-          <label className="flex h-12 min-w-0 flex-1 items-center gap-2 rounded-2xl border border-line bg-card px-3">
+          <label className="flex h-12 min-w-0 flex-1 items-center gap-2 rounded-control border border-line bg-card px-3">
             <Search className="h-5 w-5 shrink-0 text-muted" aria-hidden />
             <input value={dest} onChange={(e) => setDest(e.target.value)} placeholder={t.today.driverElse} aria-label={t.today.driverElse} className="h-full min-w-0 flex-1 bg-transparent text-body outline-none placeholder:text-muted" />
           </label>
@@ -448,11 +481,14 @@ function Moments() {
 /** In China, including arrival day (EntryConfirm only shows until the entry date is set). */
 function InChina() {
   return (
-    <Section>
-      <CityLine />
-      <EntryConfirm />
+    <>
+      <Section>
+        <CityLine />
+        <EntryConfirm />
+        <MenuHero />
+      </Section>
       <Moments />
-    </Section>
+    </>
   );
 }
 

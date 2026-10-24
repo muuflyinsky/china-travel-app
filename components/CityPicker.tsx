@@ -8,9 +8,11 @@ import { fmt } from "@/lib/i18n";
 
 /** Button + full-screen sheet to choose any city or county in mainland China. */
 export function CityPicker({
-  value, onChange, onLocate, label, compact, trigger,
+  value, onChange, onLocate, label, compact, trigger, trip = [],
 }: {
   value: City; onChange: (c: City) => void; onLocate?: () => Promise<unknown>; label?: string; compact?: boolean;
+  /** The traveller's trip cities, listed first so switching between them stays one tap. */
+  trip?: City[];
   /** Custom opener instead of the built-in button (e.g. an "Add a city" row). */
   trigger?: (open: () => void) => React.ReactNode;
 }) {
@@ -37,7 +39,7 @@ export function CityPicker({
         aria-label={`${label}: ${value.e}. ${t.common.edit}`}
         className={compact
           ? "flex min-h-11 items-center gap-1 text-headline text-cobalt"
-          : "flex min-h-14 w-full items-center gap-3 rounded-2xl border border-line bg-card px-4 text-left"}
+          : "flex min-h-14 w-full items-center gap-3 rounded-card border border-line bg-card px-4 text-left"}
       >
         {compact ? (
           <><MapPin className="h-4 w-4" aria-hidden />{value.e}<ChevronDown className="h-4 w-4" aria-hidden /></>
@@ -66,7 +68,7 @@ export function CityPicker({
             onClear={() => setQ("")}
             disableButton={false}
           />
-          <div className="flex-1 overflow-auto pb-8">
+          <div className="flex-1 overflow-auto pb-[calc(32px+env(safe-area-inset-bottom))]">
             {!all.length && <div className="flex justify-center py-8"><Preloader /></div>}
 
             {onLocate && !q && (
@@ -83,14 +85,27 @@ export function CityPicker({
                 />
               </List>
             )}
-            {error && <p className="mx-4 rounded-xl bg-warn-soft p-3 text-subhead text-warn">{error}</p>}
+            {error && <p className="mx-4 rounded-control bg-warn-soft p-3 text-subhead text-warn">{error}</p>}
 
+            {!q && trip.length > 0 && (
+              <>
+                <BlockTitle>{t.city.trip}</BlockTitle>
+                <div className="mx-4 grid grid-cols-2 gap-2">
+                  {trip.map((c) => (
+                    <button key={c.a} onClick={() => pick(c)} aria-pressed={c.a === value.a}
+                      className={`flex min-h-control items-center justify-between rounded-control border px-3 text-left ${c.a === value.a ? "border-cobalt bg-cobalt-soft" : "border-line bg-card"}`}>
+                      <span className="text-subhead font-semibold">{c.e}</span><span className="zh text-footnote text-muted">{c.s}</span>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
             {!q && popular.length > 0 && (
               <>
                 <BlockTitle>{t.city.popular}</BlockTitle>
                 <div className="mx-4 grid grid-cols-2 gap-2">
                   {popular.map((c) => (
-                    <button key={c.a} onClick={() => pick(c)} className="flex min-h-12 items-center justify-between rounded-xl border border-line bg-card px-3 text-left">
+                    <button key={c.a} onClick={() => pick(c)} className="flex min-h-control items-center justify-between rounded-control border border-line bg-card px-3 text-left">
                       <span className="text-subhead font-semibold">{c.e}</span><span className="zh text-footnote text-muted">{c.s}</span>
                     </button>
                   ))}

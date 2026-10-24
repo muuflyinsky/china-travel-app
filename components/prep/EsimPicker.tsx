@@ -20,7 +20,7 @@ export function EsimPicker() {
   return (
     <div className="space-y-3">
       <p className="text-subhead">{t.esim.intro}</p>
-      <div className="rounded-2xl border border-line p-4">
+      <div className="rounded-card border border-line p-4">
         <p className="text-footnote text-muted">{fmt(t.esim.recommended, { name: APPS[top.app].name })}</p>
         <div className="mt-2 flex items-center gap-3">
           <AppIcon id={top.app} size={44} />
@@ -30,7 +30,7 @@ export function EsimPicker() {
           </div>
         </div>
         <a href={goLink("esim", "esim", { provider: top.id }, "today_esim")} target="_blank" rel="noopener"
-          className="mt-3 flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-cta text-headline text-cta-ink">
+          className="mt-3 flex min-h-control items-center justify-center gap-2 rounded-control bg-cta text-headline text-cta-ink">
           {t.esim.seePlans} <ExternalLink className="h-4 w-4" aria-hidden />
         </a>
       </div>

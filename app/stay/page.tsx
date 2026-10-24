@@ -2,9 +2,9 @@
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Preloader } from "konsta/react";
-import { MapPin, Minus, Plus, ExternalLink, Check, TrainFront, Sparkles } from "lucide-react";
+import { MapPin, Minus, Plus, ExternalLink, Check, TrainFront, Sparkles, BedDouble, CalendarDays, Info } from "lucide-react";
 import { Screen, DemoNote } from "@/components/Shell";
-import { Section, Group, Field, Note, Seg } from "@/components/ui";
+import { Section, Group, Field, Note, Seg, Button, Disclosure, EmptyState } from "@/components/ui";
 import { EditSheet } from "@/components/EditSheet";
 import { CityPicker } from "@/components/CityPicker";
 import { FeaturedHotel, HotelRow, useHotelPicks } from "@/components/HotelPicks";
@@ -90,11 +90,16 @@ function Stay() {
   const picks = data?.tiers[shownTier] ?? [];
   const [top, ...rest] = picks;
   const tagBase = `stay-${area ? `a${areaIdx + 1}-` : ""}${shownTier}`;
+  // No picks in any tier (or the picks service is down): one empty state with ways forward,
+  // instead of a price switch that leads nowhere.
+  const empty = error || (data && TIER_IDS.every((id) => !data.tiers[id].length));
+  const otherTrip = profile.cities.filter((x) => x.a !== c.a);
+  const allTrip = goLink("trip", "hotel_list", link, "stay_all", "stay-all");
 
   return (
     <Screen title={t.stay.title}>
       <Section>
-        <button onClick={() => setEdit(true)} className="flex min-h-14 w-full items-center gap-3 rounded-2xl border border-line bg-card px-4 py-2 text-left">
+        <button onClick={() => setEdit(true)} className="flex min-h-14 w-full items-center gap-3 rounded-card border border-line bg-card px-4 py-2 text-left">
           <MapPin className="h-5 w-5 shrink-0 text-cobalt" aria-hidden />
           <span className="min-w-0 flex-1">
             <span className="block text-headline">{c.e} <span className="zh font-normal text-muted">{c.s}</span></span>
@@ -127,28 +132,46 @@ function Stay() {
         </Section>
       )}
 
-      <Section>
-        <Seg value={tier} onChange={setTier} label={t.stay.priceRange} options={TIER_IDS.map((id) => ({ value: id, label: t.stay.tiers[id] }))} />
-        <p className="px-1 text-footnote text-muted tabular-nums">{fmt(t.stay.perNight, { price: range })}</p>
-        <DemoNote show={data?.demo} what={t.common.mapKey} />
-        {!data && !error && <div className="flex justify-center py-8"><Preloader /></div>}
-        {error && <Note tone="warn">{t.stay.picksDown}</Note>}
-        {data && shownTier !== tier && <Note>{fmt(t.stay.tierFallback, { tier: t.stay.tiers[tier], other: t.stay.tiers[shownTier] })}</Note>}
-        {data && !top && <p className="px-1 text-subhead text-muted">{t.stay.noneTier}</p>}
-        {top && <FeaturedHotel h={top} label={fmt(t.stay.pick, { tier: t.stay.tiers[shownTier] })} link={link} tag={`${tagBase}-1`} />}
-        {rest.length > 0 && <Group>{rest.map((h, i) => <HotelRow key={h.id} h={h} link={link} tag={`${tagBase}-${i + 2}`} />)}</Group>}
-      </Section>
+      {empty ? (
+        <Section>
+          <EmptyState icon={<BedDouble className="h-6 w-6" aria-hidden />}
+            title={error ? t.stay.picksDownTitle : fmt(t.stay.emptyTitle, { city: c.e })}
+            body={error ? t.stay.picksDown : t.stay.emptyBody}>
+            <a href={goLink("trip", "hotel_list", link, "stay_empty", "stay-empty")} target="_blank" rel="noopener"
+              className="flex min-h-control w-full items-center justify-center gap-2 rounded-control bg-cta px-4 text-center text-headline text-cta-ink">
+              {fmt(t.stay.allTrip, { city: c.e })}<ExternalLink className="h-4 w-4 shrink-0" aria-hidden />
+            </a>
+            {otherTrip.map((x) => (
+              <Button key={x.a} variant="outline" className="w-full text-subhead!" onClick={() => setCity({ a: x.a, e: x.e, s: x.s })}>
+                <BedDouble className="h-4 w-4 text-cobalt" aria-hidden />{fmt(t.stay.picksIn, { city: x.e })}
+              </Button>
+            ))}
+            <Button variant="ghost" className="w-full text-subhead!" onClick={() => setEdit(true)}><CalendarDays className="h-4 w-4" aria-hidden />{t.stay.changeCityDates}</Button>
+          </EmptyState>
+          <DemoNote show={data?.demo} what={t.common.mapKey} />
+        </Section>
+      ) : (
+        <Section>
+          <Seg value={tier} onChange={setTier} label={t.stay.priceRange} options={TIER_IDS.map((id) => ({ value: id, label: t.stay.tiers[id] }))} />
+          <p className="px-1 text-footnote text-muted tabular-nums">{fmt(t.stay.perNight, { price: range })}</p>
+          <DemoNote show={data?.demo} what={t.common.mapKey} />
+          {!data && <div className="flex justify-center py-8"><Preloader /></div>}
+          {data && shownTier !== tier && <Note>{fmt(t.stay.tierFallback, { tier: t.stay.tiers[tier], other: t.stay.tiers[shownTier] })}</Note>}
+          {top && <FeaturedHotel h={top} label={fmt(t.stay.pick, { tier: t.stay.tiers[shownTier] })} link={link} tag={`${tagBase}-1`} />}
+          {rest.length > 0 && <Group>{rest.map((h, i) => <HotelRow key={h.id} h={h} link={link} tag={`${tagBase}-${i + 2}`} />)}</Group>}
+          <a href={allTrip} target="_blank" rel="noopener" className="flex min-h-touch items-center gap-1 px-1 text-subhead font-semibold text-cobalt">
+            {fmt(t.stay.allTrip, { city: c.e })} <ExternalLink className="h-4 w-4" aria-hidden />
+          </a>
+        </Section>
+      )}
 
+      {/* Kept visible: the check-in rule and the commission disclosure. The method is one tap away. */}
       <Section>
-        <a href={goLink("trip", "hotel_list", link, "stay_all", "stay-all")} target="_blank" rel="noopener" className="flex min-h-11 items-center gap-1 px-1 text-subhead font-semibold text-cobalt">
-          {fmt(t.stay.allTrip, { city: c.e })} <ExternalLink className="h-4 w-4" aria-hidden />
-        </a>
-        <p className="px-1 text-footnote text-muted">
-          {t.stay.howWePick}
-          {data && !data.demo && <> {fmt(t.stay.updated, { date: fmtDay(data.generatedAt.slice(0, 10)) })}</>}
-        </p>
-        <p className="px-1 text-footnote text-muted">{t.common.commission}</p>
         <Note>{t.stay.passportNote}</Note>
+        <Disclosure title={t.stay.howWePickTitle} icon={<Info className="h-4 w-4 shrink-0 text-cobalt" aria-hidden />}>
+          <p>{t.stay.howWePick}{data && !data.demo && <> {fmt(t.stay.updated, { date: fmtDay(data.generatedAt.slice(0, 10)) })}</>}</p>
+        </Disclosure>
+        <p className="px-1 text-footnote text-muted">{t.common.commission}</p>
       </Section>
 
       <EditSheet open={edit} title={t.stay.trip} onClose={() => setEdit(false)}>

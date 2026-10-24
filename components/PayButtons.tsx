@@ -37,10 +37,10 @@ export function WechatGuide({ onClose }: { onClose: () => void }) {
         </div>
         <ol className="mt-4 space-y-3">
           {steps.map((s) => (
-            <li key={s.n} className="flex items-center gap-3 rounded-2xl border border-line p-3">
+            <li key={s.n} className="flex items-center gap-3 rounded-card border border-line p-3">
               <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-cobalt-soft text-subhead font-semibold text-cobalt">{s.n}</span>
               <span className="flex-1 text-body">{s.text}</span>
-              <span className="grid h-12 min-w-12 shrink-0 place-items-center rounded-xl bg-porcelain px-2 text-ink">{s.art}</span>
+              <span className="grid h-12 min-w-12 shrink-0 place-items-center rounded-control bg-porcelain px-2 text-ink">{s.art}</span>
             </li>
           ))}
         </ol>
@@ -54,7 +54,7 @@ export function WechatGuide({ onClose }: { onClose: () => void }) {
 export function PayButtons({ compact }: { compact?: boolean }) {
   const t = useT();
   const [guide, setGuide] = useState(false);
-  const btn = "flex min-h-14 w-full flex-1 items-center gap-3 rounded-2xl border border-line bg-card px-3 text-left";
+  const btn = "flex min-h-14 w-full flex-1 items-center gap-3 rounded-card border border-line bg-card px-3 text-left";
   return (
     <div className="space-y-2">
       <div className={compact ? "grid grid-cols-2 gap-2" : "space-y-2"}>

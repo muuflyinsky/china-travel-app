@@ -29,6 +29,8 @@ export const ja: Dict = {
     switchToInChina: "中国滞在中",
   },
   city: {
+    // v0.6
+    trip: "旅行の都市",
     youreIn: "現在地：",
     searchingIn: "検索エリア：",
     choose: "{label}を選択",
@@ -44,6 +46,9 @@ export const ja: Dict = {
     near: "{city}近郊",
   },
   today: {
+    // v0.6
+    quickActions: "クイック操作",
+    essentials: "旅の基本",
     chinaApps: "中国で使うアプリ",
     amapToHotel: "Amapでホテルへ",
     openDidi: "DiDiを開く",
@@ -111,6 +116,13 @@ export const ja: Dict = {
     stayTrackSub: "入国日を登録すると出国期限をお知らせします",
   },
   stay: {
+    // v0.6
+    emptyTitle: "{city}のおすすめホテルはまだありません",
+    emptyBody: "外国人を確実に受け入れているホテルだけを選んでいますが、この都市にはまだありません。Trip.comではすべてのホテルを表示し、外国人が泊まれるホテルに印が付いています。",
+    picksDownTitle: "ホテル情報を読み込めませんでした",
+    picksIn: "{city}のおすすめホテル",
+    changeCityDates: "都市や日程を変更",
+    howWePickTitle: "ホテルの選び方",
     overstayFree: "{planned}に出国する予定ですが、ビザなし滞在は{legal}までです。{legal}までに出国するか、出発前にビザを取得してください。",
     overstayVisa: "{planned}に出国する予定ですが、ビザで滞在できるのは{legal}までです。{legal}までに出国するか、先に出入国管理局で滞在延長を申請してください。",
     transitRules: "240時間トランジット：第三国へ向かうこと、指定の出入国地点から出国すること、許可された省内に滞在することが必要です。",
@@ -167,6 +179,19 @@ export const ja: Dict = {
     onMap: "{name}を地図で見る",
   },
   eat: {
+    // v0.6
+    checkOn: "アレルギーチェック：オン",
+    checkOff: "アレルギーチェック：オフ",
+    checkOffBody: "アレルギーや食事制限を登録すると、料理ごとに「OK」「確認が必要」「注文しない」を表示します。",
+    checkScope: "メニューの全料理について、一般的なレシピの主材料・ソース・付け合わせを確認します。店によって作り方は違うため、重いアレルギーがある場合はアレルギーカードも見せてください。",
+    takePhotoBtn: "写真を撮る",
+    choosePhoto: "写真を選ぶ",
+    typeInstead: "料理名を入力",
+    photoInstead: "写真を使う",
+    checkedFor: "チェック対象：{list}",
+    notChecked: "アレルギーチェックなし",
+    turnOn: "オンにする",
+    allergyCardShort: "アレルギーカード",
     verdictOk: "食べられます",
     verdictAsk: "確認してから",
     verdictNo: "注文しない",
@@ -249,6 +274,11 @@ export const ja: Dict = {
     approx: "≈ {amount}",
   },
   go: {
+    // v0.6
+    placeholderShort: "場所・住所",
+    clear: "検索をクリア",
+    topPicks: "おすすめ",
+    mustEat: "名物料理",
     cats: { museum: "博物館", temple: "寺院", park: "公園", night: "夜景", food: "グルメ", shopping: "ショッピング" },
     showMore: "もっと見る",
     photoBy: "写真：Amap",
@@ -298,6 +328,12 @@ export const ja: Dict = {
     metroNote: "地下鉄の改札ではAlipayかWeChatの「乗車コード」をかざします。多くの大都市ではVisaやMastercardのタッチ決済も使えます。",
   },
   talk: {
+    // v0.6
+    listening: "聞き取り中… 話してください",
+    stop: "停止",
+    stopListening: "聞き取りを停止",
+    clear: "テキストを消去",
+    micBlocked: "マイクへのアクセスがオフです。設定で許可するか、入力してください。",
     typeFirst: "先に入力するか話してください。",
     title: "会話",
     placeholderMe: "伝えたいことを入力…",

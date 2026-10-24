@@ -65,10 +65,10 @@ export function FeaturedHotel({ h, label, link, tag }: { h: HotelPick; label: st
       <p className="text-footnote text-muted">{t.stay.priceRef}</p>
       <div className="mt-3 flex gap-2">
         <a href={goLink("trip", "hotel_search", { ...link, keyword: h.name }, "stay_pick", tag)} target="_blank" rel="noopener" onClick={() => track("hotel_pick_click", { tag })}
-          className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-2xl bg-cta px-4 text-headline text-cta-ink">
+          className="flex min-h-control flex-1 items-center justify-center gap-2 rounded-control bg-cta px-4 text-headline text-cta-ink">
           {t.stay.checkTrip} <ExternalLink className="h-4 w-4" aria-hidden />
         </a>
-        <a href={amapNav(h, "car")} target="_blank" rel="noopener" aria-label={fmt(t.stay.onMap, { name: h.name })} className="grid min-h-12 w-12 place-items-center rounded-2xl bg-cobalt-soft"><AppIcon id="amap" size={24} /></a>
+        <a href={amapNav(h, "car")} target="_blank" rel="noopener" aria-label={fmt(t.stay.onMap, { name: h.name })} className="grid min-h-control w-12 place-items-center rounded-control bg-cobalt-soft"><AppIcon id="amap" size={24} /></a>
       </div>
     </Card>
   );

@@ -49,7 +49,7 @@ export function ReservationSheet({ r, open, onClose }: { r: Reservation; open: b
         <Field label={t.resv.visitDate}><input type="date" value={visit} min={todayIso()} onChange={(e) => { setVisit(e.target.value); setSaved(false); }} /></Field>
       </Group>
       {at ? (
-        <div className="rounded-2xl border border-line bg-card p-4">
+        <div className="rounded-card border border-line bg-card p-4">
           <p className="text-footnote text-muted">{fmt(t.resv.forDate, { date: visitLabel })}</p>
           <p className="text-title">{r.release?.time ? local(at) : at.toLocaleDateString(p.lang, { weekday: "short", day: "numeric", month: "short" })}</p>
           <p className="text-footnote text-muted">
@@ -63,7 +63,7 @@ export function ReservationSheet({ r, open, onClose }: { r: Reservation; open: b
         <p className="px-1 text-subhead">{t.resv.noFixed}</p>
       )}
       {r.noShow && (
-        <p className="flex gap-2 rounded-2xl bg-warn-soft p-3 text-subhead text-warn">
+        <p className="flex gap-2 rounded-card bg-warn-soft p-3 text-subhead text-warn">
           <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
           {r.noShow.count > 1 ? fmt(t.resv.noShow, { count: r.noShow.count, days: r.noShow.windowDays ?? 0, ban: r.noShow.banDays }) : fmt(t.resv.noShow1, { ban: r.noShow.banDays })}
         </p>

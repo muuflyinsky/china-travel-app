@@ -65,10 +65,10 @@ export function RoutePanel({ dest, origin }: { dest: Place; origin: { location: 
     <>
       <p className="px-1 text-footnote text-muted">{origin.label === "here" ? t.go.fromHere : t.go.fromHotel}</p>
       {r.transit.length === 0 ? <p className="px-1 text-subhead text-muted">{t.go.transitNone}</p> : (
-        <ul className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-card">
+        <ul className="divide-y divide-line overflow-hidden rounded-card border border-line bg-card">
           {r.transit.map((plan, i) => (
             <li key={i}>
-              <button onClick={() => setOpen(i)} aria-expanded={open === i} className="flex min-h-12 w-full items-center gap-3 px-4 py-2.5 text-left">
+              <button onClick={() => setOpen(i)} aria-expanded={open === i} className="flex min-h-control w-full items-center gap-3 px-4 py-2.5 text-left">
                 <span className="text-headline tabular-nums">{fmt(t.go.min, { n: plan.minutes })}</span>
                 <span className="min-w-0 flex-1 truncate text-footnote text-muted">
                   {plan.steps.filter((s) => s.kind !== "walk").map((s) => lineName(t, s as Exclude<RouteStep, { kind: "walk" }>)).join(" → ")}

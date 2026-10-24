@@ -12,7 +12,7 @@ export function EditSheet({ open, title, onClose, children }: { open: boolean; t
           <h2 className="text-title text-ink">{title}</h2>
           <button onClick={onClose} className="flex min-h-11 items-center px-2 text-headline text-cobalt">{t.common.done}</button>
         </div>
-        <div className="flex-1 space-y-3 overflow-auto px-4 pb-10">{open && children}</div>
+        <div className="flex-1 space-y-stack overflow-auto px-4 pb-[calc(40px+env(safe-area-inset-bottom))]">{open && children}</div>
       </div>
     </Popup>
   );

@@ -46,6 +46,22 @@
   --text-footnote--line-height: 18px;
 
   --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "PingFang SC", "Noto Sans SC", sans-serif;
+
+  /* Shape, spacing and elevation tokens (v0.6). Components use these names, not raw values:
+     rounded-card (cards, groups, tiles) · rounded-control (buttons, inputs, chips inside cards) ·
+     mt-section between sections · gap-stack inside one · p-card inside cards ·
+     min-h-control (48, main buttons) / min-h-touch (44, every other tappable thing) ·
+     shadow-float for anything floating above the tab bar. */
+  --radius-card: 16px;
+  --radius-control: 12px;
+  --spacing-section: 24px;
+  --spacing-stack: 12px;
+  --spacing-card: 16px;
+  --spacing-gutter: 16px;
+  --spacing-control: 48px;
+  --spacing-touch: 44px;
+  --shadow-float: 0 6px 20px rgb(26 31 46 / 0.18);
+  --shadow-bar: 0 8px 24px rgb(26 31 46 / 0.12);
 }
 
 :root {
@@ -108,9 +124,19 @@ body { -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transpa
   .app-column { border-inline: 1px solid var(--line); }
   body { background: color-mix(in srgb, var(--porcelain) 92%, var(--ink)); }
 }
-.content { padding-bottom: calc(112px + env(safe-area-inset-bottom)); }
+/* The floating tab bar is a 64px pill with 16px below it, above the home indicator.
+   Everything that must stay clear of it reads --tabbar-h. */
+:root { --tabbar-h: calc(80px + env(safe-area-inset-bottom)); }
+.content { padding-bottom: calc(var(--tabbar-h) + 32px); }
 .tabbar-fixed { position: fixed !important; bottom: 0; left: 50% !important; transform: translateX(-50%); width: 100% !important; max-width: 600px; }
-.sticky-bottom { position: fixed; bottom: calc(92px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: 100%; max-width: 600px; padding: 0 16px 8px; z-index: 10; }
+.sticky-bottom { position: fixed; bottom: calc(var(--tabbar-h) + 4px); left: 50%; transform: translateX(-50%); width: 100%; max-width: 600px; padding: 0 16px 8px; z-index: 10; }
+/* Room at the end of a list so a .sticky-bottom bar never covers the last item. */
+.sticky-spacer { height: 72px; }
+/* Top-level screens: the status bar area stays opaque while content scrolls under it. */
+.status-scrim { position: fixed; top: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 600px; height: env(safe-area-inset-top); z-index: 30; background: color-mix(in srgb, var(--porcelain) 88%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); pointer-events: none; }
+/* Horizontal chip rows scroll; the fade at the edge says there is more. */
+.chip-row { display: flex; gap: 8px; overflow-x: auto; margin-inline: calc(-1 * var(--spacing-gutter)); padding-inline: var(--spacing-gutter); scrollbar-width: none; mask-image: linear-gradient(to right, transparent 0, #000 12px, #000 calc(100% - 28px), transparent 100%); }
+.chip-row::-webkit-scrollbar { display: none; }
 
 /* Status chips: compact labels, not controls */
 .tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font-size: var(--text-footnote); font-weight: 600; line-height: var(--text-footnote--line-height); background: var(--porcelain); color: var(--ink); border: 1px solid var(--line); }
@@ -122,6 +148,7 @@ body { -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transpa
 .pill { min-height: 44px; padding: 0 16px; border-radius: 999px; font-size: var(--text-subhead); font-weight: 600; border: 1px solid var(--line); background: var(--card); color: var(--ink); display: inline-flex; align-items: center; gap: 6px; }
 .pill[aria-pressed="true"] { background: var(--cobalt); border-color: var(--cobalt); color: #fff; }
 .dark .pill[aria-pressed="true"] { color: #12141c; }
+.pill { flex-shrink: 0; white-space: nowrap; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }

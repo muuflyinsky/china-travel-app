@@ -18,13 +18,13 @@ export function RideButtons({ to, address }: { to: { location: string; name: str
   const [copied, setCopied] = useState(false);
   const amap = (
     <a key="amap" href={amapNav(to, "car")} target="_blank" rel="noopener" onClick={() => track("app_open", { app: "amap", source: "ride" })}
-      className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-2xl border border-line bg-card px-3 text-subhead font-semibold">
+      className="flex min-h-control flex-1 items-center justify-center gap-2 rounded-control border border-line bg-card px-3 text-subhead font-semibold">
       <AppIcon id="amap" size={24} />{t.go.rideAmap}
     </a>
   );
   const didi = (
     <button key="didi" onClick={() => { navigator.clipboard?.writeText(`${to.name} ${address}`).then(() => setCopied(true)).catch(() => {}); openApp("didi"); }}
-      className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-2xl border border-line bg-card px-3 text-subhead font-semibold">
+      className="flex min-h-control flex-1 items-center justify-center gap-2 rounded-control border border-line bg-card px-3 text-subhead font-semibold">
       <AppIcon id="didi" size={24} />{t.go.rideDidi}
     </button>
   );

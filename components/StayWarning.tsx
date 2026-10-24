@@ -30,7 +30,7 @@ export function StayWarning({ transit = true, policy = true }: { transit?: boole
   return (
     <div className="space-y-2" role="alert">
       {notes.map((n) => (
-        <p key={n.text} className={`flex gap-2 rounded-xl p-3 text-subhead ${n.strong ? "bg-danger-soft font-semibold text-danger" : "bg-warn-soft text-warn"}`}>
+        <p key={n.text} className={`flex gap-2 rounded-control p-3 text-subhead ${n.strong ? "bg-danger-soft font-semibold text-danger" : "bg-warn-soft text-warn"}`}>
           <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />{n.text}
         </p>
       ))}

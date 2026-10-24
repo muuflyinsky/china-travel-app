@@ -29,6 +29,8 @@ export const en = {
     switchToInChina: "In China",
   },
   city: {
+    // v0.6
+    trip: "Your trip",
     youreIn: "You’re in",
     searchingIn: "Searching in",
     choose: "Choose {label}",
@@ -44,6 +46,9 @@ export const en = {
     near: "near {city}",
   },
   today: {
+    // v0.6
+    quickActions: "Quick actions",
+    essentials: "Travel essentials",
     chinaApps: "Your China apps",
     amapToHotel: "Amap to hotel",
     openDidi: "Open DiDi",
@@ -113,6 +118,13 @@ export const en = {
     stayTrackSub: "Add your entry date to get a leave-by reminder",
   },
   stay: {
+    // v0.6
+    emptyTitle: "No hotel picks for {city} yet",
+    emptyBody: "We only pick hotels that reliably take foreign guests, and we don’t have any for this city yet. Trip.com lists every hotel and marks the ones that accept foreigners.",
+    picksDownTitle: "Hotel picks didn’t load",
+    picksIn: "Hotel picks in {city}",
+    changeCityDates: "Change city or dates",
+    howWePickTitle: "How we pick hotels",
     overstayFree: "You plan to leave on {planned}, but your visa-free stay ends on {legal}. Leave China by {legal}, or get a visa before you travel.",
     overstayVisa: "You plan to leave on {planned}, but your visa allows you to stay until {legal}. Leave China by {legal}, or extend your stay at the exit-entry bureau first.",
     transitRules: "240-hour transit: you must fly on to a third country, leave from a designated port, and stay within the permitted provinces.",
@@ -170,6 +182,19 @@ export const en = {
     onMap: "{name} on the map",
   },
   eat: {
+    // v0.6
+    checkOn: "Allergy check is on",
+    checkOff: "Allergy check is off",
+    checkOffBody: "Add your allergies or diet and every dish gets a verdict: OK, ask first, or don’t order.",
+    checkScope: "Every dish on the menu is checked for these — main ingredients, sauces and garnishes in the usual recipe. Kitchens vary, so with a severe allergy show your allergy card too.",
+    takePhotoBtn: "Take photo",
+    choosePhoto: "Choose photo",
+    typeInstead: "Type dish names",
+    photoInstead: "Use a photo",
+    checkedFor: "Checked for {list}",
+    notChecked: "No allergy check",
+    turnOn: "Turn on",
+    allergyCardShort: "Allergy card",
     verdictOk: "OK for you",
     verdictAsk: "Ask first",
     verdictNo: "Don’t order",
@@ -252,6 +277,11 @@ export const en = {
     approx: "≈ {amount}",
   },
   go: {
+    // v0.6
+    placeholderShort: "Place or address",
+    clear: "Clear search",
+    topPicks: "Top picks",
+    mustEat: "Must-try dishes",
     cats: { museum: "Museums", temple: "Temples", park: "Parks", night: "Night views", food: "Food", shopping: "Shopping" },
     showMore: "Show more",
     photoBy: "Photo: Amap",
@@ -301,6 +331,12 @@ export const en = {
     metroNote: "At the metro gate, scan the Alipay or WeChat “Transport code”. In many big cities you can also tap a Visa or Mastercard.",
   },
   talk: {
+    // v0.6
+    listening: "Listening… speak now",
+    stop: "Stop",
+    stopListening: "Stop listening",
+    clear: "Clear text",
+    micBlocked: "Microphone access is off. Allow it in Settings, or type instead.",
     typeFirst: "Type or say something first.",
     title: "Talk",
     placeholderMe: "Type what you want to say…",

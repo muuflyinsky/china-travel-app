@@ -31,7 +31,7 @@ function ChoiceList<T extends string>({ items, value, onPick }: { items: { value
     <Group>
       {items.map((i) => (
         <li key={i.value}>
-          <button onClick={() => onPick(i.value)} aria-pressed={i.value === value} className="flex min-h-12 w-full items-center px-4 text-left text-body">
+          <button onClick={() => onPick(i.value)} aria-pressed={i.value === value} className="flex min-h-control w-full items-center px-4 text-left text-body">
             <span className="flex-1">{i.label}</span>
             {i.value === value && <Check className="h-5 w-5 text-cobalt" aria-hidden />}
           </button>
@@ -112,7 +112,7 @@ export default function SettingsPage() {
       <Section>
         <Group>
           <li>
-            <button onClick={clearAll} className="flex min-h-12 w-full items-center justify-center gap-2 px-4 text-body text-danger">
+            <button onClick={clearAll} className="flex min-h-control w-full items-center justify-center gap-2 px-4 text-body text-danger">
               <Trash2 className="h-5 w-5" aria-hidden />{t.settings.clear}
             </button>
           </li>
@@ -167,7 +167,7 @@ export default function SettingsPage() {
             const patch = (x: Partial<TripCity>) => set({ cities: p.cities.map((y) => (y.a === c.a ? { ...y, ...x } : y)) });
             return (
               <li key={c.a} className="py-1 pl-4">
-                <div className="flex min-h-12 items-center gap-2">
+                <div className="flex min-h-control items-center gap-2">
                   <span className="flex-1 text-body">{c.e} <span className="zh text-muted">{c.s}</span></span>
                   <button onClick={() => set({ cities: p.cities.filter((x) => x.a !== c.a) })} aria-label={`${t.common.close}: ${c.e}`} className="grid h-11 w-11 place-items-center text-muted"><X className="h-5 w-5" /></button>
                 </div>
@@ -186,7 +186,7 @@ export default function SettingsPage() {
             <CityPicker value={DEFAULT_CITY} label={t.settings.addCity}
               onChange={(c) => { if (!p.cities.some((x) => x.a === c.a)) set({ cities: [...p.cities, { a: c.a, e: c.e, s: c.s, n: c.n, p: c.p }] }); }}
               trigger={(open) => (
-                <button onClick={open} className="flex min-h-12 w-full items-center gap-2 px-4 text-body text-cobalt"><Plus className="h-5 w-5" aria-hidden />{t.settings.addCity}</button>
+                <button onClick={open} className="flex min-h-control w-full items-center gap-2 px-4 text-body text-cobalt"><Plus className="h-5 w-5" aria-hidden />{t.settings.addCity}</button>
               )} />
           </li>
         </Group>
