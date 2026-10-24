@@ -107,8 +107,11 @@ type ChatReply = { choices?: { message?: { content?: unknown }; finish_reason?: 
 /** POST to the first endpoint that accepts the key; upstream errors carry status and body for the logs. */
 async function post(body: object): Promise<ChatReply> {
   const urls = config.ai.baseUrls;
+  // What each endpoint answered, so the final error says why every region failed, not just the last.
+  const tried: string[] = [];
   for (let i = 0; ; i++) {
     const at = (region + i) % urls.length;
+    const host = new URL(urls[at]).host;
     let res: Response;
     try {
       res = await fetch(`${urls[at]}/chat/completions`, {
@@ -118,15 +121,17 @@ async function post(body: object): Promise<ChatReply> {
         signal: AbortSignal.timeout(110_000),
       });
     } catch (e) {
+      tried.push(`${host}: unreachable (${(e as Error).message})`);
       // Connection failed (DNS, reset, region unreachable): the other region may still work.
       if (i < urls.length - 1 && (e as Error).name !== "TimeoutError") continue;
-      throw new Error(`AI unreachable at ${new URL(urls[at]).host}: ${(e as Error).message}`);
+      throw new Error(`AI unreachable · ${tried.join(" · ")}`);
     }
     if (res.ok) { region = at; return res.json(); }
-    const detail = (await res.text()).slice(0, 300);
+    const detail = (await res.text()).slice(0, 200);
+    tried.push(`${host}: ${res.status} ${detail}`);
     // A key from the other region is rejected as invalid, so try the next endpoint.
     if ((res.status === 401 || res.status === 403) && i < urls.length - 1) continue;
-    throw new Error(`AI ${res.status} from ${new URL(urls[at]).host}: ${detail}`);
+    throw new Error(`AI ${res.status} · ${tried.join(" · ")}`);
   }
 }
 
