@@ -2,6 +2,7 @@ import type { Dict } from "./en";
 
 export const ko: Dict = {
   common: {
+    retry: "다시 시도",
     unavailable: "지금은 이용할 수 없습니다. 잠시 후 다시 시도해 주세요.",
     skip: "건너뛰기",
     aiKey: "AI 키",
@@ -19,6 +20,9 @@ export const ko: Dict = {
   },
   tabs: { today: "오늘", eat: "식사", go: "탐색", stay: "숙소", talk: "대화" },
   show: { title: "이 화면을 보여 주세요", play: "중국어로 읽어 주기", whatItSays: "카드 내용 보기" },
+  // v0.6 · where content comes from (components/SourceLine.tsx) and feedback on it (components/Feedback.tsx)
+  src: { source: "출처: {name}", ai: "{name} 기반 AI 작성", checked: "{date} 확인", updated: "{date} 업데이트" },
+  fb: { ask: "도움이 됐나요?", yes: "네", no: "아니요", thanks: "감사합니다!", outdated: "오래된 정보 신고", reported: "신고했어요. 확인할게요" },
   mode: {
     question: "지금 어디에 계신가요?",
     planning: "여행 준비 중",
@@ -118,7 +122,7 @@ export const ko: Dict = {
   stay: {
     // v0.6
     emptyTitle: "{city} 추천 호텔이 아직 없어요",
-    emptyBody: "외국인 투숙객을 확실히 받는 호텔만 추천하는데, 이 도시는 아직 없어요. Trip.com에서는 모든 호텔을 보여 주고 외국인이 묵을 수 있는 곳을 표시해요.",
+    emptyBody: "외국인 투숙객을 확실히 받는 호텔만 추천하는데, 이 도시는 아직 없어요. Trip.com에서 외국인이 묵을 수 있는 호텔을 표시해요.",
     picksDownTitle: "호텔 정보를 불러오지 못했어요",
     picksIn: "{city} 추천 호텔",
     changeCityDates: "도시나 날짜 변경",
@@ -179,11 +183,12 @@ export const ko: Dict = {
     onMap: "지도에서 {name} 보기",
   },
   eat: {
+    aiSource: "메뉴판",
     // v0.6
     checkOn: "알레르기 확인 켜짐",
     checkOff: "알레르기 확인 꺼짐",
     checkOffBody: "알레르기나 식단을 추가하면 요리마다 ‘괜찮음’, ‘먼저 물어보기’, ‘주문 금지’로 알려 드려요.",
-    checkScope: "메뉴의 모든 요리를 일반 레시피의 주재료, 소스, 고명까지 확인해요. 식당마다 조리법이 다르니, 심한 알레르기가 있다면 알레르기 카드도 보여 주세요.",
+    checkScope: "일반 레시피의 주재료, 소스, 고명을 확인해요. 식당마다 조리법이 달라요.",
     takePhotoBtn: "사진 찍기",
     choosePhoto: "사진 선택",
     typeInstead: "요리 이름 입력",
@@ -325,7 +330,7 @@ export const ko: Dict = {
     train: "열차 {n}",
     stops: "{n}개 역",
     stop1: "1개 역",
-    metroNote: "지하철 개찰구에서는 Alipay나 WeChat의 ‘교통 코드’를 스캔하세요. 대도시 상당수에서는 Visa나 Mastercard 비접촉 결제도 됩니다.",
+    metroNote: "지하철 개찰구에서는 Alipay나 WeChat의 ‘교통 코드’를 스캔하세요.",
   },
   talk: {
     // v0.6
@@ -539,6 +544,7 @@ export const ko: Dict = {
     change: "호텔 변경",
   },
   guide: {
+    loadError: "추천 정보를 불러오지 못했어요. 연결을 확인하고 다시 시도해 주세요.",
     autoMap: "Amap 지도 데이터로 자동 선정.",
     "title": "{city} 추천",
     "see": "볼거리",

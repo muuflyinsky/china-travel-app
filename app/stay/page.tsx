@@ -6,6 +6,7 @@ import { MapPin, Minus, Plus, ExternalLink, Check, TrainFront, Sparkles, BedDoub
 import { Screen, DemoNote } from "@/components/Shell";
 import { Section, Group, Field, Note, Seg, Button, Disclosure, EmptyState } from "@/components/ui";
 import { EditSheet } from "@/components/EditSheet";
+import { SourceLine } from "@/components/SourceLine";
 import { CityPicker } from "@/components/CityPicker";
 import { FeaturedHotel, HotelRow, useHotelPicks } from "@/components/HotelPicks";
 import { useGuide } from "@/components/CityGuide";
@@ -159,6 +160,7 @@ function Stay() {
           {data && shownTier !== tier && <Note>{fmt(t.stay.tierFallback, { tier: t.stay.tiers[tier], other: t.stay.tiers[shownTier] })}</Note>}
           {top && <FeaturedHotel h={top} label={fmt(t.stay.pick, { tier: t.stay.tiers[shownTier] })} link={link} tag={`${tagBase}-1`} />}
           {rest.length > 0 && <Group>{rest.map((h, i) => <HotelRow key={h.id} h={h} link={link} tag={`${tagBase}-${i + 2}`} />)}</Group>}
+          {data && !data.demo && <SourceLine name="Amap" date={data.generatedAt} />}
           <a href={allTrip} target="_blank" rel="noopener" className="flex min-h-touch items-center gap-1 px-1 text-subhead font-semibold text-cobalt">
             {fmt(t.stay.allTrip, { city: c.e })} <ExternalLink className="h-4 w-4" aria-hidden />
           </a>
@@ -169,7 +171,7 @@ function Stay() {
       <Section>
         <Note>{t.stay.passportNote}</Note>
         <Disclosure title={t.stay.howWePickTitle} icon={<Info className="h-4 w-4 shrink-0 text-cobalt" aria-hidden />}>
-          <p>{t.stay.howWePick}{data && !data.demo && <> {fmt(t.stay.updated, { date: fmtDay(data.generatedAt.slice(0, 10)) })}</>}</p>
+          <p>{t.stay.howWePick}</p>
         </Disclosure>
         <p className="px-1 text-footnote text-muted">{t.common.commission}</p>
       </Section>

@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { AlarmClock, ExternalLink, TriangleAlert, Check } from "lucide-react";
 import { EditSheet } from "./EditSheet";
 import { Group, Field, Button, Note } from "./ui";
+import { SourceLine } from "./SourceLine";
+import { Feedback } from "./Feedback";
 import { useProfile } from "./useProfile";
 import { useT } from "./useT";
 import { fmt } from "@/lib/i18n";
@@ -75,10 +77,8 @@ export function ReservationSheet({ r, open, onClose }: { r: Reservation; open: b
         {r.channel === "trip" && <a href={goLink("trip", "attraction", { keyword: r.en }, "resv_trip", `resv-${r.id.slice(0, 12)}`)} target="_blank" rel="noopener" className="flex min-h-11 items-center gap-1 text-subhead font-semibold text-cobalt">{t.resv.onTrip}<ExternalLink className="h-3.5 w-3.5" aria-hidden /></a>}
         <a href={r.guide} target="_blank" rel="noopener" className="flex min-h-11 items-center gap-1 text-subhead font-semibold text-cobalt">{t.resv.guide}<ExternalLink className="h-3.5 w-3.5" aria-hidden /></a>
       </div>
-      <p className="px-1 text-footnote text-muted">
-        {fmt(t.resv.source, { date: new Date(`${RESERVATION_SOURCE.checked}T00:00:00Z`).toLocaleDateString(p.lang, { timeZone: "UTC", day: "numeric", month: "long", year: "numeric" }) })}{" "}
-        <a href={RESERVATION_SOURCE.url} target="_blank" rel="noopener" className="underline">{RESERVATION_SOURCE.name}</a> ({RESERVATION_SOURCE.license})
-      </p>
+      <SourceLine name={RESERVATION_SOURCE.name} href={RESERVATION_SOURCE.url} date={RESERVATION_SOURCE.checked} extra={RESERVATION_SOURCE.license} />
+      <Feedback kind="resv" id={r.id} version={RESERVATION_SOURCE.checked} city={r.city} />
     </EditSheet>
   );
 }

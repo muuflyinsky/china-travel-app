@@ -85,7 +85,7 @@ export function Screen({ title, right, children, back }: { title: string; right?
         icons
         className="tabbar-fixed z-20"
         colors={{ bgIos: "bg-gradient-to-t from-porcelain via-porcelain/85 to-transparent" }}
-        innerClassName="bg-card/95! backdrop-blur-xl rounded-full border border-line shadow-bar"
+        innerClassName="gap-0! bg-card/95! backdrop-blur-xl rounded-full border border-line shadow-bar"
       >
         {TABS.map(({ href, key, Icon }) => {
           const active = href === "/" ? path === "/" : path.startsWith(href);

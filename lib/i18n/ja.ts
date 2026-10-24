@@ -2,6 +2,7 @@ import type { Dict } from "./en";
 
 export const ja: Dict = {
   common: {
+    retry: "再試行",
     unavailable: "現在ご利用いただけません。しばらくしてからお試しください。",
     skip: "スキップ",
     aiKey: "AIのキー",
@@ -19,6 +20,9 @@ export const ja: Dict = {
   },
   tabs: { today: "今日", eat: "食事", go: "探す", stay: "宿泊", talk: "会話" },
   show: { title: "この画面を見せてください", play: "中国語で読み上げる", whatItSays: "カードの内容" },
+  // v0.6 · where content comes from (components/SourceLine.tsx) and feedback on it (components/Feedback.tsx)
+  src: { source: "出典：{name}", ai: "{name}をもとにAIが作成", checked: "{date}に確認", updated: "{date}更新" },
+  fb: { ask: "役に立ちましたか？", yes: "はい", no: "いいえ", thanks: "ありがとうございます", outdated: "情報が古いと報告", reported: "報告しました。確認します" },
   mode: {
     question: "いまどちらにいますか？",
     planning: "旅行の準備中",
@@ -118,7 +122,7 @@ export const ja: Dict = {
   stay: {
     // v0.6
     emptyTitle: "{city}のおすすめホテルはまだありません",
-    emptyBody: "外国人を確実に受け入れているホテルだけを選んでいますが、この都市にはまだありません。Trip.comではすべてのホテルを表示し、外国人が泊まれるホテルに印が付いています。",
+    emptyBody: "外国人を確実に受け入れるホテルだけを選んでいますが、この都市にはまだありません。Trip.comでは外国人が泊まれるホテルに印が付いています。",
     picksDownTitle: "ホテル情報を読み込めませんでした",
     picksIn: "{city}のおすすめホテル",
     changeCityDates: "都市や日程を変更",
@@ -179,11 +183,12 @@ export const ja: Dict = {
     onMap: "{name}を地図で見る",
   },
   eat: {
+    aiSource: "メニュー",
     // v0.6
     checkOn: "アレルギーチェック：オン",
     checkOff: "アレルギーチェック：オフ",
     checkOffBody: "アレルギーや食事制限を登録すると、料理ごとに「OK」「確認が必要」「注文しない」を表示します。",
-    checkScope: "メニューの全料理について、一般的なレシピの主材料・ソース・付け合わせを確認します。店によって作り方は違うため、重いアレルギーがある場合はアレルギーカードも見せてください。",
+    checkScope: "一般的なレシピの主材料・ソース・付け合わせを確認します。店によって作り方は異なります。",
     takePhotoBtn: "写真を撮る",
     choosePhoto: "写真を選ぶ",
     typeInstead: "料理名を入力",
@@ -325,7 +330,7 @@ export const ja: Dict = {
     train: "列車 {n}",
     stops: "{n}駅",
     stop1: "1駅",
-    metroNote: "地下鉄の改札ではAlipayかWeChatの「乗車コード」をかざします。多くの大都市ではVisaやMastercardのタッチ決済も使えます。",
+    metroNote: "地下鉄の改札ではAlipayかWeChatの「乗車コード」をかざします。",
   },
   talk: {
     // v0.6
@@ -539,6 +544,7 @@ export const ja: Dict = {
     change: "ホテルを変更",
   },
   guide: {
+    loadError: "おすすめを読み込めませんでした。接続を確認して、もう一度お試しください。",
     autoMap: "Amapの地図データから自動選定。",
     "title": "{city}のおすすめ",
     "see": "見る",

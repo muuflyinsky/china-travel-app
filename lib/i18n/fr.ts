@@ -2,6 +2,7 @@ import type { Dict } from "./en";
 
 export const fr: Dict = {
   common: {
+    retry: "Réessayer",
     unavailable: "Indisponible pour le moment. Réessayez plus tard.",
     skip: "Passer",
     aiKey: "la clé IA",
@@ -19,6 +20,9 @@ export const fr: Dict = {
   },
   tabs: { today: "Accueil", eat: "Manger", go: "Explorer", stay: "Dormir", talk: "Parler" },
   show: { title: "Montrez cet écran", play: "Lire à voix haute en chinois", whatItSays: "Ce que dit cette carte" },
+  // v0.6 · where content comes from (components/SourceLine.tsx) and feedback on it (components/Feedback.tsx)
+  src: { source: "Source : {name}", ai: "Rédigé par IA à partir de {name}", checked: "vérifié le {date}", updated: "mis à jour le {date}" },
+  fb: { ask: "Utile ?", yes: "Oui", no: "Non", thanks: "Merci !", outdated: "Signaler une info périmée", reported: "Signalé — nous allons vérifier" },
   mode: {
     question: "Où êtes-vous en ce moment ?",
     planning: "Je prépare mon voyage",
@@ -118,7 +122,7 @@ export const fr: Dict = {
   stay: {
     // v0.6
     emptyTitle: "Pas encore d’hôtels sélectionnés à {city}",
-    emptyBody: "Nous ne retenons que les hôtels qui acceptent sans souci les clients étrangers, et nous n’en avons pas encore pour cette ville. Trip.com liste tous les hôtels et indique ceux qui acceptent les étrangers.",
+    emptyBody: "Nous ne retenons que les hôtels qui acceptent sans souci les étrangers, et nous n’en avons pas encore ici. Trip.com indique ceux qui les acceptent.",
     picksDownTitle: "Les hôtels n’ont pas pu être chargés",
     picksIn: "Hôtels sélectionnés à {city}",
     changeCityDates: "Changer de ville ou de dates",
@@ -179,11 +183,12 @@ export const fr: Dict = {
     onMap: "{name} sur la carte",
   },
   eat: {
+    aiSource: "la carte",
     // v0.6
     checkOn: "Contrôle des allergies activé",
     checkOff: "Contrôle des allergies désactivé",
     checkOffBody: "Ajoutez vos allergies ou votre régime : chaque plat reçoit un verdict — OK, à demander ou à éviter.",
-    checkScope: "Chaque plat du menu est vérifié : ingrédients principaux, sauces et garnitures de la recette habituelle. Les cuisines varient ; en cas d’allergie grave, montrez aussi votre carte d’allergies.",
+    checkScope: "Vérifie ingrédients principaux, sauces et garnitures de la recette habituelle. Les cuisines varient.",
     takePhotoBtn: "Prendre une photo",
     choosePhoto: "Choisir une photo",
     typeInstead: "Saisir les plats",
@@ -325,7 +330,7 @@ export const fr: Dict = {
     train: "Train {n}",
     stops: "{n} arrêts",
     stop1: "1 arrêt",
-    metroNote: "Aux portiques du métro, scannez le « code transport » d’Alipay ou de WeChat. Dans beaucoup de grandes villes, une carte Visa ou Mastercard sans contact fonctionne aussi.",
+    metroNote: "Aux portiques du métro, scannez le « code transport » d’Alipay ou de WeChat.",
   },
   talk: {
     // v0.6
@@ -539,6 +544,7 @@ export const fr: Dict = {
     change: "Changer d’hôtel",
   },
   guide: {
+    loadError: "Impossible de charger la sélection. Vérifiez la connexion et réessayez.",
     autoMap: "Sélection automatique à partir des données Amap.",
     "title": "{city} : l’essentiel",
     "see": "Voir",

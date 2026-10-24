@@ -6,6 +6,9 @@
 import { currentModel } from "./llm";
 import type { DishDetail } from "./dishes";
 import { normalizeName } from "./dish-name";
+import { rest, supabaseOn } from "./supabase";
+
+export { supabaseOn };
 
 /** Bump when the prompts change: older entries are then treated as missing and regenerated. */
 export const PROMPT_VERSION = "2026-10-24.2";
@@ -25,23 +28,6 @@ export type Cached = {
 type Entry = Cached & { at: number };
 const memory = new Map<string, Entry>();
 const memKey = (n: string, region: string, lang: string) => `${n}|${region}|${lang}`;
-
-const sb = {
-  url: (process.env.SUPABASE_URL ?? "").replace(/\/$/, ""),
-  key: (process.env.SUPABASE_SERVICE_ROLE_KEY ?? "").trim(),
-};
-export const supabaseOn = Boolean(sb.url && sb.key);
-
-async function rest(path: string, init: RequestInit = {}) {
-  const res = await fetch(`${sb.url}/rest/v1/${path}`, {
-    ...init,
-    headers: { apikey: sb.key, authorization: `Bearer ${sb.key}`, "content-type": "application/json", ...init.headers },
-    signal: AbortSignal.timeout(4000),
-    cache: "no-store",
-  });
-  if (!res.ok) throw new Error(`supabase ${res.status}: ${(await res.text()).slice(0, 200)}`);
-  return res.status === 204 ? null : res.json();
-}
 
 const fresh = (confidence: string, at: number) => confidence === "high" || (confidence === "medium" && Date.now() - at < MEDIUM_TTL);
 

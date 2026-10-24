@@ -10,7 +10,11 @@ import { compressImage } from "@/lib/image";
 import { track } from "@/lib/track";
 
 /** "Back to my hotel": one photo of the booking, then a one-tap taxi card forever after. */
-export function HotelCard({ bare }: { bare?: boolean } = {}) {
+export function HotelCard({ bare, brief }: {
+  bare?: boolean;
+  /** Title only in lists; the how-to line belongs where people add the hotel. */
+  brief?: boolean;
+} = {}) {
   const t = useT();
   const [p, set] = useProfile();
   const [busy, setBusy] = useState(false);
@@ -45,7 +49,7 @@ export function HotelCard({ bare }: { bare?: boolean } = {}) {
     </>
   ) : (
     <Row onClick={() => fileRef.current?.click()} icon={<IconTile>{busy ? <Preloader className="h-5! w-5!" /> : <BedDouble className="h-5 w-5" aria-hidden />}</IconTile>}
-      title={busy ? t.hotel.reading : t.hotel.add} sub={t.hotel.addSub} />
+      title={busy ? t.hotel.reading : t.hotel.add} sub={brief ? undefined : t.hotel.addSub} />
   );
 
   // `bare` renders list items only, for use inside another grouped list.

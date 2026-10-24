@@ -295,10 +295,7 @@ function MenuHero() {
     <Link href="/menu" className="block rounded-card bg-cobalt p-card text-white dark:text-porcelain">
       <span className="flex items-center gap-3">
         <span className="grid h-12 w-12 shrink-0 place-items-center rounded-control bg-white/20"><Camera className="h-6 w-6" aria-hidden /></span>
-        <span className="min-w-0 flex-1">
-          <span className="block text-title">{t.today.tileMenu}</span>
-          <span className="block text-subhead opacity-90">{t.today.tileMenuSub}</span>
-        </span>
+        <span className="min-w-0 flex-1 text-title">{t.today.tileMenu}</span>
         <ChevronRight className="h-5 w-5 shrink-0 opacity-80" aria-hidden />
       </span>
       <span className="mt-3 flex items-start gap-1.5 border-t border-white/20 pt-3 text-footnote opacity-95">
@@ -311,7 +308,7 @@ function MenuHero() {
 
 /** Tier 2 — a quick action: icon, title, one line of context. */
 function Tile({ icon, title, sub, onClick, href, apps }: {
-  icon: React.ReactNode; title: string; sub: React.ReactNode; onClick?: () => void; href?: string;
+  icon: React.ReactNode; title: string; sub?: React.ReactNode; onClick?: () => void; href?: string;
   /** Brand icons of the Chinese apps this moment uses — the only colour besides allergy colours. */
   apps?: AppId[];
 }) {
@@ -323,7 +320,7 @@ function Tile({ icon, title, sub, onClick, href, apps }: {
         {apps && <span className="flex -space-x-1.5">{apps.map((a) => <AppIcon key={a} id={a} size={22} />)}</span>}
       </span>
       <span className="text-headline">{title}</span>
-      <span className="line-clamp-2 text-footnote text-muted">{sub}</span>
+      {sub && <span className="line-clamp-2 text-footnote text-muted">{sub}</span>}
     </>
   );
   return href ? <Link href={href} className={cls}>{body}</Link> : <button onClick={onClick} className={cls}>{body}</button>;
@@ -428,7 +425,8 @@ function Moments() {
       <Section title={t.today.quickActions}>
         <div className="grid grid-cols-2 gap-stack">
           <Tile onClick={() => setSheet("driver")} icon={<CarTaxiFront className="h-5 w-5" aria-hidden />} title={t.today.tileDriver} apps={["didi", "amap"]}
-            sub={p.hotel ? <span className="zh">{p.hotel.name}</span> : t.today.tileDriverAdd} />
+            // How to add a hotel is explained in the sheet, not on the tile.
+            sub={p.hotel && <span className="zh">{p.hotel.name}</span>} />
           <Tile onClick={() => (alarms.length ? setSheet("today") : router.push("/explore"))} icon={<CalendarClock className="h-5 w-5" aria-hidden />}
             title={t.today.tileToday} sub={next ? fmt(t.today.tileTodayAlarm, { name: next.en, when: nextWhen! }) : fmt(t.today.tileTodaySub, { city: city.e })} />
         </div>

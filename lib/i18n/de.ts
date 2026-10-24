@@ -2,6 +2,7 @@ import type { Dict } from "./en";
 
 export const de: Dict = {
   common: {
+    retry: "Erneut versuchen",
     unavailable: "Vorübergehend nicht verfügbar. Bitte später erneut versuchen.",
     skip: "Überspringen",
     aiKey: "den KI-Schlüssel",
@@ -19,6 +20,9 @@ export const de: Dict = {
   },
   tabs: { today: "Heute", eat: "Essen", go: "Entdecken", stay: "Hotel", talk: "Sprechen" },
   show: { title: "Diesen Bildschirm zeigen", play: "Auf Chinesisch vorlesen", whatItSays: "Was auf der Karte steht" },
+  // v0.6 · where content comes from (components/SourceLine.tsx) and feedback on it (components/Feedback.tsx)
+  src: { source: "Quelle: {name}", ai: "Von KI verfasst · Grundlage: {name}", checked: "geprüft am {date}", updated: "aktualisiert am {date}" },
+  fb: { ask: "Hilfreich?", yes: "Ja", no: "Nein", thanks: "Danke!", outdated: "Veraltete Info melden", reported: "Gemeldet – wir prüfen das" },
   mode: {
     question: "Wo bist du gerade?",
     planning: "Ich plane meine Reise",
@@ -118,7 +122,7 @@ export const de: Dict = {
   stay: {
     // v0.6
     emptyTitle: "Noch keine Hotel-Tipps für {city}",
-    emptyBody: "Wir empfehlen nur Hotels, die zuverlässig ausländische Gäste aufnehmen – für diese Stadt haben wir noch keine. Trip.com zeigt alle Hotels und markiert die, die Ausländer aufnehmen.",
+    emptyBody: "Wir empfehlen nur Hotels, die zuverlässig ausländische Gäste aufnehmen – hier haben wir noch keine. Trip.com markiert die Hotels, die Ausländer aufnehmen.",
     picksDownTitle: "Hotel-Tipps konnten nicht geladen werden",
     picksIn: "Hotel-Tipps in {city}",
     changeCityDates: "Stadt oder Daten ändern",
@@ -179,11 +183,12 @@ export const de: Dict = {
     onMap: "{name} auf der Karte",
   },
   eat: {
+    aiSource: "Speisekarte",
     // v0.6
     checkOn: "Allergie-Check ist an",
     checkOff: "Allergie-Check ist aus",
     checkOffBody: "Trag deine Allergien oder Ernährungsweise ein, dann bekommt jedes Gericht eine Einschätzung: OK, erst fragen oder nicht bestellen.",
-    checkScope: "Jedes Gericht auf der Karte wird darauf geprüft – Hauptzutaten, Soßen und Garnituren im üblichen Rezept. Küchen kochen unterschiedlich; zeig bei einer schweren Allergie zusätzlich deine Allergiekarte.",
+    checkScope: "Geprüft werden Hauptzutaten, Soßen und Garnituren im üblichen Rezept. Küchen kochen unterschiedlich.",
     takePhotoBtn: "Foto aufnehmen",
     choosePhoto: "Foto auswählen",
     typeInstead: "Gerichte eintippen",
@@ -325,7 +330,7 @@ export const de: Dict = {
     train: "Zug {n}",
     stops: "{n} Stationen",
     stop1: "1 Station",
-    metroNote: "Scanne an der U-Bahn-Sperre den „Verkehrscode“ in Alipay oder WeChat. In vielen Großstädten kannst du auch kontaktlos mit Visa oder Mastercard zahlen.",
+    metroNote: "Scanne an der U-Bahn-Sperre den „Verkehrscode“ in Alipay oder WeChat.",
   },
   talk: {
     // v0.6
@@ -539,6 +544,7 @@ export const de: Dict = {
     change: "Hotel ändern",
   },
   guide: {
+    loadError: "Die Tipps konnten nicht geladen werden. Prüf deine Verbindung und versuch es noch mal.",
     autoMap: "Automatisch aus Amap-Kartendaten ausgewählt.",
     "title": "{city}: Top-Tipps",
     "see": "Sehen",

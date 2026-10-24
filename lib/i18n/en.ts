@@ -2,6 +2,7 @@
 // {name} placeholders are filled by fmt().
 export const en = {
   common: {
+    retry: "Try again",
     unavailable: "Temporarily unavailable. Please try again later.",
     skip: "Skip",
     aiKey: "the AI key",
@@ -19,6 +20,9 @@ export const en = {
   },
   tabs: { today: "Today", eat: "Eat", go: "Explore", stay: "Stay", talk: "Talk" },
   show: { title: "Show this screen", play: "Play aloud in Chinese", whatItSays: "What this card says" },
+  // v0.6 · where content comes from (components/SourceLine.tsx) and feedback on it (components/Feedback.tsx)
+  src: { source: "Source: {name}", ai: "Written by AI from {name}", checked: "checked {date}", updated: "updated {date}" },
+  fb: { ask: "Helpful?", yes: "Yes", no: "No", thanks: "Thanks!", outdated: "Report outdated info", reported: "Reported — we’ll check it" },
   mode: {
     question: "Where are you right now?",
     planning: "Planning my trip",
@@ -120,7 +124,7 @@ export const en = {
   stay: {
     // v0.6
     emptyTitle: "No hotel picks for {city} yet",
-    emptyBody: "We only pick hotels that reliably take foreign guests, and we don’t have any for this city yet. Trip.com lists every hotel and marks the ones that accept foreigners.",
+    emptyBody: "We only pick hotels that reliably take foreign guests, and have none here yet. Trip.com marks the hotels that accept foreigners.",
     picksDownTitle: "Hotel picks didn’t load",
     picksIn: "Hotel picks in {city}",
     changeCityDates: "Change city or dates",
@@ -182,11 +186,12 @@ export const en = {
     onMap: "{name} on the map",
   },
   eat: {
+    aiSource: "the menu",
     // v0.6
     checkOn: "Allergy check is on",
     checkOff: "Allergy check is off",
     checkOffBody: "Add your allergies or diet and every dish gets a verdict: OK, ask first, or don’t order.",
-    checkScope: "Every dish on the menu is checked for these — main ingredients, sauces and garnishes in the usual recipe. Kitchens vary, so with a severe allergy show your allergy card too.",
+    checkScope: "Checks main ingredients, sauces and garnishes in the usual recipe. Kitchens vary.",
     takePhotoBtn: "Take photo",
     choosePhoto: "Choose photo",
     typeInstead: "Type dish names",
@@ -328,7 +333,7 @@ export const en = {
     train: "Train {n}",
     stops: "{n} stops",
     stop1: "1 stop",
-    metroNote: "At the metro gate, scan the Alipay or WeChat “Transport code”. In many big cities you can also tap a Visa or Mastercard.",
+    metroNote: "At the metro gate, scan the Alipay or WeChat “Transport code”.",
   },
   talk: {
     // v0.6
@@ -542,6 +547,7 @@ export const en = {
     change: "Change hotel",
   },
   guide: {
+    loadError: "Couldn’t load this city’s picks. Check your connection and try again.",
     autoMap: "Picked automatically from Amap map data.",
     "title": "{city}: top picks",
     "see": "See",

@@ -2,6 +2,7 @@ import type { Dict } from "./en";
 
 export const es: Dict = {
   common: {
+    retry: "Reintentar",
     unavailable: "No disponible por ahora. Inténtalo más tarde.",
     skip: "Omitir",
     aiKey: "la clave de IA",
@@ -19,6 +20,9 @@ export const es: Dict = {
   },
   tabs: { today: "Hoy", eat: "Comer", go: "Explorar", stay: "Dormir", talk: "Hablar" },
   show: { title: "Muestra esta pantalla", play: "Reproducir en chino", whatItSays: "Qué dice esta tarjeta" },
+  // v0.6 · where content comes from (components/SourceLine.tsx) and feedback on it (components/Feedback.tsx)
+  src: { source: "Fuente: {name}", ai: "Escrito por IA a partir de {name}", checked: "verificado el {date}", updated: "actualizado el {date}" },
+  fb: { ask: "¿Te ha servido?", yes: "Sí", no: "No", thanks: "¡Gracias!", outdated: "Avisar de info desactualizada", reported: "Enviado: lo revisaremos" },
   mode: {
     question: "¿Dónde estás ahora?",
     planning: "Preparando mi viaje",
@@ -118,7 +122,7 @@ export const es: Dict = {
   stay: {
     // v0.6
     emptyTitle: "Aún no hay hoteles recomendados en {city}",
-    emptyBody: "Solo recomendamos hoteles que aceptan huéspedes extranjeros sin problemas, y todavía no tenemos ninguno en esta ciudad. Trip.com muestra todos los hoteles y marca los que aceptan extranjeros.",
+    emptyBody: "Solo recomendamos hoteles que aceptan extranjeros sin problemas y aquí aún no tenemos ninguno. Trip.com marca los hoteles que aceptan extranjeros.",
     picksDownTitle: "No se han podido cargar los hoteles",
     picksIn: "Hoteles recomendados en {city}",
     changeCityDates: "Cambiar ciudad o fechas",
@@ -179,11 +183,12 @@ export const es: Dict = {
     onMap: "{name} en el mapa",
   },
   eat: {
+    aiSource: "el menú",
     // v0.6
     checkOn: "Control de alergias activado",
     checkOff: "Control de alergias desactivado",
     checkOffBody: "Añade tus alergias o tu dieta y cada plato tendrá un veredicto: apto, pregunta antes o no lo pidas.",
-    checkScope: "Revisamos cada plato del menú: ingredientes principales, salsas y guarniciones de la receta habitual. Cada cocina es distinta; con una alergia grave, muestra también tu tarjeta de alergias.",
+    checkScope: "Revisa ingredientes principales, salsas y guarniciones de la receta habitual. Cada cocina es distinta.",
     takePhotoBtn: "Hacer foto",
     choosePhoto: "Elegir foto",
     typeInstead: "Escribir los platos",
@@ -325,7 +330,7 @@ export const es: Dict = {
     train: "Tren {n}",
     stops: "{n} paradas",
     stop1: "1 parada",
-    metroNote: "En los tornos del metro, escanea el «código de transporte» de Alipay o WeChat. En muchas ciudades grandes también puedes pagar con Visa o Mastercard sin contacto.",
+    metroNote: "En los tornos del metro, escanea el «código de transporte» de Alipay o WeChat.",
   },
   talk: {
     // v0.6
@@ -539,6 +544,7 @@ export const es: Dict = {
     change: "Cambiar hotel",
   },
   guide: {
+    loadError: "No se han podido cargar las recomendaciones. Revisa la conexión y vuelve a intentarlo.",
     autoMap: "Elegido automáticamente con datos de Amap.",
     "title": "{city}: lo mejor",
     "see": "Ver",

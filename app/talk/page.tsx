@@ -179,14 +179,14 @@ export default function TalkPage() {
 
       <Section title={t.today.showTo}>
         <Group>
-          <Row href="/explore" icon={<IconTile><CarTaxiFront className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.taxiCard} sub={t.today.taxiCardSub} />
+          <Row href="/explore" icon={<IconTile><CarTaxiFront className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.taxiCard} />
           <Row
             icon={<IconTile tone="danger"><ShieldAlert className="h-5 w-5" aria-hidden /></IconTile>}
             title={t.today.allergyCard}
-            sub={hasRestrictions ? t.today.allergyCardSub : t.today.allergyCardEmpty}
+            sub={hasRestrictions ? undefined : t.today.allergyCardEmpty}
             onClick={() => (hasRestrictions ? setAllergyCard(true) : router.push("/settings#allergies"))}
           />
-          <HotelCard bare />
+          <HotelCard bare brief />
           <Row href="/sos" icon={<IconTile tone="danger"><Siren className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.help} sub={t.today.helpSub} />
         </Group>
       </Section>

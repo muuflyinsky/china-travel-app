@@ -1,0 +1,38 @@
+{
+  "today": {
+    "docOverflow": false,
+    "bad": []
+  },
+  "today-nohotel": {
+    "docOverflow": false,
+    "bad": []
+  },
+  "eat": {
+    "docOverflow": false,
+    "bad": []
+  },
+  "eat-results": {
+    "docOverflow": false,
+    "bad": []
+  },
+  "explore": {
+    "docOverflow": false,
+    "bad": []
+  },
+  "stay": {
+    "docOverflow": false,
+    "bad": []
+  },
+  "stay-shanghai": {
+    "docOverflow": false,
+    "bad": []
+  },
+  "talk": {
+    "docOverflow": false,
+    "bad": []
+  },
+  "talk-result": {
+    "docOverflow": false,
+    "bad": []
+  }
+}

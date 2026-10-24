@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Popup, Preloader, Sheet } from "konsta/react";
-import { Camera, Flame, Info, Leaf, ShieldAlert, ShieldCheck, ShieldOff, ChevronRight, ChevronDown, Plus, Minus, ReceiptText, Keyboard, UtensilsCrossed, Volume2, X, Flag, Lightbulb, Images, ScanText } from "lucide-react";
+import { Camera, Flame, Info, Leaf, ShieldAlert, ShieldCheck, ShieldOff, ChevronRight, ChevronDown, Plus, Minus, ReceiptText, Keyboard, UtensilsCrossed, Volume2, X, Lightbulb, Images, ScanText } from "lucide-react";
 import { Screen, DemoNote } from "@/components/Shell";
 import { Section, Card, Group, Row, Field, Button, Note, IconTile, IconButton } from "@/components/ui";
 import { isHotCity } from "@/lib/hot-cities";
@@ -17,6 +17,8 @@ import { track } from "@/lib/track";
 import { compressImage } from "@/lib/image";
 import { fmt, type Dict } from "@/lib/i18n";
 import type { ListDish, DishDetail, MenuEvent } from "@/lib/dishes";
+import { SourceLine } from "@/components/SourceLine";
+import { Feedback } from "@/components/Feedback";
 import { verdict, withDetailAllergens, type Verdict, type VerdictKind, type Reason } from "@/lib/verdict";
 
 /** The menu as it streams in. `dishes` is indexed by position on the menu; gaps are still coming. */
@@ -30,6 +32,9 @@ type Detail = DishDetail | "loading" | "error";
 
 // Details already fetched this session, by dish + language: reopening a dish is instant.
 const detailCache = new Map<string, DishDetail>();
+
+/** Menu dishes are regenerated when the prompts change; feedback is grouped by that version. */
+const DISH_FEEDBACK_VERSION = "1";
 
 const TONE: Record<VerdictKind, string> = { ok: "tag-ok", ask: "tag-warn", no: "tag-danger" };
 
@@ -128,7 +133,6 @@ function DishSheet({ d, v, mine, detail, line, onAdd, onFlag, onClose, homePrice
   d: ListDish; v: Verdict; mine: string[]; detail?: Detail; line?: Line; onAdd: (without: string[]) => void; onFlag: () => void; onClose: () => void; homePrice?: string;
 }) {
   const t = useT();
-  const [flagged, setFlagged] = useState(false);
   const speak = () => {
     const u = new SpeechSynthesisUtterance(d.zh);
     u.lang = "zh-CN";
@@ -196,11 +200,7 @@ function DishSheet({ d, v, mine, detail, line, onAdd, onFlag, onClose, homePrice
             </div>
           )}
           <p className="text-footnote text-muted">{t.eat.disclaimer}</p>
-          {flagged ? <p className="text-footnote text-muted" role="status">{t.eat.wrongThanks}</p> : (
-            <button onClick={() => { setFlagged(true); onFlag(); }} className="flex min-h-11 items-center gap-1.5 text-footnote font-semibold text-muted">
-              <Flag className="h-3.5 w-3.5" aria-hidden />{t.eat.wrongInfo}
-            </button>
-          )}
+          <Feedback kind="menu_dish" id={d.zh} version={DISH_FEEDBACK_VERSION} reportLabel={t.eat.wrongInfo} onReport={onFlag} />
         </div>
 
         {/* Severe allergen as a main ingredient: no add button at all. */}
@@ -487,10 +487,7 @@ export default function MenuPage() {
                   {preview
                     ? <img src={preview} alt="" className="h-12 w-12 shrink-0 rounded-control object-cover" />
                     : <span className="grid h-12 w-12 shrink-0 place-items-center rounded-control bg-cobalt-soft text-cobalt"><ScanText className="h-6 w-6" aria-hidden /></span>}
-                  <div className="min-w-0 flex-1">
-                    <h2 className="text-headline">{preview ? t.eat.scanAnother : t.today.tileMenu}</h2>
-                    <p className="text-footnote text-muted">{t.eat.handwritten}</p>
-                  </div>
+                  <h2 className="min-w-0 flex-1 text-headline">{preview ? t.eat.scanAnother : t.today.tileMenu}</h2>
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-2">
                   <Button onClick={() => fileRef.current?.click()} disabled={loading} className="min-w-0 px-2.5! py-1.5 text-subhead! leading-tight"><Camera className="h-5 w-5 shrink-0" aria-hidden /><span>{t.eat.takePhotoBtn}</span></Button>
@@ -524,7 +521,7 @@ export default function MenuPage() {
           <AllergyStatus onEdit={() => setAskAllergies(true)} onCard={showAllergyCard} />
           {!menu && isHotCity(city.a) && (
             <Group>
-              <Row href="/explore?tab=eat" icon={<IconTile><UtensilsCrossed className="h-5 w-5" aria-hidden /></IconTile>} title={fmt(t.guide.mustEat, { city: city.e })} sub={t.guide.mustEatSub} />
+              <Row href="/explore?tab=eat" icon={<IconTile><UtensilsCrossed className="h-5 w-5" aria-hidden /></IconTile>} title={fmt(t.guide.mustEat, { city: city.e })} />
             </Group>
           )}
         </Section>
@@ -597,7 +594,10 @@ export default function MenuPage() {
             {filter === "all" && Array.from({ length: Math.min(pending, 3) }, (_, k) => <DishSkeleton key={`s${k}`} />)}
             {!menu.streaming && menu.total === 0 && <Note tone="warn">{t.eat.noneRead}</Note>}
             {menu.missing > 0 && <Note tone="warn">{fmt(t.eat.missing, { n: menu.missing })}</Note>}
-            {rows.length > 0 && <p className="px-1 text-footnote text-muted">{t.eat.disclaimer}</p>}
+            {rows.length > 0 && <>
+              <SourceLine ai name={t.eat.aiSource} />
+              <p className="px-1 text-footnote text-muted">{t.eat.disclaimer}</p>
+            </>}
             <div className="sticky-spacer" aria-hidden />
           </Section>
         </div>

@@ -1,8 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Preloader } from "konsta/react";
-import { Clock, Sun, Star, Ticket, CarTaxiFront, Flame, Leaf, ThumbsDown, ExternalLink, ReceiptText, Search, ChevronRight, CalendarClock } from "lucide-react";
-import { Card, Group, Button, Seg } from "./ui";
+import { Clock, Sun, Star, Ticket, CarTaxiFront, Flame, Leaf, ExternalLink, ReceiptText, Search, ChevronRight, CalendarClock, RotateCw } from "lucide-react";
+import { Card, Group, Button, Seg, Note } from "./ui";
+import { SourceLine } from "./SourceLine";
+import { Feedback } from "./Feedback";
 import { AppIcon } from "./AppIcon";
 import { ShowCard } from "./ShowCard";
 import { ReservationSheet } from "./ReservationSheet";
@@ -31,7 +33,6 @@ function AwardRestaurants({ adcode, onPick }: { adcode: string; onPick: (p: Plac
   useEffect(() => { setD(null); fetch(`/api/restaurants?city=${adcode}`).then((r) => r.json()).then(setD).catch(() => {}); }, [adcode]);
   if (!d?.restaurants.length) return null;
   const used = [...new Set(d.restaurants.flatMap((r) => r.awards.map((a) => a.list)))];
-  const fmtDate = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString(p.lang, { timeZone: "UTC", day: "numeric", month: "short", year: "numeric" });
   return (
     <>
       <h3 className="mt-2 px-1 text-subhead font-semibold text-muted">{d.source === "amap" ? t.awards.amapTitle : t.awards.title}</h3>
@@ -55,12 +56,11 @@ function AwardRestaurants({ adcode, onPick }: { adcode: string; onPick: (p: Plac
           </li>
         ))}
       </Group>
-      <p className="px-1 text-footnote text-muted">
-        {d.demo ? t.awards.sample : <>
-          {used.length > 0 && <>{used.map((l) => `${d.lists[l].name} ${d.lists[l].edition}${d.lists[l].checked ? ` (${fmt(t.awards.checked, { date: fmtDate(d.lists[l].checked) })})` : ""}`).join(" · ")}. {t.awards.note} </>}
-          {d.source !== "awards" && t.awards.amapNote}
-        </>}
-      </p>
+      {d.demo ? <p className="px-1 text-footnote text-muted">{t.awards.sample}</p> : <>
+        {used.map((l) => <SourceLine key={l} name={`${d.lists[l].name} ${d.lists[l].edition}`} date={d.lists[l].checked || undefined} />)}
+        {d.source !== "awards" && <SourceLine name="Amap" extra={t.awards.amapNote} />}
+        {used.length > 0 && <p className="px-1 text-footnote text-muted">{t.awards.note}</p>}
+      </>}
     </>
   );
 }
@@ -70,34 +70,28 @@ type Tab = "see" | "eat";
 /** Static pre-generated file first (CDN), then the API, which generates and caches. */
 export function useGuide(adcode: string) {
   const [g, setG] = useState<(Guide & { demo?: boolean }) | null>(null);
-  const [state, setState] = useState<"loading" | "ok" | "none">("loading");
+  // none: this city has no guide (not covered) · error: the request failed — never shown as "none".
+  const [state, setState] = useState<"loading" | "ok" | "none" | "error">("loading");
+  const [attempt, setAttempt] = useState(0);
   useEffect(() => {
     let alive = true;
     setG(null); setState("loading");
     (async () => {
+      let failed = false;
       for (const url of [`/city-guide/${adcode}.json`, `/api/city-guide?city=${adcode}`]) {
         const r = await fetch(url).catch(() => null);
-        if (r?.ok) { const d = await r.json(); if (alive) { setG(d); setState("ok"); } return; }
+        if (r?.ok) { const d = await r.json().catch(() => null); if (d) { if (alive) { setG(d); setState("ok"); } return; } }
+        // A 404 means "not here"; no response or a server error means we don't know.
+        failed = !r || r.status >= 500 || r.ok;
       }
-      if (alive) setState("none");
+      if (alive) setState(failed ? "error" : "none");
     })();
     return () => { alive = false; };
-  }, [adcode]);
-  return { g, state };
+  }, [adcode, attempt]);
+  return { g, state, retry: () => setAttempt((n) => n + 1) };
 }
 
-function Feedback({ city, kind, name }: { city: string; kind: string; name: string }) {
-  const t = useT();
-  const [p] = useProfile();
-  const [sent, setSent] = useState(false);
-  useEffect(() => setSent(false), [name]);
-  return sent ? <span className="text-footnote text-muted">{t.guide.thanks}</span> : (
-    <button onClick={() => { setSent(true); fetch("/api/feedback", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ city, kind, name, lang: p.lang }) }).catch(() => {}); }}
-      className="flex min-h-11 items-center gap-1 text-footnote text-muted"><ThumbsDown className="h-3.5 w-3.5" aria-hidden />{t.guide.notHelpful}</button>
-  );
-}
-
-function SightCard({ s, city, cityEn, index }: { s: GuideSight; city: string; cityEn: string; index: number }) {
+function SightCard({ s, city, cityEn, index, version }: { s: GuideSight; city: string; cityEn: string; index: number; version: string }) {
   const t = useT();
   const [p] = useProfile();
   const [card, setCard] = useState(false);
@@ -117,7 +111,8 @@ function SightCard({ s, city, cityEn, index }: { s: GuideSight; city: string; ci
         {s.rating !== undefined && <li className="flex gap-1.5"><Star className="mt-0.5 h-3.5 w-3.5 shrink-0 fill-current text-ink" aria-hidden />{s.rating.toFixed(1)}</li>}
       </ul>
       {r && (
-        <button onClick={() => setResv(true)} className="mt-3 flex w-full items-center gap-2 rounded-card bg-warn-soft p-3 text-left text-subhead text-warn">
+        // Cobalt, not amber: amber is reserved for allergy cautions.
+        <button onClick={() => setResv(true)} className="mt-3 flex w-full items-center gap-2 rounded-card bg-cobalt-soft p-3 text-left text-subhead text-cobalt">
           <CalendarClock className="h-5 w-5 shrink-0" aria-hidden /><span className="flex-1">{t.guide.needsBooking}</span><ChevronRight className="h-4 w-4" aria-hidden />
         </button>
       )}
@@ -129,14 +124,14 @@ function SightCard({ s, city, cityEn, index }: { s: GuideSight; city: string; ci
         <Button variant="soft" className="text-subhead!" onClick={() => { setCard(true); track("taxi_card_shown", { source: "guide" }); }}><CarTaxiFront className="h-5 w-5" aria-hidden />{t.guide.taxi}</Button>
         <a href={amapNav({ location: s.location, name: s.zh }, "bus")} target="_blank" rel="noopener" className="flex min-h-control items-center justify-center gap-2 rounded-control bg-cobalt-soft text-subhead font-semibold text-cobalt"><AppIcon id="amap" size={22} />{t.guide.route}</a>
       </div>
-      <Feedback city={city} kind="sight" name={s.zh} />
+      <Feedback kind="sight" id={s.id} version={version} city={city} />
       {card && <ShowCard kind="taxi" lines={["师傅您好，请带我去：", s.zh, `地址：${s.address}`]} sub={s.en} onClose={() => setCard(false)} />}
       {r && <ReservationSheet r={r} open={resv} onClose={() => setResv(false)} />}
     </Card>
   );
 }
 
-function DishCard({ d, city, onFind }: { d: GuideDish; city: string; onFind: (zh: string) => void }) {
+function DishCard({ d, city, onFind, version }: { d: GuideDish; city: string; onFind: (zh: string) => void; version: string }) {
   const t = useT();
   const [p] = useProfile();
   const [card, setCard] = useState(false);
@@ -166,7 +161,7 @@ function DishCard({ d, city, onFind }: { d: GuideDish; city: string; onFind: (zh
         {blocked.length === 0 && <Button className="text-subhead!" onClick={() => { setCard(true); track("order_card_shown", { dishes: 1, source: "guide" }); }}><ReceiptText className="h-5 w-5" aria-hidden />{t.guide.orderCard}</Button>}
         <Button variant="soft" className="text-subhead!" onClick={() => onFind(d.zh)}><Search className="h-5 w-5" aria-hidden />{t.guide.whereToEat}</Button>
       </div>
-      <Feedback city={city} kind="dish" name={d.zh} />
+      <Feedback kind="guide_dish" id={d.zh} version={version} city={city} />
       {card && <ShowCard kind="order" lead={severe || undefined} lines={lines} rest={rest} explain={fmt(t.guide.orderExplain, { dish: pick(d.name, p.lang) })}
         replies={[{ zh: "可以，没问题", mine: t.eat.replyOk }, { zh: "这道菜做不了", mine: t.eat.replyCant }, ...(p.allergens.length ? [{ zh: "里面有您过敏的东西", mine: t.eat.replyContainsAny }] : [])]}
         onClose={() => setCard(false)} />}
@@ -185,16 +180,23 @@ export function CityGuide({ adcode, cityEn, initialTab = "see", tab: controlled,
 }) {
   const t = useT();
   const [p] = useProfile();
-  const { g, state } = useGuide(adcode);
+  const { g, state, retry } = useGuide(adcode);
   const [own, setTab] = useState<Tab>(initialTab);
   const tab = controlled ?? own;
   const [sel, setSel] = useState(0);
   useEffect(() => setSel(0), [tab, adcode]);
 
   if (state === "loading") return <div className="flex justify-center py-6"><Preloader /></div>;
+  if (state === "error") {
+    return (
+      <>
+        <Note tone="warn">{t.guide.loadError}</Note>
+        <Button variant="soft" className="w-full text-subhead!" onClick={retry}><RotateCw className="h-4 w-4" aria-hidden />{t.common.retry}</Button>
+      </>
+    );
+  }
   const items = tab === "see" ? g?.sights ?? [] : g?.dishes ?? [];
   const city = g?.adcode ?? adcode;
-  const updated = g && !g.demo ? new Date(g.generatedAt).toLocaleDateString(p.lang, { day: "numeric", month: "short", year: "numeric" }) : null;
 
   return (
     <>
@@ -205,8 +207,8 @@ export function CityGuide({ adcode, cityEn, initialTab = "see", tab: controlled,
       ) : (
         <>
           {tab === "see"
-            ? <SightCard key={g!.sights[sel].id} s={g!.sights[sel]} city={city} cityEn={cityEn} index={sel} />
-            : <DishCard key={g!.dishes[sel].zh} d={g!.dishes[sel]} city={city} onFind={onFindDish} />}
+            ? <SightCard key={g!.sights[sel].id} s={g!.sights[sel]} city={city} cityEn={cityEn} index={sel} version={g!.generatedAt} />
+            : <DishCard key={g!.dishes[sel].zh} d={g!.dishes[sel]} city={city} onFind={onFindDish} version={g!.generatedAt} />}
           <Group>
             {items.map((x, i) => i !== sel && (
               <li key={i}>
@@ -218,7 +220,7 @@ export function CityGuide({ adcode, cityEn, initialTab = "see", tab: controlled,
                     <span className="block text-body">{tab === "see" ? (x as GuideSight).en : pick((x as GuideDish).name, p.lang)}</span>
                     <span className="zh block text-footnote text-muted">{x.zh}</span>
                   </span>
-                  {tab === "see" && (x as GuideSight).reservation && <CalendarClock className="h-4 w-4 shrink-0 text-warn" aria-label={t.guide.needsBooking} />}
+                  {tab === "see" && (x as GuideSight).reservation && <CalendarClock className="h-4 w-4 shrink-0 text-cobalt" aria-label={t.guide.needsBooking} />}
                   <ChevronRight className="h-5 w-5 shrink-0 text-muted opacity-60" aria-hidden />
                 </button>
               </li>
@@ -230,7 +232,8 @@ export function CityGuide({ adcode, cityEn, initialTab = "see", tab: controlled,
       <a href={goLink("trip", "attraction", { cityEn }, "explore_top", "explore-top")} target="_blank" rel="noopener" className="flex min-h-11 items-center gap-1 px-1 text-subhead font-semibold text-cobalt">
         {fmt(t.guide.topTrip, { city: cityEn })}<ExternalLink className="h-3.5 w-3.5" aria-hidden />
       </a>
-      <p className="px-1 text-footnote text-muted">{(g as { partial?: boolean } | null)?.partial ? t.guide.autoMap : t.guide.auto}{updated && ` · ${fmt(t.guide.updated, { date: updated })}`}</p>
+      {/* Map data alone is sourced; anything with model-written text says so. */}
+      {g && <SourceLine ai={!(g as { partial?: boolean }).partial} name="Amap" date={g.demo ? undefined : g.generatedAt} />}
     </>
   );
 }
