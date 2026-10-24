@@ -17,6 +17,8 @@ import { stayWindow, type EntryType } from "@/lib/stay";
 import { StayWarning } from "@/components/StayWarning";
 import { currencyFor, entryTypeFor, visaRule } from "@/lib/visa";
 import pkg from "@/package.json";
+import Link from "next/link";
+import { privacyText, supportText } from "@/lib/legal";
 
 const CURRENCIES = ["USD", "EUR", "GBP", "JPY", "KRW", "AUD", "CAD", "SGD", "HKD", "CHF", "THB", "MYR", "NZD", "SEK", "INR", "BRL", "MXN", "RUB", "TRY", "IDR", "VND", "PHP"];
 const toggle = (list: string[], id: string) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
@@ -105,6 +107,7 @@ export default function SettingsPage() {
         <Group>
           <Row onClick={() => setSheet("earn")} title={t.settings.howWeEarn} />
           <Row onClick={() => setSheet("privacy")} title={t.settings.privacyTitle} />
+          <Row href="/support" title={supportText(p.lang).title} />
           <Row title={t.settings.version} after={<Value>{pkg.version}</Value>} chevron={false} />
         </Group>
       </Section>
@@ -248,6 +251,7 @@ export default function SettingsPage() {
 
       <EditSheet open={sheet === "privacy"} title={t.settings.privacyTitle} onClose={close}>
         <p className="text-body">{t.settings.privacyBody}</p>
+        <Link href="/privacy" className="flex min-h-11 items-center text-subhead font-semibold text-cobalt">{privacyText(p.lang).title} ›</Link>
       </EditSheet>
     </Screen>
   );

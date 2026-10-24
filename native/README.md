@@ -1,12 +1,13 @@
 # iOS app (App Store)
 
-The iOS app is a native shell ([Capacitor](https://capacitorjs.com) 8) around the deployed web app.
+The iOS app, **Haodego** (`com.haodego.app`), is a native shell ([Capacitor](https://capacitorjs.com) 8) around the web app at https://haodego.com.
+What to enter in App Store Connect (name, description, keywords, privacy label, review notes): [app-store.md](app-store.md).
 The menu reader, maps and affiliate links need the server's API routes, so the app's WebView loads
 the production site. Only `native/www/offline.html` ships inside the app, shown when there's no
 connection.
 
 ```
-capacitor.config.ts        app id, name, server URL (CAP_SERVER_URL), user agent suffix
+capacitor.config.ts        app id, name, server URL (https://haodego.com; CAP_SERVER_URL overrides), user agent suffix
 ios/App/                   Xcode project (Swift Package Manager, no CocoaPods)
 ios/App/App/Info.plist     permission texts, iPhone-only portrait, app schemes (alipays, weixin, iosamap, diditaxi)
 native/www/offline.html    no-connection page (6 languages)
@@ -19,20 +20,19 @@ The web app can tell it's inside the iOS app: the user agent ends with `ChinaTra
 
 ```bash
 npm run dev                  # web app on localhost:3000
-npx cap sync ios             # without CAP_SERVER_URL the app loads http://localhost:3000
+CAP_SERVER_URL=http://localhost:3000 npx cap sync ios   # point the app at the dev server
 npx cap open ios             # then ▶ in Xcode
 ```
 
 ## Release build
 
-1. Deploy the web app to its own HTTPS domain (not `*.vercel.app`, which is often blocked in mainland China).
-2. Point the app at it and copy the config into the Xcode project:
+1. `https://haodego.com` must serve the web app (Vercel → Domains; Cloudflare DNS records set to "DNS only").
+2. Copy the production config into the Xcode project (undoes any `CAP_SERVER_URL` used for testing):
    ```bash
-   CAP_SERVER_URL=https://your-domain.example npx cap sync ios
+   npx cap sync ios
    ```
 3. In Xcode (`npx cap open ios`) → target **App** → Signing & Capabilities: choose your team. The bundle id
-   is `com.chinatravelbuddy.app`; change it there and in `capacitor.config.ts` (or set `CAP_APP_ID`) if you
-   register a different one.
+   `com.haodego.app` must match the app record in App Store Connect.
 4. Bump **Version** (`MARKETING_VERSION`) and **Build** (`CURRENT_PROJECT_VERSION`) for each upload.
 5. Product → Archive → Distribute App → App Store Connect.
 
