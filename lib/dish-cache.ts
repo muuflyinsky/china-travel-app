@@ -11,7 +11,7 @@ import { rest, supabaseOn } from "./supabase";
 export { supabaseOn };
 
 /** Bump when the prompts change: older entries are then treated as missing and regenerated. */
-export const PROMPT_VERSION = "2026-10-24.3";
+export const PROMPT_VERSION = "2026-10-25.1";
 
 const MEDIUM_TTL = 7 * 24 * 3600_000;
 

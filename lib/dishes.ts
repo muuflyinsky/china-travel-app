@@ -99,7 +99,17 @@ const ALIASES: Record<string, string> = {
   peanuts: "peanut", shellfish: "crustacean", crustaceans: "crustacean", shrimp: "crustacean", prawn: "crustacean", crab: "crustacean",
   wheat: "gluten", eggs: "egg", dairy: "milk", soya: "soy", soybean: "soy", sesame_oil: "sesame", nuts: "tree_nut", tree_nuts: "tree_nut",
   molluscs: "mollusc", mollusk: "mollusc", oyster: "mollusc", sulfites: "sulphites", sulfite: "sulphites", fish_sauce: "fish",
+  oyster_sauce: "mollusc", squid: "mollusc", clam: "mollusc", flour: "gluten", tofu: "soy", sesame_seeds: "sesame",
+  sesame_paste: "sesame", peanut_oil: "peanut", eggs_yolk: "egg", egg_white: "egg", milk_products: "milk", lactose: "milk",
+  monosodium_glutamate: "msg", chicken_powder: "msg", walnut: "tree_nut", cashew: "tree_nut", almond: "tree_nut", shellfish_crustacean: "crustacean",
 };
+// Words models put in "allergens" that aren't allergens: meat, alcohol and spice are covered by
+// their own fields, so they mustn't make a well-known dish look uncertain.
+const NOT_ALLERGENS = new Set([
+  "pork", "beef", "lamb", "mutton", "chicken", "duck", "goose", "meat", "offal", "lard", "animal_fat",
+  "alcohol", "wine", "cooking_wine", "rice_wine", "shaoxing_wine", "chili", "chilli", "spicy", "sichuan_pepper",
+  "garlic", "onion", "scallion", "ginger", "vinegar", "sugar", "salt", "starch", "corn_starch", "none",
+]);
 const s = (v: unknown) => (v == null ? "" : typeof v === "string" ? v : String(v));
 const arr = (v: unknown): unknown[] => (Array.isArray(v) ? v : v == null || v === "" ? [] : [v]);
 const key = (v: unknown) => s(v).toLowerCase().trim().replace(/[\s-]+/g, "_");
@@ -117,7 +127,11 @@ function repairFacts(raw: unknown) {
       const allergens = arr(d.allergens).flatMap((y) => {
         const a = (typeof y === "string" ? { id: y } : y ?? {}) as Record<string, unknown>;
         const id = known.has(key(a.id)) ? key(a.id) : ALIASES[key(a.id)];
-        if (!id) { unsure ||= Boolean(key(a.id)); return []; }
+        if (!id) {
+          // Unknown word: could be an allergen we can't map, so the dish is marked unsure (and logged to extend ALIASES).
+          if (key(a.id) && !NOT_ALLERGENS.has(key(a.id))) { unsure = true; console.warn(`[menu] unknown allergen "${key(a.id)}" in ${s(d.zh)}`); }
+          return [];
+        }
         return [{ id, role: pick(a.role, ["main", "sauce", "garnish"] as const, "main"), via_zh: s(a.via_zh), via: s(a.via) }];
       });
       const spice = Math.round(Number(d.spice));
