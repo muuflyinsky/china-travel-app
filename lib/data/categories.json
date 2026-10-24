@@ -1,0 +1,8 @@
+[
+  { "key": "museum", "q": "博物馆", "types": "140100" },
+  { "key": "temple", "q": "寺庙", "types": "110000" },
+  { "key": "park", "q": "公园", "types": "110000" },
+  { "key": "night", "q": "夜景", "types": "110000" },
+  { "key": "food", "q": "美食", "types": "050000" },
+  { "key": "shopping", "q": "购物中心", "types": "060000" }
+]

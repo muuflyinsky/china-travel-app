@@ -22,6 +22,7 @@ import { goLink } from "@/lib/affiliate";
 import { track } from "@/lib/track";
 import { fmt } from "@/lib/i18n";
 import type { Place } from "@/lib/amap";
+import categoryDefs from "@/lib/data/categories.json";
 
 const NEARBY = [
   { key: "metro", q: "地铁站", Icon: TrainFront },
@@ -32,16 +33,20 @@ const NEARBY = [
   { key: "hospital", q: "医院", Icon: Hospital },
 ] as const;
 
-// Browse by category (SPEC v0.5 P1.6 #21): live Amap search in the city, best rated first.
-const CATEGORIES = [
-  { key: "museum", q: "博物馆", types: "140100", Icon: Landmark },
-  { key: "temple", q: "寺庙", types: "110000", Icon: Church },
-  { key: "park", q: "公园", types: "110000", Icon: Trees },
-  { key: "night", q: "夜景", types: "110000", Icon: MoonStar },
-  { key: "food", q: "美食", types: "050000", Icon: UtensilsCrossed },
-  { key: "shopping", q: "购物中心", types: "060000", Icon: ShoppingBag },
-] as const;
-type CategoryKey = (typeof CATEGORIES)[number]["key"];
+// Browse by category (SPEC v0.5 P1.6 #21), best rated first. Keywords live in
+// lib/data/categories.json, shared with scripts/build-category-lists.mjs, which pre-generates the
+// first page for hot cities into public/categories/; later pages and other cities are live.
+type CategoryKey = "museum" | "temple" | "park" | "night" | "food" | "shopping";
+const ICONS: Record<CategoryKey, typeof Landmark> = { museum: Landmark, temple: Church, park: Trees, night: MoonStar, food: UtensilsCrossed, shopping: ShoppingBag };
+const CATEGORIES = (categoryDefs as { key: CategoryKey; q: string; types: string }[]).map((c) => ({ ...c, Icon: ICONS[c.key] }));
+
+type StaticCategories = { generatedAt: string; cats: Partial<Record<CategoryKey, Place[]>> };
+const staticCats = new Map<string, Promise<StaticCategories | null>>();
+/** The pre-generated lists for a city, fetched once per session; null when there are none. */
+const loadStatic = (adcode: string) => {
+  if (!staticCats.has(adcode)) staticCats.set(adcode, fetch(`/categories/${adcode}.json`).then((r) => (r.ok ? r.json() : null)).catch(() => null));
+  return staticCats.get(adcode)!;
+};
 
 /** Screens scroll inside Konsta's Page element, not the window. */
 const scrollTop = () => document.querySelector(".k-page")?.scrollTo({ top: 0, behavior: "smooth" });
@@ -86,6 +91,14 @@ function Explore() {
     const append = next.page > 1;
     setBusy(append ? "more" : "search"); setNotice(undefined); if (!append) { setDest(null); setPlaces([]); }
     setQuery(next);
+    // First page of a category in a hot city: the static file, no Amap call.
+    if (next.cat && !append && isHotCity(city.a)) {
+      const list = (await loadStatic(city.a))?.cats[next.cat];
+      if (list?.length) {
+        setPlaces(list); setDemo(false); setMore(list.length >= 10); setBusy("");
+        return;
+      }
+    }
     const qs = new URLSearchParams({ q: next.keyword, page: String(next.page) });
     if (next.nearby && here) qs.set("around", here.location); else qs.set("city", city.a);
     if (next.types) qs.set("types", next.types);

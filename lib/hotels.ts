@@ -63,7 +63,7 @@ export function candidate(p: Place, cityShort: string, bounds: [number, number, 
 }
 
 async function nearestMetro(location: string) {
-  const [s] = await searchPlaces({ around: location, types: "150500", radius: 1500, pageSize: 1 }).catch(() => []);
+  const [s] = await searchPlaces({ around: location, types: "150500", radius: 1500, pageSize: 1, purpose: "hotels" }).catch(() => []);
   return s?.distance ? { name: s.name.replace(/\(.*\)$/, ""), meters: Number(s.distance) } : null;
 }
 
@@ -91,7 +91,7 @@ export async function cityPicks(adcode: string, cityShort: string, around?: stri
   // A generic query plus the biggest brands, so chains aren't crowded out by guesthouses.
   const queries = [["酒店", 1], ["酒店", 2], ["万豪", 1], ["希尔顿", 1], ["洲际", 1], ["凯悦", 1], ["全季", 1], ["亚朵", 1]] as const;
   const pages = await Promise.all(queries.map(([keywords, page]) =>
-    searchPlaces(around ? { keywords, types: "100100", around, radius: 2500, page } : { keywords, types: "100100", city: adcode, page }).catch(() => [])));
+    searchPlaces(around ? { keywords, types: "100100", around, radius: 2500, page, purpose: "hotels" } : { keywords, types: "100100", city: adcode, page, purpose: "hotels" }).catch(() => [])));
   const seen = new Set<string>();
   const pool = pages.flat().filter((p) => !seen.has(p.id) && seen.add(p.id))
     .map((p) => candidate(p, cityShort, bounds)).filter((h): h is HotelPick => h !== null);

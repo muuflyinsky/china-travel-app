@@ -40,6 +40,7 @@ function AwardRestaurants({ adcode, onPick }: { adcode: string; onPick: (p: Plac
         {d.restaurants.map((r) => (
           <li key={r.zh}>
             <button onClick={() => onPick(r.poi ?? r.zh)} className="flex min-h-14 w-full items-center gap-3 px-4 py-3 text-left">
+              {r.poi?.photo && <Photo src={r.poi.photo} alt="" shape="square" />}
               <span className="min-w-0 flex-1">
                 <span className="zh block text-body">{r.zh}</span>
                 {(r.en || r.cuisine) && <span className="block text-footnote text-muted">{[r.en, r.cuisine && <span key="c" className="zh">{r.cuisine}</span>].filter(Boolean).reduce<React.ReactNode[]>((a, x, i) => (i ? [...a, " · ", x] : [x]), [])}</span>}

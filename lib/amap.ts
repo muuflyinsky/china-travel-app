@@ -1,7 +1,9 @@
 import { pinyin } from "pinyin-pro";
 import { config, demo } from "./config";
 import * as mock from "./demo";
+import { after } from "next/server";
 import { Unavailable } from "./errors";
+import { logRow } from "./supabase";
 
 // Amap (高德) Web Service API. Docs: https://lbs.amap.com/api/webservice/summary
 // AMAP_BASE_URL is for tests against a local mock; production uses the default.
@@ -27,12 +29,26 @@ export type Place = {
   awards?: import("./restaurant-awards").Award[];
 };
 
-async function amap<T>(path: string, params: Record<string, string | undefined>): Promise<T> {
+/** What a call is for; the baseline for moving recommendations off live Amap search. */
+export type AmapPurpose = "search" | "category" | "nearby" | "guide" | "restaurants" | "hotels" | "route" | "weather" | "geocode";
+
+/**
+ * One `amap_call` row per request this code makes (into the events table, see lib/supabase.ts),
+ * after the response is sent. Requests answered from Next's 5-minute fetch cache are counted
+ * too, so this is an upper bound on what Amap bills.
+ */
+function count(api: string, purpose: AmapPurpose, ok: boolean) {
+  const row = { e: "amap_call", p: { api, purpose, ok }, sid: null };
+  try { after(() => logRow("events", row)); } catch { void logRow("events", row); }
+}
+
+async function amap<T>(path: string, params: Record<string, string | undefined>, purpose: AmapPurpose): Promise<T> {
   if (!config.amapKey) throw new Unavailable("map");
   const qs = new URLSearchParams({ key: config.amapKey });
   for (const [k, v] of Object.entries(params)) if (v) qs.set(k, v);
   const res = await fetch(`${BASE}${path}?${qs}`, { next: { revalidate: 300 } });
   const data = await res.json();
+  count(path, purpose, data.status === "1");
   if (data.status !== "1") throw new Error(`Amap ${path}: ${data.info ?? "error"} (${data.infocode ?? ""})`);
   return data as T;
 }
@@ -103,30 +119,30 @@ function toPlace(p: RawPoi): Place {
   };
 }
 
-export async function searchPlaces(q: { keywords?: string; city?: string; around?: string; types?: string; page?: number; radius?: number; pageSize?: number }) {
+export async function searchPlaces(q: { keywords?: string; city?: string; around?: string; types?: string; page?: number; radius?: number; pageSize?: number; purpose?: AmapPurpose }) {
   if (demo.maps) return mock.places(q.keywords, q.types);
   const fields = { show_fields: "business,photos", page_size: String(q.pageSize ?? 20), page_num: String(q.page ?? 1) };
   const data = q.around
     ? await amap<{ pois: RawPoi[] }>("/v5/place/around", {
         location: q.around, keywords: q.keywords, types: q.types, radius: String(q.radius ?? 5000), sortrule: "distance", ...fields,
-      })
+      }, q.purpose ?? "nearby")
     : await amap<{ pois: RawPoi[] }>("/v5/place/text", {
         keywords: q.keywords, types: q.types, region: q.city, city_limit: q.city ? "true" : undefined, ...fields,
-      });
+      }, q.purpose ?? "search");
   return data.pois.map(toPlace);
 }
 
 /** Chinese address → "lng,lat" (GCJ-02), or null when Amap can't place it. */
 export async function geocode(address: string): Promise<string | null> {
   if (demo.maps) return "121.4910,31.2454";
-  const d = await amap<{ geocodes: { location: string }[] }>("/v3/geocode/geo", { address });
+  const d = await amap<{ geocodes: { location: string }[] }>("/v3/geocode/geo", { address }, "geocode");
   return d.geocodes?.[0]?.location || null;
 }
 
 export async function reverseGeocode(location: string) {
   if (demo.maps) return mock.regeo;
   const d = await amap<{ regeocode: { formatted_address: string; addressComponent: { city: string | []; province: string; citycode: string; adcode: string } } }>(
-    "/v3/geocode/regeo", { location },
+    "/v3/geocode/regeo", { location }, "geocode",
   );
   const c = d.regeocode.addressComponent;
   return {
@@ -140,7 +156,7 @@ export async function reverseGeocode(location: string) {
 export async function weather(adcode: string) {
   if (demo.maps) return mock.weather;
   const d = await amap<{ forecasts: { city: string; casts: { date: string; dayweather: string; daytemp: string; nighttemp: string }[] }[] }>(
-    "/v3/weather/weatherInfo", { city: adcode, extensions: "all" },
+    "/v3/weather/weatherInfo", { city: adcode, extensions: "all" }, "weather",
   );
   return d.forecasts[0];
 }
@@ -200,10 +216,10 @@ export async function routes(origin: string, destination: string, city: string, 
   const [transit, drive] = await Promise.all([
     amap<{ route: { taxi_cost?: string; transits?: RawTransit[] } }>("/v3/direction/transit/integrated", {
       origin, destination, city, cityd: cityTo ?? city, strategy: "0", nightflag: "1",
-    }).catch((e) => { console.error("[route] transit:", (e as Error).message); return null; }),
+    }, "route").catch((e) => { console.error("[route] transit:", (e as Error).message); return null; }),
     amap<{ route: { taxi_cost?: string; paths?: { distance: string; duration: string }[] } }>("/v3/direction/driving", {
       origin, destination, strategy: "10", extensions: "base",
-    }).catch((e) => { console.error("[route] driving:", (e as Error).message); return null; }),
+    }, "route").catch((e) => { console.error("[route] driving:", (e as Error).message); return null; }),
   ]);
   if (!transit && !drive) throw new Error("Amap routes unavailable");
   const path = drive?.route.paths?.[0];

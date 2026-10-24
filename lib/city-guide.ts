@@ -31,7 +31,7 @@ export function rankSights(places: Place[]) {
 
 /** Middle half of per-person spend at restaurants serving the dish, rounded to ¥10. */
 async function spendFor(dish: string, adcode: string): Promise<[number, number] | undefined> {
-  const shops = await searchPlaces({ keywords: dish, types: "050000", city: adcode }).catch(() => []);
+  const shops = await searchPlaces({ keywords: dish, types: "050000", city: adcode, purpose: "guide" }).catch(() => []);
   const costs = shops.map((s) => Number(s.cost)).filter((c) => c > 0).sort((a, b) => a - b);
   if (costs.length < 3) return undefined;
   const q = (f: number) => Math.round(costs[Math.floor(f * (costs.length - 1))] / 10) * 10;
@@ -60,9 +60,9 @@ export async function basicGuide(adcode: string, cityZh: string, cityEn: string)
 
 async function topSights(adcode: string) {
   const pages = await Promise.all([
-    searchPlaces({ keywords: "景点", types: "110000", city: adcode, page: 1 }),
-    searchPlaces({ keywords: "景点", types: "110000", city: adcode, page: 2 }).catch(() => []),
-    searchPlaces({ keywords: "博物馆", types: "140100", city: adcode, page: 1 }).catch(() => []),
+    searchPlaces({ keywords: "景点", types: "110000", city: adcode, page: 1, purpose: "guide" }),
+    searchPlaces({ keywords: "景点", types: "110000", city: adcode, page: 2, purpose: "guide" }).catch(() => []),
+    searchPlaces({ keywords: "博物馆", types: "140100", city: adcode, page: 1, purpose: "guide" }).catch(() => []),
   ]);
   return rankSights(pages.flat());
 }
@@ -104,9 +104,9 @@ export async function generateGuide(adcode: string, cityZh: string, cityEn: stri
 
   // Areas: locate each suggestion's landmark, then count metro stations within 1 km of it.
   const located = await Promise.all((text.areas ?? []).slice(0, 3).map(async (a): Promise<GuideArea | null> => {
-    const [spot] = await searchPlaces({ keywords: a.anchor_zh, city: adcode, pageSize: 1 }).catch(() => []);
+    const [spot] = await searchPlaces({ keywords: a.anchor_zh, city: adcode, pageSize: 1, purpose: "guide" }).catch(() => []);
     if (!spot) return null;
-    const stations = await searchPlaces({ around: spot.location, types: "150500", radius: 1000, pageSize: 25 }).catch(() => []);
+    const stations = await searchPlaces({ around: spot.location, types: "150500", radius: 1000, pageSize: 25, purpose: "guide" }).catch(() => []);
     return { zh: a.zh, name: a.name, reason: a.reason, location: spot.location, metro: stations.length };
   }));
   const areas = located.filter((a): a is GuideArea => a !== null);

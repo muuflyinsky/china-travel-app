@@ -13,6 +13,7 @@ export async function GET(req: Request) {
       around: q.get("around") ?? undefined,
       types: q.get("types") ?? undefined,
       page: Number(q.get("page") ?? 1),
+      purpose: q.get("around") ? "nearby" : q.get("sort") === "rating" && q.get("types") ? "category" : "search",
     });
     // Searches are cleaned and ordered (#21): `sort=rating` for category browsing, otherwise sights,
     // hotels, food and metro first. "Nearby" (around) keeps everything, nearest first.

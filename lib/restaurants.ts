@@ -48,7 +48,7 @@ async function resolve(r: AwardRestaurant, city: string): Promise<ListedRestaura
   const key = `${city}:${r.zh}`;
   const hit = resolved.get(key);
   if (hit && Date.now() - hit.at < 864e5) return { ...r, poi: hit.poi, rating: Number(hit.poi?.rating) || undefined, cost: Number(hit.poi?.cost) || undefined };
-  const found = await searchPlaces({ keywords: r.zh, types: "050000", city }).catch(() => []);
+  const found = await searchPlaces({ keywords: r.zh, types: "050000", city, purpose: "restaurants" }).catch(() => []);
   const poi = found.find((p) => sameRestaurant(r.zh, p.name)) ?? null;
   resolved.set(key, { at: Date.now(), poi });
   return { ...r, poi, rating: Number(poi?.rating) || undefined, cost: Number(poi?.cost) || undefined };
@@ -56,7 +56,7 @@ async function resolve(r: AwardRestaurant, city: string): Promise<ListedRestaura
 
 /** Well-rated restaurants straight from Amap, with guide badges where a listed restaurant matches. */
 async function amapRestaurants(city: string): Promise<ListedRestaurant[]> {
-  const pages = await Promise.all([1, 2].map((page) => searchPlaces({ keywords: "美食", types: "050000", city, page }).catch(() => [])));
+  const pages = await Promise.all([1, 2].map((page) => searchPlaces({ keywords: "美食", types: "050000", city, page, purpose: "restaurants" }).catch(() => [])));
   const seen = new Set<string>();
   return withAwards(pages.flat())
     .filter((p) => p.rating && !seen.has(p.id) && seen.add(p.id))
