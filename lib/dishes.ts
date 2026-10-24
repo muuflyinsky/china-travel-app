@@ -237,6 +237,7 @@ export async function* readMenu(input: { image?: { data: string; mediaType: stri
   for (let k = 0; k < misses.length; k += CHUNK) batches.push(misses.slice(k, k + CHUNK));
   const running = new Map<number, Promise<Done>>();
   const failed: number[] = [];
+  const writes: Promise<unknown>[] = [];
   let next = 0, tipsSent = false, lastError = "";
   const launch = () => {
     if (next >= batches.length) return;
@@ -258,15 +259,18 @@ export async function* readMenu(input: { image?: { data: string; mediaType: stri
       if (!f) { failed.push(i); continue; }
       const dish: ListDish = { ...f, zh: items[i].zh, price: items[i].price, printed: items[i].printed || undefined };
       if (!items[i].printed) {
-        cachePut(items[i].zh, region, input.lang, {
+        writes.push(cachePut(items[i].zh, region, input.lang, {
           facts: { pinyin: f.pinyin, allergens: f.allergens.map(({ id, role, via_zh }) => ({ id, role, via_zh })), spice: f.spice, vegetarian: f.vegetarian, meat: f.meat, alcohol: f.alcohol, confidence: f.confidence },
           text: { name: f.name, short: f.short, via: Object.fromEntries(f.allergens.map((a) => [a.via_zh, a.via])) },
-        }).catch((e) => console.error("[dish-cache] write:", (e as Error).message));
+        }).catch((e) => console.error("[dish-cache] write:", (e as Error).message)));
       }
       yield { type: "dish", i, dish, cached: false };
     }
   }
   // The first upstream error (no secrets in it) helps diagnose from the browser when logs aren't at hand.
+  // Serverless hosts freeze the instance once the response ends, so writes still in flight would be
+  // cut off (a dish row without its text row). Dishes are already on screen; this only delays "done".
+  await Promise.allSettled(writes);
   if (failed.length) yield { type: "missing", i: failed.sort((a, b) => a - b), reason: lastError.slice(0, 200) };
   console.log(`[menu] ${input.image ? "photo" : "text"} dishes=${items.length} read=${tRead - t0}ms cache=${items.length - misses.length}/${items.length} (${tCache - tRead}ms) generate=${Date.now() - tCache}ms failed=${failed.length} total=${Date.now() - t0}ms prompt=${PROMPT_VERSION}`);
 }
@@ -288,7 +292,8 @@ export async function dishDetail(input: { zh: string; printed?: string; lang: st
   });
   // Without menu text nothing can be "on the menu"; models still say so sometimes.
   const d = input.printed ? raw : { ...raw, ingredients: raw.ingredients.map((i) => ({ ...i, source: "standard_recipe" as const })) };
-  if (!input.printed && hit) cachePut(input.zh, region, input.lang, { ...hit, detail: d }).catch((e) => console.error("[dish-cache] write:", (e as Error).message));
+  // Awaited for the same reason as in readMenu: an unawaited write can be frozen mid-way.
+  if (!input.printed && hit) await cachePut(input.zh, region, input.lang, { ...hit, detail: d }).catch((e) => console.error("[dish-cache] write:", (e as Error).message));
   console.log(`[dish] generated ${normalizeName(input.zh)} ${Date.now() - t0}ms`);
   return { ...d, cached: false };
 }
