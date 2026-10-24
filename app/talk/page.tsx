@@ -60,16 +60,21 @@ export default function TalkPage() {
   async function go(input = text) {
     if (!input.trim()) { setError(t.talk.typeFirst); inputRef.current?.focus(); return; }
     setLoading(true); setRes(null); setError(undefined);
+    let d: Result;
     try {
       const r = await fetch("/api/translate", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text: input, from, to }) });
-      const d = await r.json();
+      d = await r.json();
       if (!r.ok) throw new Error();
-      setRes(d); setCopied(false); play(d.translation);
     } catch {
       setError(t.talk.down);
+      return;
     } finally {
       setLoading(false);
     }
+    setRes(d); setCopied(false);
+    // Playback can fail (e.g. iOS right after the microphone was in use); that isn't a
+    // translation failure, so it must not show the "translation unavailable" message.
+    try { play(d.translation); } catch { setSpeaking(false); }
   }
 
   /** Plays the translation; tapping again while it plays stops it. */
