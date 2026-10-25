@@ -19,7 +19,7 @@ import type { ListDish, DishDetail, MenuEvent } from "@/lib/dishes";
 import { SourceLine } from "@/components/SourceLine";
 import { Feedback } from "@/components/Feedback";
 import { verdict, withDetailAllergens, type Verdict, type VerdictKind } from "@/lib/verdict";
-import { VerdictTag, reasonText } from "@/components/VerdictTag";
+import { VerdictTag, reasonText, verdictLabel } from "@/components/VerdictTag";
 import { orderCard, staffReplies, allergyExplain as allergyExplainText } from "@/lib/order-card";
 
 /** The menu as it streams in. `dishes` is indexed by position on the menu; gaps are still coming. */
@@ -65,7 +65,7 @@ function DishRow({ d, v, restricted, line, onChange, onOpen, homePrice }: {
 }) {
   const t = useT();
   return (
-    <div className={`rounded-card border border-line bg-card ${v.kind === "no" ? "opacity-60" : ""}`}>
+    <div className={`rounded-card border bg-card ${v.kind === "no" ? "border-danger" : "border-line"}`}>
       <button onClick={onOpen} className="block w-full px-4 pt-2.5 text-left">
         <span className="flex items-baseline justify-between gap-3">
           <span className="min-w-0 text-body font-semibold">{d.name}</span>
@@ -151,8 +151,8 @@ function DishSheet({ d, v, mine, detail, line, onAdd, onFlag, onClose, homePrice
         <div className="min-h-0 flex-1 space-y-4 overflow-auto px-4 pt-3 pb-3">
           {typeof detail === "object" && detail.literal && <p className="text-subhead text-muted">{t.eat.detailLiteral}: “{detail.literal}”</p>}
 
-          <div className={`rounded-card p-3 text-subhead ${{ ok: "bg-ok-soft text-ok", ask: "bg-warn-soft text-warn", no: "bg-danger-soft text-danger" }[v.kind]}`}>
-            <p className="font-semibold">{{ ok: t.eat.verdictOk, ask: t.eat.verdictAsk, no: t.eat.verdictNo }[v.kind]}</p>
+          <div className={`rounded-card p-3 text-subhead ${v.confirm ? "bg-porcelain text-ink" : { ok: "bg-ok-soft text-ok", ask: "bg-warn-soft text-warn", no: "bg-danger-soft text-danger" }[v.kind]}`}>
+            <p className="font-semibold">{verdictLabel(t, v)}</p>
             {v.blocked.length > 0 ? <p>{fmt(t.eat.blockedSevere, { x: v.blocked.map((a) => t.allergens[a as AllergenId].toLowerCase()).join(", ") })}</p>
               : v.kind === "ok" ? <p>{t.eat.whyOk}</p>
               : <p>{[...v.reasons.filter((r) => r.k !== "has" || v.kind === "no").map((r) => reasonText(t, r)), v.kind === "ask" && removable && fmt(t.eat.whyAsk, { x: removable })].filter(Boolean).join(" · ")}</p>}
@@ -184,9 +184,9 @@ function DishSheet({ d, v, mine, detail, line, onAdd, onFlag, onClose, homePrice
           <Feedback kind="menu_dish" id={d.zh} version={DISH_FEEDBACK_VERSION} reportLabel={t.eat.wrongInfo} onReport={onFlag} />
         </div>
 
-        {/* Severe allergen as a main ingredient: no add button at all. "Don't order" for another reason
-            (an allergen is a main ingredient, diet): only a plain, secondary Add — leaving out a sauce
-            wouldn't fix it, so "add, without X" is offered only for "ask first". */}
+        {/* Severe allergen anywhere in the usual recipe: no add button at all. "Don't order" for another
+            reason (an allergen is a main ingredient, diet): only a plain, secondary Add — leaving out a
+            sauce wouldn't fix it, so "add, without X" is offered only for "ask first". */}
         {!v.blocked.length && !line && (
           <div className="flex shrink-0 gap-2 border-t border-line px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom))]">
             {withoutOffer && (
@@ -254,28 +254,49 @@ function AllergyStatus({ onEdit, onCard }: { onEdit: () => void; onCard: () => v
   );
 }
 
-/** First visit to Eat: ask once about allergies, with "none" as the first answer. */
+/**
+ * First visit to Eat: ask once about allergies, with "none" as the first answer. Once an allergen
+ * is picked, "none" goes away (it would wipe the picks) and Save becomes the pinned main button.
+ * New allergies start as severe; finer control per allergen is in Settings.
+ */
 function AllergySheet({ onDone }: { onDone: () => void }) {
   const t = useT();
   const [p, set] = useProfile();
   const [a, setA] = useState<string[]>(p.allergens);
   const [d, setD] = useState<string[]>(p.diets);
-  const finish = (allergens: string[], diets: string[]) => { set({ allergens, diets, allergiesAsked: true }); onDone(); };
+  const [severe, setSevere] = useState(p.allergens.length === 0 || p.severe.some((x) => p.allergens.includes(x)));
+  const finish = (allergens: string[], diets: string[]) => {
+    set({ allergens, diets, severe: severe ? allergens : allergens.filter((x) => p.severe.includes(x)), allergiesAsked: true });
+    onDone();
+  };
   return (
     <Popup opened onBackdropClick={() => finish(a, d)}>
-      <div className="flex h-full flex-col overflow-auto bg-porcelain px-4 pt-[calc(16px+env(safe-area-inset-top))] pb-[calc(32px+env(safe-area-inset-bottom))] text-ink">
-        <h2 className="text-title">{t.eat.allergyAsk}</h2>
-        <p className="mt-1 text-subhead text-muted">{t.eat.allergyAskSub}</p>
-        <Button className="mt-4 w-full" onClick={() => finish([], d)}>{t.eat.noAllergy}</Button>
-        <p className="mt-6 mb-2 text-subhead font-semibold text-muted">{t.settings.allergies}</p>
-        <div className="flex flex-wrap gap-2">
-          {ALLERGENS.map((x) => <button key={x.id} className="pill" aria-pressed={a.includes(x.id)} onClick={() => setA(toggle(a, x.id))}>{t.allergens[x.id]}</button>)}
+      <div className="flex h-full flex-col bg-porcelain text-ink">
+        <div className="min-h-0 flex-1 overflow-auto px-4 pt-[calc(16px+env(safe-area-inset-top))] pb-4">
+          <h2 className="text-title">{t.eat.allergyAsk}</h2>
+          <p className="mt-1 text-subhead text-muted">{t.eat.allergyAskSub}</p>
+          {a.length === 0 && <Button className="mt-4 w-full" onClick={() => finish([], d)}>{t.eat.noAllergy}</Button>}
+          <p className="mt-6 mb-2 text-subhead font-semibold text-muted">{t.settings.allergies}</p>
+          <div className="flex flex-wrap gap-2">
+            {ALLERGENS.map((x) => <button key={x.id} className="pill" aria-pressed={a.includes(x.id)} onClick={() => setA(toggle(a, x.id))}>{t.allergens[x.id]}</button>)}
+          </div>
+          {a.length > 0 && (
+            <label className="mt-3 flex min-h-touch items-center gap-3 rounded-control bg-card px-3 ring-1 ring-line">
+              <ShieldAlert className="h-5 w-5 shrink-0 text-danger" aria-hidden />
+              <span className="min-w-0 flex-1 text-subhead">{t.settings.severe}</span>
+              <input type="checkbox" className="h-6 w-6 accent-[var(--danger)]" checked={severe} onChange={() => setSevere(!severe)} />
+            </label>
+          )}
+          <p className="mt-6 mb-2 text-subhead font-semibold text-muted">{t.settings.diet}</p>
+          <div className="flex flex-wrap gap-2">
+            {DIETS.map((x) => <button key={x.id} className="pill" aria-pressed={d.includes(x.id)} onClick={() => setD(toggle(d, x.id))}>{t.diets[x.id]}</button>)}
+          </div>
         </div>
-        <p className="mt-6 mb-2 text-subhead font-semibold text-muted">{t.settings.diet}</p>
-        <div className="flex flex-wrap gap-2">
-          {DIETS.map((x) => <button key={x.id} className="pill" aria-pressed={d.includes(x.id)} onClick={() => setD(toggle(d, x.id))}>{t.diets[x.id]}</button>)}
-        </div>
-        <Button variant="soft" className="mt-6 w-full" onClick={() => finish(a, d)}>{t.eat.save}</Button>
+        {a.length + d.length > 0 && (
+          <div className="shrink-0 border-t border-line px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom))]">
+            <Button className="w-full" onClick={() => finish(a, d)}>{t.eat.save}</Button>
+          </div>
+        )}
       </div>
     </Popup>
   );
@@ -377,10 +398,8 @@ export default function MenuPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [menu, profile.allergens, profile.diets, profile.severe]);
   const count = (k: VerdictKind) => rows.filter((r) => r.v.kind === k).length;
-  // "Don't order" sinks to the bottom once everything has arrived (not while streaming: no jumps).
-  const rank = { ok: 0, ask: 1, no: 2 };
-  const sorted = menu?.streaming ? rows : [...rows].sort((a, b) => rank[a.v.kind] - rank[b.v.kind] || a.i - b.i);
-  const shown = filter === "all" ? sorted : sorted.filter((r) => r.v.kind === filter);
+  // Menu order, not "ok" first: a dish at the top of the list must not read as a recommendation.
+  const shown = filter === "all" ? rows : rows.filter((r) => r.v.kind === filter);
   const pending = menu?.streaming ? Math.max(0, menu.total - rows.length - menu.missing) : 0;
   const restrictionNames = [...profile.allergens.map((a) => t.allergens[a as AllergenId]), ...profile.diets.map((d) => t.diets[d as DietId])];
   const restrictionLabels = [

@@ -201,7 +201,8 @@ export default function SettingsPage() {
         <div className="flex flex-wrap gap-2">
           {shown.map((a) => (
             <button key={a.id} className="pill" aria-pressed={p.allergens.includes(a.id)}
-              onClick={() => set({ allergens: toggle(p.allergens, a.id), severe: p.severe.filter((x) => x !== a.id), allergiesAsked: true })}>
+              // A newly added allergy starts as severe; untick it below if a trace is fine.
+              onClick={() => set({ allergens: toggle(p.allergens, a.id), severe: p.allergens.includes(a.id) ? p.severe.filter((x) => x !== a.id) : [...p.severe, a.id], allergiesAsked: true })}>
               {t.allergens[a.id]}
             </button>
           ))}
