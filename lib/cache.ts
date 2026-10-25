@@ -1,0 +1,38 @@
+// Durable JSON cache for computed content (city guides, hotel picks): the Supabase table
+// app_cache (supabase/migrations/0007) when the service role key is set, otherwise
+// data/<ns>/<key>.json for local development. Reads and writes never throw: a cache problem
+// means recomputing, not an error page.
+import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { rest, supabaseOn } from "./supabase";
+
+const file = (ns: string, key: string) => `data/${ns}/${key.replace(/[^0-9a-z.@_-]/gi, "_")}.json`;
+
+export async function cacheRead<T>(ns: string, key: string): Promise<T | null> {
+  try {
+    if (supabaseOn) {
+      const rows = (await rest(`app_cache?select=value&ns=eq.${encodeURIComponent(ns)}&key=eq.${encodeURIComponent(key)}`)) as { value: T }[];
+      return rows[0]?.value ?? null;
+    }
+    return JSON.parse(await readFile(file(ns, key), "utf8")) as T;
+  } catch (e) {
+    if (supabaseOn) console.error(`[cache] read ${ns}/${key}:`, (e as Error).message);
+    return null;
+  }
+}
+
+export async function cacheWrite(ns: string, key: string, value: { generatedAt: string }) {
+  try {
+    if (supabaseOn) {
+      await rest("app_cache?on_conflict=ns,key", {
+        method: "POST",
+        headers: { prefer: "resolution=merge-duplicates,return=minimal" },
+        body: JSON.stringify({ ns, key, value, generated_at: value.generatedAt, updated_at: new Date().toISOString() }),
+      });
+      return;
+    }
+    await mkdir(`data/${ns}`, { recursive: true });
+    await writeFile(file(ns, key), JSON.stringify(value, null, 2));
+  } catch (e) {
+    console.error(`[cache] write ${ns}/${key}:`, (e as Error).message);
+  }
+}

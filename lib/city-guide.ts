@@ -1,10 +1,12 @@
-import { readFile, writeFile, mkdir, appendFile } from "node:fs/promises";
+import { mkdir, appendFile } from "node:fs/promises";
 import { searchPlaces, py, type Place } from "./amap";
 import { analyzeMenu, currentModel, writeCityGuide } from "./llm";
 import { aiProvider, config, demo } from "./config";
 import { Unavailable } from "./errors";
 import { RESERVATION_SOURCE, reservationFor } from "./reservations";
 import * as mock from "./demo";
+import { cacheRead, cacheWrite } from "./cache";
+import { logRow } from "./supabase";
 import type { CityGuide, GuideArea, GuideDish, GuideSight } from "./city-guide-types";
 
 // Automatic city guides (SPEC v0.4 · Explore). Facts come from data, words from the model:
@@ -123,11 +125,11 @@ export async function generateGuide(adcode: string, cityZh: string, cityEn: stri
 const TTL = 30 * 864e5;
 const memory = new Map<string, CityGuide>();
 const inflight = new Map<string, Promise<CityGuide>>();
-const file = (adcode: string) => `data/city-guide/${adcode}.json`;
 
+/** Kept in memory and in the durable cache (lib/cache.ts), so every server instance can use it. */
 const save = async (g: CityGuide) => {
   memory.set(g.adcode, g);
-  try { await mkdir("data/city-guide", { recursive: true }); await writeFile(file(g.adcode), JSON.stringify(g, null, 2)); } catch {}
+  await cacheWrite("city_guide", g.adcode, g);
 };
 
 /**
@@ -147,7 +149,8 @@ export async function cityGuide(adcode: string, cityZh: string, cityEn: string, 
   const fresh = (g?: CityGuide) => g && Date.now() - Date.parse(g.generatedAt) < TTL;
   let cached = memory.get(adcode);
   if (!fresh(cached)) {
-    try { const disk = JSON.parse(await readFile(file(adcode), "utf8")) as CityGuide; if (fresh(disk)) { cached = disk; memory.set(adcode, disk); } } catch {}
+    const stored = await cacheRead<CityGuide>("city_guide", adcode);
+    if (fresh(stored ?? undefined)) { cached = stored!; memory.set(adcode, stored!); }
   }
   const complete = (g?: CityGuide) => fresh(g) && !(g as { partial?: boolean }).partial;
   if (complete(cached)) return { guide: cached! };
@@ -155,10 +158,16 @@ export async function cityGuide(adcode: string, cityZh: string, cityEn: string, 
   // Map data now; the model's part in the background, once per city at a time.
   const guide = fresh(cached) ? cached! : await basicGuide(adcode, cityZh, cityEn);
   if (guide !== cached) memory.set(adcode, guide);
+  // Each background run logs whether it finished and how long it took (events: guide_generated),
+  // to tell a slow model from a run cut off by the function time limit.
   const later = aiProvider && !inflight.has(adcode) ? async () => {
+    const t0 = Date.now();
     const job = generateGuide(adcode, cityZh, cityEn).then(async (g) => { await save(g); await review(g); return g; }).finally(() => inflight.delete(adcode));
     inflight.set(adcode, job);
-    await job.catch((e) => console.error("[city-guide] background generation failed:", e));
+    await job.then(
+      (g) => logRow("events", { e: "guide_generated", p: { city: adcode, ok: true, ms: Date.now() - t0, partial: Boolean((g as { partial?: boolean }).partial) }, sid: null }),
+      (e) => { console.error("[city-guide] background generation failed:", e); return logRow("events", { e: "guide_generated", p: { city: adcode, ok: false, ms: Date.now() - t0, error: String((e as Error).message ?? e).slice(0, 40) }, sid: null }); },
+    );
   } : undefined;
   return { guide, later };
 }

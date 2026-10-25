@@ -1,8 +1,8 @@
-import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { searchPlaces, type Place } from "./amap";
 import { demo } from "./config";
 import { TRIP_CITY_ID } from "./affiliate";
 import * as mock from "./demo";
+import { cacheRead, cacheWrite } from "./cache";
 import { TIER_IDS, tierBounds, tierOf, type CityPicks, type HotelPick, type TierId } from "./hotel-tiers";
 
 export { tierBounds };
@@ -70,9 +70,8 @@ async function nearestMetro(location: string) {
 const PER_TIER = 3;
 const TTL = 7 * 864e5;
 const memory = new Map<string, CityPicks>();
-const file = (key: string) => `data/hotels/${key.replace(/[^0-9a-z.@_-]/gi, "_")}.json`;
 
-/** Picks for a city, cached in memory and on disk (data/hotels/<adcode>.json) for 7 days. */
+/** Picks for a city, cached in memory and in the durable cache (lib/cache.ts) for 7 days. */
 /**
  * Picks for a city — or, with `around` ("lng,lat"), for the area within 2.5 km of that point
  * (the Stay page's "where to stay" areas).
@@ -82,10 +81,8 @@ export async function cityPicks(adcode: string, cityShort: string, around?: stri
   const key = around ? `${adcode}@${around}` : adcode;
   const fresh = (c?: CityPicks) => c && Date.now() - Date.parse(c.generatedAt) < TTL;
   if (fresh(memory.get(key))) return memory.get(key)!;
-  try {
-    const disk = JSON.parse(await readFile(file(key), "utf8")) as CityPicks;
-    if (fresh(disk)) { memory.set(key, disk); return disk; }
-  } catch {}
+  const stored = await cacheRead<CityPicks>("hotel_picks", key);
+  if (fresh(stored ?? undefined)) { memory.set(key, stored!); return stored!; }
 
   const bounds = tierBounds(cityShort);
   // A generic query plus the biggest brands, so chains aren't crowded out by guesthouses.
@@ -105,6 +102,7 @@ export async function cityPicks(adcode: string, cityShort: string, around?: stri
   }
   const picks: CityPicks = { city: cityShort, generatedAt: new Date().toISOString(), source: "amap", tiers };
   memory.set(key, picks);
-  try { await mkdir("data/hotels", { recursive: true }); await writeFile(file(key), JSON.stringify(picks, null, 2)); } catch {}
+  // An empty result isn't stored: it would hide a fix (or a better Amap day) for a week.
+  if (TIER_IDS.some((id) => tiers[id].length)) await cacheWrite("hotel_picks", key, picks);
   return picks;
 }
