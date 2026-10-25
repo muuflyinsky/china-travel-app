@@ -606,7 +606,6 @@ export const ja: Dict = {
   },
   awards: {
     cuisine: "料理ジャンルで絞り込む",
-    photoOf: "写真 {i}/{n}",
     daily: "毎日",
     closed: "定休",
     signature: "看板料理",

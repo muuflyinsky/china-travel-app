@@ -606,7 +606,6 @@ export const ko: Dict = {
   },
   awards: {
     cuisine: "요리 종류로 필터",
-    photoOf: "사진 {i}/{n}",
     daily: "매일",
     closed: "휴무",
     signature: "대표 메뉴",

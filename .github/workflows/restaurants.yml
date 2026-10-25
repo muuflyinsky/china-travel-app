@@ -1,11 +1,10 @@
-# Matches guide-listed restaurants to Amap (photos, signature-dish tags, price, hours) and picks
-# cover photos. Monthly, or by hand (Actions → Restaurants → Run workflow), optionally for one city.
-# Secrets: AMAP_KEY (required); AI_API_KEY for covers; SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY to
-# also write the restaurants table (apply supabase/migrations/0005 first).
+# Matches guide-listed restaurants to Amap (signature-dish tags, price, hours; no photos). By hand
+# only (Actions → Restaurants → Run workflow), so it never spends Amap quota unasked: about one
+# call per restaurant. Use city/limit to stay within the daily quota; a re-run continues.
+# Secrets: AMAP_KEY (required); SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY to also write the
+# restaurants table (apply supabase/migrations/0005 first).
 name: Restaurants
 on:
-  schedule:
-    - cron: "41 4 2 * *" # 04:41 UTC on the 2nd of each month
   workflow_dispatch:
     inputs:
       city: { description: "City adcode (e.g. 110000 for Beijing); empty = all", required: false, default: "" }
@@ -20,11 +19,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
-      - name: Match and pick covers
+      - name: Match to Amap
         env:
           AMAP_KEY: ${{ secrets.AMAP_KEY }}
-          AI_API_KEY: ${{ secrets.AI_API_KEY }}
-          AI_BASE_URL: ${{ secrets.AI_BASE_URL }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |

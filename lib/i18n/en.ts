@@ -609,7 +609,6 @@ export const en = {
   },
   awards: {
     cuisine: "Filter by cuisine",
-    photoOf: "Photo {i} of {n}",
     daily: "Daily",
     closed: "closed",
     signature: "Signature dishes",

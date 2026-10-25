@@ -606,7 +606,6 @@ export const de: Dict = {
   },
   awards: {
     cuisine: "Nach Küche filtern",
-    photoOf: "Foto {i} von {n}",
     daily: "Täglich",
     closed: "geschlossen",
     signature: "Spezialitäten",

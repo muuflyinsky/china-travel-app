@@ -155,7 +155,7 @@ function Explore() {
   const hot = isHotCity(city.a);
   const show = (v: View) => { reset(); setDest(null); setRestaurant(null); setView(v); };
   const pickPlace = (x: Place | string) => { setRestaurant(null); if (typeof x === "string") { setQ(x); search(x); } else setDest(x); scrollTop(); };
-  const pickRestaurant = (r: ListedRestaurant) => { setRestaurant(r); setDest(r.poi); scrollTop(); track("restaurant_open", { photo: r.photos.length > 0, dishes: r.dishes.length }); };
+  const pickRestaurant = (r: ListedRestaurant) => { setRestaurant(r); setDest(r.poi); scrollTop(); track("restaurant_open", { dishes: r.dishes.length }); };
   const closeDetail = () => { setDest(null); setRestaurant(null); };
 
   const finder = (

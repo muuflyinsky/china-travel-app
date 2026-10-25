@@ -1,19 +1,19 @@
 #!/usr/bin/env node
 // Matches every guide-listed restaurant (lib/data/restaurant-awards.json) to its Amap POI and
-// stores what Amap returns: id, location, address, up to 3 photos, business.tag, rating, cost,
-// opening hours. Then (with an AI key) picks a cover photo per restaurant with a vision model.
-// Only Amap Web Service data and our own model output are used; nothing is taken from Dianping,
-// Michelin or search engines.
+// stores what Amap returns: id, location, address, business.tag, rating, cost, opening hours.
+// No photos: the app shows a cuisine tile instead (Amap quota is kept for search and routes).
+// Only Amap Web Service data is used; nothing is taken from Dianping, Michelin or search engines.
+// Cost: 1 Amap call per restaurant, 2 more when the name search is unsure (geocode + nearby).
 //
-//   AMAP_KEY=… node scripts/enrich-restaurants.mjs                 # match all, then covers
+//   AMAP_KEY=… node scripts/enrich-restaurants.mjs                 # match all
 //   AMAP_KEY=… node scripts/enrich-restaurants.mjs --city 110000   # one city
-//   … --limit 50 --refresh-days 30 --no-covers --report-only --names "店名A,店名B"
+//   … --limit 50 --refresh-days 30 --report-only --names "店名A,店名B"
 //
 // Results: lib/data/restaurant-places.json (keyed "<city adcode>:<name as listed>"), and when
 // SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY are set, the same fields on the restaurants table
-// (supabase/migrations/0005). Report: docs/reports/restaurant-match.md + two CSVs.
-// Resumable: restaurants matched within --refresh-days are skipped; covers are cached by photo
-// set, so a re-run only calls the model for new or changed photos.
+// (supabase/migrations/0005). Report: docs/reports/restaurant-match.md + a CSV of matches to check.
+// Resumable: restaurants matched within --refresh-days are skipped, so a run cut short by the
+// daily quota continues where it stopped.
 // Manual fixes: lib/data/restaurant-overrides.json {"110000:店名": {"amap_id": "B0FFxxxx"}} or
 // {"amap_id": null} for "not on Amap".
 import { readFile, writeFile, mkdir } from "node:fs/promises";
@@ -55,11 +55,10 @@ async function amap(path, params) {
     throw new Error(`Amap ${path}: ${d.info} (${d.infocode})`);
   }
 }
-const FIELDS = "business,photos";
+const FIELDS = "business";
 const textSearch = (keywords, city) => amap("/v5/place/text", { keywords, region: city, city_limit: "true", types: "050000", show_fields: FIELDS, page_size: "10" }).then((d) => d.pois ?? []);
 const aroundSearch = (keywords, location) => amap("/v5/place/around", { keywords, location, radius: "2000", types: "050000", sortrule: "distance", show_fields: FIELDS, page_size: "10" }).then((d) => d.pois ?? []);
 const geocode = (address, city) => amap("/v3/geocode/geo", { address, city }).then((d) => d.geocodes?.[0]?.location || null);
-const https = (u) => String(u).replace(/^http:\/\//, "https://");
 const str = (v) => (Array.isArray(v) ? "" : v == null ? "" : String(v));
 
 // ---- matching --------------------------------------------------------------------------------
@@ -146,65 +145,11 @@ function toPlace(m) {
   const p = m.poi, b = p.business ?? {};
   return {
     id: p.id, name: p.name, location: p.location, address: str(p.address), district: str(p.adname), typecode: str(p.typecode),
-    photos: (p.photos ?? []).map((x) => https(x.url)).filter(Boolean).slice(0, 3),
     tag: str(b.tag), keytag: str(b.keytag), rectag: str(b.rectag),
     rating: Number(b.rating) || null, cost: Math.round(Number(b.cost)) || null,
     opentime: str(b.opentime_week) || str(b.opentime_today),
     confidence: m.confidence, score: m.score, method: m.method,
   };
-}
-
-// ---- covers (vision model) -------------------------------------------------------------------
-
-const AI_KEY = (process.env.AI_API_KEY ?? "").trim().replace(/^["']|["']$/g, "");
-const DASH_INTL = "https://dashscope-intl.aliyuncs.com/compatible-mode/v1", DASH_CN = "https://dashscope.aliyuncs.com/compatible-mode/v1";
-const AI_URLS = (() => {
-  const set = process.env.AI_BASE_URL ? process.env.AI_BASE_URL.split(",").map((u) => u.trim().replace(/\/$/, "")).filter(Boolean) : [DASH_INTL, DASH_CN];
-  if (set.includes(DASH_INTL) && !set.includes(DASH_CN)) set.push(DASH_CN);
-  if (set.includes(DASH_CN) && !set.includes(DASH_INTL)) set.push(DASH_INTL);
-  return set;
-})();
-const VISION = [...new Set([process.env.AI_MODEL_VISION || "qwen3-vl-plus", "qwen3-vl-plus", "qwen-vl-max", "qwen-vl-max-latest", "qwen3-vl-flash", "qwen-vl-plus"])];
-let urlAt = 0, modelAt = 0, aiCalls = 0;
-
-async function vision(content) {
-  for (let m = modelAt; m < VISION.length; m++) {
-    for (let i = 0; i < AI_URLS.length; i++) {
-      const u = AI_URLS[(urlAt + i) % AI_URLS.length];
-      aiCalls++;
-      const res = await fetch(`${u}/chat/completions`, {
-        method: "POST", headers: { "content-type": "application/json", authorization: `Bearer ${AI_KEY}` },
-        body: JSON.stringify({ model: VISION[m], temperature: 0, max_tokens: 300, messages: [{ role: "user", content }] }),
-      });
-      if (res.ok) { urlAt = (urlAt + i) % AI_URLS.length; modelAt = m; return (await res.json()).choices?.[0]?.message?.content ?? ""; }
-      const body = await res.text();
-      if (res.status === 401 || res.status === 403) continue; // key from the other region
-      if (res.status === 404 || /model_not_found|Model not exist/i.test(body)) break; // next model
-      throw new Error(`AI ${res.status}: ${body.slice(0, 200)}`);
-    }
-  }
-  throw new Error("no vision model accepted the key");
-}
-
-const KINDS = ["dish", "storefront", "interior", "menu", "receipt", "people", "other"];
-const COVER_PROMPT = `These are photos of one restaurant from a map app. For each photo, in order, classify it.
-kind: "dish" (close-up of food), "storefront" (entrance or facade), "interior" (dining room), "menu" (a menu or price list), "receipt" (bill, invoice, ticket), "people" (people are the subject), "other".
-blurry: true if out of focus, very dark or tiny. faces: true if any human face is clearly recognisable.
-Reply with JSON only: {"photos":[{"kind":"dish","blurry":false,"faces":false}]}`;
-
-/** Dish close-up first, then storefront or dining room; never menus, receipts, blurry photos or faces. */
-async function pickCover(photos) {
-  const text = await vision([...photos.map((url) => ({ type: "image_url", image_url: { url } })), { type: "text", text: COVER_PROMPT }]);
-  const raw = JSON.parse(text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1));
-  const judged = (raw.photos ?? []).slice(0, photos.length).map((x, i) => ({
-    url: photos[i], kind: KINDS.includes(String(x.kind).toLowerCase()) ? String(x.kind).toLowerCase() : "other",
-    ok: x.blurry !== true && x.blurry !== "true" && x.faces !== true && x.faces !== "true",
-  }));
-  for (const want of [["dish"], ["storefront", "interior"]]) {
-    const hit = judged.find((j) => j.ok && want.includes(j.kind));
-    if (hit) return { url: hit.url, kind: hit.kind };
-  }
-  return null;
 }
 
 // ---- run -------------------------------------------------------------------------------------
@@ -226,10 +171,7 @@ if (!flag("report-only")) {
     if (fresh(store.places[k]) && !overrides[k]) continue;
     try {
       const m = await match(r);
-      const prev = store.places[k];
       const place = m.none ? { none: true, method: m.method, candidate: m.candidate ?? null } : toPlace(m);
-      // Keep the cached cover while the photo set is unchanged.
-      if (!m.none && prev?.coverFor === place.photos.join("|")) { place.cover = prev.cover; place.coverFor = prev.coverFor; }
       store.places[k] = { ...place, matchedAt: new Date().toISOString() };
       done++;
       console.log(`${m.none ? "✗" : m.confidence === "high" ? "✓" : "~"} ${k}${m.none ? "" : ` → ${m.poi.name} (${m.confidence} ${m.score}, ${m.method})`}`);
@@ -242,22 +184,6 @@ if (!flag("report-only")) {
   await save();
   console.log(`matched ${done} restaurants · ${calls} Amap calls`);
 
-  if (!flag("no-covers") && AI_KEY) {
-    let picked = 0;
-    for (const r of todo) {
-      const p = store.places[keyOf(r)];
-      if (!p || p.none || !p.photos?.length || p.confidence === "low") continue;
-      const set = p.photos.join("|");
-      if (p.coverFor === set) continue;
-      try {
-        p.cover = await pickCover(p.photos); p.coverFor = set; picked++;
-        console.log(`cover ${keyOf(r)}: ${p.cover ? p.cover.kind : "none usable"}`);
-        if (picked % 25 === 0) await save();
-      } catch (e) { console.error(`! cover ${keyOf(r)}: ${e.message}`); if (/no vision model|AI 4/.test(e.message)) break; }
-    }
-    await save();
-    console.log(`covers: ${picked} picked · ${aiCalls} model calls`);
-  } else if (!flag("no-covers")) console.log("No AI_API_KEY: covers skipped (the app then uses the first photo of high/medium matches).");
 }
 
 // ---- Supabase (optional) ---------------------------------------------------------------------
@@ -270,7 +196,7 @@ if (SB && SBK && !flag("report-only")) {
     return {
       city: r.city, name_zh: r.zh,
       amap_id: ok ? p.id : null, location: ok ? p.location : null, address: ok ? p.address : null, district: ok ? p.district : null,
-      amap_type: ok ? p.typecode : null, photos: ok ? p.photos : null, cover: ok ? p.cover ?? null : null, tags: ok ? p.tag || null : null,
+      amap_type: ok ? p.typecode : null, tags: ok ? p.tag || null : null,
       rating: ok ? p.rating : null, cost: ok ? p.cost : null, opentime: ok ? p.opentime || null : null,
       match: p ? { confidence: p.confidence ?? null, score: p.score ?? null, method: p.method, amap_name: p.name ?? null, matched_at: p.matchedAt } : null,
     };
@@ -292,12 +218,11 @@ const tried = rows.filter((x) => x.p);
 const matched = tried.filter((x) => !x.p.none);
 const by = (c) => matched.filter((x) => x.p.confidence === c).length;
 const usable = matched.filter((x) => x.p.confidence !== "low");
-const withPhoto = usable.filter((x) => x.p.photos?.length);
 const pct = (a, b) => (b ? `${Math.round((a / b) * 1000) / 10}%` : "–");
 const cityLabel = (a) => cities.find((c) => c.a === a)?.s ?? a;
 const perCity = [...new Set(rows.map((x) => x.r.city))].map((c) => {
   const xs = rows.filter((x) => x.r.city === c), t = xs.filter((x) => x.p), m = t.filter((x) => !x.p.none && x.p.confidence !== "low");
-  return { c, n: xs.length, tried: t.length, matched: m.length, photos: m.filter((x) => x.p.photos?.length).length, covers: m.filter((x) => x.p.cover).length };
+  return { c, n: xs.length, tried: t.length, matched: m.length, tags: m.filter((x) => x.p.tag).length };
 }).sort((a, b) => b.n - a.n);
 const bj = perCity.find((x) => x.c === "110000");
 const tagSamples = matched.filter((x) => x.p.tag).slice(0, 5);
@@ -306,7 +231,7 @@ const awardLabel = (aw) => aw.map((a) => `${a.list}:${a.level}`).join(" + ");
 
 const md = `# 餐厅 ↔ 高德匹配报告
 
-生成时间：${new Date().toISOString().slice(0, 16).replace("T", " ")} UTC · 范围：${ONLY_CITY ? cityLabel(ONLY_CITY) : "全部城市"} · 本次高德调用 ${calls} 次${aiCalls ? ` · 看图模型调用 ${aiCalls} 次` : ""}
+生成时间：${new Date().toISOString().slice(0, 16).replace("T", " ")} UTC · 范围：${ONLY_CITY ? cityLabel(ONLY_CITY) : "全部城市"} · 本次高德调用 ${calls} 次
 
 ## 总览
 
@@ -319,17 +244,17 @@ const md = `# 餐厅 ↔ 高德匹配报告
 | · 中置信度 | ${by("medium")} | |
 | 低置信度（App 不使用，待人工抽查） | ${by("low")} | |
 | 未匹配 | ${tried.length - matched.length} | |
-| 成功匹配中有高德照片 | ${withPhoto.length} | ${pct(withPhoto.length, usable.length)} |
-| 已选出封面 | ${usable.filter((x) => x.p.cover).length} | ${pct(usable.filter((x) => x.p.cover).length, withPhoto.length)}（占有照片的） |
 | 成功匹配中 tag 非空 | ${usable.filter((x) => x.p.tag).length} | ${pct(usable.filter((x) => x.p.tag).length, usable.length)} |
 
-**北京榜单照片覆盖率：** ${bj ? `${bj.photos} / ${bj.n} 家有高德照片（${pct(bj.photos, bj.n)}），匹配成功 ${bj.matched} 家，已尝试 ${bj.tried} 家` : "本次未包含北京"}
+**北京：** ${bj ? `${bj.n} 家，已尝试 ${bj.tried} 家，匹配成功 ${bj.matched} 家（${pct(bj.matched, bj.tried)}），有主打菜 tag ${bj.tags} 家` : "本次未包含北京"}
+
+不请求、不展示高德照片（额度留给搜索和路线），App 统一显示菜系色块。
 
 ## 各城市
 
-| 城市 | 餐厅 | 已尝试 | 匹配成功 | 有照片 | 有封面 |
-|---|---|---|---|---|---|
-${perCity.slice(0, 40).map((x) => `| ${cityLabel(x.c)} | ${x.n} | ${x.tried} | ${x.matched} | ${x.photos} (${pct(x.photos, x.n)}) | ${x.covers} |`).join("\n")}
+| 城市 | 餐厅 | 已尝试 | 匹配成功 | 有 tag |
+|---|---|---|---|---|
+${perCity.slice(0, 40).map((x) => `| ${cityLabel(x.c)} | ${x.n} | ${x.tried} | ${x.matched} (${pct(x.matched, x.tried)}) | ${x.tags} |`).join("\n")}
 
 ## business.tag 样例（餐饮类 POI）
 
@@ -339,12 +264,11 @@ ${tagSamples.length ? tagSamples.map((x) => `- **${x.r.zh}** → 高德「${x.p.
 
 ## 清单
 
-- 没有照片的餐厅：\`docs/reports/restaurant-no-photo.csv\`（${rows.filter((x) => !x.p || x.p.none || x.p.confidence === "low" || !x.p.photos?.length).length} 家，含未匹配和低置信度）
 - 低置信度和未匹配（供人工抽查）：\`docs/reports/restaurant-low-confidence.csv\`（${tried.filter((x) => x.p.none || x.p.confidence === "low").length} 家）。确认后写进 \`lib/data/restaurant-overrides.json\` 再跑一次。
 
 ## 匹配规则
 
-1. 高德 POI 搜索 2.0：keywords = 店名，region = 城市 adcode，types = 050000，show_fields = business,photos。
+1. 高德 POI 搜索 2.0：keywords = 店名，region = 城市 adcode，types = 050000，show_fields = business（不要照片）。
 2. 去掉括号里的分店名比较品牌名（相同 / 包含 / 字符相似度）；分店名与高德名称里的分店、地址中的路名、区名比较。
 3. 置信度：品牌一致且分店一致（或榜单没写分店且结果里只有一家同品牌）为“高”；综合分 ≥ 0.75 为“中”；≥ 0.55 为“低”。榜单没写分店的连锁店最多“中”。
 4. 仍然没有高、中置信度结果时，用分店名里的路名（或分店名）地理编码，再在 2 km 内按品牌搜索；800 m 内同品牌视为中置信度。
@@ -352,10 +276,7 @@ ${tagSamples.length ? tagSamples.map((x) => `- **${x.r.zh}** → 高德「${x.p.
 await mkdir(file("docs/reports/"), { recursive: true });
 await writeFile(file("docs/reports/restaurant-match.md"), md);
 const BOM = "﻿";
-await writeFile(file("docs/reports/restaurant-no-photo.csv"), BOM + ["city,name,awards,status,amap_name",
-  ...rows.filter((x) => !x.p || x.p.none || x.p.confidence === "low" || !x.p.photos?.length)
-    .map((x) => [cityLabel(x.r.city), x.r.zh, awardLabel(x.r.awards), !x.p ? "not tried" : x.p.none ? "unmatched" : x.p.confidence === "low" ? "low confidence" : "no photo", x.p?.name ?? ""].map(q).join(","))].join("\n") + "\n");
 await writeFile(file("docs/reports/restaurant-low-confidence.csv"), BOM + ["city,name,awards,status,amap_name,amap_address,score,method,amap_id,decision",
   ...tried.filter((x) => x.p.none || x.p.confidence === "low")
     .map((x) => [cityLabel(x.r.city), x.r.zh, awardLabel(x.r.awards), x.p.none ? "unmatched" : "low", x.p.name ?? x.p.candidate?.name ?? "", x.p.address ?? x.p.candidate?.address ?? "", x.p.score ?? x.p.candidate?.score ?? "", x.p.method, x.p.id ?? "", ""].map(q).join(","))].join("\n") + "\n");
-console.log(`report: docs/reports/restaurant-match.md · usable ${usable.length}/${tried.length} · photos ${withPhoto.length}`);
+console.log(`report: docs/reports/restaurant-match.md · usable ${usable.length}/${tried.length}`);

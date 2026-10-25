@@ -14,7 +14,7 @@ type ListMeta = { name: string; edition: string; source: string; checked: string
 /** Amap data matched by scripts/enrich-restaurants.mjs (Supabase columns, or the bundled file). */
 type Stored = {
   id: string; name?: string; location: string; address: string; district?: string; typecode?: string;
-  photos: string[]; cover?: { url: string; kind: string } | null; tag?: string; rating?: number | null; cost?: number | null;
+  tag?: string; rating?: number | null; cost?: number | null;
   opentime?: string; confidence?: string;
 };
 type Known = AwardRestaurant & { place?: Stored };
@@ -24,7 +24,7 @@ type Row = {
   city: string; name_zh: string; name_en: string | null; cuisine: string | null; awards: Award[];
   // From migration 0005; absent until it is applied.
   amap_id?: string | null; location?: string | null; address?: string | null; district?: string | null; amap_type?: string | null;
-  photos?: string[] | null; cover?: Stored["cover"]; tags?: string | null; rating?: number | null; cost?: number | null; opentime?: string | null;
+  tags?: string | null; rating?: number | null; cost?: number | null; opentime?: string | null;
   match?: { confidence?: string } | null;
 };
 
@@ -56,7 +56,7 @@ async function fromSupabase(): Promise<Data> {
       const base = { city: r.city, zh: r.name_zh, en: r.name_en ?? undefined, cuisine: r.cuisine ?? undefined, awards: r.awards };
       const db = r.amap_id && r.location ? usable({
         id: r.amap_id, location: r.location, address: r.address ?? "", district: r.district ?? undefined, typecode: r.amap_type ?? undefined,
-        photos: r.photos ?? [], cover: r.cover, tag: r.tags ?? undefined, rating: r.rating, cost: r.cost, opentime: r.opentime ?? undefined,
+        tag: r.tags ?? undefined, rating: r.rating, cost: r.cost, opentime: r.opentime ?? undefined,
         confidence: r.match?.confidence,
       }) : undefined;
       return { ...base, place: db ?? fromFile(base) };
@@ -118,7 +118,6 @@ const resolved = new Map<string, { at: number; poi: Place | null }>();
 export type ListedRestaurant = AwardRestaurant & {
   poi: Place | null; rating?: number; cost?: number;
   nameEn: string; cuisineKey?: string;
-  photos: string[]; // cover first
   dishes: string[]; // signature dishes from Amap's business.tag, at most 5
   opentime?: string;
 };
@@ -136,19 +135,19 @@ function storedPoi(r: AwardRestaurant, p: Stored, city: string): Place {
   return {
     id: p.id, name: p.name ?? r.zh, pinyin: py(p.name ?? r.zh), address: p.address, city: "", citycode: "", location: p.location,
     type: "", typecode: p.typecode, district: p.district, adcode: city, rating: p.rating ? String(p.rating) : undefined,
-    cost: p.cost ? String(p.cost) : undefined, photo: p.cover?.url ?? p.photos[0], photos: p.photos, tag: p.tag, opentime: p.opentime,
+    cost: p.cost ? String(p.cost) : undefined, tag: p.tag, opentime: p.opentime,
   };
 }
 
 function listed(r: Known, poi: Place | null): ListedRestaurant {
   const p = r.place;
-  // The vision model's pick leads; without one (no AI key yet), Amap's own order.
-  const photos = p ? [...new Set([p.cover?.url, ...p.photos].filter((x): x is string => Boolean(x)))] : poi?.photos ?? (poi?.photo ? [poi.photo] : []);
+  // No photos (Amap quota): the list and detail show the cuisine tile. Drop any a live search returned.
+  const place = poi && { ...poi, photo: undefined, photos: undefined };
   return {
-    city: r.city, zh: r.zh, en: r.en, cuisine: r.cuisine, awards: r.awards, poi,
+    city: r.city, zh: r.zh, en: r.en, cuisine: r.cuisine, awards: r.awards, poi: place,
     rating: Number(p?.rating ?? poi?.rating) || undefined, cost: Number(p?.cost ?? poi?.cost) || undefined,
     nameEn: restaurantNameEn(r.zh, r.en), cuisineKey: cuisineKey(r.cuisine, p?.typecode ?? poi?.typecode),
-    photos, dishes: signatureDishes(p?.tag ?? poi?.tag), opentime: p?.opentime || poi?.opentime || undefined,
+    dishes: signatureDishes(p?.tag ?? poi?.tag), opentime: p?.opentime || poi?.opentime || undefined,
   };
 }
 
@@ -177,7 +176,7 @@ async function amapRestaurants(city: string): Promise<ListedRestaurant[]> {
 
 /**
  * Restaurants for Explore → Eat: every guide-listed one in the city (Michelin, Black Pearl,
- * Must-Eat), best first, the top `featured` matched to Amap for photo, rating and price. With fewer
+ * Must-Eat), best first, the top `featured` matched to Amap for rating, price and hours. With fewer
  * than 5 listed, well-rated Amap restaurants fill the list so it is never empty.
  */
 export async function awardRestaurants(city: string, { featured = 8, listedOnly = false } = {}): Promise<{ restaurants: ListedRestaurant[]; source: "awards" | "mixed" | "amap" }> {
