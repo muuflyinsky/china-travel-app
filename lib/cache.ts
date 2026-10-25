@@ -20,7 +20,19 @@ export async function cacheRead<T>(ns: string, key: string): Promise<T | null> {
   }
 }
 
-export async function cacheWrite(ns: string, key: string, value: { generatedAt: string }) {
+/** Keys stored in a namespace with when each was generated (Supabase only; [] otherwise). */
+export async function cacheList(ns: string): Promise<{ key: string; generatedAt: string }[]> {
+  if (!supabaseOn) return [];
+  try {
+    const rows = (await rest(`app_cache?select=key,generated_at&ns=eq.${encodeURIComponent(ns)}`)) as { key: string; generated_at: string }[];
+    return rows.map((r) => ({ key: r.key, generatedAt: r.generated_at }));
+  } catch (e) {
+    console.error(`[cache] list ${ns}:`, (e as Error).message);
+    return [];
+  }
+}
+
+export async function cacheWrite<T extends { generatedAt: string }>(ns: string, key: string, value: T) {
   try {
     if (supabaseOn) {
       await rest("app_cache?on_conflict=ns,key", {

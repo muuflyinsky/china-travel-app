@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Generates the city guide for every hot city, one city at a time, and stores each in Supabase
-// (app_cache, see lib/cache.ts), which the live app only reads. Run by
-// .github/workflows/city-guides.yml once a month, outside Vercel's function time limit.
+// (app_cache, see lib/cache.ts), which the live app only reads. The daily Vercel Cron
+// (app/api/cron/city-guides) does this a few cities at a time; this script is the manual way to
+// do all of them at once, e.g. after a prompt change.
 //
 //   CITY_GUIDE_TOKEN=… node scripts/build-city-guides.mjs http://localhost:3000 [adcode …]
 //

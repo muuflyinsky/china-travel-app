@@ -5,7 +5,8 @@ import { aiProvider, config, demo } from "./config";
 import { Unavailable } from "./errors";
 import { RESERVATION_SOURCE, reservationFor } from "./reservations";
 import * as mock from "./demo";
-import { cacheRead, cacheWrite } from "./cache";
+import { cacheList, cacheRead, cacheWrite } from "./cache";
+import { HOT_CITIES } from "./hot-cities";
 import { logRow } from "./supabase";
 import type { CityGuide, GuideArea, GuideDish, GuideSight } from "./city-guide-types";
 
@@ -177,4 +178,30 @@ export async function review(g: CityGuide | null, extra?: Record<string, unknown
     const line = JSON.stringify({ ts: new Date().toISOString(), ...r });
     try { await mkdir("data", { recursive: true }); await appendFile("data/review.jsonl", line + "\n"); } catch { console.log("review", line); }
   }
+}
+
+/**
+ * The daily job (app/api/cron/city-guides): hot cities with no guide first, then the oldest,
+ * skipping any refreshed within `maxAgeDays`. Generates one city at a time and stops starting
+ * new ones once `budgetMs` has passed, so the run ends inside the function's time limit.
+ */
+export async function refreshStaleGuides({ budgetMs, maxAgeDays = 30 }: { budgetMs: number; maxAgeDays?: number }) {
+  const t0 = Date.now();
+  const stored = new Map((await cacheList("city_guide")).map((r) => [r.key, Date.parse(r.generatedAt)]));
+  const due = HOT_CITIES
+    .map((c) => ({ c, at: stored.get(c.a) ?? 0 }))
+    .filter(({ at }) => Date.now() - at > maxAgeDays * 864e5)
+    .sort((a, b) => a.at - b.at);
+  const done: { city: string; ok: boolean; s: number; error?: string }[] = [];
+  for (const { c } of due) {
+    if (Date.now() - t0 > budgetMs) break;
+    const t = Date.now();
+    try {
+      const { guide } = await cityGuide(c.a, c.s, c.e, true);
+      done.push({ city: c.e, ok: !(guide as { partial?: boolean }).partial, s: Math.round((Date.now() - t) / 1000) });
+    } catch (e) {
+      done.push({ city: c.e, ok: false, s: Math.round((Date.now() - t) / 1000), error: String((e as Error).message ?? e).slice(0, 80) });
+    }
+  }
+  return { done, remaining: due.length - done.length, total: HOT_CITIES.length };
 }

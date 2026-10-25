@@ -37,19 +37,11 @@ const NEARBY = [
 ] as const;
 
 // Browse by category (SPEC v0.5 P1.6 #21), best rated first. Keywords live in
-// lib/data/categories.json, shared with scripts/build-category-lists.mjs, which pre-generates the
-// first page for hot cities into public/categories/; later pages and other cities are live.
+// lib/data/categories.json; /api/places keeps each first page in Supabase for 30 days.
 type CategoryKey = "museum" | "temple" | "park" | "night" | "shopping";
 const ICONS: Record<CategoryKey, typeof Landmark> = { museum: Landmark, temple: Church, park: Trees, night: MoonStar, shopping: ShoppingBag };
 const CATEGORIES = (categoryDefs as { key: CategoryKey; q: string; types: string }[]).map((c) => ({ ...c, Icon: ICONS[c.key] }));
 
-type StaticCategories = { generatedAt: string; cats: Partial<Record<CategoryKey, Place[]>> };
-const staticCats = new Map<string, Promise<StaticCategories | null>>();
-/** The pre-generated lists for a city, fetched once per session; null when there are none. */
-const loadStatic = (adcode: string) => {
-  if (!staticCats.has(adcode)) staticCats.set(adcode, fetch(`/categories/${adcode}.json`).then((r) => (r.ok ? r.json() : null)).catch(() => null));
-  return staticCats.get(adcode)!;
-};
 
 /** Screens scroll inside Konsta's Page element, not the window. */
 const scrollTop = () => document.querySelector(".k-page")?.scrollTo({ top: 0, behavior: "smooth" });
@@ -99,14 +91,6 @@ function Explore() {
     const append = next.page > 1;
     setBusy(append ? "more" : "search"); setNotice(undefined); if (!append) { setDest(null); setPlaces([]); }
     setQuery(next);
-    // First page of a category in a hot city: the static file, no Amap call.
-    if (next.cat && !append && isHotCity(city.a)) {
-      const list = (await loadStatic(city.a))?.cats[next.cat];
-      if (list?.length) {
-        setPlaces(list); setDemo(false); setMore(list.length >= 10); setBusy("");
-        return;
-      }
-    }
     const qs = new URLSearchParams({ q: next.keyword, page: String(next.page) });
     if (next.nearby && here) qs.set("around", here.location); else qs.set("city", city.a);
     if (next.types) qs.set("types", next.types);

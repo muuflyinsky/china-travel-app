@@ -45,14 +45,15 @@ function count(api: string, purpose: AmapPurpose, ok: boolean) {
   try { after(() => logRow("events", row)); } catch { void logRow("events", row); }
 }
 
-// Throttle: AMAP_MIN_INTERVAL_MS spaces requests out within this process (the batch job sets it
-// to stay under the key's QPS; online it is 0). Requests queue in order.
-const MIN_GAP = Number(process.env.AMAP_MIN_INTERVAL_MS) || 0;
+// Throttle: requests are spaced at least this far apart within this process, in order. 0 online;
+// the daily guide job turns it on while it runs (setAmapGap) to stay under the key's QPS.
+let gap = Number(process.env.AMAP_MIN_INTERVAL_MS) || 0;
 let nextSlot = 0;
+export const setAmapGap = (ms: number) => { gap = ms; };
 async function slot() {
-  if (!MIN_GAP) return;
+  if (!gap) return;
   const now = Date.now(), at = Math.max(now, nextSlot);
-  nextSlot = at + MIN_GAP;
+  nextSlot = at + gap;
   if (at > now) await new Promise((r) => setTimeout(r, at - now));
 }
 // Amap's "too many requests" answers (QPS limits): wait and try again, 3 times at most.
