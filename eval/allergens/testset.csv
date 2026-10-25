@@ -1,0 +1,73 @@
+﻿id,dish_zh,traditional,pinyin,english,cuisine,test_adcode,standard_ingredients,hidden_or_variant,allergens_D_standard,allergens_H_hidden,meat_D,meat_H(lard/stock),vegetarian,vegan,alcohol(D/H/N),spice0-3,source
+1,夫妻肺片,夫妻肺片,fuqi feipian,Sliced beef and ox offal in chili oil,川菜,510100,牛肉、牛杂、红油、花椒、熟花生碎、熟芝麻、酱油、卤水,卤水中的料酒；部分店加芹菜、味精,peanut sesame soy gluten,celery msg sulphites,beef,,False,False,H,3,https://m.xiachufang.com/recipe/13705/ ；chise wiki Fuqi feipian
+2,宫保鸡丁,宮保雞丁,gongbao jiding,Kung Pao chicken,川菜,510100,鸡腿丁、油炸花生米、干辣椒、花椒、葱、酱油、醋、糖、料酒、淀粉,上浆用蛋清（部分）、味精,peanut soy gluten,egg msg sulphites,chicken,,False,False,D,2,通行菜谱（下厨房/美食杰多份菜谱交叉）
+3,麻婆豆腐,麻婆豆腐,mapo doufu,Mapo tofu,川菜,510100,豆腐、牛肉末（传统）、郫县豆瓣（蚕豆+小麦粉）、豆豉、花椒、酱油,不少店用猪肉末；料酒；味精,soy gluten,msg,beef,pork,False,False,H,3,通行菜谱（下厨房/美食杰多份菜谱交叉）；郫县豆瓣配料含小麦粉
+4,担担面,擔擔麵,dandan mian,Dan dan noodles,川菜,510100,碱水面、猪肉臊、芽菜、芝麻酱、红油、酱油、葱,成都做法多撒花生碎；面条可能含蛋,gluten soy sesame,peanut egg msg,pork,,False,False,H,2,通行菜谱（下厨房/美食杰多份菜谱交叉）
+5,鱼香肉丝,魚香肉絲,yuxiang rousi,Fish-fragrant shredded pork,川菜,510100,猪肉丝、木耳、笋、泡椒、豆瓣、酱油、醋、糖、料酒、淀粉,上浆用蛋清（部分）；不含鱼,soy gluten,egg msg,pork,,False,False,D,2,通行菜谱（下厨房/美食杰多份菜谱交叉）
+6,回锅肉,回鍋肉,huiguo rou,Twice-cooked pork,川菜,510100,猪后腿/五花肉、蒜苗、郫县豆瓣、甜面酱、豆豉、酱油,料酒,soy gluten,msg sulphites,pork,,False,False,H,2,通行菜谱（下厨房/美食杰多份菜谱交叉）
+7,水煮鱼,水煮魚,shuizhu yu,Fish in fiery chili oil,川菜,510100,草鱼片、豆芽、豆瓣、干辣椒、花椒、蛋清上浆、淀粉、料酒,味精；部分店用花生油/牛油,fish soy gluten egg,msg peanut,fish,beef,False,False,D,3,通行菜谱（下厨房/美食杰多份菜谱交叉）
+8,口水鸡,口水雞,koushui ji,Mouth-watering chicken,川菜,510100,鸡、红油、花椒、熟芝麻、花生碎、酱油、醋、糖、蒜,味精,sesame peanut soy gluten,msg,chicken,,False,False,H,3,通行菜谱（下厨房/美食杰多份菜谱交叉）
+9,酸辣粉,酸辣粉,suanla fen,Hot and sour sweet-potato noodles,川菜,500100,红薯粉、油酥花生、油酥黄豆、红油、醋、酱油、榨菜、葱,骨汤底；肉臊,peanut soy gluten,sesame msg,,pork,True,True,N,3,通行菜谱（下厨房/美食杰多份菜谱交叉）
+10,钟水饺,鍾水餃,zhong shuijiao,Zhong's dumplings in sweet chili sauce,川菜,510100,小麦面皮、猪肉馅、复制甜酱油、红油、蒜泥,芝麻油,gluten soy,sesame msg,pork,,False,False,N,2,通行菜谱（下厨房/美食杰多份菜谱交叉）
+11,麻辣火锅,麻辣火鍋,mala huoguo,Sichuan mala hotpot (beef tallow base),川菜,500100,牛油锅底、郫县豆瓣、豆豉、花椒、干辣椒、醪糟/冰糖；油碟（香油+蒜）,锅底同锅涮虾、鱼、毛肚等，交叉接触不可避免,soy gluten sesame,crustacean fish mollusc egg peanut msg,beef,pork,False,False,H,3,重庆火锅底料通用配方（牛油、豆瓣、豆豉）
+12,剁椒鱼头,剁椒魚頭,duojiao yutou,Steamed fish head with chopped chilies,湘菜,430100,鳙鱼头、剁辣椒、豆豉、蒸鱼豉油、料酒、姜葱,味精、猪油（部分）,fish soy gluten,msg,fish,pork,False,False,D,3,通行菜谱（下厨房/美食杰多份菜谱交叉）
+13,辣椒炒肉,辣椒炒肉,lajiao chao rou,Hunan stir-fried pork with chili,湘菜,430100,猪五花/前腿、青辣椒、豆豉、酱油、蒜,味精；猪油,soy gluten,msg,pork,,False,False,N,3,通行菜谱（下厨房/美食杰多份菜谱交叉）
+14,毛氏红烧肉,毛氏紅燒肉,maoshi hongshao rou,Chairman Mao's red-braised pork,湘菜,430100,五花肉、冰糖炒糖色、料酒、八角、桂皮、干辣椒,正宗说法不放酱油，但多数店仍加生抽/老抽,,soy gluten,pork,,False,False,D,1,通行菜谱（下厨房/美食杰多份菜谱交叉）
+15,长沙臭豆腐,長沙臭豆腐,changsha chou doufu,Changsha stinky tofu,湘菜,430100,发酵豆腐、油炸、辣椒酱、蒜、酱油、香菜、萝卜丁,卤水可能含动物成分（少见）,soy,gluten msg,,,True,True,N,2,通行菜谱（下厨房/美食杰多份菜谱交叉）
+16,虾饺,蝦餃,har gow,Shrimp dumplings,粤菜,440100,鲜虾、澄面（小麦淀粉）、生粉、笋、猪肥膘,芝麻油、味精,crustacean gluten,sesame msg,pork seafood,,False,False,N,0,通行菜谱（下厨房/美食杰多份菜谱交叉）；澄面为小麦淀粉
+17,烧卖,燒賣,siu mai,Pork and shrimp siu mai,粤菜,440100,猪肉、虾仁、冬菇、小麦面皮（常加蛋/碱）、酱油、蚝油,面皮常用鸡蛋；蟹籽点缀（鱼卵）,pork crustacean gluten soy,egg mollusc fish sesame,pork seafood,,False,False,N,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+18,叉烧,叉燒,char siu,Cantonese barbecued pork,粤菜,440100,猪梅头肉、叉烧酱（酱油、海鲜酱、腐乳）、麦芽糖、玫瑰露酒,海鲜酱含芝麻（部分品牌）,soy gluten,sesame,pork,,False,False,D,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+19,白切鸡,白切雞,baiqie ji,Cantonese poached chicken,粤菜,440100,鸡、姜葱油（随菜上）、生抽蘸料,花生油调姜葱蓉（粤式常用）,soy gluten,peanut msg,chicken,,False,False,N,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+20,蚝油生菜,蠔油生菜,haoyou shengcai,Lettuce with oyster sauce,粤菜,440100,生菜、蚝油、生抽、蒜、糖,蚝油含小麦（部分品牌）；味精,mollusc soy gluten,msg,,,False,False,N,0,通行菜谱（下厨房/美食杰多份菜谱交叉）；蚝油=牡蛎提取物
+21,干炒牛河,乾炒牛河,ganchao niuhe,Dry-fried beef ho fun,粤菜,440100,河粉、牛肉、豆芽、韭黄、老抽、生抽,牛肉腌料蛋清；蚝油,beef soy gluten,egg mollusc,beef,,False,False,N,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+22,鲜虾肠粉,鮮蝦腸粉,xianxia changfen,Shrimp rice-noodle roll,粤菜,440100,米浆（常掺澄面/粟粉）、鲜虾、甜豉油,米浆掺澄面,crustacean soy gluten,msg,seafood,,False,False,N,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+23,白灼虾,白灼蝦,baizhuo xia,Poached shrimp with soy dip,粤菜,440100,鲜虾、姜葱、豉油蘸料,,crustacean soy gluten,,seafood,,False,False,H,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+24,腊味煲仔饭,臘味煲仔飯,lawei baozai fan,Claypot rice with Chinese sausage,粤菜,440100,大米、广式腊肠（猪肉、玫瑰露酒）、腊肉、煲仔饭豉油,鸡蛋（常见加料）；猪油,pork soy gluten,egg,pork,,False,False,D,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+25,皮蛋瘦肉粥,皮蛋瘦肉粥,pidan shourou zhou,Congee with century egg and pork,粤菜,440100,大米、皮蛋、猪瘦肉、姜、葱,味精；油条配,egg,msg gluten,pork,,False,False,N,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+26,菠萝包,菠蘿包,bolo bao,Pineapple bun,粤菜·甜品,440100,小麦面粉、黄油、鸡蛋、奶粉/牛奶、糖（不含菠萝）,酥皮传统用猪油,gluten egg milk,,,pork,True,False,N,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+27,双皮奶,雙皮奶,shuangpi nai,Double-skin milk pudding,粤菜·甜品,440600,水牛奶、蛋清、糖,红豆配料,milk egg,,,,True,False,N,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+28,蛋挞,蛋撻,dan ta,Egg tart,粤菜·甜品,440100,鸡蛋、牛奶/淡奶、小麦面粉、黄油,港式酥皮常用猪油,egg milk gluten,,,pork,True,False,N,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+29,九转大肠,九轉大腸,jiuzhuan dachang,Braised pork intestines in brown sauce,鲁菜,370100,猪大肠、酱油、醋、糖、料酒、花椒油、肉桂、砂仁,花生油炸制（鲁菜常用）,soy gluten,peanut sulphites,pork,,False,False,D,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+30,糖醋鲤鱼,糖醋鯉魚,tangcu liyu,Sweet and sour carp,鲁菜,370100,鲤鱼、淀粉、糖、醋、酱油、料酒、葱姜蒜,花生油炸制（鲁菜常用）,fish soy gluten,peanut,fish,,False,False,D,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+31,葱烧海参,蔥燒海參,congshao haishen,Braised sea cucumber with scallion,鲁菜,370600,水发海参、大葱、酱油、蚝油、高汤、料酒、糖,高汤含鸡/猪,soy gluten mollusc,,seafood,chicken pork,False,False,D,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+32,松鼠桂鱼,松鼠桂魚,songshu guiyu,Squirrel-shaped mandarin fish,苏菜,320500,鳜鱼、淀粉、番茄酱、糖、醋、料酒,部分店撒松子；面粉挂糊,fish,tree_nut gluten soy,fish,,False,False,H,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+33,蟹粉狮子头,蟹粉獅子頭,xiefen shizi tou,Crab-roe pork meatballs,苏菜,320100,猪肉、蟹粉、鸡蛋、淀粉、料酒、姜葱、高汤,酱油,pork crustacean egg,soy gluten,pork seafood,chicken,False,False,D,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+34,盐水鸭,鹽水鴨,yanshui ya,Nanjing salted duck,苏菜,320100,鸭、盐、花椒、八角、姜葱、料酒,,,,duck,,False,False,D,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+35,大煮干丝,大煮乾絲,dazhu gansi,Braised tofu shreds in chicken broth,淮扬菜,321000,豆腐干丝、鸡汤、虾仁、火腿丝、鸡丝,虾籽,soy crustacean,,pork chicken seafood,,False,False,H,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+36,西湖醋鱼,西湖醋魚,xihu cuyu,West Lake fish in vinegar sauce,浙菜,330100,草鱼、糖、醋、酱油、料酒、姜,,fish soy gluten,,fish,,False,False,D,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+37,东坡肉,東坡肉,dongpo rou,Dongpo braised pork,浙菜,330100,五花肉、绍兴黄酒、酱油、冰糖、葱姜,,soy gluten,sulphites,pork,,False,False,D,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+38,龙井虾仁,龍井蝦仁,longjing xiaren,Shrimp with Longjing tea,浙菜,330100,河虾仁、龙井茶、蛋清上浆、淀粉、料酒,猪油炒制（传统）,crustacean egg,,seafood,pork,False,False,D,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+39,佛跳墙,佛跳牆,fotiao qiang,Buddha jumps over the wall,闽菜,350100,鲍鱼、海参、干贝、鱼肚/鱼翅、鹌鹑蛋、猪蹄筋、鸡、鸭、绍兴酒、酱油,部分版本加花菇、虾干,mollusc fish egg soy gluten,crustacean,pork chicken duck seafood fish,,False,False,D,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+40,荔枝肉,荔枝肉,lizhi rou,Fuzhou lychee pork,闽菜,350100,猪里脊、荸荠、番茄酱、淀粉、酱油、醋、糖,红糟（含酒）,soy gluten,,pork,,False,False,H,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+41,沙茶面,沙茶麵,shacha mian,Xiamen satay noodles,闽菜·小吃,350200,碱面、沙茶酱（花生、芝麻、虾米、扁鱼干、蒜）、骨汤、配料（鱿鱼、虾、猪肝）,,peanut crustacean fish gluten sesame,mollusc soy egg,pork seafood,,False,False,N,1,沙茶酱通行配方（花生、虾米、扁鱼）
+42,土笋冻,土筍凍,tusun dong,Sipunculid worm jelly,闽菜·小吃,350200,土笋（星虫）冻、蘸料：酱油、芥末、蒜蓉、辣酱、醋,萝卜酸,soy mustard gluten,,seafood,,False,False,N,1,厦门土笋冻通行吃法（配芥辣、酱油）
+43,臭鳜鱼,臭鱖魚,chou guiyu,Anhui fermented mandarin fish,徽菜,341000,腌鳜鱼、五花肉片、笋、酱油、料酒、辣椒,,fish soy gluten,,fish pork,,False,False,H,1,通行菜谱（下厨房/美食杰多份菜谱交叉）
+44,毛豆腐,毛豆腐,mao doufu,Fried hairy tofu,徽菜,341000,霉豆腐、菜籽油煎、辣椒酱,酱油,soy,gluten,,,True,True,N,2,通行菜谱（下厨房/美食杰多份菜谱交叉）
+45,北京烤鸭,北京烤鴨,beijing kaoya,Peking roast duck,京菜,110100,烤鸭、荷叶饼（小麦）、甜面酱（小麦+大豆）、葱丝、黄瓜,甜面酱可能加芝麻油,gluten soy,sesame,duck,,False,False,N,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+46,老北京炸酱面,老北京炸醬麵,zhajiang mian,Old Beijing noodles with fried soybean paste,京菜,110100,手擀面、猪五花丁、黄酱/甜面酱、黄瓜、黄豆、萝卜丝,,gluten soy,,pork,,False,False,N,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+47,涮羊肉,涮羊肉,shuan yangrou,Beijing copper-pot lamb hotpot,京菜,110100,羊肉片、清水/骨汤锅底；麻酱小料（芝麻酱、韭菜花、腐乳、辣椒油）,二八酱（芝麻酱掺花生酱）；虾油；锅底共用,sesame soy,peanut crustacean fish gluten,lamb,,False,False,N,0,老北京涮肉麻酱小料通行配方
+48,羊肉泡馍,羊肉泡饃,yangrou paomo,Xi'an lamb soup with torn bread,西北,610100,羊肉、羊骨汤、死面饼（小麦）、粉丝、木耳、糖蒜,,gluten,soy,lamb,,False,False,N,1,通行菜谱（下厨房/美食杰多份菜谱交叉）
+49,大盘鸡,大盤雞,dapan ji,Xinjiang big-plate chicken,西北,650100,鸡、土豆、青椒、干辣椒、豆瓣/酱油、皮带面（小麦）,啤酒焖（常见变体）,gluten soy,sulphites,chicken,,False,False,H,2,通行菜谱（下厨房/美食杰多份菜谱交叉）
+50,兰州牛肉面,蘭州牛肉麵,lanzhou niurou mian,Lanzhou beef noodle soup,西北,620100,拉面（小麦+蓬灰）、牛骨汤、牛肉片、萝卜、辣椒油、香菜、蒜苗,,gluten,,beef,,False,False,N,1,通行菜谱（下厨房/美食杰多份菜谱交叉）
+51,锅包肉,鍋包肉,guobao rou,Northeastern sweet and sour pork,东北菜,230100,猪里脊、土豆淀粉、糖、白醋、葱姜丝、胡萝卜丝,部分做法加酱油；炸油,,soy gluten,pork,,False,False,N,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+52,地三鲜,地三鮮,di sanxian,"Stir-fried eggplant, potato and pepper",东北菜,210100,茄子、土豆、青椒、酱油、蒜、淀粉,蚝油（常见）；猪油/鸡精,soy gluten,mollusc msg,,pork chicken,True,True,N,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+53,西红柿炒鸡蛋,西紅柿炒雞蛋,xihongshi chao jidan,Tomato and egg stir-fry,家常菜,110100,番茄、鸡蛋、糖、盐、葱,味精；猪油（部分）,egg,msg,,pork,True,False,N,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+54,麻辣烫,麻辣燙,mala tang,Mala tang (self-pick skewer soup),小吃,230100,骨汤底、鱼丸、蟹棒、午餐肉、腐竹、面筋、蔬菜、麻酱（北方）,花生碎；牛油；鸡蛋；虾滑,soy gluten fish sesame,peanut crustacean egg msg,pork fish,beef,False,False,N,2,通行菜谱（下厨房/美食杰多份菜谱交叉）
+55,煎饼果子,煎餅果子,jianbing guozi,Tianjin jianbing crepe,小吃·早餐,120100,绿豆面+小麦面糊、鸡蛋、油条或薄脆、甜面酱、腐乳、辣酱、葱花、芝麻,,egg gluten soy sesame,,,,True,False,N,1,通行菜谱（下厨房/美食杰多份菜谱交叉）
+56,小笼包,小籠包,xiaolong bao,Shanghai soup dumplings,沪菜·早餐,310100,猪肉、猪皮冻、小麦面皮、酱油、料酒、姜,蟹粉版（甲壳）,pork gluten soy,crustacean,pork,,False,False,H,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+57,生煎包,生煎包,shengjian bao,Pan-fried pork buns,沪菜·早餐,310100,猪肉、皮冻、发面（小麦）、酱油、撒芝麻和葱,,pork gluten soy sesame,,pork,,False,False,H,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+58,肉夹馍,肉夾饃,roujiamo,Xi'an pork in flatbread,西北·小吃,610100,腊汁猪肉、白吉馍（小麦）、酱油、香料,回民街版本为牛羊肉,gluten soy,,pork,beef,False,False,N,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+59,豆浆,豆漿,doujiang,Soy milk,早餐,310100,黄豆、水、糖,,soy,,,,True,True,N,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+60,油条,油條,youtiao,Fried dough stick,早餐,310100,小麦面粉、泡打粉/明矾、盐,炸油,gluten,,,,True,True,N,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+61,热干面,熱乾麵,regan mian,Wuhan hot dry noodles,鄂菜·早餐,420100,碱面、芝麻酱、香油、萝卜丁、酱油、葱、辣油,芝麻酱常掺花生酱；卤水,gluten sesame soy,peanut msg,,,True,True,N,1,通行菜谱（下厨房/美食杰多份菜谱交叉）
+62,嘉兴肉粽,嘉興肉粽,jiaxing rouzong,Jiaxing pork zongzi,浙菜·小吃,330400,糯米、猪五花、酱油、糖、料酒,咸蛋黄（常见加料）,pork soy gluten,egg,pork,,False,False,H,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+63,糖葫芦,糖葫蘆,tang hulu,Candied hawthorn skewer,小吃·甜品,110100,山楂、冰糖,撒芝麻（部分）,,sesame,,,True,True,N,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+64,鸡蛋灌饼,雞蛋灌餅,jidan guanbing,Egg-filled pancake,小吃·早餐,410100,小麦面饼、鸡蛋、甜面酱、生菜,火腿肠；猪油起酥,gluten egg soy,,,pork,True,False,N,1,通行菜谱（下厨房/美食杰多份菜谱交叉）
+65,黑芝麻汤圆,黑芝麻湯圓,heizhima tangyuan,Black sesame glutinous rice balls,甜品,330200,水磨糯米粉、黑芝麻、白糖、猪油（宁波传统）,花生馅变体,sesame,peanut,pork,,False,False,N,0,https://m.xiachufang.com/recipe/251224 ；缸鸭狗猪油黑芝麻汤圆
+66,杨枝甘露,楊枝甘露,yangzhi ganlu,Mango pomelo sago,甜品,440300,芒果、西柚/柚子、西米、椰浆、淡奶/牛奶,,milk,,,,True,False,N,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+67,五仁月饼,五仁月餅,wuren yuebing,Five-nut mooncake,甜品,440100,小麦面粉皮（转化糖浆+花生油/猪油）、核桃、杏仁、瓜子仁、芝麻、橄榄仁、冬瓜糖、蛋液刷面,皮用花生油（广式常用）；猪油,tree_nut sesame gluten egg,peanut sulphites,,pork,True,False,N,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+68,驴打滚,驢打滾,lü dagun,Glutinous rice rolls in soybean flour,京味甜品,110100,糯米粉、红豆沙、黄豆面（炒熟外裹）,,soy,,,,True,True,N,0,通行菜谱（下厨房/美食杰多份菜谱交叉）
+69,干煸四季豆,乾煸四季豆,ganbian sijidou,Dry-fried green beans,川菜,510100,四季豆、猪肉末、芽菜、干辣椒、花椒、酱油,,soy gluten,msg,pork,,False,False,N,2,通行菜谱（下厨房/美食杰多份菜谱交叉）；标准做法带肉末，素食陷阱
+70,清炒时蔬,清炒時蔬,qingchao shishu,Stir-fried seasonal greens,家常菜,310100,时令青菜、蒜、盐、油,鸡精/味精；猪油；蚝油（部分）,,msg mollusc,,pork chicken,True,True,N,0,通行菜谱（下厨房/美食杰多份菜谱交叉）；素食隐藏：鸡精、猪油
+71,拍黄瓜,拍黃瓜,pai huanggua,Smashed cucumber salad,凉菜,110100,黄瓜、蒜、醋、香油、盐、糖,生抽；麻酱版,sesame,soy gluten,,,True,True,N,1,通行菜谱（下厨房/美食杰多份菜谱交叉）
+72,扬州炒饭,揚州炒飯,yangzhou chaofan,Yangzhou fried rice,淮扬菜,321000,米饭、鸡蛋、虾仁、火腿、海参丁、青豆、葱,猪油；鸡汤,egg crustacean,soy,pork seafood,chicken,False,False,H,0,通行菜谱（下厨房/美食杰多份菜谱交叉）

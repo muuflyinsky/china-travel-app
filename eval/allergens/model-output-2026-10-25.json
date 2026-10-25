@@ -1,0 +1,2738 @@
+{
+ "1": {
+  "meat": [
+   "beef",
+   "offal"
+  ],
+  "spice": 3,
+  "pinyin": "fū qī fèi piàn",
+  "alcohol": true,
+  "allergens": [
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "sesame",
+    "role": "sauce",
+    "via_zh": "芝麻油",
+    "via": "sesame oil"
+   },
+   {
+    "id": "peanut",
+    "role": "garnish",
+    "via_zh": "花生碎",
+    "via": "crushed peanuts (standard in Chengdu version)"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "豆瓣酱",
+    "via": "fermented broad bean paste"
+   },
+   {
+    "id": "mollusc",
+    "role": "sauce",
+    "via_zh": "蚝油",
+    "via": "oyster sauce (common in Chengdu preparation)"
+   }
+  ],
+  "confidence": "high",
+  "vegetarian": false,
+  "zh": "夫妻肺片",
+  "price": "",
+  "name": "Sliced Beef and Ox Tripe in Chili Oil",
+  "short": "Thinly sliced beef and ox tripe in aromatic chili–Sichuan pepper oil",
+  "cached": true
+ },
+ "2": {
+  "meat": [
+   "chicken"
+  ],
+  "spice": 2,
+  "pinyin": "gōng bǎo jī dīng",
+  "alcohol": true,
+  "allergens": [
+   {
+    "id": "peanut",
+    "role": "main",
+    "via_zh": "花生",
+    "via": "peanuts"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "mollusc",
+    "role": "sauce",
+    "via_zh": "蚝油",
+    "via": "oyster sauce"
+   },
+   {
+    "id": "sesame",
+    "role": "sauce",
+    "via_zh": "芝麻油",
+    "via": "sesame oil"
+   }
+  ],
+  "confidence": "high",
+  "vegetarian": false,
+  "zh": "宫保鸡丁",
+  "price": "",
+  "name": "Kung Pao Chicken",
+  "short": "Diced chicken with roasted peanuts, dried chilies, and Sichuan pepper",
+  "cached": true
+ },
+ "3": {
+  "meat": [
+   "beef"
+  ],
+  "spice": 3,
+  "pinyin": "má pó dòu fu",
+  "alcohol": true,
+  "allergens": [
+   {
+    "id": "soy",
+    "role": "main",
+    "via_zh": "豆腐",
+    "via": "tofu"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "豆瓣酱",
+    "via": "fermented broad bean paste"
+   },
+   {
+    "id": "sesame",
+    "role": "sauce",
+    "via_zh": "芝麻油",
+    "via": "sesame oil"
+   },
+   {
+    "id": "peanut",
+    "role": "sauce",
+    "via_zh": "花生碎",
+    "via": "crushed peanuts (common garnish in Chengdu versions)"
+   },
+   {
+    "id": "mollusc",
+    "role": "sauce",
+    "via_zh": "蚝油",
+    "via": "oyster sauce (frequently used in modern Chengdu preparations)"
+   }
+  ],
+  "confidence": "high",
+  "vegetarian": false,
+  "zh": "麻婆豆腐",
+  "price": "",
+  "name": "Mapo Tofu",
+  "short": "Soft tofu in spicy, numbing Sichuan chili sauce with minced beef",
+  "cached": true
+ },
+ "4": {
+  "meat": [
+   "pork"
+  ],
+  "spice": 3,
+  "pinyin": "dàn dàn miàn",
+  "alcohol": false,
+  "allergens": [
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "main",
+    "via_zh": "面条",
+    "via": "wheat noodles"
+   },
+   {
+    "id": "sesame",
+    "role": "sauce",
+    "via_zh": "芝麻油",
+    "via": "sesame oil"
+   },
+   {
+    "id": "mollusc",
+    "role": "sauce",
+    "via_zh": "蚝油",
+    "via": "oyster sauce"
+   }
+  ],
+  "confidence": "high",
+  "vegetarian": false,
+  "zh": "担担面",
+  "price": "",
+  "name": "Dan Dan Noodles",
+  "short": "Spicy Sichuan noodles with minced pork and chili oil",
+  "cached": true
+ },
+ "5": {
+  "zh": "鱼香肉丝",
+  "pinyin": "yú xiāng ròu sī",
+  "name": "Fish-Flavoured Shredded Pork",
+  "short": "Shredded pork with garlic, ginger, pickled chili, and sweet-sour sauce",
+  "allergens": [
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "celery",
+    "role": "main",
+    "via_zh": "芹菜",
+    "via": "celery"
+   }
+  ],
+  "spice": 2,
+  "vegetarian": false,
+  "meat": [
+   "pork"
+  ],
+  "alcohol": true,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "6": {
+  "meat": [
+   "pork"
+  ],
+  "spice": 2,
+  "pinyin": "huí guō ròu",
+  "alcohol": true,
+  "allergens": [
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "豆瓣酱",
+    "via": "fermented broad bean paste"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "豆瓣酱",
+    "via": "fermented broad bean paste"
+   }
+  ],
+  "confidence": "high",
+  "vegetarian": false,
+  "zh": "回锅肉",
+  "price": "",
+  "name": "Twice-Cooked Pork Slices",
+  "short": "Sliced pork belly stir-fried with leeks, chili, and fermented beans",
+  "cached": true
+ },
+ "7": {
+  "meat": [
+   "fish"
+  ],
+  "spice": 3,
+  "pinyin": "shuǐ zhǔ yú",
+  "alcohol": true,
+  "allergens": [
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "fish",
+    "role": "main",
+    "via_zh": "鱼片",
+    "via": "fish slices"
+   },
+   {
+    "id": "sesame",
+    "role": "sauce",
+    "via_zh": "芝麻油",
+    "via": "sesame oil"
+   },
+   {
+    "id": "crustacean",
+    "role": "sauce",
+    "via_zh": "虾皮",
+    "via": "shrimp flakes (common in Chengdu versions)"
+   },
+   {
+    "id": "mollusc",
+    "role": "sauce",
+    "via_zh": "蚝油",
+    "via": "oyster sauce"
+   }
+  ],
+  "confidence": "high",
+  "vegetarian": false,
+  "zh": "水煮鱼",
+  "price": "",
+  "name": "Sichuan Boiled Fish",
+  "short": "Sliced fish poached in spicy chili oil with Sichuan pepper",
+  "cached": true
+ },
+ "8": {
+  "zh": "口水鸡",
+  "pinyin": "kǒu shuǐ jī",
+  "name": "Mouthwatering Chicken",
+  "short": "Shredded poached chicken in spicy, numbing, sesame–chili oil sauce",
+  "allergens": [
+   {
+    "id": "sesame",
+    "role": "sauce",
+    "via_zh": "芝麻油",
+    "via": "sesame oil"
+   },
+   {
+    "id": "peanut",
+    "role": "garnish",
+    "via_zh": "花生",
+    "via": "peanuts"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   }
+  ],
+  "spice": 3,
+  "vegetarian": false,
+  "meat": [
+   "chicken"
+  ],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "10": {
+  "zh": "钟水饺",
+  "pinyin": "zhōng shuǐ jiǎo",
+  "name": "Zhong-style Wonton Dumplings",
+  "short": "Steamed or boiled dumplings in spicy-sweet red oil sauce",
+  "allergens": [
+   {
+    "id": "gluten",
+    "role": "main",
+    "via_zh": "饺子皮",
+    "via": "wonton wrappers"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "sesame",
+    "role": "sauce",
+    "via_zh": "芝麻油",
+    "via": "sesame oil"
+   }
+  ],
+  "spice": 2,
+  "vegetarian": false,
+  "meat": [
+   "pork"
+  ],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "69": {
+  "zh": "干煸四季豆",
+  "pinyin": "gān biān sì jì dòu",
+  "name": "Dry-Fried Green Beans",
+  "short": "Crispy stir-fried green beans with minced pork and Sichuan pepper",
+  "allergens": [
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "sesame",
+    "role": "sauce",
+    "via_zh": "芝麻油",
+    "via": "sesame oil"
+   },
+   {
+    "id": "peanut",
+    "role": "sauce",
+    "via_zh": "花生碎",
+    "via": "crushed peanuts (common garnish)"
+   }
+  ],
+  "spice": 2,
+  "vegetarian": false,
+  "meat": [
+   "pork"
+  ],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "9": {
+  "zh": "酸辣粉",
+  "pinyin": "suān là fěn",
+  "name": "Sour-and-Spicy Sweet Potato Noodles",
+  "short": "Chongqing-style noodles in tangy, spicy broth with peanuts and pickles",
+  "allergens": [
+   {
+    "id": "peanut",
+    "role": "garnish",
+    "via_zh": "花生",
+    "via": "peanuts"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "main",
+    "via_zh": "红薯粉",
+    "via": "sweet potato starch noodles (often cut with wheat flour in Chongqing versions)"
+   },
+   {
+    "id": "sesame",
+    "role": "sauce",
+    "via_zh": "芝麻油",
+    "via": "sesame oil"
+   }
+  ],
+  "spice": 2,
+  "vegetarian": true,
+  "meat": [],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "11": {
+  "zh": "麻辣火锅",
+  "pinyin": "má là huǒ guō",
+  "name": "Chongqing Spicy Hotpot",
+  "short": "Shared simmering pot with numbing Sichuan pepper and fiery chili broth",
+  "allergens": [
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "豆瓣酱",
+    "via": "fermented broad bean paste"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "sesame",
+    "role": "sauce",
+    "via_zh": "芝麻酱",
+    "via": "sesame paste (common dipping sauce)"
+   },
+   {
+    "id": "crustacean",
+    "role": "sauce",
+    "via_zh": "虾酱",
+    "via": "shrimp paste (in some regional base broths)"
+   },
+   {
+    "id": "mollusc",
+    "role": "sauce",
+    "via_zh": "蚝油",
+    "via": "oyster sauce (frequent in broth or dips)"
+   },
+   {
+    "id": "fish",
+    "role": "sauce",
+    "via_zh": "鱼露",
+    "via": "fish sauce (occasional in complex broths)"
+   }
+  ],
+  "spice": 3,
+  "vegetarian": false,
+  "meat": [
+   "beef",
+   "pork",
+   "lamb",
+   "chicken",
+   "duck",
+   "seafood",
+   "offal"
+  ],
+  "alcohol": true,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "12": {
+  "zh": "剁椒鱼头",
+  "pinyin": "duò jiāo yú tóu",
+  "name": "Steamed Fish Head with Chopped Chili",
+  "short": "Steamed bighead carp head with fermented chili paste",
+  "allergens": [
+   {
+    "id": "fish",
+    "role": "main",
+    "via_zh": "鱼头",
+    "via": "fish head"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "celery",
+    "role": "sauce",
+    "via_zh": "芹菜",
+    "via": "celery"
+   }
+  ],
+  "spice": 3,
+  "vegetarian": false,
+  "meat": [],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "13": {
+  "zh": "辣椒炒肉",
+  "pinyin": "là jiāo chǎo ròu",
+  "name": "Stir-Fried Pork with Chili Peppers",
+  "short": "Sliced pork and fresh chilies stir-fried together",
+  "allergens": [
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   }
+  ],
+  "spice": 3,
+  "vegetarian": false,
+  "meat": [
+   "pork"
+  ],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "14": {
+  "zh": "毛氏红烧肉",
+  "pinyin": "máo shì hóng shāo ròu",
+  "name": "Mao’s Braised Pork Belly",
+  "short": "Slow-braised pork belly with soy, sugar, and spices",
+  "allergens": [
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "egg",
+    "role": "sauce",
+    "via_zh": "料酒",
+    "via": "cooking wine (often contains egg in some regional variants, though rare; conservative inclusion due to possible egg-based marinades or binding in some Hunan preparations)"
+   }
+  ],
+  "spice": 1,
+  "vegetarian": false,
+  "meat": [
+   "pork"
+  ],
+  "alcohol": true,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "15": {
+  "zh": "长沙臭豆腐",
+  "pinyin": "cháng shā chòu dòu fu",
+  "name": "Changsha Stinky Tofu",
+  "short": "Fermented tofu, deep-fried, served with spicy sauce",
+  "allergens": [
+   {
+    "id": "soy",
+    "role": "main",
+    "via_zh": "豆腐",
+    "via": "tofu"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "sesame",
+    "role": "sauce",
+    "via_zh": "芝麻油",
+    "via": "sesame oil"
+   },
+   {
+    "id": "mollusc",
+    "role": "sauce",
+    "via_zh": "虾酱",
+    "via": "shrimp paste (common in Changsha brine/fermentation and dipping sauce)"
+   },
+   {
+    "id": "crustacean",
+    "role": "sauce",
+    "via_zh": "虾酱",
+    "via": "shrimp paste"
+   }
+  ],
+  "spice": 2,
+  "vegetarian": false,
+  "meat": [],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "16": {
+  "zh": "虾饺",
+  "pinyin": "xiā jiǎo",
+  "name": "Shrimp Dumplings (Har Gow)",
+  "short": "Translucent steamed dumplings filled with whole shrimp",
+  "allergens": [
+   {
+    "id": "gluten",
+    "role": "main",
+    "via_zh": "小麦淀粉",
+    "via": "wheat starch"
+   },
+   {
+    "id": "crustacean",
+    "role": "main",
+    "via_zh": "虾",
+    "via": "shrimp"
+   },
+   {
+    "id": "egg",
+    "role": "sauce",
+    "via_zh": "蛋清",
+    "via": "egg white"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "seafood"
+  ],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "17": {
+  "zh": "烧卖",
+  "pinyin": "shāo mài",
+  "name": "Steamed Pork and Shrimp Siu Mai",
+  "short": "Open-topped steamed dumplings with pork, shrimp, and mushrooms",
+  "allergens": [
+   {
+    "id": "gluten",
+    "role": "main",
+    "via_zh": "面粉",
+    "via": "wheat flour"
+   },
+   {
+    "id": "crustacean",
+    "role": "main",
+    "via_zh": "虾",
+    "via": "shrimp"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "egg",
+    "role": "sauce",
+    "via_zh": "蛋清",
+    "via": "egg white"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "pork",
+   "seafood"
+  ],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "18": {
+  "zh": "叉烧",
+  "pinyin": "chā shāo",
+  "name": "Char Siu",
+  "short": "Honey-glazed roasted pork",
+  "allergens": [
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "egg",
+    "role": "sauce",
+    "via_zh": "蛋清",
+    "via": "egg white"
+   },
+   {
+    "id": "milk",
+    "role": "sauce",
+    "via_zh": "炼乳",
+    "via": "condensed milk"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "pork"
+  ],
+  "alcohol": true,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "19": {
+  "zh": "白切鸡",
+  "pinyin": "bái qiē jī",
+  "name": "Poached Chicken with Ginger-Scallion Oil",
+  "short": "Sliced poached chicken with aromatic oil dip",
+  "allergens": [
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "sesame",
+    "role": "sauce",
+    "via_zh": "芝麻油",
+    "via": "sesame oil"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "chicken"
+  ],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "20": {
+  "zh": "蚝油生菜",
+  "pinyin": "háo yóu shēng cài",
+  "name": "Oyster Sauce Lettuce",
+  "short": "Blanched lettuce stir-fried with oyster sauce",
+  "allergens": [
+   {
+    "id": "mollusc",
+    "role": "sauce",
+    "via_zh": "蚝油",
+    "via": "oyster sauce"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "蚝油",
+    "via": "oyster sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "蚝油",
+    "via": "oyster sauce"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "21": {
+  "zh": "干炒牛河",
+  "pinyin": "gān chǎo niú hé",
+  "name": "Dry-Fried Beef Chow Fun",
+  "short": "Wide rice noodles stir-fried with beef and bean sprouts",
+  "allergens": [
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "beef"
+  ],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "22": {
+  "zh": "鲜虾肠粉",
+  "pinyin": "xiān xiā cháng fěn",
+  "name": "Fresh Shrimp Rice Noodle Roll",
+  "short": "Steamed rice noodle roll with whole shrimp",
+  "allergens": [
+   {
+    "id": "crustacean",
+    "role": "main",
+    "via_zh": "虾",
+    "via": "shrimp"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "seafood"
+  ],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "23": {
+  "zh": "白灼虾",
+  "pinyin": "bái zhuó xiā",
+  "name": "Blanched Shrimp",
+  "short": "Whole shrimp lightly poached in seasoned broth",
+  "allergens": [
+   {
+    "id": "crustacean",
+    "role": "main",
+    "via_zh": "虾",
+    "via": "shrimp"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "seafood"
+  ],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "24": {
+  "zh": "腊味煲仔饭",
+  "pinyin": "là wèi bāo zǎi fàn",
+  "name": "Claypot Rice with Preserved Meats",
+  "short": "Rice cooked in claypot with cured pork and sausage",
+  "allergens": [
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "tree_nut",
+    "role": "sauce",
+    "via_zh": "芝麻油",
+    "via": "sesame oil"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "pork",
+   "other"
+  ],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "25": {
+  "zh": "皮蛋瘦肉粥",
+  "pinyin": "pí dàn shòu ròu zhōu",
+  "name": "Century Egg and Lean Pork Congee",
+  "short": "Rice porridge with preserved egg and minced pork",
+  "allergens": [
+   {
+    "id": "egg",
+    "role": "main",
+    "via_zh": "皮蛋",
+    "via": "century egg"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "pork"
+  ],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "26": {
+  "zh": "菠萝包",
+  "pinyin": "bō luó bāo",
+  "name": "Pineapple Bun",
+  "short": "Sweet yeasted bun with crisp sugary topping",
+  "allergens": [
+   {
+    "id": "gluten",
+    "role": "main",
+    "via_zh": "面粉",
+    "via": "wheat flour"
+   },
+   {
+    "id": "egg",
+    "role": "sauce",
+    "via_zh": "蛋液",
+    "via": "egg wash"
+   },
+   {
+    "id": "milk",
+    "role": "sauce",
+    "via_zh": "牛奶",
+    "via": "milk"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce (in some versions for browning)"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": true,
+  "meat": [],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "28": {
+  "zh": "蛋挞",
+  "pinyin": "dàn tà",
+  "name": "Egg Tart",
+  "short": "Flaky pastry cup filled with baked egg custard",
+  "allergens": [
+   {
+    "id": "gluten",
+    "role": "main",
+    "via_zh": "面粉",
+    "via": "wheat flour"
+   },
+   {
+    "id": "egg",
+    "role": "main",
+    "via_zh": "鸡蛋",
+    "via": "eggs"
+   },
+   {
+    "id": "milk",
+    "role": "main",
+    "via_zh": "牛奶",
+    "via": "milk"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "炼乳",
+    "via": "condensed milk (common in Cantonese version)"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": true,
+  "meat": [],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "67": {
+  "zh": "五仁月饼",
+  "pinyin": "wǔ rén yuè bǐng",
+  "name": "Five-Kernel Mooncake",
+  "short": "Traditional baked mooncake with five mixed nuts and seeds",
+  "allergens": [
+   {
+    "id": "peanut",
+    "role": "main",
+    "via_zh": "花生",
+    "via": "peanuts"
+   },
+   {
+    "id": "tree_nut",
+    "role": "main",
+    "via_zh": "核桃仁、杏仁、瓜子仁等",
+    "via": "walnut, almond, sunflower seed kernels"
+   },
+   {
+    "id": "gluten",
+    "role": "main",
+    "via_zh": "面粉",
+    "via": "wheat flour"
+   },
+   {
+    "id": "egg",
+    "role": "sauce",
+    "via_zh": "蛋液（刷面用）",
+    "via": "egg wash"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油（部分配方含）",
+    "via": "soy sauce"
+   },
+   {
+    "id": "sesame",
+    "role": "garnish",
+    "via_zh": "芝麻",
+    "via": "sesame"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": true,
+  "meat": [],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "27": {
+  "zh": "双皮奶",
+  "pinyin": "shuāng pí nǎi",
+  "name": "Double-Skin Milk",
+  "short": "Chilled sweetened milk pudding with two delicate skins",
+  "allergens": [
+   {
+    "id": "milk",
+    "role": "main",
+    "via_zh": "牛奶",
+    "via": "milk"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": true,
+  "meat": [],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "29": {
+  "zh": "九转大肠",
+  "pinyin": "jiǔ zhuǎn dà cháng",
+  "name": "Braised Intestines in Nine-Step Sauce",
+  "short": "Pork large intestine braised with vinegar, sugar, soy, and spices",
+  "allergens": [
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "celery",
+    "role": "sauce",
+    "via_zh": "芹菜",
+    "via": "celery"
+   },
+   {
+    "id": "mustard",
+    "role": "sauce",
+    "via_zh": "芥末",
+    "via": "mustard"
+   }
+  ],
+  "spice": 1,
+  "vegetarian": false,
+  "meat": [
+   "pork"
+  ],
+  "alcohol": true,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "30": {
+  "zh": "糖醋鲤鱼",
+  "pinyin": "táng cù lǐ yú",
+  "name": "Sweet-and-Sour Yellow River Carp",
+  "short": "Whole carp deep-fried and glazed with sweet-sour sauce",
+  "allergens": [
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "fish",
+    "role": "main",
+    "via_zh": "鲤鱼",
+    "via": "carp"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "fish"
+  ],
+  "alcohol": true,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "31": {
+  "zh": "葱烧海参",
+  "pinyin": "cōng shāo hǎi shēn",
+  "name": "Scallion-Braised Sea Cucumber",
+  "short": "Sea cucumber braised with scallions and brown sauce",
+  "allergens": [
+   {
+    "id": "mollusc",
+    "role": "main",
+    "via_zh": "海参",
+    "via": "sea cucumber"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "fish",
+    "role": "sauce",
+    "via_zh": "鱼露 or 鱼汤 (common in Shandong braising stock)",
+    "via": "fish stock or fish sauce"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "seafood"
+  ],
+  "alcohol": true,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "32": {
+  "zh": "松鼠桂鱼",
+  "pinyin": "sōng shǔ guì yú",
+  "name": "Squirrel-Shaped Mandarin Fish",
+  "short": "Crispy whole mandarin fish with sweet-sour sauce",
+  "allergens": [
+   {
+    "id": "fish",
+    "role": "main",
+    "via_zh": "桂鱼",
+    "via": "mandarin fish"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "egg",
+    "role": "main",
+    "via_zh": "蛋液",
+    "via": "egg wash"
+   },
+   {
+    "id": "peanut",
+    "role": "garnish",
+    "via_zh": "熟花生",
+    "via": "roasted peanuts"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "fish"
+  ],
+  "alcohol": true,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "33": {
+  "zh": "蟹粉狮子头",
+  "pinyin": "xiè fěn shī zi tóu",
+  "name": "Crab Roe Braised Pork Meatballs",
+  "short": "Large tender pork meatballs with crab roe and broth",
+  "allergens": [
+   {
+    "id": "crustacean",
+    "role": "main",
+    "via_zh": "蟹粉",
+    "via": "crab roe"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "pork"
+  ],
+  "alcohol": true,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "34": {
+  "zh": "盐水鸭",
+  "pinyin": "yán shuǐ yā",
+  "name": "Nanjing Salted Duck",
+  "short": "Brined and poached duck, served cold",
+  "allergens": [
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "duck"
+  ],
+  "alcohol": true,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "35": {
+  "zh": "大煮干丝",
+  "pinyin": "dà zhǔ gān sī",
+  "name": "Braised Dried Tofu Shreds",
+  "short": "Silken dried tofu shreds in clear chicken broth with ham and bamboo",
+  "allergens": [
+   {
+    "id": "soy",
+    "role": "main",
+    "via_zh": "干丝",
+    "via": "dried tofu"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "高汤",
+    "via": "chicken stock (often contains wheat)},{"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "chicken",
+   "pork"
+  ],
+  "alcohol": true,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "72": {
+  "zh": "扬州炒饭",
+  "pinyin": "Yángzhōu chǎo fàn",
+  "name": "Yangzhou Fried Rice",
+  "short": "Fried rice with shrimp, ham, egg, peas, and scallions",
+  "allergens": [
+   {
+    "id": "crustacean",
+    "role": "main",
+    "via_zh": "虾仁",
+    "via": "shrimp"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "egg",
+    "role": "main",
+    "via_zh": "鸡蛋",
+    "via": "egg"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "pork",
+   "seafood"
+  ],
+  "alcohol": true,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "36": {
+  "zh": "西湖醋鱼",
+  "pinyin": "xī hú cù yú",
+  "name": "West Lake Fish in Vinegar Gravy",
+  "short": "Poached freshwater fish in sweet-sour vinegar sauce",
+  "allergens": [
+   {
+    "id": "fish",
+    "role": "main",
+    "via_zh": "草鱼 or 鲢鱼",
+    "via": "grass carp or silver carp"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "egg",
+    "role": "sauce",
+    "via_zh": "蛋清",
+    "via": "egg white"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "fish"
+  ],
+  "alcohol": true,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "37": {
+  "zh": "东坡肉",
+  "pinyin": "dōng pō ròu",
+  "name": "Dongpo Braised Pork Belly",
+  "short": "Slow-braised pork belly in soy-wine sauce, tender and rich",
+  "allergens": [
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "pork"
+  ],
+  "alcohol": true,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "38": {
+  "zh": "龙井虾仁",
+  "pinyin": "lóng jǐng xiā rén",
+  "name": "West Lake Shrimp with Longjing Tea",
+  "short": "Fresh shrimp stir-fried with Longjing tea leaves and bamboo shoots",
+  "allergens": [
+   {
+    "id": "crustacean",
+    "role": "main",
+    "via_zh": "虾仁",
+    "via": "shrimp"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "tree_nut",
+    "role": "sauce",
+    "via_zh": "芝麻油",
+    "via": "sesame oil"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "seafood"
+  ],
+  "alcohol": true,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "39": {
+  "zh": "佛跳墙",
+  "pinyin": "fó tiào qiáng",
+  "name": "Buddha Jumps Over the Wall",
+  "short": "Luxury seafood and meat stew in aged broth",
+  "allergens": [
+   {
+    "id": "crustacean",
+    "role": "main",
+    "via_zh": "虾干",
+    "via": "dried shrimp"
+   },
+   {
+    "id": "mollusc",
+    "role": "main",
+    "via_zh": "鲍鱼",
+    "via": "abalone"
+   },
+   {
+    "id": "fish",
+    "role": "main",
+    "via_zh": "鱼翅",
+    "via": "shark fin (traditional) or fish maw (common modern substitute)"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "pork",
+   "chicken",
+   "duck",
+   "seafood"
+  ],
+  "alcohol": true,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "40": {
+  "zh": "荔枝肉",
+  "pinyin": "lì zhī ròu",
+  "name": "Lychee Pork",
+  "short": "Sweet-sour braised pork with bell pepper and pineapple",
+  "allergens": [
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "egg",
+    "role": "sauce",
+    "via_zh": "蛋清",
+    "via": "egg white (used for velveting)"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "pork"
+  ],
+  "alcohol": true,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "41": {
+  "zh": "沙茶面",
+  "pinyin": "shā chá miàn",
+  "name": "Satay Noodles",
+  "short": "Wheat noodles in satay-spiced broth with meat and vegetables",
+  "allergens": [
+   {
+    "id": "peanut",
+    "role": "sauce",
+    "via_zh": "沙茶酱",
+    "via": "satay sauce"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "沙茶酱",
+    "via": "satay sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "main",
+    "via_zh": "面条",
+    "via": "wheat noodles"
+   },
+   {
+    "id": "crustacean",
+    "role": "sauce",
+    "via_zh": "沙茶酱",
+    "via": "satay sauce"
+   },
+   {
+    "id": "fish",
+    "role": "sauce",
+    "via_zh": "沙茶酱",
+    "via": "satay sauce"
+   }
+  ],
+  "spice": 1,
+  "vegetarian": false,
+  "meat": [
+   "pork",
+   "seafood"
+  ],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "42": {
+  "zh": "土笋冻",
+  "pinyin": "tǔ sǔn dòng",
+  "name": "Stiffened Bamboo Worm Jelly",
+  "short": "Chilled jelly made from cooked marine polychaete worms",
+  "allergens": [
+   {
+    "id": "mollusc",
+    "role": "main",
+    "via_zh": "土笋",
+    "via": "marine polychaete worms (Penicillus spp.)"
+   },
+   {
+    "id": "fish",
+    "role": "sauce",
+    "via_zh": "鱼露",
+    "via": "fish sauce"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "seafood"
+  ],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "43": {
+  "zh": "臭鳜鱼",
+  "pinyin": "chòu guì yú",
+  "name": "Stinky Mandarin Fish",
+  "short": "Fermented mandarin fish, braised with ham and bamboo shoots",
+  "allergens": [
+   {
+    "id": "fish",
+    "role": "main",
+    "via_zh": "鳜鱼",
+    "via": "mandarin fish"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "mollusc",
+    "role": "sauce",
+    "via_zh": "蚝油",
+    "via": "oyster sauce (common in regional braises)"
+   },
+   {
+    "id": "tree_nut",
+    "role": "sauce",
+    "via_zh": "核桃油（偶用）",
+    "via": "walnut oil (occasional finishing oil)"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "fish"
+  ],
+  "alcohol": true,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "44": {
+  "zh": "毛豆腐",
+  "pinyin": "máo dòu fu",
+  "name": "Hairy Tofu",
+  "short": "Fermented tofu with white mycelium, pan-fried and served with chili sauce",
+  "allergens": [
+   {
+    "id": "soy",
+    "role": "main",
+    "via_zh": "豆腐",
+    "via": "tofu"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "sesame",
+    "role": "sauce",
+    "via_zh": "芝麻油",
+    "via": "sesame oil"
+   },
+   {
+    "id": "crustacean",
+    "role": "sauce",
+    "via_zh": "虾酱（常见蘸料）",
+    "via": "shrimp paste (common condiment)"
+   }
+  ],
+  "spice": 1,
+  "vegetarian": true,
+  "meat": [],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "45": {
+  "zh": "北京烤鸭",
+  "pinyin": "běi jīng kǎo yā",
+  "name": "Peking Duck",
+  "short": "Crispy roasted duck with pancakes, scallions, and hoisin sauce",
+  "allergens": [
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "甜面酱",
+    "via": "sweet bean sauce"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "甜面酱",
+    "via": "sweet bean sauce"
+   },
+   {
+    "id": "egg",
+    "role": "garnish",
+    "via_zh": "荷叶饼",
+    "via": "pancake (wheat flour + egg)"
+   },
+   {
+    "id": "sesame",
+    "role": "sauce",
+    "via_zh": "芝麻油",
+    "via": "sesame oil (in some versions)"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "duck"
+  ],
+  "alcohol": true,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "46": {
+  "zh": "老北京炸酱面",
+  "pinyin": "lǎo běi jīng zhá jiàng miàn",
+  "name": "Old Beijing Zha Jiang Noodles",
+  "short": "Wheat noodles topped with fried soybean paste and minced pork",
+  "allergens": [
+   {
+    "id": "gluten",
+    "role": "main",
+    "via_zh": "面条",
+    "via": "wheat noodles"
+   },
+   {
+    "id": "soy",
+    "role": "main",
+    "via_zh": "黄豆酱",
+    "via": "yellow soybean paste"
+   },
+   {
+    "id": "peanut",
+    "role": "sauce",
+    "via_zh": "花生油",
+    "via": "peanut oil (common frying oil)"
+   },
+   {
+    "id": "egg",
+    "role": "garnish",
+    "via_zh": "鸡蛋丝",
+    "via": "shredded egg (optional but traditional garnish)"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "pork"
+  ],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "47": {
+  "zh": "涮羊肉",
+  "pinyin": "shuàn yáng ròu",
+  "name": "Mongolian Hot Pot (Lamb)",
+  "short": "Thin-sliced lamb cooked in boiling broth at the table",
+  "allergens": [
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "芝麻酱",
+    "via": "sesame paste"
+   },
+   {
+    "id": "sesame",
+    "role": "sauce",
+    "via_zh": "芝麻酱",
+    "via": "sesame paste"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "lamb"
+  ],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "53": {
+  "zh": "西红柿炒鸡蛋",
+  "pinyin": "xī hóng shì chǎo jī dàn",
+  "name": "Scrambled Eggs with Tomatoes",
+  "short": "Soft scrambled eggs and fresh tomatoes, lightly seasoned",
+  "allergens": [
+   {
+    "id": "egg",
+    "role": "main",
+    "via_zh": "鸡蛋",
+    "via": "eggs"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": true,
+  "meat": [],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "63": {
+  "zh": "糖葫芦",
+  "pinyin": "táng hú lu",
+  "name": "Candied Hawthorn on a Stick",
+  "short": "Skewered hawthorn berries coated in hard sugar syrup",
+  "allergens": [
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "麦芽糖",
+    "via": "maltose syrup (often contains wheat)"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油（微量，用于熬糖色）",
+    "via": "soy sauce (trace, for caramel color)"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": true,
+  "meat": [],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "68": {
+  "zh": "驴打滚",
+  "pinyin": "lǘ dǎ gǔn",
+  "name": "Glutinous Rice Roll with Soybean Powder",
+  "short": "Sweet rolled glutinous rice cake dusted with roasted soybean flour",
+  "allergens": [
+   {
+    "id": "soy",
+    "role": "main",
+    "via_zh": "黄豆粉",
+    "via": "roasted soybean powder"
+   },
+   {
+    "id": "gluten",
+    "role": "main",
+    "via_zh": "糯米粉",
+    "via": "glutinous rice flour (may contain gluten cross-contact; traditionally gluten-free but often processed with wheat)"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": true,
+  "meat": [],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "71": {
+  "zh": "拍黄瓜",
+  "pinyin": "pāi huáng guā",
+  "name": "Smashed Cucumber Salad",
+  "short": "Cold salad of smashed cucumbers with garlic and vinegar",
+  "allergens": [
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "sesame",
+    "role": "sauce",
+    "via_zh": "芝麻油",
+    "via": "sesame oil"
+   }
+  ],
+  "spice": 1,
+  "vegetarian": true,
+  "meat": [],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "48": {
+  "zh": "羊肉泡馍",
+  "pinyin": "yáng ròu pào mó",
+  "name": "Shaanxi Lamb Stew with Crumbled Flatbread",
+  "short": "Tender lamb stew with hand-torn leavened flatbread",
+  "allergens": [
+   {
+    "id": "gluten",
+    "role": "main",
+    "via_zh": "馍",
+    "via": "leavened wheat flatbread"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "celery",
+    "role": "sauce",
+    "via_zh": "芹菜",
+    "via": "celery (common in broth garnish)"
+   },
+   {
+    "id": "msg",
+    "role": "sauce",
+    "via_zh": "味精",
+    "via": "MSG (common in commercial broth)"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "lamb"
+  ],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "58": {
+  "zh": "肉夹馍",
+  "pinyin": "ròu jiā mó",
+  "name": "Shaanxi Braised Pork Belly in Flatbread",
+  "short": "Slow-braised pork belly stuffed in crisp wheat flatbread",
+  "allergens": [
+   {
+    "id": "gluten",
+    "role": "main",
+    "via_zh": "馍",
+    "via": "wheat flatbread"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "msg",
+    "role": "sauce",
+    "via_zh": "味精",
+    "via": "MSG (common in braising liquid)"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "pork"
+  ],
+  "alcohol": true,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "49": {
+  "zh": "大盘鸡",
+  "pinyin": "dà pán jī",
+  "name": "Xinjiang Big Plate Chicken",
+  "short": "Spicy braised chicken with potatoes and peppers on noodles",
+  "allergens": [
+   {
+    "id": "gluten",
+    "role": "main",
+    "via_zh": "面条或馒头",
+    "via": "wheat noodles or steamed buns"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "sesame",
+    "role": "sauce",
+    "via_zh": "芝麻油",
+    "via": "sesame oil"
+   }
+  ],
+  "spice": 2,
+  "vegetarian": false,
+  "meat": [
+   "chicken"
+  ],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "50": {
+  "zh": "兰州牛肉面",
+  "pinyin": "lán zhōu niú ròu miàn",
+  "name": "Lanzhou Beef Noodle Soup",
+  "short": "Hand-pulled noodles in clear beef broth with tender beef",
+  "allergens": [
+   {
+    "id": "gluten",
+    "role": "main",
+    "via_zh": "面粉",
+    "via": "wheat flour"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "celery",
+    "role": "garnish",
+    "via_zh": "香菜",
+    "via": "cilantro"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "beef"
+  ],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "51": {
+  "zh": "锅包肉",
+  "pinyin": "guō bāo ròu",
+  "name": "Guo Bao Rou",
+  "short": "Crispy sweet-sour pork slices",
+  "allergens": [
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "egg",
+    "role": "main",
+    "via_zh": "蛋液",
+    "via": "egg batter"
+   },
+   {
+    "id": "msg",
+    "role": "sauce",
+    "via_zh": "味精",
+    "via": "MSG"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "pork"
+  ],
+  "alcohol": true,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "54": {
+  "zh": "麻辣烫",
+  "pinyin": "má là tàng",
+  "name": "Malatang",
+  "short": "Custom spicy hotpot-style soup with skewered ingredients",
+  "allergens": [
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "sesame",
+    "role": "sauce",
+    "via_zh": "芝麻酱",
+    "via": "sesame paste"
+   },
+   {
+    "id": "crustacean",
+    "role": "sauce",
+    "via_zh": "虾皮",
+    "via": "shrimp flakes"
+   },
+   {
+    "id": "fish",
+    "role": "sauce",
+    "via_zh": "鱼露",
+    "via": "fish sauce (in some broths)"
+   },
+   {
+    "id": "mollusc",
+    "role": "sauce",
+    "via_zh": "蚝油",
+    "via": "oyster sauce (in some broths)"
+   },
+   {
+    "id": "peanut",
+    "role": "sauce",
+    "via_zh": "花生酱",
+    "via": "peanut butter (in some regional variants)"
+   }
+  ],
+  "spice": 3,
+  "vegetarian": false,
+  "meat": [
+   "pork",
+   "beef",
+   "chicken",
+   "duck",
+   "seafood",
+   "offal"
+  ],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "52": {
+  "zh": "地三鲜",
+  "pinyin": "dì sān xiān",
+  "name": "Three Fresh Vegetables of the Earth",
+  "short": "Stir-fried potato, eggplant, and green pepper in savory sauce",
+  "allergens": [
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "egg",
+    "role": "main",
+    "via_zh": "鸡蛋",
+    "via": "egg"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": true,
+  "meat": [],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "55": {
+  "zh": "煎饼果子",
+  "pinyin": "jiān bǐng guǒ zi",
+  "name": "Tianjin Jianbing",
+  "short": "Crispy scallion crepe with youtiao and egg",
+  "allergens": [
+   {
+    "id": "egg",
+    "role": "main",
+    "via_zh": "鸡蛋",
+    "via": "egg"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "甜面酱",
+    "via": "sweet soybean sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "main",
+    "via_zh": "油条",
+    "via": "fried dough stick"
+   },
+   {
+    "id": "gluten",
+    "role": "main",
+    "via_zh": "面糊",
+    "via": "wheat batter"
+   },
+   {
+    "id": "sesame",
+    "role": "garnish",
+    "via_zh": "芝麻",
+    "via": "sesame seeds"
+   },
+   {
+    "id": "msg",
+    "role": "sauce",
+    "via_zh": "甜面酱",
+    "via": "sweet soybean sauce"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "56": {
+  "zh": "小笼包",
+  "pinyin": "xiǎo lóng bāo",
+  "name": "Xiaolongbao",
+  "short": "Steamed soup dumplings with pork filling",
+  "allergens": [
+   {
+    "id": "gluten",
+    "role": "main",
+    "via_zh": "面粉",
+    "via": "wheat flour"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "main",
+    "via_zh": "面粉",
+    "via": "wheat flour"
+   },
+   {
+    "id": "egg",
+    "role": "sauce",
+    "via_zh": "蛋清",
+    "via": "egg white"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "pork"
+  ],
+  "alcohol": true,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "57": {
+  "zh": "生煎包",
+  "pinyin": "shēng jiān bāo",
+  "name": "Shengjianbao",
+  "short": "Pan-fried pork buns with crisp bottom and juicy filling",
+  "allergens": [
+   {
+    "id": "gluten",
+    "role": "main",
+    "via_zh": "面粉",
+    "via": "wheat flour"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "main",
+    "via_zh": "面粉",
+    "via": "wheat flour"
+   },
+   {
+    "id": "egg",
+    "role": "sauce",
+    "via_zh": "蛋清",
+    "via": "egg white"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "pork"
+  ],
+  "alcohol": true,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "59": {
+  "zh": "豆浆",
+  "pinyin": "dòu jiāng",
+  "name": "Soybean Milk",
+  "short": "Hot unsweetened or sweetened soy milk, plain",
+  "allergens": [
+   {
+    "id": "soy",
+    "role": "main",
+    "via_zh": "大豆",
+    "via": "soybeans"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "可能含小麦粉（增稠）",
+    "via": "possible wheat flour (thickener)"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": true,
+  "meat": [],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "60": {
+  "zh": "油条",
+  "pinyin": "yóu tiáo",
+  "name": "Chinese Cruller",
+  "short": "Deep-fried wheat dough sticks, crispy and airy",
+  "allergens": [
+   {
+    "id": "gluten",
+    "role": "main",
+    "via_zh": "面粉",
+    "via": "wheat flour"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "豆油或菜籽油（常含大豆成分）",
+    "via": "soybean or rapeseed oil (often contains soy)"
+   },
+   {
+    "id": "egg",
+    "role": "sauce",
+    "via_zh": "部分配方含鸡蛋",
+    "via": "some recipes contain egg"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "70": {
+  "zh": "清炒时蔬",
+  "pinyin": "qīng chǎo shí shū",
+  "name": "Stir-Fried Seasonal Vegetables",
+  "short": "Lightly stir-fried fresh seasonal vegetables",
+  "allergens": [
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": true,
+  "meat": [],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "61": {
+  "zh": "热干面",
+  "pinyin": "rè gān miàn",
+  "name": "Hot Dry Noodles",
+  "short": "Alkaline wheat noodles with sesame paste, soy sauce, and pickles",
+  "allergens": [
+   {
+    "id": "sesame",
+    "role": "sauce",
+    "via_zh": "芝麻酱",
+    "via": "sesame paste"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "gluten",
+    "role": "main",
+    "via_zh": "碱水面",
+    "via": "alkaline wheat noodles"
+   }
+  ],
+  "spice": 1,
+  "vegetarian": true,
+  "meat": [],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "62": {
+  "zh": "嘉兴肉粽",
+  "pinyin": "jiā xīng ròu zòng",
+  "name": "Jiaxing Glutinous Rice Dumpling with Pork",
+  "short": "Sticky rice dumpling wrapped in bamboo leaf, stuffed with braised pork",
+  "allergens": [
+   {
+    "id": "gluten",
+    "role": "main",
+    "via_zh": "糯米",
+    "via": "glutinous rice"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "egg",
+    "role": "sauce",
+    "via_zh": "咸蛋黄",
+    "via": "salted duck egg yolk"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": false,
+  "meat": [
+   "pork"
+  ],
+  "alcohol": true,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "64": {
+  "zh": "鸡蛋灌饼",
+  "pinyin": "jī dàn guàn bǐng",
+  "name": "Egg-Stuffed Scallion Pancake",
+  "short": "Crispy layered pancake with beaten egg injected inside",
+  "allergens": [
+   {
+    "id": "egg",
+    "role": "main",
+    "via_zh": "鸡蛋",
+    "via": "egg"
+   },
+   {
+    "id": "gluten",
+    "role": "main",
+    "via_zh": "面粉",
+    "via": "wheat flour"
+   },
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "酱油",
+    "via": "soy sauce"
+   },
+   {
+    "id": "sesame",
+    "role": "garnish",
+    "via_zh": "芝麻",
+    "via": "sesame seeds"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": true,
+  "meat": [],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "65": {
+  "zh": "黑芝麻汤圆",
+  "pinyin": "hēi zhī ma tāng yuán",
+  "name": "Black Sesame Glutinous Rice Balls",
+  "short": "Sweet glutinous rice balls filled with black sesame paste",
+  "allergens": [
+   {
+    "id": "sesame",
+    "role": "main",
+    "via_zh": "黑芝麻",
+    "via": "black sesame"
+   },
+   {
+    "id": "gluten",
+    "role": "main",
+    "via_zh": "糯米粉",
+    "via": "glutinous rice flour"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": true,
+  "meat": [],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ },
+ "66": {
+  "zh": "杨枝甘露",
+  "pinyin": "yáng zhī gān lù",
+  "name": "Mango Pomelo Sago",
+  "short": "Chilled dessert with mango, pomelo, sago pearls, and coconut milk",
+  "allergens": [
+   {
+    "id": "soy",
+    "role": "sauce",
+    "via_zh": "椰浆或豆奶",
+    "via": "coconut milk or soy milk"
+   },
+   {
+    "id": "sesame",
+    "role": "garnish",
+    "via_zh": "芝麻（少见但 possible in modern variants）",
+    "via": "sesame (rare but possible in modern variants)"
+   },
+   {
+    "id": "sulphites",
+    "role": "garnish",
+    "via_zh": "柚子（pomelo often treated with sulphites）",
+    "via": "pomelo (often treated with sulphites)"
+   },
+   {
+    "id": "milk",
+    "role": "sauce",
+    "via_zh": "椰浆或鲜奶",
+    "via": "coconut milk or fresh milk"
+   }
+  ],
+  "spice": 0,
+  "vegetarian": true,
+  "meat": [],
+  "alcohol": false,
+  "confidence": "high",
+  "price": "",
+  "cached": false
+ }
+}

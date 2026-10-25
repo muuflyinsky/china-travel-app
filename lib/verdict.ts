@@ -2,6 +2,7 @@
 // Red/amber/green are used for this verdict only. Wording follows the 2026-10-25 safety review
 // (option B): a severe allergy never gets a green answer.
 import type { ListDish } from "./dishes";
+import { tighten } from "./ingredients";
 
 export type VerdictKind = "ok" | "ask" | "no";
 export type Reason =
@@ -62,9 +63,12 @@ export function verdict(d: ListDish, p: Restrictions): Verdict {
   return { kind, reasons, blocked, removable, confirm: kind === "ok" && p.severe.some((a) => p.allergens.includes(a)) };
 }
 
-/** Allergens found when the detail loads are merged in, so the verdict only gets stricter. */
+/**
+ * Allergens found when the detail loads are merged in, and the detail's ingredients go through
+ * the word list too (猪油 makes the dish pork, 高汤 not vegetarian), so the verdict only gets stricter.
+ */
 export function withDetailAllergens(d: ListDish, ingredients: { zh: string; name: string; role: "main" | "sauce" | "garnish"; allergens: string[] }[]): ListDish {
   const extra = ingredients.flatMap((i) => i.allergens.map((id) => ({ id, role: i.role, via: i.name, via_zh: i.zh })))
     .filter((a) => !d.allergens.some((x) => x.id === a.id && (x.via_zh === a.via_zh || x.role === "main")));
-  return extra.length ? { ...d, allergens: [...d.allergens, ...extra] } : d;
+  return tighten(extra.length ? { ...d, allergens: [...d.allergens, ...extra] } : d, ingredients);
 }

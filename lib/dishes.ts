@@ -7,8 +7,9 @@ import * as z from "zod/v4";
 import { structured, allergenEnum } from "./llm";
 import { langName } from "./languages";
 import { ALLERGENS } from "./allergens";
-import { cacheGet, cachePut, PROMPT_VERSION, type Cached } from "./dish-cache";
+import { cacheGet, cachePut, canonicalZh, factsGet, isChineseName, mergeFacts, PROMPT_VERSION, type Cached } from "./dish-cache";
 import { normalizeName, regionOf } from "./dish-name";
+import { tighten } from "./ingredients";
 
 const ROLE = z.enum(["main", "sauce", "garnish"]);
 const MEAT = ["pork", "beef", "lamb", "chicken", "duck", "fish", "seafood", "offal", "other"] as const;
@@ -104,9 +105,11 @@ const ALIASES: Record<string, string> = {
   monosodium_glutamate: "msg", chicken_powder: "msg", walnut: "tree_nut", cashew: "tree_nut", almond: "tree_nut", shellfish_crustacean: "crustacean",
 };
 // Words models put in "allergens" that aren't allergens: meat, alcohol and spice are covered by
-// their own fields, so they mustn't make a well-known dish look uncertain.
+// their own fields, so they mustn't make a well-known dish look uncertain. Lard and animal fat
+// aren't dropped: they make the dish pork and not vegetarian (review R2).
+const ANIMAL_FAT: Record<string, (typeof MEAT)[number]> = { lard: "pork", pork_fat: "pork", suet: "beef", tallow: "beef", beef_tallow: "beef", chicken_fat: "chicken", animal_fat: "other" };
 const NOT_ALLERGENS = new Set([
-  "pork", "beef", "lamb", "mutton", "chicken", "duck", "goose", "meat", "offal", "lard", "animal_fat",
+  "pork", "beef", "lamb", "mutton", "chicken", "duck", "goose", "meat", "offal",
   "alcohol", "wine", "cooking_wine", "rice_wine", "shaoxing_wine", "chili", "chilli", "spicy", "sichuan_pepper",
   "garlic", "onion", "scallion", "ginger", "vinegar", "sugar", "salt", "starch", "corn_starch", "none",
 ]);
@@ -123,9 +126,11 @@ function repairFacts(raw: unknown) {
     cuisine: s(m.cuisine), tips: arr(m.tips).map(s).filter(Boolean),
     dishes: arr(m.dishes).map((x) => {
       const d = (x ?? {}) as Record<string, unknown>;
+      const fat: (typeof MEAT)[number][] = [];
       let unsure = false;
       const allergens = arr(d.allergens).flatMap((y) => {
         const a = (typeof y === "string" ? { id: y } : y ?? {}) as Record<string, unknown>;
+        if (ANIMAL_FAT[key(a.id)]) { fat.push(ANIMAL_FAT[key(a.id)]); return []; }
         const id = known.has(key(a.id)) ? key(a.id) : ALIASES[key(a.id)];
         if (!id) {
           // Unknown word: could be an allergen we can't map, so the dish is marked unsure (and logged to extend ALIASES).
@@ -138,8 +143,8 @@ function repairFacts(raw: unknown) {
       return {
         zh: s(d.zh), pinyin: s(d.pinyin), name: s(d.name), short: s(d.short), allergens,
         spice: Number.isFinite(spice) ? Math.min(3, Math.max(0, spice)) : 0,
-        vegetarian: yes(d.vegetarian), alcohol: yes(d.alcohol),
-        meat: [...new Set(arr(d.meat).map((v) => pick(v, MEAT, "other")))],
+        vegetarian: yes(d.vegetarian) && !fat.length, alcohol: yes(d.alcohol),
+        meat: [...new Set([...arr(d.meat).map((v) => pick(v, MEAT, "other")), ...fat])],
         confidence: unsure ? "low" : pick(d.confidence, ["high", "medium", "low"] as const, "low"),
       };
     }),
@@ -191,7 +196,8 @@ const PARALLEL = 6;   // concurrent model calls per menu
 
 type Item = { zh: string; price: string; printed: string };
 
-const fromCache = (it: Item, c: Cached): ListDish => ({
+// Every dish leaves through the word list (lib/ingredients.ts), cached or fresh.
+const fromCache = (it: Item, c: Cached): ListDish => tighten({
   ...c.facts, zh: it.zh, price: it.price, name: c.text.name, short: c.text.short,
   allergens: c.facts.allergens.map((a) => ({ ...a, via: c.text.via?.[a.via_zh] || a.via_zh })),
 });
@@ -216,6 +222,13 @@ export async function* readMenu(input: { image?: { data: string; mediaType: stri
   } else {
     items = splitTyped(input.text ?? "");
   }
+  // Pinyin or English typed in: the Chinese name when we know the dish, so it is looked up
+  // (and shown to staff) as that dish. Unknown ones are answered but never cached (review R3).
+  items = await Promise.all(items.map(async (it) => {
+    if (isChineseName(it.zh)) return it;
+    const zh = await canonicalZh(it.zh);
+    return zh ? { ...it, zh } : it;
+  }));
   const tRead = Date.now();
   yield { type: "meta", cuisine, total: items.length };
   if (!items.length) return;
@@ -229,6 +242,13 @@ export async function* readMenu(input: { image?: { data: string; mediaType: stri
     if (h) yield { type: "dish", i, dish: fromCache(items[i], h), cached: true };
     else misses.push(i);
   }
+
+  // Facts another language already stored: a new language merges into them instead of replacing them.
+  const stored = new Map<number, Cached["facts"]>();
+  await Promise.all(misses.map(async (i) => {
+    const f = items[i].printed ? null : await factsGet(items[i].zh, region);
+    if (f) stored.set(i, f);
+  }));
 
   // Misses in small batches, a few at a time; each batch is emitted the moment it returns.
   type Facts = z.infer<typeof FactsSchema>;
@@ -257,12 +277,16 @@ export async function* readMenu(input: { image?: { data: string; mediaType: stri
       // Models occasionally reorder, so prefer an exact name match over the position.
       const f = out.dishes.find((d) => normalizeName(d.zh) === normalizeName(items[i].zh)) ?? out.dishes[j];
       if (!f) { failed.push(i); continue; }
-      const dish: ListDish = { ...f, zh: items[i].zh, price: items[i].price, printed: items[i].printed || undefined };
+      const drawn: Cached["facts"] = { pinyin: f.pinyin, allergens: f.allergens.map(({ id, role, via_zh }) => ({ id, role, via_zh })), spice: f.spice, vegetarian: f.vegetarian, meat: f.meat, alcohol: f.alcohol, confidence: f.confidence };
+      const facts = stored.has(i) ? mergeFacts(stored.get(i)!, drawn) : drawn;
+      const via: Record<string, string> = Object.fromEntries(f.allergens.map((a) => [a.via_zh, a.via]));
+      const dish: ListDish = tighten({
+        ...f, ...facts, zh: items[i].zh, price: items[i].price, printed: items[i].printed || undefined,
+        allergens: facts.allergens.map((a) => ({ ...a, via: via[a.via_zh] || a.via_zh })),
+      });
       if (!items[i].printed) {
-        writes.push(cachePut(items[i].zh, region, input.lang, {
-          facts: { pinyin: f.pinyin, allergens: f.allergens.map(({ id, role, via_zh }) => ({ id, role, via_zh })), spice: f.spice, vegetarian: f.vegetarian, meat: f.meat, alcohol: f.alcohol, confidence: f.confidence },
-          text: { name: f.name, short: f.short, via: Object.fromEntries(f.allergens.map((a) => [a.via_zh, a.via])) },
-        }).catch((e) => console.error("[dish-cache] write:", (e as Error).message)));
+        writes.push(cachePut(items[i].zh, region, input.lang, { facts, text: { name: f.name, short: f.short, via } })
+          .catch((e) => console.error("[dish-cache] write:", (e as Error).message)));
       }
       yield { type: "dish", i, dish, cached: false };
     }
