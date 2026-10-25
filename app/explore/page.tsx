@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { Preloader } from "konsta/react";
 import { LocateFixed, Search, X, MapPin, ChevronDown, Sparkles, Soup, TrainFront, Bath, Pill, Landmark, Store, Hospital, CarTaxiFront, ExternalLink, Church, Trees, MoonStar, UtensilsCrossed, ShoppingBag, Star } from "lucide-react";
 import { Screen, DemoNote } from "@/components/Shell";
-import { Section, Card, Group, Row, Button, Note } from "@/components/ui";
+import { Section, SectionTitle, Card, Group, Row, Button, Note } from "@/components/ui";
 import { AppIcon } from "@/components/AppIcon";
 import { ShowCard } from "@/components/ShowCard";
 import { CityPicker } from "@/components/CityPicker";
@@ -13,6 +13,8 @@ import { Photo } from "@/components/Photo";
 import { RoutePanel } from "@/components/RoutePanel";
 import { AwardBadges } from "@/components/AwardBadges";
 import { AwardRestaurants } from "@/components/AwardRestaurants";
+import { RestaurantDetail } from "@/components/RestaurantDetail";
+import type { ListedRestaurant } from "@/lib/restaurants";
 import { awardScore } from "@/lib/restaurant-awards";
 import { isHotCity } from "@/lib/hot-cities";
 import { useCity, type Here } from "@/components/useCity";
@@ -70,6 +72,8 @@ function Explore() {
   const [query, setQuery] = useState<Query | null>(null);
   const [more, setMore] = useState(false);
   const [dest, setDest] = useState<Place | null>(null);
+  // A guide-listed restaurant opened from the Restaurants view: its own detail, then the same route block.
+  const [restaurant, setRestaurant] = useState<ListedRestaurant | null>(null);
   const [demo, setDemo] = useState(false);
   const [busy, setBusy] = useState("");
   const [notice, setNotice] = useState<string>();
@@ -149,15 +153,17 @@ function Explore() {
   const tripCities = p.cities.map((c) => ({ n: c.n ?? c.s, s: c.s, a: c.a, e: c.e, p: c.p ?? "", py: "", t: "city" as const }));
   const reset = () => { setPlaces([]); setQ(""); setQuery(null); setMore(false); setNotice(undefined); };
   const hot = isHotCity(city.a);
-  const show = (v: View) => { reset(); setDest(null); setView(v); };
-  const pickPlace = (x: Place | string) => { if (typeof x === "string") { setQ(x); search(x); } else setDest(x); scrollTop(); };
+  const show = (v: View) => { reset(); setDest(null); setRestaurant(null); setView(v); };
+  const pickPlace = (x: Place | string) => { setRestaurant(null); if (typeof x === "string") { setQ(x); search(x); } else setDest(x); scrollTop(); };
+  const pickRestaurant = (r: ListedRestaurant) => { setRestaurant(r); setDest(r.poi); scrollTop(); track("restaurant_open", { photo: r.photos.length > 0, dishes: r.dishes.length }); };
+  const closeDetail = () => { setDest(null); setRestaurant(null); };
 
   const finder = (
     <Section>
       <div className="flex h-control items-center rounded-control border border-line bg-card">
         {/* The city the search runs in, inside the bar; trip cities are listed first in the picker.
             Kept outside the <form>: the picker's sheet renders here and its buttons must not submit. */}
-        <CityPicker value={city} trip={tripCities} onChange={(c) => { setCity(c); setHere(null); reset(); setDest(null); }} onLocate={locate}
+        <CityPicker value={city} trip={tripCities} onChange={(c) => { setCity(c); setHere(null); reset(); setDest(null); setRestaurant(null); }} onLocate={locate}
           trigger={(open) => (
             <button type="button" onClick={open} aria-label={`${t.city.searchingIn} ${city.e}. ${t.common.edit}`}
               className="flex h-full max-w-[42%] shrink-0 items-center gap-1 border-r border-line pr-2 pl-3 text-subhead font-semibold text-cobalt">
@@ -210,36 +216,59 @@ function Explore() {
     </Section>
   );
 
+  /** Taxi card and Amap navigation for a place (shared by the place card and the restaurant detail). */
+  const actions = (x: Place) => (
+    <div>
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <Button variant="soft" className="text-subhead!" onClick={() => { setCard(["师傅您好，请带我去：", x.name, `地址：${x.address}`]); track("taxi_card_shown", { source: restaurant ? "restaurant" : "explore" }); }}>
+          <CarTaxiFront className="h-5 w-5" aria-hidden /> {t.go.showDriver}
+        </Button>
+        <a href={amapNav(x, "bus", from)} target="_blank" rel="noopener" className="flex min-h-control items-center justify-center gap-2 rounded-control bg-cobalt-soft text-subhead font-semibold text-cobalt">
+          <AppIcon id="amap" size={22} /> {t.go.start}
+        </a>
+      </div>
+      <a href={appleNav(x, "r")} target="_blank" rel="noopener" className="mt-1 flex min-h-11 items-center justify-center gap-1.5 text-footnote font-semibold text-cobalt"><AppIcon id="applemaps" size={18} /> Apple Maps</a>
+    </div>
+  );
+
+  /** Metro, bus and taxi in the app (RoutePanel), under a "Getting there" heading. */
+  const routes = (x: Place) => (
+    <div className="space-y-stack pt-2">
+      <SectionTitle aside={!here && <button onClick={locate} className="flex min-h-11 items-center gap-1 text-subhead font-semibold text-cobalt"><LocateFixed className="h-4 w-4" aria-hidden />{t.go.useLocation}</button>}>{t.go.ways}</SectionTitle>
+      <RoutePanel dest={x} origin={origin} />
+      <div className="flex items-start gap-3 px-1">
+        <span className="flex -space-x-2"><AppIcon id="alipay" size={28} /><AppIcon id="wechat" size={28} /></span>
+        <p className="text-footnote text-muted">{t.go.metroNote}</p>
+      </div>
+    </div>
+  );
+
   return (
     <Screen title={t.go.title}>
-      {dest ? (
+      {dest || restaurant ? (
         <>
           <Section>
-            <button onClick={() => setDest(null)} className="flex min-h-11 items-center px-1 text-subhead font-semibold text-cobalt">{places.length ? t.go.back : t.guide.backToPicks}</button>
-            <Card>
-              <Photo src={dest.photo} alt={dest.name} className="mb-3" />
-              <h2 className="zh text-title">{dest.name}</h2>
-              <AwardBadges awards={dest.awards} />
-              <p className="text-subhead">{dest.pinyin}</p>
-              <p className="zh text-footnote text-muted">{dest.address}</p>
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                <Button variant="soft" className="text-subhead!" onClick={() => { setCard(["师傅您好，请带我去：", dest.name, `地址：${dest.address}`]); track("taxi_card_shown", { source: "explore" }); }}>
-                  <CarTaxiFront className="h-5 w-5" aria-hidden /> {t.go.showDriver}
-                </Button>
-                <a href={amapNav(dest, "bus", from)} target="_blank" rel="noopener" className="flex min-h-control items-center justify-center gap-2 rounded-control bg-cobalt-soft text-subhead font-semibold text-cobalt">
-                  <AppIcon id="amap" size={22} /> {t.go.start}
-                </a>
-              </div>
-              <a href={appleNav(dest, "r")} target="_blank" rel="noopener" className="mt-1 flex min-h-11 items-center justify-center gap-1.5 text-footnote font-semibold text-cobalt"><AppIcon id="applemaps" size={18} /> Apple Maps</a>
-            </Card>
+            <button onClick={closeDetail} className="flex min-h-11 items-center px-1 text-subhead font-semibold text-cobalt">{places.length || restaurant ? t.go.back : t.guide.backToPicks}</button>
+            {restaurant ? (
+              <RestaurantDetail r={restaurant}>
+                {dest ? <>{actions(dest)}{routes(dest)}</> : (
+                  <Button variant="soft" className="w-full text-subhead!" onClick={() => { setCard(["您好，我想去这家餐厅：", restaurant.zh]); track("taxi_card_shown", { source: "restaurant" }); }}>
+                    <CarTaxiFront className="h-5 w-5" aria-hidden /> {t.go.showDriver}
+                  </Button>
+                )}
+              </RestaurantDetail>
+            ) : dest && (
+              <Card>
+                <Photo src={dest.photo} alt={dest.name} className="mb-3" />
+                <h2 className="zh text-title">{dest.name}</h2>
+                <AwardBadges awards={dest.awards} />
+                <p className="text-subhead">{dest.pinyin}</p>
+                <p className="zh text-footnote text-muted">{dest.address}</p>
+                {actions(dest)}
+              </Card>
+            )}
           </Section>
-          <Section title={t.go.ways} aside={!here && <button onClick={locate} className="flex min-h-11 items-center gap-1 text-subhead font-semibold text-cobalt"><LocateFixed className="h-4 w-4" aria-hidden />{t.go.useLocation}</button>}>
-            <RoutePanel dest={dest} origin={origin} />
-            <div className="flex items-start gap-3 px-1">
-              <span className="flex -space-x-2"><AppIcon id="alipay" size={28} /><AppIcon id="wechat" size={28} /></span>
-              <p className="text-footnote text-muted">{t.go.metroNote}</p>
-            </div>
-          </Section>
+          {dest && !restaurant && <Section>{routes(dest)}</Section>}
         </>
       ) : searching ? (
         <>
@@ -274,7 +303,7 @@ function Explore() {
           {finder}
           {view === "restaurants" ? (
             <Section>
-              <AwardRestaurants adcode={city.a} cityEn={city.e} onPick={pickPlace} />
+              <AwardRestaurants adcode={city.a} cityEn={city.e} onPick={pickRestaurant} />
             </Section>
           ) : hot ? (
             <Section>
@@ -284,7 +313,7 @@ function Explore() {
           ) : (
             <Section>
               {/* No city guide here, but the city may still have Michelin / Must-Eat restaurants. */}
-              <AwardRestaurants adcode={city.a} cityEn={city.e} listedOnly onPick={pickPlace} />
+              <AwardRestaurants adcode={city.a} cityEn={city.e} listedOnly onPick={pickRestaurant} />
               <a href={goLink("trip", "attraction", { cityEn: city.e, city: city.s }, "explore_top", "explore-top")} target="_blank" rel="noopener" className="flex min-h-11 items-center gap-1 px-1 text-subhead font-semibold text-cobalt">
                 {fmt(t.guide.topTrip, { city: city.e })}<ExternalLink className="h-3.5 w-3.5" aria-hidden />
               </a>
@@ -293,7 +322,7 @@ function Explore() {
           {nearby}
         </>
       )}
-      {card && <ShowCard kind="taxi" lines={card} sub={dest?.pinyin} onClose={() => setCard(null)} />}
+      {card && <ShowCard kind="taxi" lines={card} sub={restaurant?.nameEn ?? dest?.pinyin} onClose={() => setCard(null)} />}
     </Screen>
   );
 }

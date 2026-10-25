@@ -14,11 +14,13 @@ import { LANGUAGES } from "@/lib/languages";
 import { ALLERGENS, DIETS, allergyLinesZh, type AllergenId, type DietId } from "@/lib/allergens";
 import { track } from "@/lib/track";
 import { compressImage } from "@/lib/image";
-import { fmt, type Dict } from "@/lib/i18n";
+import { fmt } from "@/lib/i18n";
 import type { ListDish, DishDetail, MenuEvent } from "@/lib/dishes";
 import { SourceLine } from "@/components/SourceLine";
 import { Feedback } from "@/components/Feedback";
-import { verdict, withDetailAllergens, type Verdict, type VerdictKind, type Reason } from "@/lib/verdict";
+import { verdict, withDetailAllergens, type Verdict, type VerdictKind } from "@/lib/verdict";
+import { VerdictTag, reasonText } from "@/components/VerdictTag";
+import { orderCard, staffReplies, allergyExplain as allergyExplainText } from "@/lib/order-card";
 
 /** The menu as it streams in. `dishes` is indexed by position on the menu; gaps are still coming. */
 type Menu = { cuisine: string; total: number; dishes: (ListDish | undefined)[]; tips: string[]; missing: number; streaming: boolean; demo?: boolean };
@@ -35,15 +37,6 @@ const detailCache = new Map<string, DishDetail>();
 /** Menu dishes are regenerated when the prompts change; feedback is grouped by that version. */
 const DISH_FEEDBACK_VERSION = "1";
 
-const TONE: Record<VerdictKind, string> = { ok: "tag-ok", ask: "tag-warn", no: "tag-danger" };
-
-function reasonText(t: Dict, r: Reason) {
-  if (r.k === "main") return fmt(t.eat.reasonMain, { x: r.via });
-  if (r.k === "has") return fmt(t.eat.reasonHas, { x: r.via });
-  if (r.k === "unsure") return t.eat.reasonUnsure;
-  return { notVeg: t.eat.notVeg, pork: t.eat.pork, beef: t.eat.beef, alcohol: t.eat.cookedAlcohol, spicy: t.eat.spicy }[r.what];
-}
-
 function Spice({ n }: { n: number }) {
   const t = useT();
   if (!n) return null;
@@ -51,18 +44,6 @@ function Spice({ n }: { n: number }) {
   return (
     <span className="inline-flex text-ink" aria-label={fmt(t.eat.spice, { n })} role="img">
       {Array.from({ length: n }, (_, i) => <Flame key={i} className="h-3.5 w-3.5" aria-hidden />)}
-    </span>
-  );
-}
-
-function VerdictTag({ v }: { v: Verdict }) {
-  const t = useT();
-  const label = { ok: t.eat.verdictOk, ask: t.eat.verdictAsk, no: t.eat.verdictNo }[v.kind];
-  const why = v.reasons.slice(0, 2).map((r) => reasonText(t, r)).join(", ");
-  return (
-    // Wraps rather than truncates: the reason is the point of the list (#26).
-    <span className={`tag ${TONE[v.kind]} max-w-full rounded-control! py-1!`}>
-      <span className="line-clamp-2">{label}{why && ` · ${why}`}</span>
     </span>
   );
 }
@@ -406,7 +387,6 @@ export default function MenuPage() {
     ...profile.allergens.map((a) => `${t.allergens[a as AllergenId]}${profile.severe.includes(a) ? ` (${t.settings.severeShort})` : ""}`),
     ...profile.diets.map((d) => t.diets[d as DietId]),
   ];
-  const myAllergensMine = profile.allergens.map((a) => t.allergens[a as AllergenId].toLowerCase());
   const homePrice = (price: string) => {
     const cny = parseCny(price);
     return cny && fx && profile.homeCurrency !== "CNY" ? formatMoney(cny / fx.value, profile.homeCurrency, profile.lang) : undefined;
@@ -445,26 +425,12 @@ export default function MenuPage() {
     fetch("/api/dish/flag", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ zh: d.zh, adcode: city.a, lang: profile.lang }) }).catch(() => {});
   }
 
-  // At most three answers, so they fit under the card without scrolling.
-  const replies = (withCant: boolean): StaffReply[] => [
-    { zh: "可以，没问题", mine: t.eat.replyOk },
-    ...(withCant ? [{ zh: "这道菜做不了", mine: t.eat.replyCant }] : []),
-    ...(profile.allergens.length ? [{ zh: "里面有您过敏的东西", mine: t.eat.replyContainsAny }] : []),
-  ];
-  const allergyExplain = myAllergensMine.length ? fmt(t.eat.orderExplainAllergy, { allergens: myAllergensMine.join(", ") }) : "";
+  const replies = (withCant: boolean) => staffReplies(t, profile, withCant);
+  const allergyExplain = allergyExplainText(t, profile);
 
   function showOrder() {
-    const { severe, rest } = allergyLinesZh(profile.allergens, profile.diets, profile.severe);
-    const dishes = orderLines.map(({ row, l }) => `${row.d.name} ×${l.qty}`).join(", ");
-    track("order_card_shown", { dishes: orderLines.length, severe: Boolean(severe) });
-    setCard({
-      kind: "order",
-      lead: severe || undefined,
-      lines: ["您好，我要点：", ...orderLines.map(({ row, l }) => `${row.d.zh} ×${l.qty}${l.without.length ? `（不要放${l.without.join("、")}）` : ""}`)],
-      rest,
-      explain: [fmt(t.eat.orderExplain, { dishes }), allergyExplain].filter(Boolean).join(" "),
-      replies: replies(true),
-    });
+    track("order_card_shown", { dishes: orderLines.length, severe: Boolean(allergyLinesZh(profile.allergens, profile.diets, profile.severe).severe) });
+    setCard(orderCard(t, profile, orderLines.map(({ row, l }) => ({ zh: row.d.zh, name: row.d.name, qty: l.qty, without: l.without }))));
   }
 
   function showAllergyCard() {

@@ -1,0 +1,1517 @@
+{
+ "_status": "DRAFT — AI-generated 2026-10-25, awaiting product-owner review. Short names: 2–3 words; 'about' only on the detail page.",
+ "cuisines": {
+  "粤菜": {
+   "icon": "Soup",
+   "tone": 1,
+   "short": {
+    "en": "Cantonese",
+    "es": "Cantonesa",
+    "fr": "Cantonais",
+    "de": "Kantonesisch",
+    "ja": "広東料理",
+    "ko": "광둥 요리"
+   },
+   "about": {
+    "en": "Southern Chinese cooking from Guangdong: fresh ingredients, light sauces, steaming and dim sum.",
+    "es": "Cocina del sur de China (Guangdong): ingredientes frescos, salsas ligeras, cocción al vapor y dim sum.",
+    "fr": "Cuisine du sud de la Chine (Guangdong) : produits frais, sauces légères, cuisson vapeur et dim sum.",
+    "de": "Südchinesische Küche aus Guangdong: frische Zutaten, leichte Saucen, Dämpfen und Dim Sum.",
+    "ja": "広東省の南方料理。新鮮な食材、あっさりした味付け、蒸し料理と点心が特徴。",
+    "ko": "광둥성의 남부 요리. 신선한 재료, 담백한 소스, 찜 요리와 딤섬이 특징."
+   }
+  },
+  "川菜": {
+   "icon": "Flame",
+   "tone": 2,
+   "short": {
+    "en": "Sichuan",
+    "es": "Sichuan",
+    "fr": "Sichuanais",
+    "de": "Sichuan-Küche",
+    "ja": "四川料理",
+    "ko": "쓰촨 요리"
+   },
+   "about": {
+    "en": "Bold, spicy cooking from Sichuan, known for chili and numbing Sichuan pepper.",
+    "es": "Cocina intensa y picante de Sichuan, famosa por el chile y la pimienta de Sichuan.",
+    "fr": "Cuisine relevée et épicée du Sichuan, connue pour le piment et le poivre du Sichuan.",
+    "de": "Kräftige, scharfe Küche aus Sichuan, bekannt für Chili und betäubenden Sichuanpfeffer.",
+    "ja": "唐辛子としびれる花椒で知られる、刺激的な四川料理。",
+    "ko": "고추와 얼얼한 화자오로 유명한 맵고 강렬한 쓰촨 요리."
+   }
+  },
+  "闽菜": {
+   "icon": "Shell",
+   "tone": 1,
+   "short": {
+    "en": "Fujian cuisine",
+    "es": "Cocina de Fujian",
+    "fr": "Cuisine du Fujian",
+    "de": "Fujian-Küche",
+    "ja": "福建料理",
+    "ko": "푸젠 요리"
+   },
+   "about": {
+    "en": "Coastal cooking from Fujian: seafood, rich broths and slightly sweet, sour flavours.",
+    "es": "Cocina costera de Fujian: marisco, caldos sabrosos y sabores agridulces suaves.",
+    "fr": "Cuisine côtière du Fujian : fruits de mer, bouillons riches, saveurs légèrement aigres-douces.",
+    "de": "Küstenküche aus Fujian: Meeresfrüchte, kräftige Brühen, leicht süßsauer.",
+    "ja": "福建の沿海料理。海鮮、濃厚なスープ、ほんのり甘酸っぱい味。",
+    "ko": "푸젠의 해안 요리. 해산물, 진한 국물, 은은한 새콤달콤함."
+   }
+  },
+  "台州菜": {
+   "icon": "Fish",
+   "tone": 1,
+   "short": {
+    "en": "Taizhou seafood (Zhejiang)",
+    "es": "Mariscos de Taizhou (Zhejiang)",
+    "fr": "Fruits de mer de Taizhou (Zhejiang)",
+    "de": "Taizhou-Meeresfrüchte (Zhejiang)",
+    "ja": "台州料理（浙江・海鮮）",
+    "ko": "타이저우 해산물 (저장)"
+   },
+   "about": {
+    "en": "Seafood-focused home cooking from coastal Taizhou in Zhejiang, simply seasoned.",
+    "es": "Cocina casera de la costera Taizhou (Zhejiang), centrada en el marisco y poco condimentada.",
+    "fr": "Cuisine familiale de Taizhou, sur la côte du Zhejiang, axée sur les produits de la mer.",
+    "de": "Einfach gewürzte, fischreiche Hausmannskost aus dem Küstenort Taizhou in Zhejiang.",
+    "ja": "浙江省沿海の台州の家庭料理。海鮮中心でシンプルな味付け。",
+    "ko": "저장성 해안 도시 타이저우의 해산물 중심 가정식. 간이 담백하다."
+   }
+  },
+  "面食": {
+   "icon": "Wheat",
+   "tone": 4,
+   "short": {
+    "en": "Noodles & dough",
+    "es": "Fideos y masas",
+    "fr": "Nouilles et pâtes",
+    "de": "Nudeln & Teigwaren",
+    "ja": "麺・粉もの",
+    "ko": "면 & 밀가루 음식"
+   },
+   "about": {
+    "en": "Noodles, buns and other wheat dishes, the staple food of northern China.",
+    "es": "Fideos, bollos y otros platos de trigo, base de la comida del norte de China.",
+    "fr": "Nouilles, brioches vapeur et autres plats de blé, base du nord de la Chine.",
+    "de": "Nudeln, Teigtaschen und andere Weizengerichte, Grundnahrung Nordchinas.",
+    "ja": "麺や饅頭など小麦の料理。中国北方の主食。",
+    "ko": "면, 찐빵 등 밀가루 요리. 중국 북방의 주식."
+   }
+  },
+  "浙江菜": {
+   "icon": "Fish",
+   "tone": 3,
+   "short": {
+    "en": "Zhejiang cuisine",
+    "es": "Cocina de Zhejiang",
+    "fr": "Cuisine du Zhejiang",
+    "de": "Zhejiang-Küche",
+    "ja": "浙江料理",
+    "ko": "저장 요리"
+   },
+   "about": {
+    "en": "Delicate cooking from Zhejiang (Hangzhou, Ningbo): fresh fish, bamboo shoots, mild flavours.",
+    "es": "Cocina delicada de Zhejiang (Hangzhou, Ningbo): pescado fresco, brotes de bambú, sabores suaves.",
+    "fr": "Cuisine délicate du Zhejiang (Hangzhou, Ningbo) : poisson frais, pousses de bambou, saveurs douces.",
+    "de": "Feine Küche aus Zhejiang (Hangzhou, Ningbo): frischer Fisch, Bambussprossen, milde Aromen.",
+    "ja": "杭州・寧波などの浙江料理。新鮮な魚、筍、やさしい味。",
+    "ko": "항저우·닝보 등의 섬세한 저장 요리. 신선한 생선, 죽순, 순한 맛."
+   }
+  },
+  "潮州菜": {
+   "icon": "Fish",
+   "tone": 1,
+   "short": {
+    "en": "Teochew seafood",
+    "es": "Mariscos de Chaozhou",
+    "fr": "Fruits de mer teochew",
+    "de": "Teochew-Meeresfrüchte",
+    "ja": "潮州料理（海鮮）",
+    "ko": "차오저우 해산물"
+   },
+   "about": {
+    "en": "From Chaozhou in eastern Guangdong: very fresh seafood, braised goose, clean flavours, congee.",
+    "es": "De Chaozhou, al este de Guangdong: marisco muy fresco, oca estofada, sabores limpios y gachas.",
+    "fr": "De Chaozhou, à l'est du Guangdong : fruits de mer très frais, oie braisée, saveurs nettes, congee.",
+    "de": "Aus Chaozhou im Osten Guangdongs: sehr frische Meeresfrüchte, geschmorte Gans, klare Aromen, Reisbrei.",
+    "ja": "広東省東部・潮州の料理。新鮮な海鮮、ガチョウの煮込み、すっきりした味、お粥。",
+    "ko": "광둥성 동부 차오저우 요리. 신선한 해산물, 거위 조림, 깔끔한 맛, 죽."
+   }
+  },
+  "素食": {
+   "icon": "Leaf",
+   "tone": 6,
+   "short": {
+    "en": "Vegetarian",
+    "es": "Vegetariana",
+    "fr": "Végétarien",
+    "de": "Vegetarisch",
+    "ja": "精進・ベジタリアン",
+    "ko": "채식"
+   },
+   "about": {
+    "en": "Meat-free cooking, often Buddhist-style; ask about egg, garlic and onion if they matter to you.",
+    "es": "Cocina sin carne, a menudo de estilo budista; pregunte por huevo, ajo y cebolla si le importan.",
+    "fr": "Cuisine sans viande, souvent bouddhiste ; demandez pour l'œuf, l'ail et l'oignon si besoin.",
+    "de": "Fleischlose, oft buddhistische Küche; nach Ei, Knoblauch und Zwiebeln fragen, falls wichtig.",
+    "ja": "肉を使わない料理（多くは精進料理）。卵・にんにく・ねぎが気になる場合は確認を。",
+    "ko": "고기를 쓰지 않는 요리(주로 사찰식). 달걀·마늘·파가 중요하면 확인하세요."
+   }
+  },
+  "创新菜": {
+   "icon": "Sparkles",
+   "tone": 5,
+   "short": {
+    "en": "Modern Chinese",
+    "es": "China moderna",
+    "fr": "Chinois moderne",
+    "de": "Modern Chinesisch",
+    "ja": "創作中華",
+    "ko": "모던 중식"
+   },
+   "about": {
+    "en": "Contemporary chefs reinventing Chinese dishes with new techniques and presentation.",
+    "es": "Chefs contemporáneos que reinventan platos chinos con nuevas técnicas y presentación.",
+    "fr": "Des chefs contemporains réinventent les plats chinois, techniques et dressage modernes.",
+    "de": "Zeitgenössische Köche interpretieren chinesische Gerichte mit neuen Techniken neu.",
+    "ja": "新しい技法と盛り付けで中国料理を再解釈する創作料理。",
+    "ko": "새로운 기법과 플레이팅으로 중국 요리를 재해석한 요리."
+   }
+  },
+  "京菜": {
+   "icon": "Bird",
+   "tone": 4,
+   "short": {
+    "en": "Beijing cuisine",
+    "es": "Cocina de Pekín",
+    "fr": "Cuisine pékinoise",
+    "de": "Pekinger Küche",
+    "ja": "北京料理",
+    "ko": "베이징 요리"
+   },
+   "about": {
+    "en": "Northern dishes from the capital: Peking duck, savoury sauces, lamb, wheat noodles.",
+    "es": "Platos del norte de la capital: pato laqueado, salsas sabrosas, cordero y fideos de trigo.",
+    "fr": "Plats du nord de la capitale : canard laqué, sauces savoureuses, agneau, nouilles de blé.",
+    "de": "Nordchinesische Küche der Hauptstadt: Pekingente, würzige Saucen, Lamm, Weizennudeln.",
+    "ja": "首都の北方料理。北京ダック、濃い味のたれ、羊肉、小麦麺。",
+    "ko": "수도의 북방 요리. 베이징 덕, 짭짤한 소스, 양고기, 밀면."
+   }
+  },
+  "时尚法国菜": {
+   "icon": "Wine",
+   "tone": 5,
+   "short": {
+    "en": "Modern French",
+    "es": "Francesa moderna",
+    "fr": "Français moderne",
+    "de": "Modern Französisch",
+    "ja": "モダンフレンチ",
+    "ko": "모던 프렌치"
+   },
+   "about": {
+    "en": "French fine dining with a contemporary, often seasonal tasting menu.",
+    "es": "Alta cocina francesa con menú degustación contemporáneo y de temporada.",
+    "fr": "Gastronomie française contemporaine, souvent en menu dégustation de saison.",
+    "de": "Französische Spitzenküche mit zeitgemäßem, oft saisonalem Degustationsmenü.",
+    "ja": "季節感のあるコースが多い、現代的なフランス料理。",
+    "ko": "계절 코스가 많은 현대적인 프랑스 파인다이닝."
+   }
+  },
+  "本帮菜": {
+   "icon": "Soup",
+   "tone": 3,
+   "short": {
+    "en": "Shanghainese",
+    "es": "Shanghainesa",
+    "fr": "Shanghaïen",
+    "de": "Shanghaier Küche",
+    "ja": "上海料理",
+    "ko": "상하이 요리"
+   },
+   "about": {
+    "en": "Local Shanghai cooking: red-braised dishes, soy sauce and sugar, rich and slightly sweet.",
+    "es": "Cocina local de Shanghái: guisos en salsa de soja y azúcar, sabrosos y algo dulces.",
+    "fr": "Cuisine locale de Shanghai : plats braisés au soja et au sucre, riches et un peu sucrés.",
+    "de": "Lokale Shanghaier Küche: in Sojasauce und Zucker geschmort, kräftig und leicht süß.",
+    "ja": "上海の郷土料理。醤油と砂糖の煮込み（紅焼）が多く、濃厚でやや甘い。",
+    "ko": "상하이 향토 요리. 간장과 설탕으로 졸인 요리가 많고 진하며 약간 달다."
+   }
+  },
+  "法国菜": {
+   "icon": "Wine",
+   "tone": 5,
+   "short": {
+    "en": "French",
+    "es": "Francesa",
+    "fr": "Français",
+    "de": "Französisch",
+    "ja": "フランス料理",
+    "ko": "프랑스 요리"
+   },
+   "about": {
+    "en": "Classic French cooking.",
+    "es": "Cocina francesa clásica.",
+    "fr": "Cuisine française classique.",
+    "de": "Klassische französische Küche.",
+    "ja": "クラシックなフランス料理。",
+    "ko": "클래식 프랑스 요리."
+   }
+  },
+  "湘菜": {
+   "icon": "Flame",
+   "tone": 2,
+   "short": {
+    "en": "Hunan",
+    "es": "Hunanesa",
+    "fr": "Hunanais",
+    "de": "Hunan-Küche",
+    "ja": "湖南料理",
+    "ko": "후난 요리"
+   },
+   "about": {
+    "en": "Hot, sour and smoky cooking from Hunan, with fresh chili and cured meats.",
+    "es": "Cocina picante, ácida y ahumada de Hunan, con chile fresco y carnes curadas.",
+    "fr": "Cuisine piquante, acidulée et fumée du Hunan, piment frais et viandes séchées.",
+    "de": "Scharfe, saure und rauchige Küche aus Hunan mit frischem Chili und Räucherfleisch.",
+    "ja": "生唐辛子と燻製肉を使う、辛くて酸味のある湖南料理。",
+    "ko": "생고추와 훈제 고기를 쓰는 맵고 새콤한 후난 요리."
+   }
+  },
+  "淮扬菜": {
+   "icon": "Fish",
+   "tone": 3,
+   "short": {
+    "en": "Huaiyang cuisine",
+    "es": "Cocina Huaiyang",
+    "fr": "Cuisine huaiyang",
+    "de": "Huaiyang-Küche",
+    "ja": "淮揚料理",
+    "ko": "화이양 요리"
+   },
+   "about": {
+    "en": "Refined Jiangsu cooking (Yangzhou, Huai'an): fine knife work, gentle braises, light broths.",
+    "es": "Cocina refinada de Jiangsu (Yangzhou, Huai'an): corte fino, guisos suaves y caldos ligeros.",
+    "fr": "Cuisine raffinée du Jiangsu (Yangzhou, Huai'an) : découpe fine, braisés doux, bouillons légers.",
+    "de": "Feine Jiangsu-Küche (Yangzhou, Huai'an): Schnitttechnik, sanfte Schmorgerichte, leichte Brühen.",
+    "ja": "揚州・淮安の洗練された江蘇料理。繊細な包丁技、やさしい煮込み、澄んだスープ。",
+    "ko": "양저우·화이안의 세련된 장쑤 요리. 섬세한 칼질, 부드러운 조림, 맑은 국물."
+   }
+  },
+  "意大利菜": {
+   "icon": "Pizza",
+   "tone": 5,
+   "short": {
+    "en": "Italian",
+    "es": "Italiana",
+    "fr": "Italien",
+    "de": "Italienisch",
+    "ja": "イタリア料理",
+    "ko": "이탈리아 요리"
+   },
+   "about": {
+    "en": "Italian cooking.",
+    "es": "Cocina italiana.",
+    "fr": "Cuisine italienne.",
+    "de": "Italienische Küche.",
+    "ja": "イタリア料理。",
+    "ko": "이탈리아 요리."
+   }
+  },
+  "苏帮菜": {
+   "icon": "Fish",
+   "tone": 3,
+   "short": {
+    "en": "Suzhou cuisine",
+    "es": "Cocina de Suzhou",
+    "fr": "Cuisine de Suzhou",
+    "de": "Suzhou-Küche",
+    "ja": "蘇州料理",
+    "ko": "쑤저우 요리"
+   },
+   "about": {
+    "en": "Seasonal, slightly sweet cooking from Suzhou: river fish, shrimp and delicate soups.",
+    "es": "Cocina de temporada y algo dulce de Suzhou: pescado de río, gambas y sopas delicadas.",
+    "fr": "Cuisine de saison, un peu sucrée, de Suzhou : poisson de rivière, crevettes, soupes fines.",
+    "de": "Saisonale, leicht süße Küche aus Suzhou: Flussfisch, Garnelen, feine Suppen.",
+    "ja": "季節感のあるやや甘い蘇州料理。川魚、川えび、繊細なスープ。",
+    "ko": "계절감 있고 약간 단 쑤저우 요리. 민물고기, 새우, 섬세한 국."
+   }
+  },
+  "火锅": {
+   "icon": "CookingPot",
+   "tone": 2,
+   "short": {
+    "en": "Hotpot",
+    "es": "Hot pot",
+    "fr": "Fondue chinoise",
+    "de": "Feuertopf (Hotpot)",
+    "ja": "火鍋",
+    "ko": "훠궈"
+   },
+   "about": {
+    "en": "You cook raw ingredients yourself in a simmering broth at the table; spicy and mild broths.",
+    "es": "Usted cocina los ingredientes crudos en un caldo hirviendo en la mesa; caldos picantes y suaves.",
+    "fr": "On cuit soi-même les ingrédients dans un bouillon frémissant à table ; bouillons épicés ou doux.",
+    "de": "Rohe Zutaten gart man selbst am Tisch in köchelnder Brühe; scharfe und milde Brühen.",
+    "ja": "卓上の煮立ったスープで具材を自分で煮る鍋料理。辛いスープと辛くないスープがある。",
+    "ko": "식탁의 끓는 육수에 재료를 직접 익혀 먹는 요리. 매운 육수와 순한 육수가 있다."
+   }
+  },
+  "宁波菜": {
+   "icon": "Fish",
+   "tone": 3,
+   "short": {
+    "en": "Ningbo seafood",
+    "es": "Mariscos de Ningbo",
+    "fr": "Fruits de mer de Ningbo",
+    "de": "Ningbo-Meeresfrüchte",
+    "ja": "寧波料理（海鮮）",
+    "ko": "닝보 해산물"
+   },
+   "about": {
+    "en": "Salty-savoury coastal cooking from Ningbo: yellow croaker, preserved vegetables, crab.",
+    "es": "Cocina costera salada de Ningbo: corvina amarilla, verduras encurtidas y cangrejo.",
+    "fr": "Cuisine côtière salée de Ningbo : courbine jaune, légumes conservés, crabe.",
+    "de": "Salzig-würzige Küstenküche aus Ningbo: Gelber Umberfisch, eingelegtes Gemüse, Krabben.",
+    "ja": "寧波の塩味の効いた沿海料理。イシモチ、漬物、カニ。",
+    "ko": "닝보의 짭짤한 해안 요리. 조기, 절임 채소, 게."
+   }
+  },
+  "时尚欧陆菜": {
+   "icon": "Wine",
+   "tone": 5,
+   "short": {
+    "en": "Modern European",
+    "es": "Europea moderna",
+    "fr": "Européen moderne",
+    "de": "Modern Europäisch",
+    "ja": "モダンヨーロピアン",
+    "ko": "모던 유러피언"
+   },
+   "about": {
+    "en": "Contemporary European cooking, often as a tasting menu.",
+    "es": "Cocina europea contemporánea, a menudo en menú degustación.",
+    "fr": "Cuisine européenne contemporaine, souvent en menu dégustation.",
+    "de": "Zeitgenössische europäische Küche, oft als Degustationsmenü.",
+    "ja": "コース仕立てが多い、現代的なヨーロッパ料理。",
+    "ko": "코스로 나오는 경우가 많은 현대 유럽 요리."
+   }
+  },
+  "海鲜": {
+   "icon": "Shrimp",
+   "tone": 1,
+   "short": {
+    "en": "Seafood",
+    "es": "Marisco",
+    "fr": "Fruits de mer",
+    "de": "Meeresfrüchte",
+    "ja": "海鮮料理",
+    "ko": "해산물"
+   },
+   "about": {
+    "en": "Fish and shellfish, often chosen live and priced by weight; ask the price per jin (500 g).",
+    "es": "Pescado y marisco, a menudo elegido vivo y cobrado al peso; pregunte el precio por jin (500 g).",
+    "fr": "Poissons et coquillages souvent choisis vivants et vendus au poids ; demandez le prix au jin (500 g).",
+    "de": "Fisch und Meeresfrüchte, oft lebend ausgesucht und nach Gewicht berechnet; Preis pro Jin (500 g) erfragen.",
+    "ja": "魚介料理。生け簀から選び量り売りが多い。1斤（500g）の値段を確認。",
+    "ko": "생선·조개류. 수조에서 골라 무게로 계산하는 경우가 많으니 1근(500g) 가격을 확인하세요."
+   }
+  },
+  "饺子": {
+   "icon": "Wheat",
+   "tone": 4,
+   "short": {
+    "en": "Dumplings",
+    "es": "Dumplings (jiaozi)",
+    "fr": "Raviolis (jiaozi)",
+    "de": "Teigtaschen (Jiaozi)",
+    "ja": "餃子",
+    "ko": "만두 (자오쯔)"
+   },
+   "about": {
+    "en": "Boiled, steamed or fried dumplings, usually ordered by weight or by the plate.",
+    "es": "Empanadillas hervidas, al vapor o fritas, normalmente por peso o por plato.",
+    "fr": "Raviolis bouillis, vapeur ou grillés, commandés au poids ou à l'assiette.",
+    "de": "Gekochte, gedämpfte oder gebratene Teigtaschen, meist nach Gewicht oder Teller.",
+    "ja": "水餃子・蒸し餃子・焼き餃子。量り売りか皿単位で注文。",
+    "ko": "물만두·찐만두·군만두. 보통 무게나 접시 단위로 주문한다."
+   }
+  },
+  "时尚中国菜": {
+   "icon": "Sparkles",
+   "tone": 5,
+   "short": {
+    "en": "Modern Chinese",
+    "es": "China moderna",
+    "fr": "Chinois moderne",
+    "de": "Modern Chinesisch",
+    "ja": "モダンチャイニーズ",
+    "ko": "모던 중식"
+   },
+   "about": {
+    "en": "Chinese cooking in a contemporary fine-dining style.",
+    "es": "Cocina china con estilo contemporáneo de alta cocina.",
+    "fr": "Cuisine chinoise dans un style gastronomique contemporain.",
+    "de": "Chinesische Küche im modernen Fine-Dining-Stil.",
+    "ja": "現代的なファインダイニングスタイルの中国料理。",
+    "ko": "현대적인 파인다이닝 스타일의 중국 요리."
+   }
+  },
+  "扒房": {
+   "icon": "Beef",
+   "tone": 5,
+   "short": {
+    "en": "Steakhouse",
+    "es": "Asador (steakhouse)",
+    "fr": "Steakhouse",
+    "de": "Steakhaus",
+    "ja": "ステーキハウス",
+    "ko": "스테이크하우스"
+   },
+   "about": {
+    "en": "Grilled steaks and meats, Western style.",
+    "es": "Carnes y filetes a la parrilla, al estilo occidental.",
+    "fr": "Steaks et viandes grillés, à l'occidentale.",
+    "de": "Gegrillte Steaks und Fleisch nach westlicher Art.",
+    "ja": "西洋式のステーキやグリル料理。",
+    "ko": "서양식 스테이크와 그릴 요리."
+   }
+  },
+  "滇菜": {
+   "icon": "Leaf",
+   "tone": 2,
+   "short": {
+    "en": "Yunnan cuisine",
+    "es": "Cocina de Yunnan",
+    "fr": "Cuisine du Yunnan",
+    "de": "Yunnan-Küche",
+    "ja": "雲南料理",
+    "ko": "윈난 요리"
+   },
+   "about": {
+    "en": "From Yunnan in the southwest: wild mushrooms, fresh herbs, rice noodles, sour-spicy flavours.",
+    "es": "De Yunnan, en el suroeste: setas silvestres, hierbas frescas, fideos de arroz, sabores ácidos y picantes.",
+    "fr": "Du Yunnan, au sud-ouest : champignons sauvages, herbes fraîches, nouilles de riz, saveurs aigres-piquantes.",
+    "de": "Aus Yunnan im Südwesten: Wildpilze, frische Kräuter, Reisnudeln, sauer-scharf.",
+    "ja": "南西部・雲南の料理。野生きのこ、香草、米線、酸っぱ辛い味。",
+    "ko": "남서부 윈난 요리. 야생 버섯, 향채, 쌀국수, 새콤매콤한 맛."
+   }
+  },
+  "鲁菜": {
+   "icon": "Soup",
+   "tone": 4,
+   "short": {
+    "en": "Shandong cuisine",
+    "es": "Cocina de Shandong",
+    "fr": "Cuisine du Shandong",
+    "de": "Shandong-Küche",
+    "ja": "山東料理",
+    "ko": "산둥 요리"
+   },
+   "about": {
+    "en": "One of China's classic schools: clear and rich broths, seafood, scallion and savoury flavours.",
+    "es": "Una de las escuelas clásicas: caldos claros y densos, marisco, cebolleta y sabores salados.",
+    "fr": "L'une des écoles classiques : bouillons clairs et riches, fruits de mer, ciboule, saveurs salées.",
+    "de": "Eine der klassischen Schulen: klare und kräftige Brühen, Meeresfrüchte, Lauchzwiebeln, würzig.",
+    "ja": "中国の古典的な流派の一つ。澄んだスープと濃いスープ、海鮮、ねぎの効いた塩味。",
+    "ko": "중국 고전 요리 유파의 하나. 맑고 진한 국물, 해산물, 파와 짭짤한 맛."
+   }
+  },
+  "鄂菜": {
+   "icon": "Fish",
+   "tone": 2,
+   "short": {
+    "en": "Hubei cuisine",
+    "es": "Cocina de Hubei",
+    "fr": "Cuisine du Hubei",
+    "de": "Hubei-Küche",
+    "ja": "湖北料理",
+    "ko": "후베이 요리"
+   },
+   "about": {
+    "en": "From Hubei (Wuhan): freshwater fish, lotus root, steamed dishes and hot dry noodles.",
+    "es": "De Hubei (Wuhan): pescado de agua dulce, raíz de loto, platos al vapor y fideos secos picantes.",
+    "fr": "Du Hubei (Wuhan) : poisson d'eau douce, racine de lotus, plats vapeur, nouilles sèches épicées.",
+    "de": "Aus Hubei (Wuhan): Süßwasserfisch, Lotuswurzel, Gedämpftes und scharfe trockene Nudeln.",
+    "ja": "武漢などの湖北料理。淡水魚、れんこん、蒸し料理、熱乾麺。",
+    "ko": "우한 등의 후베이 요리. 민물고기, 연근, 찜 요리, 러간몐."
+   }
+  },
+  "徽菜": {
+   "icon": "CookingPot",
+   "tone": 3,
+   "short": {
+    "en": "Anhui cuisine",
+    "es": "Cocina de Anhui",
+    "fr": "Cuisine de l'Anhui",
+    "de": "Anhui-Küche",
+    "ja": "安徽料理",
+    "ko": "안후이 요리"
+   },
+   "about": {
+    "en": "Hearty mountain cooking from Anhui: wild herbs, ham, braising and stewing.",
+    "es": "Cocina de montaña de Anhui: hierbas silvestres, jamón, guisos y estofados.",
+    "fr": "Cuisine montagnarde de l'Anhui : herbes sauvages, jambon, braisés et mijotés.",
+    "de": "Kräftige Bergküche aus Anhui: Wildkräuter, Schinken, Schmoren und Eintöpfe.",
+    "ja": "安徽の山の料理。山菜、ハム、煮込み。",
+    "ko": "안후이의 산간 요리. 산나물, 햄, 조림과 찜."
+   }
+  },
+  "欧陆菜": {
+   "icon": "Wine",
+   "tone": 5,
+   "short": {
+    "en": "European",
+    "es": "Europea",
+    "fr": "Européen",
+    "de": "Europäisch",
+    "ja": "ヨーロッパ料理",
+    "ko": "유럽 요리"
+   },
+   "about": {
+    "en": "Continental European cooking.",
+    "es": "Cocina europea continental.",
+    "fr": "Cuisine européenne continentale.",
+    "de": "Kontinentaleuropäische Küche.",
+    "ja": "ヨーロッパ大陸の料理。",
+    "ko": "유럽 대륙 요리."
+   }
+  },
+  "客家菜": {
+   "icon": "Drumstick",
+   "tone": 1,
+   "short": {
+    "en": "Hakka cuisine",
+    "es": "Cocina hakka",
+    "fr": "Cuisine hakka",
+    "de": "Hakka-Küche",
+    "ja": "客家料理",
+    "ko": "하카 요리"
+   },
+   "about": {
+    "en": "Rustic Hakka home cooking: salt-baked chicken, stuffed tofu, preserved vegetables with pork.",
+    "es": "Cocina casera hakka: pollo al horno con sal, tofu relleno, cerdo con verduras encurtidas.",
+    "fr": "Cuisine familiale hakka : poulet en croûte de sel, tofu farci, porc aux légumes conservés.",
+    "de": "Rustikale Hakka-Hausmannskost: Salzkrustenhuhn, gefüllter Tofu, Schwein mit Eingelegtem.",
+    "ja": "素朴な客家の家庭料理。塩焼き鶏、詰め物豆腐、梅菜扣肉。",
+    "ko": "소박한 하카 가정식. 소금구이 닭, 속을 채운 두부, 절임 채소 돼지고기."
+   }
+  },
+  "东北菜": {
+   "icon": "Drumstick",
+   "tone": 4,
+   "short": {
+    "en": "Northeastern Chinese",
+    "es": "Cocina del noreste",
+    "fr": "Cuisine du Nord-Est",
+    "de": "Nordostchinesisch",
+    "ja": "東北料理",
+    "ko": "둥베이 요리"
+   },
+   "about": {
+    "en": "Big, hearty portions from Dongbei: stews, sweet-sour pork, dumplings, pickled cabbage.",
+    "es": "Raciones grandes y contundentes del noreste: guisos, cerdo agridulce, dumplings, col encurtida.",
+    "fr": "Portions généreuses du Nord-Est : ragoûts, porc aigre-doux, raviolis, chou fermenté.",
+    "de": "Große, deftige Portionen aus dem Nordosten: Eintöpfe, süßsaures Schwein, Teigtaschen, Sauerkraut.",
+    "ja": "量が多くボリュームのある東北料理。煮込み、酢豚風の鍋包肉、餃子、白菜の漬物。",
+    "ko": "양이 푸짐한 둥베이 요리. 찜, 꿔바로우, 만두, 절인 배추."
+   }
+  },
+  "江浙菜": {
+   "icon": "Fish",
+   "tone": 3,
+   "short": {
+    "en": "Jiangnan cuisine",
+    "es": "Cocina de Jiangnan",
+    "fr": "Cuisine du Jiangnan",
+    "de": "Jiangnan-Küche",
+    "ja": "江南料理",
+    "ko": "강남 요리 (장쑤·저장)"
+   },
+   "about": {
+    "en": "Cooking from Jiangsu and Zhejiang: fresh river food, gentle flavours, a touch of sweetness.",
+    "es": "Cocina de Jiangsu y Zhejiang: productos de río, sabores suaves y un toque dulce.",
+    "fr": "Cuisine du Jiangsu et du Zhejiang : produits de rivière, saveurs douces, pointe sucrée.",
+    "de": "Küche aus Jiangsu und Zhejiang: Flussfisch, sanfte Aromen, leicht süßlich.",
+    "ja": "江蘇・浙江の料理。川の幸、やさしい味、ほのかな甘み。",
+    "ko": "장쑤·저장 요리. 민물 재료, 순한 맛, 약간의 단맛."
+   }
+  },
+  "泰国菜": {
+   "icon": "Salad",
+   "tone": 5,
+   "short": {
+    "en": "Thai",
+    "es": "Tailandesa",
+    "fr": "Thaï",
+    "de": "Thailändisch",
+    "ja": "タイ料理",
+    "ko": "태국 요리"
+   },
+   "about": {
+    "en": "Thai cooking.",
+    "es": "Cocina tailandesa.",
+    "fr": "Cuisine thaïe.",
+    "de": "Thailändische Küche.",
+    "ja": "タイ料理。",
+    "ko": "태국 요리."
+   }
+  },
+  "日本菜": {
+   "icon": "Fish",
+   "tone": 5,
+   "short": {
+    "en": "Japanese",
+    "es": "Japonesa",
+    "fr": "Japonais",
+    "de": "Japanisch",
+    "ja": "日本料理",
+    "ko": "일본 요리"
+   },
+   "about": {
+    "en": "Japanese cooking.",
+    "es": "Cocina japonesa.",
+    "fr": "Cuisine japonaise.",
+    "de": "Japanische Küche.",
+    "ja": "日本料理。",
+    "ko": "일본 요리."
+   }
+  },
+  "特色菜": {
+   "icon": "UtensilsCrossed",
+   "tone": 6,
+   "short": {
+    "en": "Local specialities",
+    "es": "Especialidades locales",
+    "fr": "Spécialités locales",
+    "de": "Lokale Spezialitäten",
+    "ja": "郷土料理",
+    "ko": "향토 요리"
+   },
+   "about": {
+    "en": "Dishes typical of the area.",
+    "es": "Platos típicos de la zona.",
+    "fr": "Plats typiques de la région.",
+    "de": "Typische Gerichte der Gegend.",
+    "ja": "その土地ならではの料理。",
+    "ko": "그 지역의 대표 요리."
+   }
+  },
+  "烤肉餐馆": {
+   "icon": "Beef",
+   "tone": 4,
+   "short": {
+    "en": "Barbecue",
+    "es": "Barbacoa",
+    "fr": "Barbecue",
+    "de": "Grill (BBQ)",
+    "ja": "焼肉",
+    "ko": "바비큐"
+   },
+   "about": {
+    "en": "Grilled meat, often skewers or meat you grill at the table.",
+    "es": "Carne a la parrilla, a menudo brochetas o carne que asa uno mismo.",
+    "fr": "Viande grillée, souvent en brochettes ou à griller soi-même à table.",
+    "de": "Gegrilltes Fleisch, oft Spieße oder Fleisch zum Selbstgrillen am Tisch.",
+    "ja": "串焼きや卓上で焼く肉料理。",
+    "ko": "꼬치나 테이블에서 직접 굽는 고기 요리."
+   }
+  },
+  "韩国菜": {
+   "icon": "Flame",
+   "tone": 5,
+   "short": {
+    "en": "Korean",
+    "es": "Coreana",
+    "fr": "Coréen",
+    "de": "Koreanisch",
+    "ja": "韓国料理",
+    "ko": "한국 요리"
+   },
+   "about": {
+    "en": "Korean cooking.",
+    "es": "Cocina coreana.",
+    "fr": "Cuisine coréenne.",
+    "de": "Koreanische Küche.",
+    "ja": "韓国料理。",
+    "ko": "한국 요리."
+   }
+  },
+  "时尚日本菜": {
+   "icon": "Fish",
+   "tone": 5,
+   "short": {
+    "en": "Modern Japanese",
+    "es": "Japonesa moderna",
+    "fr": "Japonais moderne",
+    "de": "Modern Japanisch",
+    "ja": "モダン和食",
+    "ko": "모던 일식"
+   },
+   "about": {
+    "en": "Contemporary Japanese cooking, often omakase or a tasting menu.",
+    "es": "Cocina japonesa contemporánea, a menudo omakase o menú degustación.",
+    "fr": "Cuisine japonaise contemporaine, souvent omakase ou menu dégustation.",
+    "de": "Zeitgenössische japanische Küche, oft Omakase oder Degustationsmenü.",
+    "ja": "おまかせやコースが多い、現代的な日本料理。",
+    "ko": "오마카세나 코스가 많은 현대 일식."
+   }
+  },
+  "大连海鲜": {
+   "icon": "Shrimp",
+   "tone": 4,
+   "short": {
+    "en": "Dalian seafood",
+    "es": "Mariscos de Dalian",
+    "fr": "Fruits de mer de Dalian",
+    "de": "Dalian-Meeresfrüchte",
+    "ja": "大連海鮮",
+    "ko": "다롄 해산물"
+   },
+   "about": {
+    "en": "Simply cooked northern seafood from Dalian: shellfish, sea urchin, fish.",
+    "es": "Marisco del norte de Dalian, cocinado con sencillez: moluscos, erizo y pescado.",
+    "fr": "Fruits de mer du nord, de Dalian, cuisinés simplement : coquillages, oursins, poisson.",
+    "de": "Schlicht zubereitete Meeresfrüchte aus Dalian: Muscheln, Seeigel, Fisch.",
+    "ja": "大連のシンプルな北方海鮮。貝、ウニ、魚。",
+    "ko": "간단히 조리한 다롄의 북방 해산물. 조개, 성게, 생선."
+   }
+  },
+  "馄饨": {
+   "icon": "Soup",
+   "tone": 3,
+   "short": {
+    "en": "Wonton soup",
+    "es": "Sopa wonton",
+    "fr": "Soupe de wontons",
+    "de": "Wantan-Suppe",
+    "ja": "ワンタン",
+    "ko": "훈툰 (완탕)"
+   },
+   "about": {
+    "en": "Small dumplings in broth, a classic breakfast or snack.",
+    "es": "Pequeñas empanadillas en caldo, desayuno o tentempié clásico.",
+    "fr": "Petits raviolis en bouillon, petit-déjeuner ou en-cas classique.",
+    "de": "Kleine Teigtaschen in Brühe, klassisches Frühstück oder Snack.",
+    "ja": "スープに入った小さなワンタン。朝食や軽食の定番。",
+    "ko": "국물에 넣은 작은 만두. 아침이나 간식으로 즐긴다."
+   }
+  },
+  "陕菜": {
+   "icon": "Wheat",
+   "tone": 4,
+   "short": {
+    "en": "Shaanxi cuisine",
+    "es": "Cocina de Shaanxi",
+    "fr": "Cuisine du Shaanxi",
+    "de": "Shaanxi-Küche",
+    "ja": "陝西料理",
+    "ko": "산시(陝西) 요리"
+   },
+   "about": {
+    "en": "From Shaanxi (Xi'an): hand-pulled and biangbiang noodles, roujiamo, lamb soup with bread.",
+    "es": "De Shaanxi (Xi'an): fideos estirados a mano, roujiamo, sopa de cordero con pan.",
+    "fr": "Du Shaanxi (Xi'an) : nouilles tirées à la main, roujiamo, soupe d'agneau au pain.",
+    "de": "Aus Shaanxi (Xi'an): handgezogene Nudeln, Roujiamo, Lammsuppe mit Brot.",
+    "ja": "西安などの陝西料理。手延べ麺、ビャンビャン麺、肉夾饃、羊肉泡饃。",
+    "ko": "시안 등의 산시 요리. 수타면, 뱡뱡면, 러우자모, 양고기 빵 수프."
+   }
+  },
+  "东南亚菜": {
+   "icon": "Salad",
+   "tone": 5,
+   "short": {
+    "en": "Southeast Asian",
+    "es": "Del sudeste asiático",
+    "fr": "Asie du Sud-Est",
+    "de": "Südostasiatisch",
+    "ja": "東南アジア料理",
+    "ko": "동남아 요리"
+   },
+   "about": {
+    "en": "Thai, Vietnamese, Malaysian and similar cooking.",
+    "es": "Cocina tailandesa, vietnamita, malasia y similares.",
+    "fr": "Cuisines thaïe, vietnamienne, malaisienne et voisines.",
+    "de": "Thailändische, vietnamesische, malaysische und ähnliche Küche.",
+    "ja": "タイ・ベトナム・マレーシアなどの料理。",
+    "ko": "태국·베트남·말레이시아 등의 요리."
+   }
+  },
+  "顺德菜": {
+   "icon": "Fish",
+   "tone": 1,
+   "short": {
+    "en": "Shunde cuisine",
+    "es": "Cocina de Shunde",
+    "fr": "Cuisine de Shunde",
+    "de": "Shunde-Küche",
+    "ja": "順徳料理",
+    "ko": "순더 요리"
+   },
+   "about": {
+    "en": "From Shunde near Guangzhou, famous for freshwater fish and very fresh, light Cantonese cooking.",
+    "es": "De Shunde, cerca de Cantón: pescado de río y cocina cantonesa muy fresca y ligera.",
+    "fr": "De Shunde, près de Canton : poisson d'eau douce et cuisine cantonaise très fraîche et légère.",
+    "de": "Aus Shunde bei Guangzhou: Süßwasserfisch und sehr frische, leichte kantonesische Küche.",
+    "ja": "広州近郊・順徳の料理。淡水魚と、新鮮であっさりした広東料理で有名。",
+    "ko": "광저우 근교 순더 요리. 민물고기와 신선하고 담백한 광둥 요리로 유명."
+   }
+  },
+  "广西米粉": {
+   "icon": "Soup",
+   "tone": 2,
+   "short": {
+    "en": "Guangxi rice noodles",
+    "es": "Fideos de arroz de Guangxi",
+    "fr": "Nouilles de riz du Guangxi",
+    "de": "Guangxi-Reisnudeln",
+    "ja": "広西米粉",
+    "ko": "광시 쌀국수"
+   },
+   "about": {
+    "en": "Rice-noodle bowls from Guangxi, such as Guilin noodles or sour-spicy luosifen.",
+    "es": "Cuencos de fideos de arroz de Guangxi, como los de Guilin o el luosifen ácido y picante.",
+    "fr": "Bols de nouilles de riz du Guangxi, comme celles de Guilin ou le luosifen aigre-piquant.",
+    "de": "Reisnudelschalen aus Guangxi, etwa Guilin-Nudeln oder sauer-scharfes Luosifen.",
+    "ja": "桂林米粉や酸っぱ辛い螺螄粉など、広西の米麺。",
+    "ko": "구이린 쌀국수나 새콤매콤한 뤄쓰펀 같은 광시 쌀국수."
+   }
+  },
+  "私房菜": {
+   "icon": "ChefHat",
+   "tone": 6,
+   "short": {
+    "en": "Private kitchen",
+    "es": "Cocina privada",
+    "fr": "Table privée",
+    "de": "Privatküche",
+    "ja": "私房菜（隠れ家）",
+    "ko": "프라이빗 키친"
+   },
+   "about": {
+    "en": "A small, chef-run restaurant serving the chef's own home-style dishes; booking often needed.",
+    "es": "Restaurante pequeño dirigido por el chef con sus platos caseros; a menudo hay que reservar.",
+    "fr": "Petite adresse tenue par le chef, plats maison ; réservation souvent nécessaire.",
+    "de": "Kleines, vom Koch geführtes Lokal mit eigenen Hausgerichten; meist Reservierung nötig.",
+    "ja": "シェフが営む小さな店で、独自の家庭風料理を出す。予約が必要なことが多い。",
+    "ko": "셰프가 운영하는 작은 식당으로 자기만의 가정식을 낸다. 예약이 필요한 경우가 많다."
+   }
+  },
+  "马来西亚菜": {
+   "icon": "Salad",
+   "tone": 5,
+   "short": {
+    "en": "Malaysian",
+    "es": "Malasia",
+    "fr": "Malaisien",
+    "de": "Malaysisch",
+    "ja": "マレーシア料理",
+    "ko": "말레이시아 요리"
+   },
+   "about": {
+    "en": "Malaysian cooking.",
+    "es": "Cocina malasia.",
+    "fr": "Cuisine malaisienne.",
+    "de": "Malaysische Küche.",
+    "ja": "マレーシア料理。",
+    "ko": "말레이시아 요리."
+   }
+  },
+  "西餐": {
+   "icon": "Croissant",
+   "tone": 5,
+   "short": {
+    "en": "Western",
+    "es": "Occidental",
+    "fr": "Occidental",
+    "de": "Westlich",
+    "ja": "西洋料理",
+    "ko": "양식"
+   },
+   "about": {
+    "en": "Western-style cooking.",
+    "es": "Cocina de estilo occidental.",
+    "fr": "Cuisine de style occidental.",
+    "de": "Westliche Küche.",
+    "ja": "西洋風の料理。",
+    "ko": "서양식 요리."
+   }
+  },
+  "西北菜": {
+   "icon": "Wheat",
+   "tone": 4,
+   "short": {
+    "en": "Northwestern Chinese",
+    "es": "Cocina del noroeste",
+    "fr": "Cuisine du Nord-Ouest",
+    "de": "Nordwestchinesisch",
+    "ja": "西北料理",
+    "ko": "시베이 요리"
+   },
+   "about": {
+    "en": "From China's northwest: lamb, cumin, hand-pulled noodles and flatbreads; often halal.",
+    "es": "Del noroeste de China: cordero, comino, fideos estirados y panes planos; a menudo halal.",
+    "fr": "Du nord-ouest de la Chine : agneau, cumin, nouilles tirées, galettes ; souvent halal.",
+    "de": "Aus dem Nordwesten Chinas: Lamm, Kreuzkümmel, handgezogene Nudeln, Fladenbrot; oft halal.",
+    "ja": "中国西北部の料理。羊肉、クミン、手延べ麺、ナン。ハラールの店も多い。",
+    "ko": "중국 서북부 요리. 양고기, 쯔란, 수타면, 난. 할랄인 곳이 많다."
+   }
+  },
+  "中餐": {
+   "icon": "UtensilsCrossed",
+   "tone": 6,
+   "short": {
+    "en": "Chinese",
+    "es": "China",
+    "fr": "Chinois",
+    "de": "Chinesisch",
+    "ja": "中華料理",
+    "ko": "중식"
+   },
+   "about": {
+    "en": "Chinese restaurant with dishes from several regions.",
+    "es": "Restaurante chino con platos de varias regiones.",
+    "fr": "Restaurant chinois aux plats de plusieurs régions.",
+    "de": "Chinesisches Restaurant mit Gerichten aus mehreren Regionen.",
+    "ja": "各地の料理を出す中華料理店。",
+    "ko": "여러 지역 요리를 내는 중식당."
+   }
+  },
+  "苏菜": {
+   "icon": "Fish",
+   "tone": 3,
+   "short": {
+    "en": "Jiangsu cuisine",
+    "es": "Cocina de Jiangsu",
+    "fr": "Cuisine du Jiangsu",
+    "de": "Jiangsu-Küche",
+    "ja": "江蘇料理",
+    "ko": "장쑤 요리"
+   },
+   "about": {
+    "en": "Refined cooking from Jiangsu: river fish, gentle braises, slightly sweet.",
+    "es": "Cocina refinada de Jiangsu: pescado de río, guisos suaves, algo dulce.",
+    "fr": "Cuisine raffinée du Jiangsu : poisson de rivière, braisés doux, un peu sucrée.",
+    "de": "Feine Küche aus Jiangsu: Flussfisch, sanfte Schmorgerichte, leicht süß.",
+    "ja": "江蘇の洗練された料理。川魚、やさしい煮込み、ほのかな甘み。",
+    "ko": "장쑤의 세련된 요리. 민물고기, 부드러운 조림, 약간 단맛."
+   }
+  },
+  "云贵菜": {
+   "icon": "Leaf",
+   "tone": 2,
+   "short": {
+    "en": "Yunnan & Guizhou",
+    "es": "Yunnan y Guizhou",
+    "fr": "Yunnan et Guizhou",
+    "de": "Yunnan & Guizhou",
+    "ja": "雲南・貴州料理",
+    "ko": "윈난·구이저우 요리"
+   },
+   "about": {
+    "en": "Sour-spicy southwestern cooking: wild mushrooms, herbs, rice noodles, sour fish soup.",
+    "es": "Cocina ácida y picante del suroeste: setas silvestres, hierbas, fideos de arroz, sopa ácida de pescado.",
+    "fr": "Cuisine aigre-piquante du sud-ouest : champignons sauvages, herbes, nouilles de riz, soupe de poisson acide.",
+    "de": "Sauer-scharfe Südwestküche: Wildpilze, Kräuter, Reisnudeln, saure Fischsuppe.",
+    "ja": "酸っぱ辛い南西部の料理。野生きのこ、香草、米線、酸湯魚。",
+    "ko": "새콤매콤한 남서부 요리. 야생 버섯, 향채, 쌀국수, 신맛 생선탕."
+   }
+  },
+  "清真菜": {
+   "icon": "Beef",
+   "tone": 4,
+   "short": {
+    "en": "Halal Chinese",
+    "es": "China halal",
+    "fr": "Chinois halal",
+    "de": "Chinesisch halal",
+    "ja": "清真（ハラール）中華",
+    "ko": "할랄 중식"
+   },
+   "about": {
+    "en": "Halal Chinese cooking, usually Hui Muslim: lamb, beef and noodles, no pork or alcohol.",
+    "es": "Cocina china halal, normalmente hui: cordero, ternera y fideos, sin cerdo ni alcohol.",
+    "fr": "Cuisine chinoise halal, souvent hui : agneau, bœuf, nouilles, sans porc ni alcool.",
+    "de": "Halal-chinesische Küche, meist der Hui: Lamm, Rind, Nudeln, kein Schwein, kein Alkohol.",
+    "ja": "回族などのハラール中華。羊肉・牛肉・麺、豚肉と酒は使わない。",
+    "ko": "주로 회족의 할랄 중식. 양고기·소고기·면, 돼지고기와 술은 쓰지 않는다."
+   }
+  },
+  "台湾菜": {
+   "icon": "Soup",
+   "tone": 1,
+   "short": {
+    "en": "Taiwanese",
+    "es": "Taiwanesa",
+    "fr": "Taïwanais",
+    "de": "Taiwanisch",
+    "ja": "台湾料理",
+    "ko": "대만 요리"
+   },
+   "about": {
+    "en": "Taiwanese comfort food: braised pork rice, beef noodle soup, small eats.",
+    "es": "Comida reconfortante taiwanesa: arroz con cerdo estofado, sopa de fideos con ternera, tapas.",
+    "fr": "Cuisine réconfortante taïwanaise : riz au porc braisé, soupe de nouilles au bœuf, petits plats.",
+    "de": "Taiwanische Hausmannskost: Reis mit Schmorschwein, Rindfleischnudelsuppe, Kleinigkeiten.",
+    "ja": "魯肉飯や牛肉麺など、台湾の家庭的な料理。",
+    "ko": "루러우판, 우육면 같은 대만 가정식."
+   }
+  },
+  "老字号": {
+   "icon": "Landmark",
+   "tone": 6,
+   "short": {
+    "en": "Historic restaurant",
+    "es": "Restaurante histórico",
+    "fr": "Maison historique",
+    "de": "Traditionslokal",
+    "ja": "老舗",
+    "ko": "노포"
+   },
+   "about": {
+    "en": "A long-established, officially recognised time-honoured brand.",
+    "es": "Marca tradicional reconocida oficialmente, con muchos años de historia.",
+    "fr": "Enseigne historique reconnue officiellement, établie de longue date.",
+    "de": "Offiziell anerkannte Traditionsmarke mit langer Geschichte.",
+    "ja": "公式に認定された長い歴史を持つ老舗。",
+    "ko": "공식 인정을 받은 오래된 전통 브랜드."
+   }
+  },
+  "地中海菜": {
+   "icon": "Salad",
+   "tone": 5,
+   "short": {
+    "en": "Mediterranean",
+    "es": "Mediterránea",
+    "fr": "Méditerranéen",
+    "de": "Mediterran",
+    "ja": "地中海料理",
+    "ko": "지중해 요리"
+   },
+   "about": {
+    "en": "Mediterranean cooking.",
+    "es": "Cocina mediterránea.",
+    "fr": "Cuisine méditerranéenne.",
+    "de": "Mediterrane Küche.",
+    "ja": "地中海料理。",
+    "ko": "지중해 요리."
+   }
+  },
+  "美式菜": {
+   "icon": "Sandwich",
+   "tone": 5,
+   "short": {
+    "en": "American",
+    "es": "Estadounidense",
+    "fr": "Américain",
+    "de": "Amerikanisch",
+    "ja": "アメリカ料理",
+    "ko": "미국 요리"
+   },
+   "about": {
+    "en": "American cooking: burgers, steaks, grills.",
+    "es": "Cocina estadounidense: hamburguesas, filetes, parrilla.",
+    "fr": "Cuisine américaine : burgers, steaks, grillades.",
+    "de": "Amerikanische Küche: Burger, Steaks, Grill.",
+    "ja": "ハンバーガー、ステーキなどのアメリカ料理。",
+    "ko": "버거, 스테이크 같은 미국 요리."
+   }
+  },
+  "印度菜": {
+   "icon": "Flame",
+   "tone": 5,
+   "short": {
+    "en": "Indian",
+    "es": "India",
+    "fr": "Indien",
+    "de": "Indisch",
+    "ja": "インド料理",
+    "ko": "인도 요리"
+   },
+   "about": {
+    "en": "Indian cooking.",
+    "es": "Cocina india.",
+    "fr": "Cuisine indienne.",
+    "de": "Indische Küche.",
+    "ja": "インド料理。",
+    "ko": "인도 요리."
+   }
+  },
+  "英国菜": {
+   "icon": "Croissant",
+   "tone": 5,
+   "short": {
+    "en": "British",
+    "es": "Británica",
+    "fr": "Britannique",
+    "de": "Britisch",
+    "ja": "イギリス料理",
+    "ko": "영국 요리"
+   },
+   "about": {
+    "en": "British cooking.",
+    "es": "Cocina británica.",
+    "fr": "Cuisine britannique.",
+    "de": "Britische Küche.",
+    "ja": "イギリス料理。",
+    "ko": "영국 요리."
+   }
+  },
+  "俄罗斯菜": {
+   "icon": "Soup",
+   "tone": 5,
+   "short": {
+    "en": "Russian",
+    "es": "Rusa",
+    "fr": "Russe",
+    "de": "Russisch",
+    "ja": "ロシア料理",
+    "ko": "러시아 요리"
+   },
+   "about": {
+    "en": "Russian cooking.",
+    "es": "Cocina rusa.",
+    "fr": "Cuisine russe.",
+    "de": "Russische Küche.",
+    "ja": "ロシア料理。",
+    "ko": "러시아 요리."
+   }
+  },
+  "葡萄牙菜": {
+   "icon": "Fish",
+   "tone": 5,
+   "short": {
+    "en": "Portuguese",
+    "es": "Portuguesa",
+    "fr": "Portugais",
+    "de": "Portugiesisch",
+    "ja": "ポルトガル料理",
+    "ko": "포르투갈 요리"
+   },
+   "about": {
+    "en": "Portuguese and Macanese cooking.",
+    "es": "Cocina portuguesa y macaense.",
+    "fr": "Cuisine portugaise et macanaise.",
+    "de": "Portugiesische und macanesische Küche.",
+    "ja": "ポルトガル・マカオ料理。",
+    "ko": "포르투갈·마카오 요리."
+   }
+  },
+  "德国菜": {
+   "icon": "Beef",
+   "tone": 5,
+   "short": {
+    "en": "German",
+    "es": "Alemana",
+    "fr": "Allemand",
+    "de": "Deutsch",
+    "ja": "ドイツ料理",
+    "ko": "독일 요리"
+   },
+   "about": {
+    "en": "German cooking.",
+    "es": "Cocina alemana.",
+    "fr": "Cuisine allemande.",
+    "de": "Deutsche Küche.",
+    "ja": "ドイツ料理。",
+    "ko": "독일 요리."
+   }
+  },
+  "巴西菜": {
+   "icon": "Beef",
+   "tone": 5,
+   "short": {
+    "en": "Brazilian",
+    "es": "Brasileña",
+    "fr": "Brésilien",
+    "de": "Brasilianisch",
+    "ja": "ブラジル料理",
+    "ko": "브라질 요리"
+   },
+   "about": {
+    "en": "Brazilian grill (churrasco).",
+    "es": "Parrilla brasileña (churrasco).",
+    "fr": "Grill brésilien (churrasco).",
+    "de": "Brasilianischer Grill (Churrasco).",
+    "ja": "ブラジル式シュラスコ。",
+    "ko": "브라질식 슈하스코."
+   }
+  },
+  "墨西哥菜": {
+   "icon": "Flame",
+   "tone": 5,
+   "short": {
+    "en": "Mexican",
+    "es": "Mexicana",
+    "fr": "Mexicain",
+    "de": "Mexikanisch",
+    "ja": "メキシコ料理",
+    "ko": "멕시코 요리"
+   },
+   "about": {
+    "en": "Mexican cooking.",
+    "es": "Cocina mexicana.",
+    "fr": "Cuisine mexicaine.",
+    "de": "Mexikanische Küche.",
+    "ja": "メキシコ料理。",
+    "ko": "멕시코 요리."
+   }
+  },
+  "亚洲菜": {
+   "icon": "Salad",
+   "tone": 5,
+   "short": {
+    "en": "Asian",
+    "es": "Asiática",
+    "fr": "Asiatique",
+    "de": "Asiatisch",
+    "ja": "アジア料理",
+    "ko": "아시아 요리"
+   },
+   "about": {
+    "en": "Cooking from elsewhere in Asia.",
+    "es": "Cocina de otros países de Asia.",
+    "fr": "Cuisine d'autres pays d'Asie.",
+    "de": "Küche aus anderen Ländern Asiens.",
+    "ja": "その他のアジア料理。",
+    "ko": "기타 아시아 요리."
+   }
+  },
+  "快餐": {
+   "icon": "Sandwich",
+   "tone": 6,
+   "short": {
+    "en": "Fast food",
+    "es": "Comida rápida",
+    "fr": "Restauration rapide",
+    "de": "Fast Food",
+    "ja": "ファストフード",
+    "ko": "패스트푸드"
+   },
+   "about": {
+    "en": "Quick, inexpensive meals.",
+    "es": "Comidas rápidas y baratas.",
+    "fr": "Repas rapides et bon marché.",
+    "de": "Schnelle, günstige Gerichte.",
+    "ja": "手早く安く食べられる店。",
+    "ko": "빠르고 저렴한 식사."
+   }
+  },
+  "咖啡": {
+   "icon": "Coffee",
+   "tone": 6,
+   "short": {
+    "en": "Café",
+    "es": "Cafetería",
+    "fr": "Café",
+    "de": "Café",
+    "ja": "カフェ",
+    "ko": "카페"
+   },
+   "about": {
+    "en": "Coffee and light food.",
+    "es": "Café y comida ligera.",
+    "fr": "Café et petite restauration.",
+    "de": "Kaffee und kleine Speisen.",
+    "ja": "コーヒーと軽食。",
+    "ko": "커피와 가벼운 음식."
+   }
+  },
+  "茶馆": {
+   "icon": "Coffee",
+   "tone": 6,
+   "short": {
+    "en": "Teahouse",
+    "es": "Casa de té",
+    "fr": "Maison de thé",
+    "de": "Teehaus",
+    "ja": "茶館",
+    "ko": "찻집"
+   },
+   "about": {
+    "en": "Tea, often with snacks or dim sum.",
+    "es": "Té, a menudo con aperitivos o dim sum.",
+    "fr": "Thé, souvent avec en-cas ou dim sum.",
+    "de": "Tee, oft mit Snacks oder Dim Sum.",
+    "ja": "お茶と軽食・点心。",
+    "ko": "차와 간식, 딤섬."
+   }
+  },
+  "甜品": {
+   "icon": "CakeSlice",
+   "tone": 6,
+   "short": {
+    "en": "Desserts",
+    "es": "Postres",
+    "fr": "Desserts",
+    "de": "Desserts",
+    "ja": "スイーツ",
+    "ko": "디저트"
+   },
+   "about": {
+    "en": "Sweets, desserts and cold drinks.",
+    "es": "Dulces, postres y bebidas frías.",
+    "fr": "Douceurs, desserts et boissons fraîches.",
+    "de": "Süßes, Desserts und kalte Getränke.",
+    "ja": "スイーツや冷たい飲み物。",
+    "ko": "디저트와 차가운 음료."
+   }
+  },
+  "烘焙": {
+   "icon": "Croissant",
+   "tone": 6,
+   "short": {
+    "en": "Bakery",
+    "es": "Panadería",
+    "fr": "Boulangerie-pâtisserie",
+    "de": "Bäckerei",
+    "ja": "ベーカリー",
+    "ko": "베이커리"
+   },
+   "about": {
+    "en": "Bread, cakes and pastries.",
+    "es": "Pan, tartas y bollería.",
+    "fr": "Pain, gâteaux et viennoiseries.",
+    "de": "Brot, Kuchen und Gebäck.",
+    "ja": "パン・ケーキ・焼き菓子。",
+    "ko": "빵, 케이크, 페이스트리."
+   }
+  },
+  "烤鸭": {
+   "icon": "Bird",
+   "tone": 4,
+   "short": {
+    "en": "Peking duck",
+    "es": "Pato laqueado",
+    "fr": "Canard laqué",
+    "de": "Pekingente",
+    "ja": "北京ダック",
+    "ko": "베이징 덕"
+   },
+   "about": {
+    "en": "Roast duck carved at the table, eaten in thin pancakes with scallion and sweet sauce.",
+    "es": "Pato asado trinchado en la mesa, en tortitas finas con cebolleta y salsa dulce.",
+    "fr": "Canard rôti découpé à table, servi dans de fines crêpes avec ciboule et sauce sucrée.",
+    "de": "Am Tisch tranchierte Röstente, in dünnen Pfannkuchen mit Lauchzwiebeln und süßer Sauce.",
+    "ja": "卓上で切り分けるローストダック。薄餅にねぎと甘味噌で包んで食べる。",
+    "ko": "식탁에서 썰어 주는 오리구이를 얇은 전병에 파와 단 소스로 싸 먹는다."
+   }
+  },
+  "烧烤": {
+   "icon": "Flame",
+   "tone": 4,
+   "short": {
+    "en": "Barbecue skewers",
+    "es": "Brochetas a la brasa",
+    "fr": "Brochettes grillées",
+    "de": "Grillspieße",
+    "ja": "串焼き（焼烤）",
+    "ko": "꼬치구이"
+   },
+   "about": {
+    "en": "Grilled skewers, a late-evening favourite, often with cumin and chili.",
+    "es": "Brochetas a la brasa, típicas de la noche, a menudo con comino y chile.",
+    "fr": "Brochettes grillées, prisées le soir, souvent au cumin et au piment.",
+    "de": "Gegrillte Spieße, beliebt am späten Abend, oft mit Kreuzkümmel und Chili.",
+    "ja": "夜に人気の串焼き。クミンと唐辛子を振ることが多い。",
+    "ko": "밤에 인기인 꼬치구이. 쯔란과 고춧가루를 뿌리는 경우가 많다."
+   }
+  }
+ },
+ "aliases": {
+  "广州菜": "粤菜",
+  "浙菜": "浙江菜",
+  "沪菜": "本帮菜",
+  "上海菜": "本帮菜",
+  "素菜": "素食",
+  "面馆": "面食",
+  "云南菜": "滇菜",
+  "牛排馆": "扒房",
+  "现代欧陆菜": "时尚欧陆菜",
+  "江苏菜": "苏菜",
+  "北京菜": "京菜",
+  "山东菜": "鲁菜",
+  "湖南菜": "湘菜",
+  "四川菜": "川菜",
+  "广东菜": "粤菜",
+  "福建菜": "闽菜",
+  "湖北菜": "鄂菜",
+  "安徽菜": "徽菜",
+  "杭帮菜": "浙江菜",
+  "潮汕菜": "潮州菜",
+  "西北风味": "西北菜",
+  "日本料理": "日本菜",
+  "韩国料理": "韩国菜",
+  "法餐": "法国菜",
+  "意大利餐": "意大利菜"
+ },
+ "amapTypes": {
+  "050100": "中餐",
+  "050101": "中餐",
+  "050102": "川菜",
+  "050103": "粤菜",
+  "050104": "鲁菜",
+  "050105": "苏菜",
+  "050106": "浙江菜",
+  "050107": "本帮菜",
+  "050108": "湘菜",
+  "050109": "徽菜",
+  "050110": "闽菜",
+  "050111": "京菜",
+  "050112": "鄂菜",
+  "050113": "东北菜",
+  "050114": "云贵菜",
+  "050115": "西北菜",
+  "050116": "老字号",
+  "050117": "火锅",
+  "050118": "特色菜",
+  "050119": "海鲜",
+  "050120": "素食",
+  "050121": "清真菜",
+  "050122": "台湾菜",
+  "050123": "潮州菜",
+  "050200": "西餐",
+  "050201": "西餐",
+  "050202": "日本菜",
+  "050203": "韩国菜",
+  "050204": "法国菜",
+  "050205": "意大利菜",
+  "050206": "东南亚菜",
+  "050207": "地中海菜",
+  "050208": "美式菜",
+  "050209": "印度菜",
+  "050210": "英国菜",
+  "050211": "扒房",
+  "050212": "俄罗斯菜",
+  "050213": "葡萄牙菜",
+  "050214": "德国菜",
+  "050215": "巴西菜",
+  "050216": "墨西哥菜",
+  "050217": "亚洲菜",
+  "050300": "快餐",
+  "050301": "快餐",
+  "050302": "快餐",
+  "050303": "快餐",
+  "050304": "快餐",
+  "050305": "快餐",
+  "050306": "快餐",
+  "050307": "快餐",
+  "050308": "快餐",
+  "050309": "快餐",
+  "050310": "快餐",
+  "050311": "快餐",
+  "050500": "咖啡",
+  "050501": "咖啡",
+  "050502": "咖啡",
+  "050503": "咖啡",
+  "050504": "咖啡",
+  "050600": "茶馆",
+  "050700": "甜品",
+  "050800": "烘焙",
+  "050900": "甜品"
+ }
+}

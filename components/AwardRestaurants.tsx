@@ -1,27 +1,27 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Star, ChevronRight, UtensilsCrossed } from "lucide-react";
+import { UtensilsCrossed } from "lucide-react";
 import { Preloader } from "konsta/react";
-import { Group, Button, EmptyState } from "./ui";
+import { Button, EmptyState } from "./ui";
 import { SourceLine } from "./SourceLine";
-import { AwardBadges } from "./AwardBadges";
-import { BibGourmand, MichelinStar } from "./AwardIcon";
+import { AwardIcon, BibGourmand, MichelinStar } from "./AwardIcon";
 import { AppIcon } from "./AppIcon";
-import { Photo } from "./Photo";
+import { CuisineTile } from "./CuisineTile";
 import { useCity } from "./useCity";
+import { useProfile } from "./useProfile";
+import { useFx, formatMoney } from "./useFx";
 import { useT } from "./useT";
-import { fmt } from "@/lib/i18n";
-import type { AwardRestaurant } from "@/lib/restaurant-awards";
-import type { Place } from "@/lib/amap";
+import { fmt, type Dict } from "@/lib/i18n";
+import { cuisineInfo } from "@/lib/cuisines";
+import { awardScore, type Award } from "@/lib/restaurant-awards";
+import type { ListedRestaurant } from "@/lib/restaurants";
 import type { City } from "@/lib/cities";
 
-type Listed = AwardRestaurant & { poi: Place | null; rating?: number; cost?: number };
 type Lists = Record<string, { name: string; edition: string; checked: string }>;
-type Data = { restaurants: Listed[]; source: "awards" | "mixed" | "amap"; lists: Lists; cities: { city: City; n: number }[] };
+type Data = { restaurants: ListedRestaurant[]; source: "awards" | "mixed" | "amap"; lists: Lists; cities: { city: City; n: number }[] };
 
-// One choice of four (plus Black Pearl once it has data): all, Michelin stars, Bib Gourmand,
-// Must-Eat. "Selected" has no filter of its own; those restaurants are under "All".
-// A filter shows only when the city has a restaurant with it.
+// Award filter: all, Michelin stars, Bib Gourmand, Black Pearl, Must-Eat. "Selected" has no filter
+// of its own; those restaurants are under "All". A filter shows only when the city has one.
 const FILTERS = [
   { id: "stars", list: "michelin", levels: ["3", "2", "1"] },
   { id: "bib", list: "michelin", levels: ["bib"] },
@@ -31,26 +31,48 @@ const FILTERS = [
 type FilterId = (typeof FILTERS)[number]["id"] | "all";
 const PAGE = 20;
 
-const has = (r: Listed, id: FilterId) => {
+const has = (r: ListedRestaurant, id: FilterId) => {
   const f = FILTERS.find((x) => x.id === id);
   return !f || r.awards.some((a) => a.list === f.list && (f.levels as readonly string[]).includes(a.level));
 };
 
+/** Best award in words, the rest as symbols only: one short line under the name. */
+export function awardShort(t: Dict, a: Award) {
+  if (a.list === "michelin") return /^\d$/.test(a.level) ? t.awards.starsShort : a.level === "bib" ? t.awards.bibShort : t.awards.selectedShort;
+  if (a.list === "black_pearl") return fmt(t.awards.blackPearl, { d: "◆".repeat(Number(a.level)) }).replace(/\s*黑珍珠\s*/, " ").trim();
+  return t.awards.mustEatShort;
+}
+
+/** "¥120 ≈ €15" in the traveller's currency (offline rate is fine for a price level). */
+export function usePerPerson() {
+  const [p] = useProfile();
+  const fx = useFx(p.homeCurrency);
+  return (cny?: number) => {
+    if (!cny) return "";
+    // A price level, not a bill: whole units.
+    const home = fx && p.homeCurrency !== "CNY" ? ` ≈ ${formatMoney(Math.max(1, Math.round(cny / fx.value)), p.homeCurrency, p.lang, 0)}` : "";
+    return `¥${cny}${home}`;
+  };
+}
+
 /**
- * Restaurants on the Michelin / Black Pearl / Must-Eat lists for one city, with one filter row.
- * The city comes from Explore's search bar. A city with no lists: hidden (`listedOnly`), or
- * well-rated Amap restaurants under a line naming the cities that do have lists.
+ * Michelin / Black Pearl / Must-Eat restaurants in one city. Each card: a 96 px photo (Amap) or
+ * the cuisine tile, the Chinese name large, "English name · cuisine", and "award · price". All
+ * else is on the detail page. Filters: award, then cuisine (in the traveller's language).
  */
 export function AwardRestaurants({ adcode, cityEn, listedOnly, onPick }: {
-  adcode: string; cityEn: string; listedOnly?: boolean; onPick: (p: Place | string) => void;
+  adcode: string; cityEn: string; listedOnly?: boolean; onPick: (r: ListedRestaurant) => void;
 }) {
   const t = useT();
+  const [p] = useProfile();
   const { setCity } = useCity();
+  const perPerson = usePerPerson();
   const [d, setD] = useState<Data | null>(null);
   const [filter, setFilter] = useState<FilterId>("all");
+  const [cuisine, setCuisine] = useState<string | null>(null);
   const [shown, setShown] = useState(PAGE);
   useEffect(() => {
-    setD(null); setFilter("all"); setShown(PAGE);
+    setD(null); setFilter("all"); setCuisine(null); setShown(PAGE);
     fetch(`/api/restaurants?city=${adcode}${listedOnly ? "&listed=1" : ""}`).then((r) => r.json()).then(setD).catch(() => {});
   }, [adcode, listedOnly]);
   // As a section of another page (`listedOnly`) it stays out of the way; as Explore's
@@ -68,16 +90,21 @@ export function AwardRestaurants({ adcode, cityEn, listedOnly, onPick }: {
   }
 
   const awarded = d.source !== "amap";
-  const list = d.restaurants.filter((r) => has(r, filter));
+  const byAward = d.restaurants.filter((r) => has(r, filter));
+  const list = cuisine ? byAward.filter((r) => r.cuisineKey === cuisine) : byAward;
   const filters = FILTERS.map((f) => ({ ...f, n: d.restaurants.filter((r) => has(r, f.id)).length })).filter((f) => f.n > 0);
+  // Cuisines in this city (within the award filter), most common first; only ones we can name.
+  const counts = new Map<string, number>();
+  for (const r of byAward) if (r.cuisineKey) counts.set(r.cuisineKey, (counts.get(r.cuisineKey) ?? 0) + 1);
+  const cuisines = [...counts].sort((a, b) => b[1] - a[1]).slice(0, 12).map(([k, n]) => ({ k, n, c: cuisineInfo(k, p.lang)! })).filter((x) => x.c);
   const used = [...new Set(d.restaurants.flatMap((r) => r.awards.map((a) => a.list)))];
   const chip = (f: (typeof filters)[number]) =>
     f.id === "stars" ? <><MichelinStar />{t.awards.starsShort}</>
     : f.id === "bib" ? <><BibGourmand />{t.awards.bibShort}</>
     : f.id === "must_eat" ? <><AppIcon id="dianping" size={16} className="border-0" />{t.awards.mustEatShort}</>
     : <>{fmt(t.awards.blackPearl, { d: "" }).trim()}</>;
-  // Cities that do have lists, for a city that has none (most first, a handful).
   const others = d.cities.filter((c) => c.city.a !== adcode).slice(0, 6);
+  const pickFilter = (id: FilterId) => { setFilter(filter === id ? "all" : id); setCuisine(null); setShown(PAGE); };
 
   return (
     <>
@@ -86,48 +113,69 @@ export function AwardRestaurants({ adcode, cityEn, listedOnly, onPick }: {
         {awarded && <span className="text-footnote font-normal tabular-nums">{fmt(t.awards.inCity, { n: d.restaurants.length, city: cityEn })}</span>}
       </h3>
       {!awarded && others.length > 0 && (
-        <p className="px-1 text-footnote text-muted">
-          {fmt(t.awards.noListsHere, { city: cityEn })}{" "}
-          {cityLinks(others)}
-        </p>
+        <p className="px-1 text-footnote text-muted">{fmt(t.awards.noListsHere, { city: cityEn })} {cityLinks(others)}</p>
       )}
       {awarded && filters.length > 1 && (
         <div className="chip-row" role="group" aria-label={t.awards.filter}>
-          <button className="pill" aria-pressed={filter === "all"} onClick={() => { setFilter("all"); setShown(PAGE); }}>{t.awards.all}</button>
+          <button className="pill" aria-pressed={filter === "all"} onClick={() => pickFilter("all")}>{t.awards.all}</button>
           {filters.map((f) => (
-            <button key={f.id} className="pill" aria-pressed={filter === f.id} onClick={() => { setFilter(filter === f.id ? "all" : f.id); setShown(PAGE); }}>
+            <button key={f.id} className="pill" aria-pressed={filter === f.id} onClick={() => pickFilter(f.id)}>
               {chip(f)}<span className="tabular-nums opacity-70">{f.n}</span>
             </button>
           ))}
         </div>
       )}
-      {list.length === 0 ? <p className="px-1 text-subhead text-muted">{fmt(t.awards.noneHere, { city: cityEn })}</p> : (
-        <Group>
-          {list.slice(0, shown).map((r) => (
-            <li key={r.zh}>
-              <button onClick={() => onPick(r.poi ?? r.zh)} className="flex min-h-14 w-full items-center gap-3 px-4 py-3 text-left">
-                {r.poi?.photo && <Photo src={r.poi.photo} alt="" shape="square" />}
-                <span className="min-w-0 flex-1">
-                  <span className="zh block text-body">{r.zh}</span>
-                  {(r.en || r.cuisine) && <span className="block text-footnote text-muted">{[r.en, r.cuisine && <span key="c" className="zh">{r.cuisine}</span>].filter(Boolean).reduce<React.ReactNode[]>((a, x, i) => (i ? [...a, " · ", x] : [x]), [])}</span>}
-                  {(r.rating || r.cost) && (
-                    <span className="flex items-center gap-1 text-footnote text-muted tabular-nums">
-                      {r.rating && <><Star className="h-3.5 w-3.5 fill-current text-ink" aria-hidden />{fmt(t.awards.amapRating, { n: r.rating.toFixed(1) })}</>}
-                      {r.rating && r.cost ? " · " : ""}{r.cost ? fmt(t.awards.perPerson, { n: r.cost }) : ""}
-                    </span>
-                  )}
-                  <AwardBadges awards={r.awards} />
-                </span>
-                <ChevronRight className="h-5 w-5 shrink-0 text-muted opacity-60" aria-hidden />
-              </button>
-            </li>
+      {cuisines.length > 1 && (
+        <div className="chip-row" role="group" aria-label={t.awards.cuisine}>
+          {cuisines.map(({ k, n, c }) => (
+            <button key={k} className="pill" aria-pressed={cuisine === k} onClick={() => { setCuisine(cuisine === k ? null : k); setShown(PAGE); }}>
+              {c.short}<span className="tabular-nums opacity-70">{n}</span>
+            </button>
           ))}
-        </Group>
+        </div>
+      )}
+      {list.length === 0 ? <p className="px-1 text-subhead text-muted">{fmt(t.awards.noneHere, { city: cityEn })}</p> : (
+        <ul className="divide-y divide-line overflow-hidden rounded-card border border-line bg-card">
+          {list.slice(0, shown).map((r) => {
+            const c = cuisineInfo(r.cuisineKey, p.lang);
+            const awards = [...r.awards].sort((a, b) => awardScore([b]) - awardScore([a]));
+            return (
+              <li key={r.zh}>
+                <button onClick={() => onPick(r)} className="flex w-full items-center gap-3 p-3 text-left">
+                  {r.photos[0] ? <Thumb src={r.photos[0]} c={c} /> : <CuisineTile c={c} />}
+                  <span className="min-w-0 flex-1">
+                    <span className="zh line-clamp-2 text-headline" lang="zh-CN">{r.zh}</span>
+                    <span className="mt-0.5 line-clamp-2 block text-subhead text-muted">{[r.nameEn, c?.short].filter(Boolean).join(" · ")}</span>
+                    <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-footnote text-muted">
+                      {awards[0] && <span className="inline-flex items-center gap-1 font-semibold text-ink"><AwardIcon a={awards[0]} size={14} />{awardShort(t, awards[0])}</span>}
+                      {awards.slice(1).map((a) => <span key={a.list + a.level} className="inline-flex" title={awardShort(t, a)} aria-label={awardShort(t, a)}><AwardIcon a={a} size={14} /></span>)}
+                      {r.cost ? <span className="whitespace-nowrap tabular-nums">{perPerson(r.cost)}</span> : null}
+                    </span>
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
       )}
       {list.length > shown && <Button variant="ghost" className="w-full" onClick={() => setShown((n) => n + PAGE)}>{t.go.showMore}</Button>}
       {used.map((l) => <SourceLine key={l} name={`${d.lists[l].name} ${d.lists[l].edition}`} date={d.lists[l].checked || undefined} />)}
-      {d.source !== "awards" && <SourceLine name="Amap" extra={t.awards.amapNote} />}
+      <SourceLine name="Amap" extra={t.awards.amapNote} />
       {used.length > 0 && <p className="px-1 text-footnote text-muted">{t.awards.note}</p>}
     </>
+  );
+}
+
+/** 96 px Amap photo for the list; a photo that fails to load becomes the cuisine tile. */
+function Thumb({ src, c }: { src: string; c?: ReturnType<typeof cuisineInfo> }) {
+  const [failed, setFailed] = useState(false);
+  if (failed) return <CuisineTile c={c} />;
+  return (
+    <span className="relative block h-24 w-24 shrink-0 overflow-hidden rounded-control bg-line">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt="" loading="lazy" referrerPolicy="no-referrer" onError={() => setFailed(true)} className="h-full w-full object-cover" />
+      {/* Amap's photos are credited on every image, as on the detail page. */}
+      <span className="absolute right-1 bottom-1 rounded bg-black/55 px-1 text-[10px] leading-4 text-white">Amap</span>
+    </span>
   );
 }

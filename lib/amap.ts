@@ -23,6 +23,9 @@ export type Place = {
   rating?: string;
   cost?: string;
   photo?: string;
+  photos?: string[]; // up to 3
+  tag?: string; // business.tag: for restaurants, usually signature dishes
+  opentime?: string;
   distance?: string;
   district?: string;
   adcode?: string; // district adcode
@@ -93,7 +96,7 @@ export function py(s: string) {
 type RawPoi = {
   id: string; name: string; address: string | []; location: string; type: string; typecode?: string;
   cityname: string; citycode: string; adname: string; adcode?: string; distance?: string;
-  business?: { tel?: string; rating?: string; cost?: string };
+  business?: { tel?: string; rating?: string; cost?: string; tag?: string; opentime_week?: string; opentime_today?: string };
   photos?: { url: string }[];
 };
 
@@ -113,6 +116,9 @@ function toPlace(p: RawPoi): Place {
     rating: p.business?.rating,
     cost: p.business?.cost,
     photo: httpsImg(p.photos?.[0]?.url),
+    photos: p.photos?.slice(0, 3).map((x) => httpsImg(x.url)!).filter(Boolean),
+    tag: typeof p.business?.tag === "string" ? p.business.tag : undefined,
+    opentime: (typeof p.business?.opentime_week === "string" && p.business.opentime_week) || (typeof p.business?.opentime_today === "string" ? p.business.opentime_today : undefined),
     distance: p.distance,
     district: p.adname,
     adcode: p.adcode,

@@ -608,6 +608,18 @@ export const en = {
     "reminderLine": "For {date} · opens {when}"
   },
   awards: {
+    cuisine: "Filter by cuisine",
+    photoOf: "Photo {i} of {n}",
+    daily: "Daily",
+    closed: "closed",
+    signature: "Signature dishes",
+    orderThis: "Order this",
+    added: "Added",
+    signatureNote: "Dishes from the restaurant’s Amap listing; descriptions and allergy check by AI. Confirm with staff.",
+    perPersonLabel: "Per person",
+    hours: "Opening hours",
+    address: "Address",
+    listedIn: "Listed in:",
     withLists: "Cities with lists:",
     noneCity: "No restaurant picks for {city} yet",
     starsShort: "Michelin stars",

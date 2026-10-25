@@ -605,6 +605,18 @@ export const fr: Dict = {
     "reminderLine": "Pour le {date} · ouverture {when}"
   },
   awards: {
+    cuisine: "Filtrer par cuisine",
+    photoOf: "Photo {i} sur {n}",
+    daily: "Tous les jours",
+    closed: "fermé",
+    signature: "Plats phares",
+    orderThis: "Commander",
+    added: "Ajouté",
+    signatureNote: "Plats tirés de la fiche Amap du restaurant ; descriptions et vérification des allergènes par IA. Confirmez auprès du personnel.",
+    perPersonLabel: "Par personne",
+    hours: "Horaires",
+    address: "Adresse",
+    listedIn: "Cité dans :",
     withLists: "Villes couvertes :",
     noneCity: "Pas encore de restaurants sélectionnés à {city}",
     starsShort: "Étoiles Michelin",

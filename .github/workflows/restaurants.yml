@@ -1,0 +1,41 @@
+# Matches guide-listed restaurants to Amap (photos, signature-dish tags, price, hours) and picks
+# cover photos. Monthly, or by hand (Actions → Restaurants → Run workflow), optionally for one city.
+# Secrets: AMAP_KEY (required); AI_API_KEY for covers; SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY to
+# also write the restaurants table (apply supabase/migrations/0005 first).
+name: Restaurants
+on:
+  schedule:
+    - cron: "41 4 2 * *" # 04:41 UTC on the 2nd of each month
+  workflow_dispatch:
+    inputs:
+      city: { description: "City adcode (e.g. 110000 for Beijing); empty = all", required: false, default: "" }
+      limit: { description: "Max restaurants to match this run (0 = no limit)", required: false, default: "0" }
+permissions:
+  contents: write
+jobs:
+  enrich:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Match and pick covers
+        env:
+          AMAP_KEY: ${{ secrets.AMAP_KEY }}
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          AI_BASE_URL: ${{ secrets.AI_BASE_URL }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          if [ -z "$AMAP_KEY" ]; then echo "AMAP_KEY secret missing; skipping."; exit 0; fi
+          args=""
+          [ -n "${{ inputs.city }}" ] && args="$args --city ${{ inputs.city }}"
+          [ -n "${{ inputs.limit }}" ] && [ "${{ inputs.limit }}" != "0" ] && args="$args --limit ${{ inputs.limit }}"
+          node scripts/enrich-restaurants.mjs $args
+      - name: Commit
+        run: |
+          git config user.name "restaurants-bot"
+          git config user.email "restaurants-bot@users.noreply.github.com"
+          git add lib/data/restaurant-places.json docs/reports
+          git diff --cached --quiet || (git commit -m "Refresh restaurant Amap data" && git pull --rebase && git push)

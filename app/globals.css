@@ -78,6 +78,13 @@
   --ok-soft: #e7f6ee;
   --warn: #9a4b00;
   --warn-soft: #fff4e2;
+  /* Cuisine tiles (a restaurant without a photo): decorative, never red/green/amber. */
+  --tone1-bg: #e4eff1; --tone1-fg: #2c5a60;
+  --tone2-bg: #f0e8f2; --tone2-fg: #5e3d6c;
+  --tone3-bg: #e6edf8; --tone3-fg: #2c4d7b;
+  --tone4-bg: #eeebe6; --tone4-fg: #574b40;
+  --tone5-bg: #e9eaf5; --tone5-fg: #3d4275;
+  --tone6-bg: #eceef2; --tone6-fg: #485061;
   color-scheme: light;
 }
 
@@ -95,6 +102,12 @@
   --ok-soft: #12301f;
   --warn: #ffc069;
   --warn-soft: #3a2a12;
+  --tone1-bg: #1c3236; --tone1-fg: #a9d4d9;
+  --tone2-bg: #2f2236; --tone2-fg: #d9bfe4;
+  --tone3-bg: #1d2a40; --tone3-fg: #b3c9ee;
+  --tone4-bg: #2e2924; --tone4-fg: #d8cbbd;
+  --tone5-bg: #24263f; --tone5-fg: #c0c4f0;
+  --tone6-bg: #262a33; --tone6-fg: #c3c8d4;
   color-scheme: dark;
 }
 
@@ -146,6 +159,12 @@ body { -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transpa
 .tag-danger { background: var(--danger-soft); color: var(--danger); border-color: transparent; }
 .tag-ok { background: var(--ok-soft); color: var(--ok); border-color: transparent; }
 .tag-warn { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
+.tone-1 { background: var(--tone1-bg); color: var(--tone1-fg); }
+.tone-2 { background: var(--tone2-bg); color: var(--tone2-fg); }
+.tone-3 { background: var(--tone3-bg); color: var(--tone3-fg); }
+.tone-4 { background: var(--tone4-bg); color: var(--tone4-fg); }
+.tone-5 { background: var(--tone5-bg); color: var(--tone5-fg); }
+.tone-6 { background: var(--tone6-bg); color: var(--tone6-fg); }
 
 /* Toggle pills meet the 44px touch target */
 .pill { min-height: 44px; padding: 0 16px; border-radius: 999px; font-size: var(--text-subhead); font-weight: 600; border: 1px solid var(--line); background: var(--card); color: var(--ink); display: inline-flex; align-items: center; gap: 6px; }

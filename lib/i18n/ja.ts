@@ -605,6 +605,18 @@ export const ja: Dict = {
     "reminderLine": "{date}分 · {when}販売開始"
   },
   awards: {
+    cuisine: "料理ジャンルで絞り込む",
+    photoOf: "写真 {i}/{n}",
+    daily: "毎日",
+    closed: "定休",
+    signature: "看板料理",
+    orderThis: "注文する",
+    added: "追加済み",
+    signatureNote: "料理名は高徳地図の店舗情報から。説明とアレルギー判定はAIによるものです。店員に確認してください。",
+    perPersonLabel: "1人あたり",
+    hours: "営業時間",
+    address: "住所",
+    listedIn: "掲載：",
     withLists: "掲載のある都市：",
     noneCity: "{city}のおすすめレストランはまだありません",
     starsShort: "ミシュランの星",

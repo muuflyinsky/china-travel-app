@@ -27,9 +27,10 @@ export function parseCny(text: string): number | null {
   return m ? Number(m[1]) : null;
 }
 
-export function formatMoney(amount: number, currency: string, lang = "en") {
+export function formatMoney(amount: number, currency: string, lang = "en", digits?: number) {
   try {
-    return new Intl.NumberFormat(lang, { style: "currency", currency, maximumFractionDigits: amount < 20 ? 2 : 0 }).format(amount);
+    const d = digits ?? (amount < 20 ? 2 : 0);
+    return new Intl.NumberFormat(lang, { style: "currency", currency, minimumFractionDigits: Math.min(d, 2), maximumFractionDigits: d }).format(amount);
   } catch {
     return `${amount.toFixed(2)} ${currency}`;
   }

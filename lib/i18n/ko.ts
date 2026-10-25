@@ -605,6 +605,18 @@ export const ko: Dict = {
     "reminderLine": "{date} 방문분 · {when} 오픈"
   },
   awards: {
+    cuisine: "요리 종류로 필터",
+    photoOf: "사진 {i}/{n}",
+    daily: "매일",
+    closed: "휴무",
+    signature: "대표 메뉴",
+    orderThis: "주문하기",
+    added: "추가됨",
+    signatureNote: "메뉴는 가오더 지도의 식당 정보에서 가져왔고, 설명과 알레르기 판단은 AI가 했습니다. 직원에게 확인하세요.",
+    perPersonLabel: "1인당",
+    hours: "영업시간",
+    address: "주소",
+    listedIn: "선정:",
     withLists: "목록이 있는 도시:",
     noneCity: "{city} 추천 식당이 아직 없어요",
     starsShort: "미쉐린 스타",
