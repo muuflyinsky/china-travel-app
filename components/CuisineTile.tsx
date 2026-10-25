@@ -5,9 +5,8 @@ import type { CuisineInfo } from "@/lib/cuisines";
 const ICONS = { Bird, Beef, CakeSlice, ChefHat, Coffee, CookingPot, Croissant, Drumstick, Fish, Flame, Landmark, Leaf, Pizza, Salad, Sandwich, Shell, Shrimp, Soup, Sparkles, UtensilsCrossed, Wheat, Wine };
 
 /**
- * A restaurant's picture: the cuisine's tone, icon and name. We show no restaurant photos (Amap
- * photos would spend map quota; other sources aren't ours to use). Square (96 px) for the list,
- * a wide banner for the detail page.
+ * Stand-in for a restaurant without a photo: the cuisine's tone, icon and name, never an image
+ * from a source we may not use. Square (96 px) for the list, a wide banner for the detail page.
  */
 export function CuisineTile({ c, shape = "square" }: { c?: CuisineInfo; shape?: "square" | "wide" }) {
   const Icon = ICONS[(c?.icon ?? "UtensilsCrossed") as keyof typeof ICONS] ?? UtensilsCrossed;

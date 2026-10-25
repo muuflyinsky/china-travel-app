@@ -1,7 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Check, Clock, MapPin, Plus, ReceiptText, ShieldAlert, Sparkles, Wallet } from "lucide-react";
 import { Card, Group } from "./ui";
+import { Photo } from "./Photo";
 import { CuisineTile } from "./CuisineTile";
 import { AwardBadges } from "./AwardBadges";
 import { ShowCard } from "./ShowCard";
@@ -60,8 +61,39 @@ function useSignatureDishes(names: string[], lang: string, city: { e: string; n:
   return dishes;
 }
 
+/** Swipeable photos, each credited (Amap, or the source they were added from); none: the cuisine tile. */
+function Photos({ photos, alt, c, credit }: { photos: string[]; alt: string; c: ReturnType<typeof cuisineInfo>; credit?: string }) {
+  const t = useT();
+  const [i, setI] = useState(0);
+  const strip = useRef<HTMLDivElement>(null);
+  if (!photos.length) return <CuisineTile c={c} shape="wide" />;
+  return (
+    <div className="relative">
+      <div ref={strip} className="flex snap-x snap-mandatory gap-2 overflow-x-auto rounded-control [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        onScroll={(e) => { const el = e.currentTarget; setI(Math.round(el.scrollLeft / Math.max(1, el.clientWidth))); }}>
+        {photos.map((src, k) => (
+          <div key={src} className="w-full shrink-0 snap-center">
+            <Photo src={src} alt={k === 0 ? alt : ""} credit={credit} />
+          </div>
+        ))}
+      </div>
+      {photos.length > 1 && (
+        <div className="mt-2 flex justify-center gap-1.5" role="tablist" aria-label={fmt(t.awards.photoOf, { i: i + 1, n: photos.length })}>
+          {photos.map((src, k) => (
+            <button key={src} role="tab" aria-selected={k === i} aria-label={fmt(t.awards.photoOf, { i: k + 1, n: photos.length })}
+              onClick={() => strip.current?.scrollTo({ left: k * strip.current.clientWidth, behavior: "smooth" })}
+              className="grid h-6 w-6 place-items-center">
+              <span className={`block h-2 w-2 rounded-full ${k === i ? "bg-cobalt" : "bg-line"}`} />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /**
- * Restaurant detail, in this order: cuisine tile → signature dishes → price, hours, address →
+ * Restaurant detail, in this order: photos (or cuisine tile) → signature dishes → price, hours, address →
  * route and taxi card (`children`, from Explore) → where the award comes from.
  */
 export function RestaurantDetail({ r, aiOn = true, children }: { r: ListedRestaurant; aiOn?: boolean; children?: React.ReactNode }) {
@@ -82,7 +114,7 @@ export function RestaurantDetail({ r, aiOn = true, children }: { r: ListedRestau
   return (
     <>
       <Card>
-        <CuisineTile c={c} shape="wide" />
+        <Photos photos={r.photos} alt={r.zh} c={c} credit={r.photoSource && r.photoSource !== "Amap" ? fmt(t.awards.photoFrom, { source: r.photoSource }) : undefined} />
         <h2 className="zh mt-3 text-title" lang="zh-CN">{r.zh}</h2>
         <p className="text-subhead text-muted">{[r.nameEn, c?.short].filter(Boolean).join(" · ")}</p>
         <AwardBadges awards={r.awards} />

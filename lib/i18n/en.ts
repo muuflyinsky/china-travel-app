@@ -608,6 +608,9 @@ export const en = {
     "reminderLine": "For {date} · opens {when}"
   },
   awards: {
+    photoOf: "Photo {i} of {n}",
+    photoFrom: "Photo: {source}",
+    photoCredit: "Photo",
     cuisine: "Filter by cuisine",
     daily: "Daily",
     closed: "closed",

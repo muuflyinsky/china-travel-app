@@ -605,6 +605,9 @@ export const de: Dict = {
     "reminderLine": "Für den {date} · ab {when}"
   },
   awards: {
+    photoOf: "Foto {i} von {n}",
+    photoFrom: "Foto: {source}",
+    photoCredit: "Foto",
     cuisine: "Nach Küche filtern",
     daily: "Täglich",
     closed: "geschlossen",

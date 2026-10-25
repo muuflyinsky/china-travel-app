@@ -1,6 +1,6 @@
-# Matches guide-listed restaurants to Amap (signature-dish tags, price, hours; no photos). By hand
-# only (Actions → Restaurants → Run workflow), so it never spends Amap quota unasked: about one
-# call per restaurant. Use city/limit to stay within the daily quota; a re-run continues.
+# Matches guide-listed restaurants to Amap once each (photos, signature-dish tags, price, hours),
+# skipping any already looked up (also those the app saved). By hand only (Actions → Restaurants →
+# Run workflow): about one call per restaurant; use city/limit to stay within the daily quota.
 # Secrets: AMAP_KEY (required); SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY to also write the
 # restaurants table (apply supabase/migrations/0005 first).
 name: Restaurants

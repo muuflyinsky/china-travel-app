@@ -8,7 +8,7 @@ import { useT } from "./useT";
  * corner (Amap's terms ask for attribution). No photo at all: nothing. A photo that fails to
  * load keeps its space with a quiet placeholder, so cards and rows don't jump.
  */
-export function Photo({ src, alt, shape = "wide", className = "" }: { src?: string; alt: string; shape?: "wide" | "square"; className?: string }) {
+export function Photo({ src, alt, shape = "wide", className = "", credit }: { src?: string; alt: string; shape?: "wide" | "square"; className?: string; credit?: string }) {
   const t = useT();
   const [failed, setFailed] = useState(false);
   if (!src) return null;
@@ -25,7 +25,7 @@ export function Photo({ src, alt, shape = "wide", className = "" }: { src?: stri
       {/* Remote images from Amap's CDN: plain <img>, not next/image (no remote patterns needed, no proxying). */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={src} alt={alt} loading="lazy" referrerPolicy="no-referrer" onError={() => setFailed(true)} className="h-full w-full object-cover" />
-      {shape === "wide" && <span className="absolute right-2 bottom-2 rounded-md bg-black/55 px-1.5 py-0.5 text-[11px] leading-4 text-white">{t.go.photoBy}</span>}
+      {shape === "wide" && <span className="absolute right-2 bottom-2 rounded-md bg-black/55 px-1.5 py-0.5 text-[11px] leading-4 text-white">{credit ?? t.go.photoBy}</span>}
     </span>
   );
 }

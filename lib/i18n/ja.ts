@@ -605,6 +605,9 @@ export const ja: Dict = {
     "reminderLine": "{date}分 · {when}販売開始"
   },
   awards: {
+    photoOf: "写真 {i}/{n}",
+    photoFrom: "写真：{source}",
+    photoCredit: "写真",
     cuisine: "料理ジャンルで絞り込む",
     daily: "毎日",
     closed: "定休",

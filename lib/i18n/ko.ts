@@ -605,6 +605,9 @@ export const ko: Dict = {
     "reminderLine": "{date} 방문분 · {when} 오픈"
   },
   awards: {
+    photoOf: "사진 {i}/{n}",
+    photoFrom: "사진: {source}",
+    photoCredit: "사진",
     cuisine: "요리 종류로 필터",
     daily: "매일",
     closed: "휴무",

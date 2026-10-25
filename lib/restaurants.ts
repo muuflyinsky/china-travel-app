@@ -6,18 +6,27 @@ import { py, searchPlaces, type Place } from "./amap";
 import { cuisineKey } from "./cuisines";
 import { restaurantNameEn } from "./restaurant-names";
 import { demo } from "./config";
-import { rest, supabaseReadOn } from "./supabase";
+import { rest, supabaseOn, supabaseReadOn } from "./supabase";
+import { after } from "next/server";
 import { awardScore, cityAdcode, sameRestaurant, type Award, type AwardList, type AwardRestaurant } from "./restaurant-awards";
 
 type ListMeta = { name: string; edition: string; source: string; checked: string };
 
-/** Amap data matched by scripts/enrich-restaurants.mjs (Supabase columns, or the bundled file). */
+/**
+ * Amap data for a listed restaurant, looked up once and kept (Supabase columns, or the bundled
+ * file from scripts/enrich-restaurants.mjs). Restaurants don't move, so nothing is re-queried.
+ * `photos`: Amap's (they come with the same search), or added by hand with their source.
+ */
 type Stored = {
   id: string; name?: string; location: string; address: string; district?: string; typecode?: string;
   tag?: string; rating?: number | null; cost?: number | null;
-  opentime?: string; confidence?: string;
+  opentime?: string; confidence?: string; photos?: string[]; photoSource?: string;
 };
-type Known = AwardRestaurant & { place?: Stored };
+/**
+ * `tried`: already looked up, so it isn't searched again. `photos`: added by hand for a
+ * restaurant Amap has no photo (or no listing) for, with their source.
+ */
+type Known = AwardRestaurant & { place?: Stored; tried?: boolean; photos?: string[]; photoSource?: string };
 type Data = { lists: Record<AwardList, ListMeta>; restaurants: Known[] };
 
 type Row = {
@@ -25,15 +34,22 @@ type Row = {
   // From migration 0005; absent until it is applied.
   amap_id?: string | null; location?: string | null; address?: string | null; district?: string | null; amap_type?: string | null;
   tags?: string | null; rating?: number | null; cost?: number | null; opentime?: string | null;
-  match?: { confidence?: string } | null;
+  match?: { confidence?: string | null } | null;
+  photos?: string[] | null; photo_source?: string | null; // migration 0006
 };
 
-const FILE_PLACES = (PLACES as { places: Record<string, Stored & { none?: boolean }> }).places;
+const FILE_PLACES = (PLACES as { places: Record<string, Partial<Stored> & { none?: boolean }> }).places;
 /** Only high- and medium-confidence matches are shown; low ones wait for a manual check. */
-const usable = (p?: Stored & { none?: boolean } | null): Stored | undefined =>
-  p && !p.none && p.id && p.confidence !== "low" ? p : undefined;
+const usable = (p?: Partial<Stored> & { none?: boolean } | null): Stored | undefined =>
+  p && !p.none && p.id && p.location && p.confidence !== "low" ? (p as Stored) : undefined;
 const fromFile = (r: AwardRestaurant) => usable(FILE_PLACES[`${r.city}:${r.zh}`]);
-const withFilePlaces = (d: { lists: Data["lists"]; restaurants: AwardRestaurant[] }): Data => ({ ...d, restaurants: d.restaurants.map((r) => ({ ...r, place: fromFile(r) })) });
+const triedInFile = (r: AwardRestaurant) => Boolean(FILE_PLACES[`${r.city}:${r.zh}`]);
+/** Hand-added photos stand on their own; Amap's only count for a usable match. */
+const filePhotos = (r: AwardRestaurant) => {
+  const e = FILE_PLACES[`${r.city}:${r.zh}`];
+  return e?.photos?.length && e.photoSource && e.photoSource !== "Amap" ? { photos: e.photos, photoSource: e.photoSource } : {};
+};
+const withFilePlaces = (d: { lists: Data["lists"]; restaurants: AwardRestaurant[] }): Data => ({ ...d, restaurants: d.restaurants.map((r) => ({ ...r, place: fromFile(r), tried: triedInFile(r), ...filePhotos(r) })) });
 
 /** Every row of a table: Supabase returns at most 1000 rows per request. */
 async function all<T>(path: string): Promise<T[]> {
@@ -57,9 +73,10 @@ async function fromSupabase(): Promise<Data> {
       const db = r.amap_id && r.location ? usable({
         id: r.amap_id, location: r.location, address: r.address ?? "", district: r.district ?? undefined, typecode: r.amap_type ?? undefined,
         tag: r.tags ?? undefined, rating: r.rating, cost: r.cost, opentime: r.opentime ?? undefined,
-        confidence: r.match?.confidence,
+        confidence: r.match?.confidence ?? undefined, photos: r.photos ?? undefined, photoSource: r.photo_source ?? undefined,
       }) : undefined;
-      return { ...base, place: db ?? fromFile(base) };
+      const manual = r.photos?.length && r.photo_source && r.photo_source !== "Amap" ? { photos: r.photos, photoSource: r.photo_source } : filePhotos(base);
+      return { ...base, place: db ?? fromFile(base), tried: Boolean(r.match) || triedInFile(base), ...manual };
     }),
   };
 }
@@ -120,6 +137,7 @@ export type ListedRestaurant = AwardRestaurant & {
   nameEn: string; cuisineKey?: string;
   dishes: string[]; // signature dishes from Amap's business.tag, at most 5
   opentime?: string;
+  photos: string[]; photoSource?: string; // "Amap" unless added by hand from another source
 };
 
 // business.tag mixes dishes with features ("包间", "环境优雅"); only dish-like entries are kept.
@@ -135,33 +153,62 @@ function storedPoi(r: AwardRestaurant, p: Stored, city: string): Place {
   return {
     id: p.id, name: p.name ?? r.zh, pinyin: py(p.name ?? r.zh), address: p.address, city: "", citycode: "", location: p.location,
     type: "", typecode: p.typecode, district: p.district, adcode: city, rating: p.rating ? String(p.rating) : undefined,
-    cost: p.cost ? String(p.cost) : undefined, tag: p.tag, opentime: p.opentime,
+    cost: p.cost ? String(p.cost) : undefined, tag: p.tag, opentime: p.opentime, photos: p.photos, photo: p.photos?.[0],
   };
 }
 
 function listed(r: Known, poi: Place | null): ListedRestaurant {
   const p = r.place;
-  // No photos (Amap quota): the list and detail show the cuisine tile. Drop any a live search returned.
-  const place = poi && { ...poi, photo: undefined, photos: undefined };
+  // Amap's photos from the stored match (or the live search), else ones added by hand.
+  const amapPhotos = p?.photos?.length ? p.photos : poi?.photos ?? [];
+  const photos = amapPhotos.length ? amapPhotos : r.photos ?? [];
   return {
-    city: r.city, zh: r.zh, en: r.en, cuisine: r.cuisine, awards: r.awards, poi: place,
+    city: r.city, zh: r.zh, en: r.en, cuisine: r.cuisine, awards: r.awards, poi,
+    photos, photoSource: amapPhotos.length ? p?.photoSource || "Amap" : photos.length ? r.photoSource : undefined,
     rating: Number(p?.rating ?? poi?.rating) || undefined, cost: Number(p?.cost ?? poi?.cost) || undefined,
     nameEn: restaurantNameEn(r.zh, r.en), cuisineKey: cuisineKey(r.cuisine, p?.typecode ?? poi?.typecode),
     dishes: signatureDishes(p?.tag ?? poi?.tag), opentime: p?.opentime || poi?.opentime || undefined,
   };
 }
 
-/** Stored match first; otherwise a live Amap search (cached a day), for the top of the list only. */
+/**
+ * Stored data first. Otherwise one Amap search, kept for good: written to Supabase (when the
+ * service key is set) and to this instance's copy, found or not, so no restaurant is searched
+ * twice. Without the service key it is remembered for a day per instance.
+ */
 async function resolve(r: Known, city: string): Promise<ListedRestaurant> {
   if (r.place) return listed(r, storedPoi(r, r.place, city));
-  if (demo.maps) return listed(r, null);
+  if (r.tried || demo.maps) return listed(r, null);
   const key = `${city}:${r.zh}`;
   const hit = resolved.get(key);
   if (hit && Date.now() - hit.at < 864e5) return listed(r, hit.poi);
-  const found = await searchPlaces({ keywords: r.zh, types: "050000", city, purpose: "restaurants" }).catch(() => []);
+  let found: Place[];
+  try { found = await searchPlaces({ keywords: r.zh, types: "050000", city, purpose: "restaurants" }); }
+  catch { return listed(r, null); } // quota or network: try again another time, nothing saved
   const poi = found.find((p) => sameRestaurant(r.zh, p.name)) ?? null;
   resolved.set(key, { at: Date.now(), poi });
+  keep(r, city, poi);
   return listed(r, poi);
+}
+
+/** Saves one lookup on the restaurant's row (migration 0005/0006) after the response is sent. */
+function keep(r: Known, city: string, poi: Place | null) {
+  const stored: Stored | undefined = poi ? {
+    id: poi.id, name: poi.name, location: poi.location, address: poi.address, district: poi.district, typecode: poi.typecode,
+    tag: poi.tag, rating: Number(poi.rating) || null, cost: Math.round(Number(poi.cost)) || null, opentime: poi.opentime,
+    confidence: "high", photos: poi.photos ?? [], photoSource: poi.photos?.length ? "Amap" : undefined,
+  } : undefined;
+  r.place = stored; r.tried = true; // this instance's cached copy
+  if (!supabaseOn) return;
+  const row = {
+    amap_id: stored?.id ?? null, location: stored?.location ?? null, address: stored?.address ?? null, district: stored?.district ?? null,
+    amap_type: stored?.typecode ?? null, tags: stored?.tag || null, rating: stored?.rating ?? null, cost: stored?.cost ?? null,
+    opentime: stored?.opentime || null, photos: stored?.photos?.length ? stored.photos : null, photo_source: stored?.photoSource ?? null,
+    match: { confidence: stored ? "high" : null, method: "live", amap_name: poi?.name ?? null, matched_at: new Date().toISOString() },
+  };
+  const save = () => rest(`restaurants?city=eq.${city}&name_zh=eq.${encodeURIComponent(r.zh)}`, { method: "PATCH", body: JSON.stringify(row), headers: { prefer: "return=minimal" } })
+    .catch((e) => console.error("[restaurants] save:", (e as Error).message, "(migrations 0005 and 0006 applied?)"));
+  try { after(save); } catch { void save(); }
 }
 
 /** Well-rated restaurants straight from Amap, with guide badges where a listed restaurant matches. */
@@ -182,7 +229,7 @@ async function amapRestaurants(city: string): Promise<ListedRestaurant[]> {
 export async function awardRestaurants(city: string, { featured = 8, listedOnly = false } = {}): Promise<{ restaurants: ListedRestaurant[]; source: "awards" | "mixed" | "amap" }> {
   const all = (await data()).restaurants.filter((r) => r.city === city).sort((a, b) => awardScore(b.awards) - awardScore(a.awards));
   // Stored matches cost nothing, so every restaurant that has one gets it; live search only for the top.
-  const list = await Promise.all(all.map((r, i) => (r.place || i < featured ? resolve(r, city) : listed(r, null))));
+  const list = await Promise.all(all.map((r, i) => (r.place || (i < featured && !r.tried) ? resolve(r, city) : listed(r, null))));
   if (list.length >= 5 || demo.maps || listedOnly) return { restaurants: list, source: "awards" };
   const extra = (await amapRestaurants(city)).filter((x) => !list.some((l) => l.poi?.id === x.poi?.id || sameRestaurant(l.zh, x.zh)));
   const restaurants = [...list, ...extra].slice(0, featured);

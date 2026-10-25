@@ -1,6 +1,6 @@
 -- Amap data for guide-listed restaurants (written by scripts/enrich-restaurants.mjs): only what
--- the Amap Web Service returns, no photos. Run by hand; nothing here comes from Dianping,
--- Michelin or search engines.
+-- the Amap Web Service returns (photos: 0006), looked up once per restaurant by the script or by
+-- the app on first view. Nothing here comes from Dianping, Michelin or search engines.
 alter table restaurants
   add column if not exists amap_id text,
   add column if not exists location text,     -- "lng,lat" GCJ-02

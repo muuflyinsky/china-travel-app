@@ -56,8 +56,8 @@ export function usePerPerson() {
 }
 
 /**
- * Michelin / Black Pearl / Must-Eat restaurants in one city. Each card: the 96 px cuisine tile
- * (no photos: Amap quota), the Chinese name large, "English name · cuisine", and "award · price".
+ * Michelin / Black Pearl / Must-Eat restaurants in one city. Each card: a 96 px photo (stored with
+ * the restaurant) or the cuisine tile, the Chinese name large, "English name · cuisine", "award · price".
  * All else is on the detail page. Filters: award, then cuisine (in the traveller's language).
  */
 export function AwardRestaurants({ adcode, cityEn, listedOnly, onPick }: {
@@ -142,7 +142,7 @@ export function AwardRestaurants({ adcode, cityEn, listedOnly, onPick }: {
             return (
               <li key={r.zh}>
                 <button onClick={() => onPick(r)} className="flex w-full items-center gap-3 p-3 text-left">
-                  <CuisineTile c={c} />
+                  {r.photos[0] ? <Thumb src={r.photos[0]} c={c} credit={r.photoSource === "Amap" ? "Amap" : t.awards.photoCredit} /> : <CuisineTile c={c} />}
                   <span className="min-w-0 flex-1">
                     <span className="zh line-clamp-2 text-headline" lang="zh-CN">{r.zh}</span>
                     <span className="mt-0.5 line-clamp-2 block text-subhead text-muted">{[r.nameEn, c?.short].filter(Boolean).join(" · ")}</span>
@@ -163,5 +163,18 @@ export function AwardRestaurants({ adcode, cityEn, listedOnly, onPick }: {
       <SourceLine name="Amap" extra={t.awards.amapNote} />
       {used.length > 0 && <p className="px-1 text-footnote text-muted">{t.awards.note}</p>}
     </>
+  );
+}
+
+/** 96 px photo for the list, credited in the corner; one that fails to load becomes the cuisine tile. */
+function Thumb({ src, c, credit }: { src: string; c?: ReturnType<typeof cuisineInfo>; credit: string }) {
+  const [failed, setFailed] = useState(false);
+  if (failed) return <CuisineTile c={c} />;
+  return (
+    <span className="relative block h-24 w-24 shrink-0 overflow-hidden rounded-control bg-line">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt="" loading="lazy" referrerPolicy="no-referrer" onError={() => setFailed(true)} className="h-full w-full object-cover" />
+      <span className="absolute right-1 bottom-1 max-w-[88px] truncate rounded bg-black/55 px-1 text-[10px] leading-4 text-white">{credit}</span>
+    </span>
   );
 }
