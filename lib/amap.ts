@@ -45,15 +45,34 @@ function count(api: string, purpose: AmapPurpose, ok: boolean) {
   try { after(() => logRow("events", row)); } catch { void logRow("events", row); }
 }
 
+// Throttle: AMAP_MIN_INTERVAL_MS spaces requests out within this process (the batch job sets it
+// to stay under the key's QPS; online it is 0). Requests queue in order.
+const MIN_GAP = Number(process.env.AMAP_MIN_INTERVAL_MS) || 0;
+let nextSlot = 0;
+async function slot() {
+  if (!MIN_GAP) return;
+  const now = Date.now(), at = Math.max(now, nextSlot);
+  nextSlot = at + MIN_GAP;
+  if (at > now) await new Promise((r) => setTimeout(r, at - now));
+}
+// Amap's "too many requests" answers (QPS limits): wait and try again, 3 times at most.
+const QPS_CODES = new Set(["10019", "10020", "10021", "10022", "10029"]);
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 async function amap<T>(path: string, params: Record<string, string | undefined>, purpose: AmapPurpose): Promise<T> {
   if (!config.amapKey) throw new Unavailable("map");
   const qs = new URLSearchParams({ key: config.amapKey });
   for (const [k, v] of Object.entries(params)) if (v) qs.set(k, v);
-  const res = await fetch(`${BASE}${path}?${qs}`, { next: { revalidate: 300 } });
-  const data = await res.json();
-  count(path, purpose, data.status === "1");
-  if (data.status !== "1") throw new Error(`Amap ${path}: ${data.info ?? "error"} (${data.infocode ?? ""})`);
-  return data as T;
+  for (let attempt = 0; ; attempt++) {
+    await slot();
+    // A QPS refusal comes back as HTTP 200, so retries skip Next's 5-minute fetch cache.
+    const res = await fetch(`${BASE}${path}?${qs}`, attempt ? { cache: "no-store" } : { next: { revalidate: 300 } });
+    const data = await res.json();
+    count(path, purpose, data.status === "1");
+    if (data.status === "1") return data as T;
+    if (QPS_CODES.has(String(data.infocode)) && attempt < 3) { await sleep(1000 * 2 ** attempt); continue; }
+    throw new Error(`Amap ${path}: ${data.info ?? "error"} (${data.infocode ?? ""})`);
+  }
 }
 
 /** Amap photo URLs are often http://; the page is https, so ask for the same image over https. */

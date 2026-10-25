@@ -22,7 +22,7 @@ import type { Place } from "@/lib/amap";
 
 type Tab = "see" | "eat";
 
-/** Static pre-generated file first (CDN), then the API, which generates and caches. */
+/** The city guide from the API, which serves what the monthly job stored. */
 export function useGuide(adcode: string) {
   const [g, setG] = useState<(Guide & { demo?: boolean }) | null>(null);
   // none: this city has no guide (not covered) · error: the request failed — never shown as "none".
@@ -33,7 +33,8 @@ export function useGuide(adcode: string) {
     setG(null); setState("loading");
     (async () => {
       let failed = false;
-      for (const url of [`/city-guide/${adcode}.json`, `/api/city-guide?city=${adcode}`]) {
+      // Guides live in Supabase now (served by the API); no static files to try first.
+      for (const url of [`/api/city-guide?city=${adcode}`]) {
         const r = await fetch(url).catch(() => null);
         if (r?.ok) { const d = await r.json().catch(() => null); if (d) { if (alive) { setG(d); setState("ok"); } return; } }
         // A 404 means "not here"; no response or a server error means we don't know.

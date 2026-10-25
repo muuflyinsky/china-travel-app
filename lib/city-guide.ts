@@ -122,9 +122,7 @@ export async function generateGuide(adcode: string, cityZh: string, cityEn: stri
 
 // ---- cache ---------------------------------------------------------------------------------
 
-const TTL = 30 * 864e5;
 const memory = new Map<string, CityGuide>();
-const inflight = new Map<string, Promise<CityGuide>>();
 
 /** Kept in memory and in the durable cache (lib/cache.ts), so every server instance can use it. */
 const save = async (g: CityGuide) => {
@@ -133,43 +131,39 @@ const save = async (g: CityGuide) => {
 };
 
 /**
- * Cached guide. A cache miss answers at once with the map-only guide and returns `later`, the
- * full generation, for the route to run after the response (next/server `after`). With
- * `refresh` (the monthly job) the full guide is generated and awaited.
+ * The guide for a hot city. Online this only reads: guides are generated in batch by the
+ * monthly job (scripts/build-city-guides.mjs calls this with `refresh`, outside Vercel's time
+ * limit and throttled to Amap's QPS) and stored in the durable cache. A stored guide is served
+ * at any age; the job replaces it. A city the job hasn't reached yet gets the map-only guide
+ * (a few Amap calls, kept in memory, never stored).
  */
-export async function cityGuide(adcode: string, cityZh: string, cityEn: string, refresh = false): Promise<{ guide: CityGuide; later?: () => Promise<void> }> {
+export async function cityGuide(adcode: string, cityZh: string, cityEn: string, refresh = false): Promise<{ guide: CityGuide }> {
   if (demo.maps) return { guide: adcode === "310000" ? mock.cityGuide : { ...mock.cityGuide, city: cityZh, cityEn, adcode, sights: [], dishes: [], areas: [] } };
   if (!config.amapKey) throw new Unavailable("map");
   if (refresh) {
-    const g = await generateGuide(adcode, cityZh, cityEn);
-    await save(g);
-    await review(g);
-    return { guide: g };
-  }
-  const fresh = (g?: CityGuide) => g && Date.now() - Date.parse(g.generatedAt) < TTL;
-  let cached = memory.get(adcode);
-  if (!fresh(cached)) {
-    const stored = await cacheRead<CityGuide>("city_guide", adcode);
-    if (fresh(stored ?? undefined)) { cached = stored!; memory.set(adcode, stored!); }
-  }
-  const complete = (g?: CityGuide) => fresh(g) && !(g as { partial?: boolean }).partial;
-  if (complete(cached)) return { guide: cached! };
-
-  // Map data now; the model's part in the background, once per city at a time.
-  const guide = fresh(cached) ? cached! : await basicGuide(adcode, cityZh, cityEn);
-  if (guide !== cached) memory.set(adcode, guide);
-  // Each background run logs whether it finished and how long it took (events: guide_generated),
-  // to tell a slow model from a run cut off by the function time limit.
-  const later = aiProvider && !inflight.has(adcode) ? async () => {
+    // The batch job: one city at a time, logged so a failed run shows up in the events table.
     const t0 = Date.now();
-    const job = generateGuide(adcode, cityZh, cityEn).then(async (g) => { await save(g); await review(g); return g; }).finally(() => inflight.delete(adcode));
-    inflight.set(adcode, job);
-    await job.then(
-      (g) => logRow("events", { e: "guide_generated", p: { city: adcode, ok: true, ms: Date.now() - t0, partial: Boolean((g as { partial?: boolean }).partial) }, sid: null }),
-      (e) => { console.error("[city-guide] background generation failed:", e); return logRow("events", { e: "guide_generated", p: { city: adcode, ok: false, ms: Date.now() - t0, error: String((e as Error).message ?? e).slice(0, 40) }, sid: null }); },
-    );
-  } : undefined;
-  return { guide, later };
+    try {
+      const g = await generateGuide(adcode, cityZh, cityEn);
+      if (!(g as { partial?: boolean }).partial) await save(g);
+      await review(g);
+      await logRow("events", { e: "guide_generated", p: { city: adcode, ok: true, ms: Date.now() - t0, partial: Boolean((g as { partial?: boolean }).partial) }, sid: null });
+      return { guide: g };
+    } catch (e) {
+      await logRow("events", { e: "guide_generated", p: { city: adcode, ok: false, ms: Date.now() - t0, error: String((e as Error).message ?? e).slice(0, 40) }, sid: null });
+      throw e;
+    }
+  }
+  const complete = (g?: CityGuide | null) => Boolean(g && !(g as { partial?: boolean }).partial);
+  const inMemory = memory.get(adcode);
+  if (complete(inMemory)) return { guide: inMemory! };
+  const stored = await cacheRead<CityGuide>("city_guide", adcode);
+  if (complete(stored)) { memory.set(adcode, stored!); return { guide: stored! }; }
+  // Not generated yet: map data only, once per instance and day.
+  if (inMemory && Date.now() - Date.parse(inMemory.generatedAt) < 864e5) return { guide: inMemory };
+  const guide = await basicGuide(adcode, cityZh, cityEn);
+  memory.set(adcode, guide);
+  return { guide };
 }
 
 /** Passive review queue: low-confidence items and user 👎 go to data/review.jsonl (or the log). */
