@@ -12,7 +12,7 @@ const PRIVACY: Record<string, Privacy> = {
   en: {
     title: "Privacy policy",
     updated: "Last updated {date}",
-    intro: "Haodego (China Travel Buddy) helps visitors to mainland China read menus, get around, pay and book. There is no account and no advertising. We don’t sell data, and we don’t track you across other apps or websites.",
+    intro: "HaodeGo (China Travel Buddy) helps visitors to mainland China read menus, get around, pay and book. There is no account and no advertising. We don’t sell data, and we don’t track you across other apps or websites.",
     sections: [
       { h: "What stays on your phone", items: [
         "Your passport country, language, currency, trip dates and cities, allergies and diet, saved hotel and settings are stored only on your device.",
@@ -45,7 +45,7 @@ const PRIVACY: Record<string, Privacy> = {
   es: {
     title: "Política de privacidad",
     updated: "Última actualización: {date}",
-    intro: "Haodego (China Travel Buddy) ayuda a quienes visitan China continental a leer cartas, moverse, pagar y reservar. No hay cuenta ni publicidad. No vendemos datos ni te rastreamos en otras apps o webs.",
+    intro: "HaodeGo (China Travel Buddy) ayuda a quienes visitan China continental a leer cartas, moverse, pagar y reservar. No hay cuenta ni publicidad. No vendemos datos ni te rastreamos en otras apps o webs.",
     sections: [
       { h: "Lo que se queda en tu teléfono", items: [
         "Tu país de pasaporte, idioma, moneda, fechas y ciudades del viaje, alergias y dieta, hotel guardado y ajustes se guardan solo en tu dispositivo.",
@@ -78,7 +78,7 @@ const PRIVACY: Record<string, Privacy> = {
   fr: {
     title: "Politique de confidentialité",
     updated: "Dernière mise à jour : {date}",
-    intro: "Haodego (China Travel Buddy) aide les visiteurs en Chine continentale à lire les menus, se déplacer, payer et réserver. Pas de compte, pas de publicité. Nous ne vendons pas de données et ne vous suivons pas sur d’autres applis ou sites.",
+    intro: "HaodeGo (China Travel Buddy) aide les visiteurs en Chine continentale à lire les menus, se déplacer, payer et réserver. Pas de compte, pas de publicité. Nous ne vendons pas de données et ne vous suivons pas sur d’autres applis ou sites.",
     sections: [
       { h: "Ce qui reste sur votre téléphone", items: [
         "Votre pays de passeport, langue, devise, dates et villes du voyage, allergies et régime, hôtel enregistré et réglages sont stockés uniquement sur votre appareil.",
@@ -111,7 +111,7 @@ const PRIVACY: Record<string, Privacy> = {
   de: {
     title: "Datenschutzerklärung",
     updated: "Zuletzt aktualisiert: {date}",
-    intro: "Haodego (China Travel Buddy) hilft Reisenden in Festlandchina, Speisekarten zu lesen, sich zurechtzufinden, zu bezahlen und zu buchen. Es gibt kein Konto und keine Werbung. Wir verkaufen keine Daten und verfolgen dich nicht über andere Apps oder Websites.",
+    intro: "HaodeGo (China Travel Buddy) hilft Reisenden in Festlandchina, Speisekarten zu lesen, sich zurechtzufinden, zu bezahlen und zu buchen. Es gibt kein Konto und keine Werbung. Wir verkaufen keine Daten und verfolgen dich nicht über andere Apps oder Websites.",
     sections: [
       { h: "Was auf deinem Telefon bleibt", items: [
         "Passland, Sprache, Währung, Reisedaten und Städte, Allergien und Ernährung, gespeichertes Hotel und Einstellungen werden nur auf deinem Gerät gespeichert.",
@@ -144,7 +144,7 @@ const PRIVACY: Record<string, Privacy> = {
   ja: {
     title: "プライバシーポリシー",
     updated: "最終更新日：{date}",
-    intro: "Haodego（China Travel Buddy）は、中国本土を訪れる方がメニューを読み、移動し、支払い、予約するためのアプリです。アカウントも広告もありません。データを販売せず、他のアプリやサイトをまたいだ追跡も行いません。",
+    intro: "HaodeGo（China Travel Buddy）は、中国本土を訪れる方がメニューを読み、移動し、支払い、予約するためのアプリです。アカウントも広告もありません。データを販売せず、他のアプリやサイトをまたいだ追跡も行いません。",
     sections: [
       { h: "スマートフォンに残るもの", items: [
         "パスポートの国、言語、通貨、旅行の日程と都市、アレルギーと食事制限、保存したホテル、設定は、お使いの端末にのみ保存されます。",
@@ -177,7 +177,7 @@ const PRIVACY: Record<string, Privacy> = {
   ko: {
     title: "개인정보 처리방침",
     updated: "최종 업데이트: {date}",
-    intro: "Haodego(China Travel Buddy)는 중국 본토를 여행하는 분이 메뉴를 읽고, 이동하고, 결제하고, 예약하도록 돕는 앱입니다. 계정도 광고도 없습니다. 데이터를 판매하지 않으며, 다른 앱이나 웹사이트에 걸쳐 추적하지 않습니다.",
+    intro: "HaodeGo(China Travel Buddy)는 중국 본토를 여행하는 분이 메뉴를 읽고, 이동하고, 결제하고, 예약하도록 돕는 앱입니다. 계정도 광고도 없습니다. 데이터를 판매하지 않으며, 다른 앱이나 웹사이트에 걸쳐 추적하지 않습니다.",
     sections: [
       { h: "휴대폰에만 남는 정보", items: [
         "여권 국가, 언어, 통화, 여행 날짜와 도시, 알레르기와 식단, 저장한 호텔, 설정은 기기에만 저장됩니다.",
@@ -217,8 +217,8 @@ const SUPPORT: Record<string, Support> = {
     faqH: "Common questions",
     faq: [
       { q: "The menu reader got a dish wrong", a: "Open the dish and tap “This dish info is wrong”; we check it again. Ingredients are inferred from the usual recipe, so with an allergy always show your allergy card and confirm with staff." },
-      { q: "Alipay or WeChat doesn’t open", a: "Install the app and finish its phone-number verification before you travel. If it’s installed and nothing happens, open it yourself and use the steps shown in Haodego." },
-      { q: "My location isn’t found", a: "Allow location for Haodego in iPhone Settings → Privacy & Security → Location Services. Search and the taxi card work without it." },
+      { q: "Alipay or WeChat doesn’t open", a: "Install the app and finish its phone-number verification before you travel. If it’s installed and nothing happens, open it yourself and use the steps shown in HaodeGo." },
+      { q: "My location isn’t found", a: "Allow location for HaodeGo in iPhone Settings → Privacy & Security → Location Services. Search and the taxi card work without it." },
       { q: "How do I delete my data?", a: "Settings → Clear all data, or delete the app. Everything about your trip is stored only on your phone." },
     ],
     privacy: "Privacy policy",
@@ -230,8 +230,8 @@ const SUPPORT: Record<string, Support> = {
     faqH: "Preguntas frecuentes",
     faq: [
       { q: "El lector de cartas se equivocó con un plato", a: "Abre el plato y pulsa «La información de este plato es incorrecta»; lo revisaremos. Los ingredientes se deducen de la receta habitual, así que con una alergia muestra siempre tu tarjeta de alergias y confírmalo con el personal." },
-      { q: "Alipay o WeChat no se abren", a: "Instala la app y completa la verificación del número de teléfono antes de viajar. Si está instalada y no pasa nada, ábrela tú y sigue los pasos que muestra Haodego." },
-      { q: "No encuentra mi ubicación", a: "Permite la ubicación para Haodego en Ajustes del iPhone → Privacidad y seguridad → Localización. La búsqueda y la tarjeta para el taxista funcionan sin ella." },
+      { q: "Alipay o WeChat no se abren", a: "Instala la app y completa la verificación del número de teléfono antes de viajar. Si está instalada y no pasa nada, ábrela tú y sigue los pasos que muestra HaodeGo." },
+      { q: "No encuentra mi ubicación", a: "Permite la ubicación para HaodeGo en Ajustes del iPhone → Privacidad y seguridad → Localización. La búsqueda y la tarjeta para el taxista funcionan sin ella." },
       { q: "¿Cómo borro mis datos?", a: "Ajustes → Borrar todos los datos, o elimina la app. Todo lo de tu viaje se guarda solo en tu teléfono." },
     ],
     privacy: "Política de privacidad",
@@ -243,8 +243,8 @@ const SUPPORT: Record<string, Support> = {
     faqH: "Questions fréquentes",
     faq: [
       { q: "Le lecteur de menus s’est trompé sur un plat", a: "Ouvrez le plat et touchez « Les infos sur ce plat sont fausses » ; nous le revérifions. Les ingrédients sont déduits de la recette habituelle : en cas d’allergie, montrez toujours votre carte d’allergies et confirmez auprès du personnel." },
-      { q: "Alipay ou WeChat ne s’ouvre pas", a: "Installez l’appli et terminez la vérification du numéro de téléphone avant le voyage. Si elle est installée et que rien ne se passe, ouvrez-la vous-même et suivez les étapes affichées dans Haodego." },
-      { q: "Ma position n’est pas trouvée", a: "Autorisez la localisation pour Haodego dans Réglages de l’iPhone → Confidentialité et sécurité → Service de localisation. La recherche et la carte taxi fonctionnent sans." },
+      { q: "Alipay ou WeChat ne s’ouvre pas", a: "Installez l’appli et terminez la vérification du numéro de téléphone avant le voyage. Si elle est installée et que rien ne se passe, ouvrez-la vous-même et suivez les étapes affichées dans HaodeGo." },
+      { q: "Ma position n’est pas trouvée", a: "Autorisez la localisation pour HaodeGo dans Réglages de l’iPhone → Confidentialité et sécurité → Service de localisation. La recherche et la carte taxi fonctionnent sans." },
       { q: "Comment supprimer mes données ?", a: "Réglages → Effacer toutes les données, ou supprimez l’appli. Tout ce qui concerne votre voyage est stocké uniquement sur votre téléphone." },
     ],
     privacy: "Politique de confidentialité",
@@ -256,8 +256,8 @@ const SUPPORT: Record<string, Support> = {
     faqH: "Häufige Fragen",
     faq: [
       { q: "Ein Gericht wurde falsch erkannt", a: "Öffne das Gericht und tippe auf „Die Angaben zu diesem Gericht stimmen nicht“; wir prüfen es erneut. Zutaten werden aus dem üblichen Rezept abgeleitet: Zeig bei Allergien immer deine Allergiekarte und frag beim Personal nach." },
-      { q: "Alipay oder WeChat öffnet sich nicht", a: "Installiere die App und schließe die Telefonnummer-Bestätigung vor der Reise ab. Ist sie installiert und nichts passiert, öffne sie selbst und folge den Schritten in Haodego." },
-      { q: "Mein Standort wird nicht gefunden", a: "Erlaube Haodego den Standort unter iPhone-Einstellungen → Datenschutz & Sicherheit → Ortungsdienste. Suche und Taxikarte funktionieren auch ohne." },
+      { q: "Alipay oder WeChat öffnet sich nicht", a: "Installiere die App und schließe die Telefonnummer-Bestätigung vor der Reise ab. Ist sie installiert und nichts passiert, öffne sie selbst und folge den Schritten in HaodeGo." },
+      { q: "Mein Standort wird nicht gefunden", a: "Erlaube HaodeGo den Standort unter iPhone-Einstellungen → Datenschutz & Sicherheit → Ortungsdienste. Suche und Taxikarte funktionieren auch ohne." },
       { q: "Wie lösche ich meine Daten?", a: "Einstellungen → Alle Daten löschen, oder die App löschen. Alles zu deiner Reise ist nur auf deinem Telefon gespeichert." },
     ],
     privacy: "Datenschutzerklärung",
@@ -269,8 +269,8 @@ const SUPPORT: Record<string, Support> = {
     faqH: "よくある質問",
     faq: [
       { q: "料理の読み取りが間違っていた", a: "料理を開いて「この料理の情報が間違っている」をタップしてください。再確認します。材料は一般的なレシピからの推定なので、アレルギーがある場合は必ずアレルギーカードを見せて店員に確認してください。" },
-      { q: "AlipayやWeChatが開かない", a: "出発前にアプリをインストールし、電話番号の認証を済ませてください。インストール済みで何も起きない場合は、アプリを自分で開き、Haodegoに表示される手順に従ってください。" },
-      { q: "現在地が見つからない", a: "iPhoneの設定 → プライバシーとセキュリティ → 位置情報サービスで、Haodegoに位置情報を許可してください。検索とタクシーカードは位置情報なしでも使えます。" },
+      { q: "AlipayやWeChatが開かない", a: "出発前にアプリをインストールし、電話番号の認証を済ませてください。インストール済みで何も起きない場合は、アプリを自分で開き、HaodeGoに表示される手順に従ってください。" },
+      { q: "現在地が見つからない", a: "iPhoneの設定 → プライバシーとセキュリティ → 位置情報サービスで、HaodeGoに位置情報を許可してください。検索とタクシーカードは位置情報なしでも使えます。" },
       { q: "データを削除するには？", a: "設定 →「すべてのデータを消去」、またはアプリを削除してください。旅行に関する情報はすべて端末にのみ保存されています。" },
     ],
     privacy: "プライバシーポリシー",
@@ -282,8 +282,8 @@ const SUPPORT: Record<string, Support> = {
     faqH: "자주 묻는 질문",
     faq: [
       { q: "메뉴 읽기에서 요리를 잘못 알려 줬어요", a: "요리를 열고 '이 요리 정보가 틀렸어요'를 누르면 다시 확인합니다. 재료는 일반적인 조리법에서 추정한 것이므로, 알레르기가 있으면 항상 알레르기 카드를 보여 주고 직원에게 확인하세요." },
-      { q: "Alipay나 WeChat이 열리지 않아요", a: "여행 전에 앱을 설치하고 전화번호 인증을 마치세요. 설치되어 있는데 아무 일도 없으면 직접 앱을 열고 Haodego에 나온 순서를 따르세요." },
-      { q: "내 위치를 찾지 못해요", a: "iPhone 설정 → 개인정보 보호 및 보안 → 위치 서비스에서 Haodego의 위치 접근을 허용하세요. 검색과 택시 카드는 위치 없이도 쓸 수 있어요." },
+      { q: "Alipay나 WeChat이 열리지 않아요", a: "여행 전에 앱을 설치하고 전화번호 인증을 마치세요. 설치되어 있는데 아무 일도 없으면 직접 앱을 열고 HaodeGo에 나온 순서를 따르세요." },
+      { q: "내 위치를 찾지 못해요", a: "iPhone 설정 → 개인정보 보호 및 보안 → 위치 서비스에서 HaodeGo의 위치 접근을 허용하세요. 검색과 택시 카드는 위치 없이도 쓸 수 있어요." },
       { q: "데이터는 어떻게 지우나요?", a: "설정 → 모든 데이터 삭제, 또는 앱을 삭제하세요. 여행 정보는 모두 휴대폰에만 저장됩니다." },
     ],
     privacy: "개인정보 처리방침",

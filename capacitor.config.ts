@@ -9,8 +9,8 @@ const url = process.env.CAP_SERVER_URL || "https://haodego.com";
 
 const config: CapacitorConfig = {
   appId: "com.haodego.app",
-  // Home-screen name; the App Store name ("Haodego: China Travel Buddy") is set in App Store Connect.
-  appName: "Haodego",
+  // Home-screen name; the App Store name ("HaodeGo: China Travel Buddy") is set in App Store Connect.
+  appName: "HaodeGo",
   // Only the offline page is bundled; everything else comes from the server.
   webDir: "native/www",
   backgroundColor: "#f7f8fb",

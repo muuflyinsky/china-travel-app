@@ -1,6 +1,6 @@
 # iOS app (App Store)
 
-The iOS app, **Haodego** (`com.haodego.app`), is a native shell ([Capacitor](https://capacitorjs.com) 8) around the web app at https://haodego.com.
+The iOS app, **HaodeGo** (`com.haodego.app`), is a native shell ([Capacitor](https://capacitorjs.com) 8) around the web app at https://haodego.com.
 What to enter in App Store Connect (name, description, keywords, privacy label, review notes): [app-store.md](app-store.md).
 The menu reader, maps and affiliate links need the server's API routes, so the app's WebView loads
 the production site. Only `native/www/offline.html` ships inside the app, shown when there's no

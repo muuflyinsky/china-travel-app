@@ -6,7 +6,7 @@ Copy these into App Store Connect → your app. Limits are Apple's; every field 
 
 | Field | Value |
 |---|---|
-| Name (30) | Haodego: China Travel Buddy |
+| Name (30) | HaodeGo: China Travel Buddy |
 | Subtitle (30) | Menus, taxis & pay in China |
 | Bundle ID | com.haodego.app |
 | SKU | haodego-ios-1 |
@@ -32,7 +32,7 @@ Point your camera at a Chinese menu and see what each dish is, what's usually in
 
 **Description (4000)**
 ```
-Haodego helps you eat, get around and pay in mainland China, in your language.
+HaodeGo helps you eat, get around and pay in mainland China, in your language.
 
 READ ANY MENU
 Take a photo of a printed or handwritten menu, or type dish names. Each dish shows up in seconds with its name in your language, pinyin and price, and one clear answer: not in the usual recipe, ask first, or don't order, with the reason.
@@ -67,7 +67,7 @@ Ingredients are inferred from common recipes. With a severe allergy, always show
 
 **What's New**: First release.
 
-**Copyright**: 2026 Haodego
+**Copyright**: 2026 HaodeGo
 
 ## App Review information
 

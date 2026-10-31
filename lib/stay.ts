@@ -66,7 +66,7 @@ export function stayReminderIcs(lastDay: string, title: string, description: str
   const next = addDays(lastDay, 1).replaceAll("-", "");
   const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+/, "");
   return [
-    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//China Travel Buddy//EN", "BEGIN:VEVENT",
+    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//HaodeGo//EN", "BEGIN:VEVENT",
     `UID:stay-${d}@chinatravelbuddy`, `DTSTAMP:${stamp}`, `DTSTART;VALUE=DATE:${d}`, `DTEND;VALUE=DATE:${next}`,
     `SUMMARY:${title}`, `DESCRIPTION:${description}`,
     "BEGIN:VALARM", "TRIGGER:-P3D", "ACTION:DISPLAY", `DESCRIPTION:${title}`, "END:VALARM",

@@ -1,6 +1,6 @@
 {
-  "name": "China Travel Buddy",
-  "short_name": "ChinaBuddy",
+  "name": "HaodeGo: China Travel Buddy",
+  "short_name": "HaodeGo",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f7f8fb",
