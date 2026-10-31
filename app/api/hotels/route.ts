@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
+import { rateLimit } from "@/lib/rate-limit";
 import { errorResponse } from "@/lib/errors";
 import { cityPicks, tierBounds } from "@/lib/hotels";
 import { demo } from "@/lib/config";
 
 // GET /api/hotels?city=<adcode>&name=<short Chinese name> → picks per price tier.
 export async function GET(req: Request) {
+  const limited = rateLimit(req, "hotels");
+  if (limited) return limited;
   const q = new URL(req.url).searchParams;
   const adcode = q.get("city") ?? "";
   const name = q.get("name") ?? "";

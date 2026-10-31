@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { rateLimit } from "@/lib/rate-limit";
 import { review } from "@/lib/city-guide";
 import { logRow } from "@/lib/supabase";
 
@@ -9,6 +10,8 @@ const REPORTS = ["outdated", "wrong"];
 // Feedback on one piece of content (components/Feedback.tsx): helpful yes/no, or a report that
 // it's outdated or wrong. Only content ids, nothing about the traveller.
 export async function POST(req: Request) {
+  const limited = rateLimit(req, "feedback");
+  if (limited) return limited;
   const b = await req.json().catch(() => null);
   const s = (v: unknown, n = 80) => (typeof v === "string" && v ? v.slice(0, n) : null);
   const one = (v: unknown, list: string[]) => (typeof v === "string" && list.includes(v) ? v : null);

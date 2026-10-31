@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
 import { buildPartnerUrl, type LinkKind, type LinkParams } from "@/lib/affiliate";
 import { logRow } from "@/lib/supabase";
+import { allowed } from "@/lib/rate-limit";
 
 const clientType = (ua: string) =>
   /ChinaTravelBuddy-iOS/.test(ua) ? "ios-app" : /iPhone|iPad|iPod/.test(ua) ? "ios" : /Android/.test(ua) ? "android" : "desktop";
@@ -32,6 +33,7 @@ export async function GET(req: Request) {
   // Click log for commission reconciliation (Supabase `clicks`, else data/clicks.jsonl or the server
   // log). Link parameters only, and a coarse client type instead of the user agent.
   const params = Object.fromEntries(Object.entries(p).filter(([, v]) => v !== undefined && v !== ""));
-  await logRow("clicks", { click_id: clickId, tag: tag || null, partner, kind, src: q.get("src")?.slice(0, 40) ?? null, params, client: clientType(req.headers.get("user-agent") ?? "") });
+  // Over the limit the traveller still gets to the partner; the click just isn't logged.
+  if (allowed(req, "clicks")) await logRow("clicks", { click_id: clickId, tag: tag || null, partner, kind, src: q.get("src")?.slice(0, 40) ?? null, params, client: clientType(req.headers.get("user-agent") ?? "") });
   return NextResponse.redirect(url, 302);
 }

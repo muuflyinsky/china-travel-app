@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { rateLimit } from "@/lib/rate-limit";
 import { errorResponse } from "@/lib/errors";
 import { searchPlaces, cleanResults } from "@/lib/amap";
 import { demo } from "@/lib/config";
@@ -12,6 +13,8 @@ const CATEGORY_TTL = 30 * 864e5;
 type CategoryPage = { generatedAt: string; places: Place[] };
 
 export async function GET(req: Request) {
+  const limited = rateLimit(req, "places");
+  if (limited) return limited;
   const q = new URL(req.url).searchParams;
   const category = !q.get("around") && q.get("sort") === "rating" && q.get("types") && q.get("city") && Number(q.get("page") ?? 1) === 1;
   const key = category ? `${q.get("city")}:${q.get("types")}:${q.get("q") ?? ""}` : "";

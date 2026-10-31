@@ -432,6 +432,7 @@ export default function MenuPage() {
     try {
       const r = await fetch("/api/dish", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ zh: d.zh, printed: d.printed, lang: profile.lang, city: cityLabel, adcode: city.a }) });
       if (!r.ok) throw new Error(String(r.status));
+      track("dish_detail", {});
       const detail = (await r.json()) as DishDetail;
       detailCache.set(k, detail);
       got(detail);

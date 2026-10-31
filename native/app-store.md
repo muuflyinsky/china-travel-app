@@ -97,7 +97,7 @@ Answer **Yes, we collect data**, then declare these. For each: *not linked to th
 | Location → Precise location | App Functionality | Sent through our server to Amap to find the city, nearby places and routes (not stored by us) |
 | User Content → Photos or Videos | App Functionality | Menu photos and booking screenshots are sent to the AI service to be read, then discarded |
 | User Content → Other User Content | App Functionality | Dish names and text typed for translation go to the AI service |
-| Usage Data → Product Interaction | Analytics | Anonymous events with a per-session random id (lib/track.ts), and helpful / wrong votes on content |
+| Usage Data → Product Interaction | Analytics | Anonymous events with a random id that changes every day (lib/track.ts), and helpful / wrong votes on content |
 | Search History | Analytics | Partner link clicks record the city, hotel keyword and travel dates in the link, to match commissions (app/api/go, `clicks` table) |
 
 Not collected: contact info, health data (allergies never leave the phone), identifiers, purchases, financial info, browsing history, diagnostics.

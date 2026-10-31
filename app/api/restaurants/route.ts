@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
+import { rateLimit } from "@/lib/rate-limit";
 import { errorResponse } from "@/lib/errors";
 import { awardCities, awardLists, awardRestaurants } from "@/lib/restaurants";
 
 // GET /api/restaurants?city=<adcode> → restaurants on the Michelin / Black Pearl / Must-Eat lists,
 // plus every city that has listed restaurants (for the city switcher). `listed=1`: no Amap fill-in.
 export async function GET(req: Request) {
+  const limited = rateLimit(req, "restaurants");
+  if (limited) return limited;
   const q = new URL(req.url).searchParams;
   const city = q.get("city") ?? "";
   if (!/^\d{6}$/.test(city)) return NextResponse.json({ error: "city must be an adcode" }, { status: 400 });

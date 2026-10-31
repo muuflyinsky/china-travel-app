@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
+import { rateLimit } from "@/lib/rate-limit";
 import { flagDish } from "@/lib/dish-cache";
 import { regionOf } from "@/lib/dish-name";
 
 // "This dish info is wrong". Anonymous: the dish name, region and language, nothing about the traveller.
 export async function POST(req: Request) {
+  const limited = rateLimit(req, "flag");
+  if (limited) return limited;
   const b = (await req.json().catch(() => ({}))) as { zh?: string; adcode?: string; lang?: string; reason?: string };
   const zh = b.zh?.trim().slice(0, 40);
   if (!zh) return NextResponse.json({ error: "zh required" }, { status: 400 });

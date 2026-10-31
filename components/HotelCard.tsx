@@ -31,6 +31,7 @@ export function HotelCard({ bare, brief }: {
       const d = await r.json();
       if (!r.ok) throw new Error(r.status === 503 || r.status === 429 ? "unavailable" : "");
       set({ hotel: { name: d.name, address: d.address, nameEn: d.nameEn, location: d.location } });
+      track("hotel_read", {});
     } catch (e) {
       setError((e as Error).message === "unavailable" ? "unavailable" : true);
     } finally {

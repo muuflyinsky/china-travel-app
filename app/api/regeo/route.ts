@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
+import { rateLimit } from "@/lib/rate-limit";
 import { errorResponse } from "@/lib/errors";
 import { reverseGeocode } from "@/lib/amap";
 import { wgs84ToGcj02 } from "@/lib/coords";
 
 // Accepts raw browser GPS (WGS-84) and returns GCJ-02 + city info.
 export async function GET(req: Request) {
+  const limited = rateLimit(req, "regeo");
+  if (limited) return limited;
   const q = new URL(req.url).searchParams;
   const lng = Number(q.get("lng")), lat = Number(q.get("lat"));
   if (!lng || !lat) return NextResponse.json({ error: "lng, lat required" }, { status: 400 });

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { rateLimit } from "@/lib/rate-limit";
 import { errorResponse } from "@/lib/errors";
 import { cityGuide } from "@/lib/city-guide";
 import { HOT_CITIES } from "@/lib/hot-cities";
@@ -11,6 +12,8 @@ import { demo } from "@/lib/config";
 export const maxDuration = 120;
 
 export async function GET(req: Request) {
+  const limited = rateLimit(req, "cityGuide");
+  if (limited) return limited;
   const q = new URL(req.url).searchParams;
   const city = HOT_CITIES.find((c) => c.a === q.get("city"));
   if (!city) return NextResponse.json({ error: "not_hot" }, { status: 404 });
