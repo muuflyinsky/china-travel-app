@@ -343,8 +343,8 @@ export default function MenuPage() {
         method: "POST", signal: ctl.signal, headers: { "content-type": "application/json" },
         body: JSON.stringify({ ...body, lang: profile.lang, city: cityLabel, adcode: city.a }),
       });
-      // 503: no AI configured (production) · 422: unreadable → retake · anything else: the AI service failed.
-      if (!r.ok || !r.body) throw new Error(r.status === 503 ? "unavailable" : r.status === 422 ? "unreadable" : "down");
+      // 503: no AI configured (production) · 429: rate limited · 422: unreadable → retake · anything else: the AI service failed.
+      if (!r.ok || !r.body) throw new Error(r.status === 503 || r.status === 429 ? "unavailable" : r.status === 422 ? "unreadable" : "down");
       let m: Menu = { cuisine: "", total: 0, dishes: [], tips: [], missing: 0, streaming: true };
       setMenu(m);
       setInputOpen(false);

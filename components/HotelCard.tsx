@@ -29,7 +29,7 @@ export function HotelCard({ bare, brief }: {
       const img = await compressImage(f);
       const r = await fetch("/api/hotel", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ image: img.data, mediaType: img.mediaType }) });
       const d = await r.json();
-      if (!r.ok) throw new Error(r.status === 503 ? "unavailable" : "");
+      if (!r.ok) throw new Error(r.status === 503 || r.status === 429 ? "unavailable" : "");
       set({ hotel: { name: d.name, address: d.address, nameEn: d.nameEn, location: d.location } });
     } catch (e) {
       setError((e as Error).message === "unavailable" ? "unavailable" : true);

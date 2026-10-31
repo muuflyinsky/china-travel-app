@@ -353,9 +353,9 @@ export const ja: Dict = {
     translate: "翻訳",
     play: "再生",
     fullScreen: "全画面",
-    down: "翻訳が現在利用できません。下のフレーズ集はオフラインでも使えます。",
+    down: "翻訳が現在利用できません。下のフレーズはそのまま見せて使えます。",
     noVoice: "このブラウザは音声入力に対応していません。入力してください。",
-    phrasebook: "フレーズ集 · オフライン対応",
+    phrasebook: "フレーズ集",
     groups: { basics: "基本", eating: "食事", around: "移動", hotel: "ホテル", emergency: "緊急" },
   },
   settings: {
@@ -538,7 +538,7 @@ export const ja: Dict = {
     },
     tooLong: "旅行日数は{n}日で、許可されている{max}日を超えています。",
     expiry: "この政策は現在{date}までです。旅行はその後なので、出発前に再確認してください。",
-    source: "{source} · {date}に確認",
+    source: "{source} · {date}時点の制度概要",
   },
   hotel: {
     back: "ホテルに戻る",

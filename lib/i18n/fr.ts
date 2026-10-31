@@ -353,9 +353,9 @@ export const fr: Dict = {
     translate: "Traduire",
     play: "Écouter",
     fullScreen: "Plein écran",
-    down: "La traduction est indisponible. Le guide de conversation ci-dessous fonctionne hors ligne.",
+    down: "La traduction est indisponible. Vous pouvez quand même montrer les phrases ci-dessous.",
     noVoice: "La saisie vocale n’est pas prise en charge par ce navigateur — écrivez plutôt.",
-    phrasebook: "Guide de conversation · hors ligne",
+    phrasebook: "Guide de conversation",
     groups: { basics: "Essentiel", eating: "Au restaurant", around: "Se déplacer", hotel: "Hôtel", emergency: "Urgence" },
   },
   settings: {
@@ -538,7 +538,7 @@ export const fr: Dict = {
     },
     tooLong: "Votre voyage dure {n} jours, plus que les {max} jours autorisés.",
     expiry: "Cette politique court actuellement jusqu’au {date}. Votre voyage est après : revérifiez avant de partir.",
-    source: "{source} · vérifié le {date}",
+    source: "{source} · règles en vigueur au {date}",
   },
   hotel: {
     back: "Retour à mon hôtel",

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { errorResponse } from "@/lib/errors";
+import { rateLimit } from "@/lib/rate-limit";
 import { extractHotel } from "@/lib/llm";
 import { demo } from "@/lib/config";
 import { geocode } from "@/lib/amap";
@@ -8,6 +9,8 @@ export const maxDuration = 60;
 
 // Booking screenshot → { name, address } in Chinese for the "back to my hotel" taxi card.
 export async function POST(req: Request) {
+  const limited = rateLimit(req, "hotel");
+  if (limited) return limited;
   const body = (await req.json()) as { image?: string; mediaType?: string };
   if (!body.image) return NextResponse.json({ error: "Send a photo of the booking" }, { status: 400 });
   if (demo.ai) {

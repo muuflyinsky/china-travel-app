@@ -356,9 +356,9 @@ export const en = {
     translate: "Translate",
     play: "Play",
     fullScreen: "Full screen",
-    down: "Translation is unavailable right now. The phrasebook below works offline.",
+    down: "Translation is unavailable right now. You can still show the phrases below.",
     noVoice: "Voice input isn’t supported in this browser. Type instead.",
-    phrasebook: "Phrasebook · works offline",
+    phrasebook: "Phrasebook",
     groups: { basics: "Basics", eating: "Eating", around: "Getting around", hotel: "Hotel", emergency: "Emergency" },
   },
   settings: {
@@ -541,7 +541,7 @@ export const en = {
     },
     tooLong: "Your trip is {n} days, longer than the {max} days allowed.",
     expiry: "This policy currently runs until {date}. Your trip is after that — check again before you go.",
-    source: "{source} · verified {date}",
+    source: "{source} · policy summary as of {date}",
   },
   hotel: {
     back: "Back to my hotel",

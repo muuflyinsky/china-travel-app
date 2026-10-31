@@ -353,9 +353,9 @@ export const de: Dict = {
     translate: "Übersetzen",
     play: "Anhören",
     fullScreen: "Vollbild",
-    down: "Die Übersetzung ist gerade nicht verfügbar. Der Sprachführer unten funktioniert offline.",
+    down: "Die Übersetzung ist gerade nicht verfügbar. Die Sätze unten kannst du trotzdem zeigen.",
     noVoice: "Spracheingabe wird von diesem Browser nicht unterstützt. Tippe stattdessen.",
-    phrasebook: "Sprachführer · offline",
+    phrasebook: "Sprachführer",
     groups: { basics: "Grundlagen", eating: "Essen", around: "Unterwegs", hotel: "Hotel", emergency: "Notfall" },
   },
   settings: {
@@ -538,7 +538,7 @@ export const de: Dict = {
     },
     tooLong: "Deine Reise dauert {n} Tage – länger als die erlaubten {max} Tage.",
     expiry: "Diese Regelung gilt derzeit bis {date}. Deine Reise liegt danach – prüfe es vor der Abreise erneut.",
-    source: "{source} · geprüft am {date}",
+    source: "{source} · Stand der Regelung: {date}",
   },
   hotel: {
     back: "Zurück zu meinem Hotel",

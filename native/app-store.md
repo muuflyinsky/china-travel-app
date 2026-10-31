@@ -28,16 +28,16 @@ Copy these into App Store Connect → your app. Limits are Apple's; every field 
 ## Version 1.0
 
 **Promotional text (170)**
-Point your camera at a Chinese menu and see what each dish is, whether it's safe for your allergies, and how to order it.
+Point your camera at a Chinese menu and see what each dish is, what's usually in it for your allergies, and how to order it.
 
 **Description (4000)**
 ```
 Haodego helps you eat, get around and pay in mainland China, in your language.
 
 READ ANY MENU
-Take a photo of a printed or handwritten menu, or type dish names. Each dish shows up in seconds with its name in your language, pinyin and price, and one clear answer: OK for you, ask first, or don't order, with the reason.
+Take a photo of a printed or handwritten menu, or type dish names. Each dish shows up in seconds with its name in your language, pinyin and price, and one clear answer: not in the usual recipe, ask first, or don't order, with the reason.
 • Checks every dish against your allergies and diet (peanuts, shellfish, gluten, vegetarian, halal and more)
-• Severe allergy as a main ingredient? The dish can't be added to your order
+• Mark an allergy as severe and any dish whose usual recipe has it, even in the sauce, is "don't order" and can't be added
 • Tap a dish for its usual ingredients, literal meaning and what to watch out for
 • Show the waiter a large Chinese order card: dishes, quantities and "please leave out…", with one-tap replies they can answer
 
@@ -77,7 +77,7 @@ Ingredients are inferred from common recipes. With a severe allergy, always show
 ```
 No account is needed.
 
-To try the main feature without being in China: Eat tab → "Type names" → enter 宫保鸡丁 and 麻婆豆腐 → "Look up dishes". Dishes appear one by one with a verdict. Settings → Allergies → Peanuts (severe) changes the verdict for Kung Pao Chicken to "Don't order", with no add button.
+To try the main feature without being in China: Eat tab → "Type names" → enter 宫保鸡丁 and 麻婆豆腐 → "Look up dishes". Dishes appear one by one with a verdict. Settings → Allergies → Peanuts (severe is the default) changes the verdict for Kung Pao Chicken to "Don't order", with no add button. A severe allergy never gets a green answer; the best a dish can show is "Not in usual recipe — confirm with your card".
 
 Explore works for any Chinese city (pick one with "Other city"); routes need location or a saved hotel, so outside China use search and the taxi card.
 
@@ -107,8 +107,8 @@ Required: 6.9" iPhone (1320 × 2868 portrait). Ready in [screenshots/](screensho
 Pro Max simulator against https://haodego.com with live AI and map data (allergies set to peanuts and sesame,
 location People's Square, Shanghai). Upload in this order:
 
-1. `01-menu-results.png`: 8 dishes, each with one verdict (OK / ask first / don't order)
-2. `02-dish-detail.png`: Mapo tofu: literal meaning, why to ask, usual ingredients, "Add, without sesame oil"
+1. `01-menu-results.png`: 8 dishes, each with one verdict (not in usual recipe / ask first / don't order)
+2. `02-dish-detail.png`: a dish's literal meaning, why to ask, usual ingredients, and "Add, without …" for a non-severe allergen
 3. `03-order-card.png`: the large Chinese order card for the waiter, with one-tap replies
 4. `04-explore.png`: Shanghai top picks with an Amap photo
 5. `05-route.png`: bus routes with fares, station pinyin and Chinese, plus the taxi estimate

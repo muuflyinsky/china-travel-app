@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import { errorResponse } from "@/lib/errors";
+import { rateLimit } from "@/lib/rate-limit";
 import { translate } from "@/lib/llm";
 import { demo } from "@/lib/config";
 import { py } from "@/lib/amap";
 
 export async function POST(req: Request) {
+  const limited = rateLimit(req, "translate");
+  if (limited) return limited;
   const { text, from, to } = (await req.json()) as { text: string; from: string; to: string };
   if (!text?.trim()) return NextResponse.json({ error: "Empty text" }, { status: 400 });
   if (demo.ai) {

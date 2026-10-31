@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { errorResponse } from "@/lib/errors";
+import { rateLimit } from "@/lib/rate-limit";
 import { readMenu, type MenuEvent } from "@/lib/dishes";
 import { demo } from "@/lib/config";
 import { demoMenu } from "@/lib/demo-dishes";
@@ -12,6 +13,8 @@ export const maxDuration = 120;
  * unreadable); later ones arrive as an {"type":"error"} line.
  */
 export async function POST(req: Request) {
+  const limited = rateLimit(req, "menu");
+  if (limited) return limited;
   const body = (await req.json()) as { image?: string; mediaType?: string; text?: string; lang?: string; city?: string; adcode?: string };
   if (!body.image && !body.text?.trim()) return NextResponse.json({ error: "Send a photo or dish names" }, { status: 400 });
   const events = demo.ai ? demoMenu() : readMenu({

@@ -353,9 +353,9 @@ export const es: Dict = {
     translate: "Traducir",
     play: "Escuchar",
     fullScreen: "Pantalla completa",
-    down: "La traducción no está disponible ahora. El libro de frases funciona sin conexión.",
+    down: "La traducción no está disponible ahora. Aún puedes mostrar las frases de abajo.",
     noVoice: "Este navegador no admite voz; escribe el texto.",
-    phrasebook: "Frases útiles · sin conexión",
+    phrasebook: "Frases útiles",
     groups: { basics: "Básico", eating: "Comer", around: "Moverse", hotel: "Hotel", emergency: "Emergencia" },
   },
   settings: {
@@ -538,7 +538,7 @@ export const es: Dict = {
     },
     tooLong: "Tu viaje dura {n} días, más de los {max} permitidos.",
     expiry: "Esta política está vigente hasta el {date}. Tu viaje es posterior: compruébalo de nuevo antes de salir.",
-    source: "{source} · verificado el {date}",
+    source: "{source} · resumen de la normativa a {date}",
   },
   hotel: {
     back: "Volver a mi hotel",

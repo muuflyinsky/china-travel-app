@@ -353,9 +353,9 @@ export const ko: Dict = {
     translate: "번역",
     play: "듣기",
     fullScreen: "전체 화면",
-    down: "지금은 번역을 사용할 수 없습니다. 아래 회화집은 오프라인에서도 쓸 수 있어요.",
+    down: "지금은 번역을 사용할 수 없습니다. 아래 문장은 그대로 보여 줄 수 있어요.",
     noVoice: "이 브라우저는 음성 입력을 지원하지 않습니다. 직접 입력해 주세요.",
-    phrasebook: "회화집 · 오프라인 사용 가능",
+    phrasebook: "회화집",
     groups: { basics: "기본", eating: "식사", around: "이동", hotel: "호텔", emergency: "긴급" },
   },
   settings: {
@@ -538,7 +538,7 @@ export const ko: Dict = {
     },
     tooLong: "여행 기간이 {n}일로, 허용된 {max}일보다 깁니다.",
     expiry: "이 정책은 현재 {date}까지입니다. 여행이 그 이후이니 출발 전에 다시 확인하세요.",
-    source: "{source} · {date} 확인",
+    source: "{source} · {date} 기준 정책 요약",
   },
   hotel: {
     back: "내 호텔로 가기",
