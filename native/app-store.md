@@ -12,8 +12,8 @@ Copy these into App Store Connect → your app. Limits are Apple's; every field 
 | SKU | haodego-ios-1 |
 | Primary language | English (U.S.) |
 | Category | Travel · secondary: Food & Drink |
-| Content rights | Does not contain third-party content that needs rights (map data and photos come from Amap's API with attribution) |
-| Age rating | Answer "None" to every question → 4+ |
+| Content rights | **Yes, contains third-party content, and we have the rights**: map data, place photos and ratings come from Amap's API under its terms, with attribution; restaurant awards (MICHELIN, Black Pearl, must-eat lists) are factual listings with the source named |
+| Age rating | Answer each question as the app is: no violence, mature themes, gambling, user-generated content, chat or ads. If asked about medical or health information, the allergy verdicts are health-related information, so don't answer "none" there. Expected 4+ |
 | Price | Free |
 | Availability | All countries **except China mainland** (needs MIIT app filing / APP 备案 and generative-AI compliance first) |
 
@@ -63,7 +63,9 @@ Ingredients are inferred from common recipes. With a severe allergy, always show
 ```
 
 **Keywords (100)**
-`china,travel,menu,translate,allergy,alipay,wechat pay,didi,metro,beijing,shanghai,visa free,chinese`
+`china,travel,menu,translate,allergy,food,metro,taxi,beijing,shanghai,visa free,chinese,phrasebook`
+
+No other companies' names (Alipay, WeChat, DiDi, Amap, Trip.com): Guideline 2.3.7 doesn't allow trademarks in keywords. They can stay in the description, where they describe what the app does.
 
 **What's New**: First release.
 
@@ -95,7 +97,8 @@ Answer **Yes, we collect data**, then declare these. For each: *not linked to th
 | Location → Precise location | App Functionality | Sent through our server to Amap to find the city, nearby places and routes (not stored by us) |
 | User Content → Photos or Videos | App Functionality | Menu photos and booking screenshots are sent to the AI service to be read, then discarded |
 | User Content → Other User Content | App Functionality | Dish names and text typed for translation go to the AI service |
-| Usage Data → Product Interaction | Analytics | Anonymous events with a per-session random id (lib/track.ts) |
+| Usage Data → Product Interaction | Analytics | Anonymous events with a per-session random id (lib/track.ts), and helpful / wrong votes on content |
+| Search History | Analytics | Partner link clicks record the city, hotel keyword and travel dates in the link, to match commissions (app/api/go, `clicks` table) |
 
 Not collected: contact info, health data (allergies never leave the phone), identifiers, purchases, financial info, browsing history, diagnostics.
 
