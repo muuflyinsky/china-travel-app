@@ -105,10 +105,11 @@ Declaring location and photos is the conservative choice: Apple exempts data tha
 
 Required: 6.9" iPhone (1320 × 2868 portrait). Ready in [screenshots/](screenshots/), taken from the iPhone 18
 Pro Max simulator against https://haodego.com with live AI and map data (allergies set to peanuts and sesame,
-location People's Square, Shanghai). Upload in this order:
+both severe, which is the default; location People's Square, Shanghai). 01–03 retaken 2026-10-31 after the
+verdict wording changed. Upload in this order:
 
-1. `01-menu-results.png`: 8 dishes, each with one verdict (not in usual recipe / ask first / don't order)
-2. `02-dish-detail.png`: a dish's literal meaning, why to ask, usual ingredients, and "Add, without …" for a non-severe allergen
+1. `01-menu-results.png`: 8 dishes; with severe allergies each is "Not in usual recipe — confirm with your card" or a red "Don't order"
+2. `02-dish-detail.png`: Tomato and scrambled egg: literal meaning, verdict, what's usually in it, Add
 3. `03-order-card.png`: the large Chinese order card for the waiter, with one-tap replies
 4. `04-explore.png`: Shanghai top picks with an Amap photo
 5. `05-route.png`: bus routes with fares, station pinyin and Chinese, plus the taxi estimate
