@@ -159,8 +159,8 @@ export default function TalkPage() {
           {res && (
             <div className="space-y-2 border-t border-line p-4" aria-live="polite">
               <DemoNote show={res.demo} what={t.common.aiKey} />
-              <p className={`text-title ${toZh ? "zh" : ""}`} lang={toZh ? "zh-CN" : me}>{res.translation}</p>
-              {res.pinyin && <p className="text-subhead text-muted">{res.pinyin}</p>}
+              <p className={`select-text text-title ${toZh ? "zh" : ""}`} lang={toZh ? "zh-CN" : me}>{res.translation}</p>
+              {res.pinyin && <p className="select-text text-subhead text-muted">{res.pinyin}</p>}
               {res.note && <p className="text-footnote text-muted">{res.note}</p>}
               <div className="flex flex-wrap gap-2 pt-1">
                 <button onClick={() => play(res.translation)} aria-pressed={speaking} className="flex min-h-touch items-center gap-1.5 rounded-control bg-cobalt-soft px-3.5 text-subhead font-semibold text-cobalt">

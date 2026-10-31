@@ -28,7 +28,12 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="h-full">
+    // in-app is added before first paint inside the iOS app (user agent from capacitor.config.ts),
+    // so globals.css can drop web-page behaviour there; the class isn't in the server HTML.
+    <html lang="en" className="h-full" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: 'if(/ChinaTravelBuddy-iOS/.test(navigator.userAgent))document.documentElement.classList.add("in-app")' }} />
+      </head>
       <body className="h-full">
         <AppShell>{children}</AppShell>
       </body>

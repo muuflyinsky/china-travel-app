@@ -124,6 +124,12 @@ html, body { background: var(--porcelain); color: var(--ink); }
 body { -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; }
 ::selection { background: color-mix(in srgb, var(--cobalt) 25%, transparent); }
 :focus-visible { outline: 2px solid var(--cobalt); outline-offset: 2px; border-radius: 6px; }
+/* Inside the iOS app (html.in-app, set in layout.tsx) nothing should feel like a web page: no text
+   selection or copy/look-up menu on long press, and the whole page doesn't bounce past its edges.
+   Inner lists still bounce, like native scroll views. Fields and .select-text stay selectable. */
+html.in-app body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+html.in-app :is(input, textarea, [contenteditable="true"], .select-text) { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
+html.in-app, html.in-app body { overscroll-behavior: none; }
 .zh { font-family: "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif; }
 /* Japanese and Korean UI text needs its own system fonts, or Han characters render as Chinese forms. */
 :lang(ja) { font-family: -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; }

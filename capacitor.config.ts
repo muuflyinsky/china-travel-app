@@ -27,6 +27,8 @@ const config: CapacitorConfig = {
   ios: {
     // The web app handles safe areas itself (viewport-fit=cover + env(safe-area-inset-*)).
     contentInset: "never",
+    // Long-pressing a link shows Safari's page preview, a giveaway of a web page (App Review 4.2).
+    allowsLinkPreview: false,
     scheme: "China Travel Buddy",
   },
 };
