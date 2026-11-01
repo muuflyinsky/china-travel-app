@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { errorResponse } from "@/lib/errors";
 import { rateLimit } from "@/lib/rate-limit";
+import { useQuota } from "@/lib/quota";
 import { readMenu, type MenuEvent } from "@/lib/dishes";
 import { demo } from "@/lib/config";
 import { demoMenu } from "@/lib/demo-dishes";
@@ -17,12 +18,14 @@ export async function POST(req: Request) {
   if (limited) return limited;
   const body = (await req.json()) as { image?: string; mediaType?: string; text?: string; lang?: string; city?: string; adcode?: string };
   if (!body.image && !body.text?.trim()) return NextResponse.json({ error: "Send a photo or dish names" }, { status: 400 });
+  const use = demo.ai ? null : await useQuota(req, body.image ? "menu_photo" : "menu_text");
+  if (use instanceof NextResponse) return use;
   const events = demo.ai ? demoMenu() : readMenu({
     image: body.image ? { data: body.image, mediaType: body.mediaType ?? "image/jpeg" } : undefined,
     text: body.text?.slice(0, 2000), lang: body.lang ?? "en", city: body.city?.slice(0, 80), adcode: body.adcode?.slice(0, 6),
   });
   let first: IteratorResult<MenuEvent>;
-  try { first = await events.next(); } catch (e) { return errorResponse(e, "menu"); }
+  try { first = await events.next(); } catch (e) { await use?.refund(); return errorResponse(e, "menu"); }
 
   const enc = new TextEncoder();
   const line = (o: object) => enc.encode(JSON.stringify(o) + "\n");

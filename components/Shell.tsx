@@ -6,6 +6,7 @@ import { House, UtensilsCrossed, Compass, BedDouble, Languages, ChevronLeft, Set
 import { useEffect, useState } from "react";
 import { useT } from "./useT";
 import { useProfile } from "./useProfile";
+import { Paywall } from "./Paywall";
 import { fmt, UI_DICTS } from "@/lib/i18n";
 
 // Five top-level sections (iOS HIG: 2–5 tabs, always visible). Settings and Emergency are pushed
@@ -34,6 +35,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <App theme="ios" dark={dark} safeAreas className="app-column">
       {children}
+      <Paywall />
     </App>
   );
 }

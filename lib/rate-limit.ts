@@ -27,6 +27,7 @@ const LIMITS = {
   feedback: { max: 30, windowMs: W },
   flag: { max: 20, windowMs: W },
   clicks: { max: 60, windowMs: W },
+  pass: { max: 30, windowMs: W },
 } as const;
 
 type Route = keyof typeof LIMITS;

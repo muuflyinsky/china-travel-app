@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { errorResponse } from "@/lib/errors";
 import { rateLimit } from "@/lib/rate-limit";
+import { useQuota } from "@/lib/quota";
 import { translate } from "@/lib/llm";
 import { demo } from "@/lib/config";
 import { py } from "@/lib/amap";
@@ -14,9 +15,12 @@ export async function POST(req: Request) {
     const zh = "请带我去这个地址，谢谢。";
     return NextResponse.json({ demo: true, translation: to === "zh" ? zh : "Please take me to this address, thank you.", pinyin: to === "zh" ? py(zh) : "", note: "" });
   }
+  const use = await useQuota(req, "translate");
+  if (use instanceof NextResponse) return use;
   try {
     return NextResponse.json(await translate(text.slice(0, 2000), from, to));
   } catch (e) {
+    await use.refund();
     return errorResponse(e, "translate");
   }
 }

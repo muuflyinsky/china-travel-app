@@ -19,10 +19,13 @@ import { currencyFor, entryTypeFor, visaRule } from "@/lib/visa";
 import pkg from "@/package.json";
 import Link from "next/link";
 import { privacyText, supportText } from "@/lib/legal";
+import { TipJar } from "@/components/TipJar";
+import { hasPasses, products, savedPass, showPaywall } from "@/lib/passes";
+import { PASSES } from "@/lib/products";
 
 const CURRENCIES = ["USD", "EUR", "GBP", "JPY", "KRW", "AUD", "CAD", "SGD", "HKD", "CHF", "THB", "MYR", "NZD", "SEK", "INR", "BRL", "MXN", "RUB", "TRY", "IDR", "VND", "PHP"];
 const toggle = (list: string[], id: string) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
-type Sheet = "passport" | "language" | "currency" | "dates" | "entry" | "cities" | "allergies" | "diet" | "earn" | "privacy" | "ride";
+type Sheet = "passport" | "language" | "currency" | "dates" | "entry" | "cities" | "allergies" | "diet" | "earn" | "privacy" | "ride" | "tips";
 const SHEETS: Sheet[] = ["passport", "language", "currency", "dates", "entry", "cities", "allergies", "diet", "earn", "privacy"];
 
 /** A row's current value, right-aligned and truncated. */
@@ -48,6 +51,15 @@ export default function SettingsPage() {
   const [p, set, loaded] = useProfile();
   const country = useCountryName(p.lang);
   const [sheet, setSheet] = useState<Sheet | null>(null);
+  // Passes and tips show only in an app version with the StoreKit plugin, and only once the App
+  // Store returns the products (never a purchase row that can't work).
+  const [store, setStore] = useState<{ ends: number | null } | null>(null);
+  useEffect(() => {
+    if (!hasPasses()) return;
+    let live = true;
+    products(PASSES.map((x) => x.id)).then((items) => { if (live && items.length) setStore({ ends: savedPass()?.ends ?? null }); }, () => {});
+    return () => { live = false; };
+  }, [sheet]);
   const [moreAllergens, setMoreAllergens] = useState(false);
   // Deep links such as /settings#dates open the matching editor.
   useEffect(() => {
@@ -105,6 +117,8 @@ export default function SettingsPage() {
 
       <Section title={t.settings.about}>
         <Group>
+          {store && <Row onClick={() => showPaywall()} title={t.pass.settingsRow} after={<Value>{store.ends ? fmt(t.pass.active, { date: new Date(store.ends).toLocaleDateString(p.lang, { day: "numeric", month: "short" }) }) : t.pass.settingsNone}</Value>} />}
+          {store && <Row onClick={() => setSheet("tips")} title={t.pass.tipsRow} />}
           <Row onClick={() => setSheet("earn")} title={t.settings.howWeEarn} />
           <Row onClick={() => setSheet("privacy")} title={t.settings.privacyTitle} />
           <Row href="/support" title={supportText(p.lang).title} />
@@ -244,6 +258,10 @@ export default function SettingsPage() {
           ))}
         </Group>
         <p className="px-1 text-footnote text-muted">{t.settings.rideAppNote}</p>
+      </EditSheet>
+
+      <EditSheet open={sheet === "tips"} title={t.pass.tipsRow} onClose={close}>
+        <TipJar />
       </EditSheet>
 
       <EditSheet open={sheet === "earn"} title={t.settings.howWeEarn} onClose={close}>

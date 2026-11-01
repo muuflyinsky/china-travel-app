@@ -8,6 +8,8 @@ import { useProfile } from "./useProfile";
 import { useT } from "./useT";
 import { compressImage } from "@/lib/image";
 import { track } from "@/lib/track";
+import { apiHeaders } from "@/lib/device";
+import { quotaHit } from "@/lib/passes";
 
 /** "Back to my hotel": one photo of the booking, then a one-tap taxi card forever after. */
 export function HotelCard({ bare, brief }: {
@@ -27,7 +29,8 @@ export function HotelCard({ bare, brief }: {
     setBusy(true); setError(false);
     try {
       const img = await compressImage(f);
-      const r = await fetch("/api/hotel", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ image: img.data, mediaType: img.mediaType }) });
+      const r = await fetch("/api/hotel", { method: "POST", headers: { "content-type": "application/json", ...apiHeaders() }, body: JSON.stringify({ image: img.data, mediaType: img.mediaType }) });
+      if (await quotaHit(r)) return;
       const d = await r.json();
       if (!r.ok) throw new Error(r.status === 503 || r.status === 429 ? "unavailable" : "");
       set({ hotel: { name: d.name, address: d.address, nameEn: d.nameEn, location: d.location } });

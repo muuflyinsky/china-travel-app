@@ -9,6 +9,8 @@ import { Section, Card, Group, Row, Note, IconTile, IconButton } from "@/compone
 import { HotelCard } from "@/components/HotelCard";
 import { allergyLinesZh } from "@/lib/allergens";
 import { track } from "@/lib/track";
+import { apiHeaders } from "@/lib/device";
+import { quotaHit } from "@/lib/passes";
 import { useProfile } from "@/components/useProfile";
 import { useT } from "@/components/useT";
 import { ShowCard } from "@/components/ShowCard";
@@ -63,7 +65,8 @@ export default function TalkPage() {
     setLoading(true); setRes(null); setError(undefined);
     let d: Result;
     try {
-      const r = await fetch("/api/translate", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text: input, from, to }) });
+      const r = await fetch("/api/translate", { method: "POST", headers: { "content-type": "application/json", ...apiHeaders() }, body: JSON.stringify({ text: input, from, to }) });
+      if (await quotaHit(r)) return;
       d = await r.json();
       if (!r.ok) throw new Error();
     } catch {

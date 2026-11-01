@@ -1,6 +1,6 @@
 # Monetization: free daily limits + trip passes
 
-Decided 2026-11-01. Not built yet: first measure, then set limits, then sell passes.
+Decided 2026-11-01. Built (off until `QUOTA=on`); see "How it works" below.
 
 ## Principles
 
@@ -9,6 +9,18 @@ Decided 2026-11-01. Not built yet: first measure, then set limits, then sell pas
 - **Don't hurt affiliate revenue**: maps, routes, taxi card and booking links stay free and unlimited.
 - **Trip passes, not monthly subscriptions**: visitors use the app for one trip. Apple's non-renewing subscription type.
 - iOS only, through Apple in-app purchase (15% with the Small Business Program). The website keeps the free tier.
+
+## Free limits (per phone)
+
+| Feature | Free | Resets |
+|---|---|---|
+| Menu photo | 2 | daily, midnight Beijing time |
+| Typed dish names | 3 | daily |
+| Translation | 10 | daily |
+| Booking screenshot | 2 | never |
+| Allergy check and card, emergency, maps, routes, taxi card, booking links | unlimited | |
+
+Defined in `lib/products.ts` (`FREE`).
 
 ## Passes (starting prices, to be tested)
 
@@ -62,3 +74,27 @@ where e = 'menu_scan' and ts > now() - interval '28 days' group by 1;
 ```
 
 Events before 2026-11-01 have a per-tab id, not a daily one; leave them out.
+
+## How it works
+
+- `lib/products.ts`: product ids and free limits, shared by server and page.
+- `lib/quota.ts`: counts a use in Supabase (`usage_counts`, `use_quota()`, migration 0008) and answers 402
+  when the free uses are gone; gives the use back if the AI call fails; allows the use if Supabase is down.
+  Off unless the env var `QUOTA=on`. App 1.0 (no StoreKit plugin) sends `x-ctg-client: app-old` and isn't limited.
+- `lib/device.ts`: random device id in localStorage, sent as `x-ctg-device` with `x-ctg-client` and the pass token.
+- `ios/App/App/PassesPlugin.swift`: StoreKit 2 (products, buy, entitlements, restore), registered in
+  `MainViewController.swift`. `Products.storekit` + the shared App scheme let Xcode test purchases locally.
+- `/api/pass` + `lib/passes-server.ts`: verifies Apple's signed transaction (x5c chain to Apple Root CA G3,
+  bundle id, not revoked; Xcode test transactions only outside production) and returns an HMAC token
+  bound to the device until the pass ends.
+- `components/Paywall.tsx`: opens on a 402 (or from Settings → Trip pass); always offers the allergy card.
+  `components/TipJar.tsx`: Settings → Leave a tip.
+- The daily cron deletes daily counts older than 30 days.
+
+## Turning it on
+
+1. Apply migration 0008 to Supabase.
+2. App Store Connect: Paid Apps agreement, banking and tax; Small Business Program; create the 4 non-renewing
+   subscriptions and 3 consumable tips with the ids above (prices as in the table; tips $1.99 / $4.99 / $9.99).
+3. Submit an app version built from this code, with the in-app purchases attached to it.
+4. When it's live: set `QUOTA=on` in Vercel (Production) and redeploy.

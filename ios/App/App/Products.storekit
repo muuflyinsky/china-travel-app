@@ -1,0 +1,123 @@
+{
+  "identifier": "9F3A1C2B",
+  "nonRenewingSubscriptions": [
+    {
+      "displayPrice": "3.99",
+      "familyShareable": false,
+      "internalID": "2775237176",
+      "localizations": [
+        {
+          "description": "Unlimited menu photos, dish lookups and translation.",
+          "displayName": "1-Day Trip Pass",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.haodego.app.pass.1d",
+      "referenceName": "1-Day Trip Pass",
+      "type": "NonRenewingSubscription"
+    },
+    {
+      "displayPrice": "4.99",
+      "familyShareable": false,
+      "internalID": "0193204779",
+      "localizations": [
+        {
+          "description": "Unlimited menu photos, dish lookups and translation.",
+          "displayName": "3-Day Trip Pass",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.haodego.app.pass.3d",
+      "referenceName": "3-Day Trip Pass",
+      "type": "NonRenewingSubscription"
+    },
+    {
+      "displayPrice": "7.99",
+      "familyShareable": false,
+      "internalID": "8015003078",
+      "localizations": [
+        {
+          "description": "Unlimited menu photos, dish lookups and translation.",
+          "displayName": "7-Day Trip Pass",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.haodego.app.pass.7d",
+      "referenceName": "7-Day Trip Pass",
+      "type": "NonRenewingSubscription"
+    },
+    {
+      "displayPrice": "9.99",
+      "familyShareable": false,
+      "internalID": "8251176910",
+      "localizations": [
+        {
+          "description": "Unlimited menu photos, dish lookups and translation.",
+          "displayName": "14-Day Trip Pass",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.haodego.app.pass.14d",
+      "referenceName": "14-Day Trip Pass",
+      "type": "NonRenewingSubscription"
+    }
+  ],
+  "products": [
+    {
+      "displayPrice": "1.99",
+      "familyShareable": false,
+      "internalID": "1748682444",
+      "localizations": [
+        {
+          "description": "A tip for HaodeGo. Unlocks nothing.",
+          "displayName": "Coffee tip",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.haodego.app.tip.small",
+      "referenceName": "Coffee tip",
+      "type": "Consumable"
+    },
+    {
+      "displayPrice": "4.99",
+      "familyShareable": false,
+      "internalID": "0086513177",
+      "localizations": [
+        {
+          "description": "A tip for HaodeGo. Unlocks nothing.",
+          "displayName": "Lunch tip",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.haodego.app.tip.medium",
+      "referenceName": "Lunch tip",
+      "type": "Consumable"
+    },
+    {
+      "displayPrice": "9.99",
+      "familyShareable": false,
+      "internalID": "0333085535",
+      "localizations": [
+        {
+          "description": "A tip for HaodeGo. Unlocks nothing.",
+          "displayName": "Dinner tip",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.haodego.app.tip.large",
+      "referenceName": "Dinner tip",
+      "type": "Consumable"
+    }
+  ],
+  "settings": {
+    "_applicationInternalID": "",
+    "_developerTeamID": "",
+    "_locale": "en_US",
+    "_storefront": "USA"
+  },
+  "subscriptionGroups": [],
+  "version": {
+    "major": 3,
+    "minor": 0
+  }
+}

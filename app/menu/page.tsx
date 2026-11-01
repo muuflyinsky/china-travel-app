@@ -13,6 +13,8 @@ import { ShowCard, type StaffReply } from "@/components/ShowCard";
 import { LANGUAGES } from "@/lib/languages";
 import { ALLERGENS, DIETS, allergyLinesZh, type AllergenId, type DietId } from "@/lib/allergens";
 import { track } from "@/lib/track";
+import { apiHeaders } from "@/lib/device";
+import { quotaHit } from "@/lib/passes";
 import { compressImage } from "@/lib/image";
 import { fmt } from "@/lib/i18n";
 import type { ListDish, DishDetail, MenuEvent } from "@/lib/dishes";
@@ -340,10 +342,12 @@ export default function MenuPage() {
     setLoading(true); setError(undefined); setMenu(null); setOrder({}); setDetails({}); setFilter("all"); setTipsOpen(false);
     try {
       const r = await fetch("/api/menu", {
-        method: "POST", signal: ctl.signal, headers: { "content-type": "application/json" },
+        method: "POST", signal: ctl.signal, headers: { "content-type": "application/json", ...apiHeaders() },
         body: JSON.stringify({ ...body, lang: profile.lang, city: cityLabel, adcode: city.a }),
       });
-      // 503: no AI configured (production) · 429: rate limited · 422: unreadable → retake · anything else: the AI service failed.
+      // 402: today's free uses are gone (the pass sheet opens) · 503: no AI configured (production) ·
+      // 429: rate limited · 422: unreadable → retake · anything else: the AI service failed.
+      if (await quotaHit(r)) { setMenu(null); return; }
       if (!r.ok || !r.body) throw new Error(r.status === 503 || r.status === 429 ? "unavailable" : r.status === 422 ? "unreadable" : "down");
       let m: Menu = { cuisine: "", total: 0, dishes: [], tips: [], missing: 0, streaming: true };
       setMenu(m);

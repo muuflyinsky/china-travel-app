@@ -98,6 +98,8 @@ Answer **Yes, we collect data**, then declare these. For each: *not linked to th
 | User Content → Photos or Videos | App Functionality | Menu photos and booking screenshots are sent to the AI service to be read, then discarded |
 | User Content → Other User Content | App Functionality | Dish names and text typed for translation go to the AI service |
 | Usage Data → Product Interaction | Analytics | Anonymous events with a random id that changes every day (lib/track.ts), and helpful / wrong votes on content |
+| Identifiers → Device ID | App Functionality | A random id the app makes for itself, to count free uses per day (`usage_counts`, daily rows deleted after 30 days) |
+| Purchases → Purchase History | App Functionality | The server checks Apple's signed transaction for a trip pass (which pass, when) to unlock unlimited use; not stored |
 | Search History | Analytics | Partner link clicks record the city, hotel keyword and travel dates in the link, to match commissions (app/api/go, `clicks` table) |
 
 Not collected: contact info, health data (allergies never leave the phone), identifiers, purchases, financial info, browsing history, diagnostics.
