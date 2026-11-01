@@ -6,8 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "typecheck": "tsc --noEmit",
-    "check:allergens": "node scripts/check-allergens.mjs"
+    "typecheck": "next typegen && tsc --noEmit",
+    "check:allergens": "node scripts/check-allergens.mjs",
+    "verify": "npm run typecheck && npm run check:allergens"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "1.1.0",
