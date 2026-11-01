@@ -157,7 +157,7 @@ v0.4 把 Pay、Mobile data、Before you go 三个独立页面并入 Today。旧�
 - **存放与刷新**：
   - 预生成文件 `public/city-guide/<adcode>.json`（静态，走 CDN）；没有文件时前端调 `/api/city-guide`，服务器当场生成并缓存 30 天。
   - 只有热门城市会生成，防止被刷接口；强制刷新需要 `CITY_GUIDE_TOKEN`。
-  - **每月自动刷新**：`.github/workflows/city-guides.yml` 每月 1 日运行，构建 App、启动、运行 `scripts/build-city-guides.mjs` 生成全部城市，把变化提交到 `main`，Vercel 自动重新部署。需要在 GitHub 仓库 Settings → Secrets 里添加 `AMAP_KEY`（必需）和 `AI_API_KEY`（可选；没有时只生成高德部分，标记为 partial）。
+  - **自动刷新**：Vercel Cron（`vercel.json`）每天调用 `/api/cron/city-guides`，每次重新生成最久没更新的城市（实际约 1 个），结果写入 Supabase。高德和模型的 key 用 Vercel 环境变量。手动生成全部城市可本地运行 `scripts/build-city-guides.mjs`。（原先的 GitHub Actions 月度任务从未配置密钥，已于 2026-11-01 删除。）
 - **人工环节（被动）**：低置信度条目和用户 👎 写入 `data/review.jsonl`（Vercel 上写到日志），只需要偶尔看一下。
 - **成本估算**：每个城市 1 次文字生成 + 1 次菜品分析 + 约 8 次高德请求；46 个城市每月一次。
 
