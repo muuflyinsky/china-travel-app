@@ -13,7 +13,7 @@ Copy these into App Store Connect → your app. Limits are Apple's; every field 
 | Primary language | English (U.S.) |
 | Category | Travel · secondary: Food & Drink |
 | Content rights | **Yes, contains third-party content, and we have the rights**: map data, place photos and ratings come from Amap's API under its terms, with attribution; restaurant awards (MICHELIN, Black Pearl, must-eat lists) are factual listings with the source named |
-| Age rating | Answer each question as the app is: no violence, mature themes, gambling, user-generated content, chat or ads. If asked about medical or health information, the allergy verdicts are health-related information, so don't answer "none" there. Expected 4+ |
+| Age rating | Answer each question as the app is: no violence, mature themes, gambling, user-generated content, chat or ads. If asked about medical or health information, the allergy verdicts are health-related information, so don't answer "none" there. Entered 2026-11-01: alcohol references infrequent (menus), medical/treatment info infrequent, health topics yes, everything else none/no → 13+ (12+ in some regions) |
 | Price | Free |
 | Availability | All countries **except China mainland** (needs MIIT app filing / APP 备案 and generative-AI compliance first) |
 
@@ -102,13 +102,13 @@ Answer **Yes, we collect data**, then declare these. For each: *not linked to th
 | Purchases → Purchase History | App Functionality | The server checks Apple's signed transaction for a trip pass (which pass, when) to unlock unlimited use; not stored |
 | Search History | Analytics | Partner link clicks record the city, hotel keyword and travel dates in the link, to match commissions (app/api/go, `clicks` table) |
 
-Not collected: contact info, health data (allergies never leave the phone), identifiers, purchases, financial info, browsing history, diagnostics.
+Not collected: contact info, health data (allergies never leave the phone), financial info, browsing history, diagnostics.
 
 Declaring location and photos is the conservative choice: Apple exempts data that is only processed in real time and not retained, but the map and AI providers are third parties whose retention we don't control.
 
 ## Screenshots
 
-Required: 6.9" iPhone (1320 × 2868 portrait). Ready in [screenshots/](screenshots/), taken from the iPhone 18
+Required now: iPhone 6.1"/6.3" (1206 × 2622), in [screenshots/6.3/](screenshots/6.3/), scaled from the 6.9" originals (1320 × 2868, optional slot) in [screenshots/](screenshots/), taken from the iPhone 18
 Pro Max simulator against https://haodego.com with live AI and map data (allergies set to peanuts and sesame,
 both severe, which is the default; location People's Square, Shanghai). 01–03 retaken 2026-10-31 after the
 verdict wording changed. Upload in this order:
