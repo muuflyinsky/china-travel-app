@@ -6,15 +6,15 @@ Product spec: `docs/SPEC.md` (what every screen does, integrations, open questio
 
 ## Commands
 - `npm run dev` — local dev server (works without keys: demo data)
-- `npm run verify` — typecheck + offline allergen regression; must pass before committing (a hook in `.claude/settings.json` runs it before `git commit`/`git push` and blocks on failure)
+- `npm run verify` — typecheck + offline allergen regression; must pass before pushing (a hook in `.claude/settings.json` runs it before `git push` and blocks on failure; commits are not checked)
 - `npm run build` — production build; CI (`.github/workflows/ci.yml`) runs verify + build on every PR
+- `node scripts/build-cities.mjs <china-division/dist>` — regenerate `lib/data/cities.json`
 
 ## Shipping
 Vercel deploys `main`, so `main` only moves through a pull request with green CI. Work on a branch, then before merging:
 1. `haode-test-engineer` checks the change against its acceptance criteria (and `haode-allergen-safety` for anything touching verdicts, ingredients or dish prompts).
 2. `haode-release-manager` runs the release checklist and writes the release notes.
 3. Veer merges. Agents never push `main`.
-- `node scripts/build-cities.mjs <china-division/dist>` — regenerate `lib/data/cities.json`
 
 ## Conventions
 - UI text lives in `lib/i18n/en.ts`; add every new key to es/fr/de/ja/ko too (the `Dict` type enforces it). Never hard-code English in components.
