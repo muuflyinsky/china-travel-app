@@ -2,7 +2,7 @@
 
 A mobile-first PWA prototype for foreigners travelling in China: menu reading with allergens, Amap navigation and metro routes, hotel search with Trip.com / Fliggy affiliate links, translation, and trip essentials.
 
-> **项目现状、分支和下一步见 [docs/PROJECT.md](docs/PROJECT.md)。** 本 README 的 key 表和 AI 说明写于 v0.3 原型阶段：现在 AI 默认走阿里云百炼（`AI_BASE_URL` / `AI_API_KEY` / `AI_MODEL_*`，见 `.env.example`），Anthropic 只是回退。
+> **项目现状、分支和下一步见工作区根目录的 `PROJECT.md`（仓库外，见 `CLAUDE.md`）。** 本 README 的 key 表和 AI 说明写于 v0.3 原型阶段：现在 AI 默认走阿里云百炼（`AI_BASE_URL` / `AI_API_KEY` / `AI_MODEL_*`，见 `.env.example`），Anthropic 只是回退。
 
 需求脑暴、变现方式和上线合规要点见 **[BRAINSTORM.md](./BRAINSTORM.md)**（早期脑暴，历史资料）。
 

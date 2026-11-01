@@ -10,4 +10,4 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## Project entry point
 
-Read `docs/PROJECT.md` before any work: current stage, which checkout and branch to use, open tasks, confirmed decisions, and the start / finish / hand-off rules (§7). The workspace-level `CHARTER.md` read-only rules apply only to the review agents, not to development sessions.
+Before any work, read the workspace root above this repo (`../` from the main checkout, `../../` from `worktrees/*`): `CLAUDE.md` (hand-off rules), `PROJECT.md` (stage, who's working on what, which checkout to use), `DECISIONS.md` and `LAUNCH-TODO.md` (the only task list). They are outside git on purpose. The workspace `CHARTER.md` read-only rules apply only to the review agents, not to development sessions.
