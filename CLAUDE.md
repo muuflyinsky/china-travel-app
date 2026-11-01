@@ -2,6 +2,8 @@
 
 @AGENTS.md
 
+Start here: `docs/PROJECT.md` — current stage, which checkout/branch to use, open tasks and decisions, and the hand-off rules (§7). Keep it current when you finish.
+
 Product spec: `docs/SPEC.md` (what every screen does, integrations, open questions). Read it before proposing product changes.
 
 ## Commands
