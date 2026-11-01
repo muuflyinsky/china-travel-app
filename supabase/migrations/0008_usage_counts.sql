@@ -35,3 +35,5 @@ $$;
 
 revoke execute on function use_quota(text, text, text, int) from public, anon, authenticated;
 revoke execute on function refund_quota(text, text, text) from public, anon, authenticated;
+grant execute on function use_quota(text, text, text, int) to service_role;
+grant execute on function refund_quota(text, text, text) to service_role;
