@@ -12,6 +12,8 @@ type Ask = {
   system: string; text: string; image?: { data: string; mediaType: string }; maxTokens: number; repair?: (raw: unknown) => unknown;
   /** A compact sample answer. When given, OpenAI-compatible models see it instead of the full JSON Schema (shorter prompt, faster). */
   example?: unknown;
+  /** Per-request limit for the OpenAI-compatible endpoint (default 110 s). */
+  timeoutMs?: number;
 };
 
 /**
@@ -54,7 +56,7 @@ async function openaiCompatible<T extends z.ZodType>(schema: T, ask: Ask): Promi
     : ask.text;
   let last = "", retry = "";
   for (let attempt = 0; attempt < 2; attempt++) {
-    const data = await chat(vision ? "vision" : "text", {
+    const data = await chat(vision ? "vision" : "text", ask.timeoutMs, {
       messages: [{ role: "system", content: system + retry }, { role: "user", content: user }],
       max_tokens: Math.min(ask.maxTokens, 8192),
       temperature: 0.2,
@@ -87,12 +89,12 @@ const models = (kind: Kind) => (kind === "vision" ? config.ai.visionModels : con
 export const currentModel = (kind: Kind) => models(kind)[modelAt[kind]];
 
 /** Tries each model in turn while the endpoint says it doesn't exist, and remembers the first that does. */
-async function chat(kind: Kind, body: object): Promise<ChatReply> {
+async function chat(kind: Kind, timeoutMs: number | undefined, body: object): Promise<ChatReply> {
   const list = models(kind);
   for (let i = 0; ; i++) {
     const at = (modelAt[kind] + i) % list.length;
     try {
-      const data = await post({ ...body, model: list[at] });
+      const data = await post({ ...body, model: list[at] }, timeoutMs);
       modelAt[kind] = at;
       return data;
     } catch (e) {
@@ -105,7 +107,7 @@ async function chat(kind: Kind, body: object): Promise<ChatReply> {
 type ChatReply = { choices?: { message?: { content?: unknown }; finish_reason?: string }[] };
 
 /** POST to the first endpoint that accepts the key; upstream errors carry status and body for the logs. */
-async function post(body: object): Promise<ChatReply> {
+async function post(body: object, timeoutMs = 110_000): Promise<ChatReply> {
   const urls = config.ai.baseUrls;
   // What each endpoint answered, so the final error says why every region failed, not just the last.
   const tried: string[] = [];
@@ -118,7 +120,7 @@ async function post(body: object): Promise<ChatReply> {
         method: "POST",
         headers: { "content-type": "application/json", authorization: `Bearer ${config.ai.key}` },
         body: JSON.stringify(body),
-        signal: AbortSignal.timeout(110_000),
+        signal: AbortSignal.timeout(timeoutMs),
       });
     } catch (e) {
       tried.push(`${host}: unreachable (${(e as Error).message})`);
@@ -139,7 +141,7 @@ async function post(body: object): Promise<ChatReply> {
 export async function checkAi() {
   const probe = async (kind: Kind, content: unknown) => {
     try {
-      const d = await chat(kind, { max_tokens: 5, messages: [{ role: "user", content }] });
+      const d = await chat(kind, undefined, { max_tokens: 5, messages: [{ role: "user", content }] });
       return { ok: true, endpoint: new URL(config.ai.baseUrls[region]).host, model: currentModel(kind), reply: String(d.choices?.[0]?.message?.content ?? "").slice(0, 40) };
     } catch (e) { return { ok: false, error: (e as Error).message.slice(0, 400) }; }
   };
@@ -371,6 +373,8 @@ export async function writeCityGuide(input: { cityZh: string; cityEn: string; si
   return structured(GuideSchema, {
     system: GUIDE_SYSTEM,
     maxTokens: 16000,
+    // A whole city in six languages often takes 100–120 s; this only runs in the batch job.
+    timeoutMs: 170_000,
     text: `City: ${input.cityEn} (${input.cityZh}).\nSights (from the map, keep the order):\n` +
       input.sights.map((x, i) => `${i + 1}. ${x.zh} — ${x.type}; ${x.address}${x.rating ? `; rated ${x.rating}` : ""}`).join("\n"),
   });
