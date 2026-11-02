@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { rateLimit } from "@/lib/rate-limit";
 import { deviceOf } from "@/lib/quota";
-import { passEnds, passToken, verifyTransaction } from "@/lib/passes-server";
+import { passEnds, passesOn, passToken, verifyTransaction } from "@/lib/passes-server";
 
 /**
  * Trip pass bought in the app → token for unlimited AI on this phone until the pass ends.
@@ -10,6 +10,7 @@ import { passEnds, passToken, verifyTransaction } from "@/lib/passes-server";
 export async function POST(req: Request) {
   const limited = rateLimit(req, "pass");
   if (limited) return limited;
+  if (!passesOn()) return NextResponse.json({ error: "passes unavailable" }, { status: 503 });
   const b = (await req.json().catch(() => ({}))) as { transactions?: string[] };
   const device = deviceOf(req);
   if (device.startsWith("ip:")) return NextResponse.json({ error: "device id required" }, { status: 400 });

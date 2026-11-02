@@ -27,7 +27,7 @@ const dupPath = dupArg > 0 ? process.argv[dupArg + 1] : null;
 async function all(path) {
   const rows = [];
   for (let from = 0; ; from += 1000) {
-    const res = await fetch(`${url}/rest/v1/${path}`, { headers: { apikey: key, authorization: `Bearer ${key}`, range: `${from}-${from + 999}` } });
+    const res = await fetch(`${url}/rest/v1/${path}`, { headers: { apikey: key, range: `${from}-${from + 999}` } });
     if (!res.ok) throw new Error(`GET ${path.split("?")[0]} ${res.status}: ${(await res.text()).slice(0, 300)}`);
     const page = await res.json();
     rows.push(...page);
