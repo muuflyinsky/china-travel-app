@@ -16,6 +16,7 @@ const PRIVACY: Record<string, Privacy> = {
     sections: [
       { h: "What stays on your phone", items: [
         "Your passport country, language, currency, trip dates and cities, allergies and diet, saved hotel and settings are stored only on your device.",
+        "The menu you are reading (small copies of its photos and the dishes found) is kept on your device until 3 hours after your last change; dishes you save stay until you remove them.",
         "Your allergies are never sent to us: dishes are checked against them on your phone.",
         "Delete everything at any time in Settings → Clear all data, or by deleting the app.",
       ] },
@@ -51,6 +52,7 @@ const PRIVACY: Record<string, Privacy> = {
     sections: [
       { h: "Lo que se queda en tu teléfono", items: [
         "Tu país de pasaporte, idioma, moneda, fechas y ciudades del viaje, alergias y dieta, hotel guardado y ajustes se guardan solo en tu dispositivo.",
+        "La carta que estás leyendo (copias pequeñas de sus fotos y los platos encontrados) se guarda en tu dispositivo hasta 3 horas después de tu último cambio; los platos que guardes se quedan hasta que los quites.",
         "Tus alergias nunca se nos envían: los platos se comprueban en tu teléfono.",
         "Puedes borrarlo todo cuando quieras en Ajustes → Borrar todos los datos, o eliminando la app.",
       ] },
@@ -86,6 +88,7 @@ const PRIVACY: Record<string, Privacy> = {
     sections: [
       { h: "Ce qui reste sur votre téléphone", items: [
         "Votre pays de passeport, langue, devise, dates et villes du voyage, allergies et régime, hôtel enregistré et réglages sont stockés uniquement sur votre appareil.",
+        "Le menu que vous lisez (petites copies de ses photos et plats trouvés) reste sur votre appareil jusqu’à 3 heures après votre dernière modification ; les plats enregistrés restent jusqu’à ce que vous les retiriez.",
         "Vos allergies ne nous sont jamais envoyées : les plats sont vérifiés sur votre téléphone.",
         "Supprimez tout à tout moment dans Réglages → Effacer toutes les données, ou en supprimant l’appli.",
       ] },
@@ -121,6 +124,7 @@ const PRIVACY: Record<string, Privacy> = {
     sections: [
       { h: "Was auf deinem Telefon bleibt", items: [
         "Passland, Sprache, Währung, Reisedaten und Städte, Allergien und Ernährung, gespeichertes Hotel und Einstellungen werden nur auf deinem Gerät gespeichert.",
+        "Die Speisekarte, die du gerade liest (kleine Kopien ihrer Fotos und gefundene Gerichte), bleibt bis 3 Stunden nach deiner letzten Änderung auf deinem Gerät; gemerkte Gerichte bleiben, bis du sie entfernst.",
         "Deine Allergien werden nie an uns gesendet: Gerichte werden auf deinem Telefon geprüft.",
         "Lösche alles jederzeit unter Einstellungen → Alle Daten löschen oder indem du die App löschst.",
       ] },
@@ -156,6 +160,7 @@ const PRIVACY: Record<string, Privacy> = {
     sections: [
       { h: "スマートフォンに残るもの", items: [
         "パスポートの国、言語、通貨、旅行の日程と都市、アレルギーと食事制限、保存したホテル、設定は、お使いの端末にのみ保存されます。",
+        "読み取り中のメニュー（写真の縮小コピーと見つかった料理）は、最後の変更から3時間まで端末に保存されます。保存した料理は削除するまで残ります。",
         "アレルギー情報が当社に送られることはありません。料理のチェックは端末上で行います。",
         "設定 →「すべてのデータを消去」、またはアプリの削除で、いつでもすべて削除できます。",
       ] },
@@ -191,6 +196,7 @@ const PRIVACY: Record<string, Privacy> = {
     sections: [
       { h: "휴대폰에만 남는 정보", items: [
         "여권 국가, 언어, 통화, 여행 날짜와 도시, 알레르기와 식단, 저장한 호텔, 설정은 기기에만 저장됩니다.",
+        "읽고 있는 메뉴(사진의 작은 사본과 찾은 요리)는 마지막 변경 후 3시간까지 기기에 보관되며, 저장한 요리는 삭제할 때까지 남습니다.",
         "알레르기 정보는 저희에게 전송되지 않습니다. 요리는 휴대폰에서 확인합니다.",
         "설정 → 모든 데이터 삭제 또는 앱 삭제로 언제든 모두 지울 수 있습니다.",
       ] },

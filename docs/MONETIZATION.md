@@ -14,13 +14,13 @@ Decided 2026-11-01. Built (off until `QUOTA=on`); see "How it works" below.
 
 | Feature | Free | Resets |
 |---|---|---|
-| Menu photo | 2 | daily, midnight Beijing time |
+| Menu photo | 2 meals (each: up to 4 photos within 30 min of the first) | daily, midnight Beijing time |
 | Typed dish names | 3 | daily |
 | Translation | 10 | daily |
 | Booking screenshot | 2 | never |
 | Allergy check and card, emergency, maps, routes, taxi card, booking links | unlimited | |
 
-Defined in `lib/products.ts` (`FREE`).
+Defined in `lib/products.ts` (`FREE`). Menu photos count per meal (DECISIONS D8, 2026-11-02): a menu is often 3–4 pages, so the first photo opens a 30-minute window for up to 4 photos (`use_menu_photo`, migration 0010). A 5th photo, or one after 30 minutes, starts the next meal.
 
 ## Passes (starting prices, to be tested)
 
