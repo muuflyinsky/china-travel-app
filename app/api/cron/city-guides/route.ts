@@ -4,8 +4,11 @@ import { setAmapGap } from "@/lib/amap";
 import { supabaseOn } from "@/lib/supabase";
 import { aiProvider, demo } from "@/lib/config";
 import { pruneUsage } from "@/lib/quota";
+import { resolveManualLinks } from "@/lib/restaurants";
 
-// Daily Vercel Cron (vercel.json): generates the stalest city guides into Supabase, a few per run.
+// Daily Vercel Cron (vercel.json): fills restaurants fixed by hand (an Amap link pasted into
+// Supabase, lib/restaurants.ts resolveManualLinks), then generates the stalest city guides into
+// Supabase, a few per run.
 // Vercel calls it with `Authorization: Bearer $CRON_SECRET`; CITY_GUIDE_TOKEN works too, for a
 // manual run (curl -H "authorization: Bearer …" https://…/api/cron/city-guides).
 // Hobby plans allow one cron run a day and 300 s per function. One city takes 110–185 s (up to
@@ -21,8 +24,9 @@ export async function GET(req: Request) {
   if (!supabaseOn || demo.maps || !aiProvider) return NextResponse.json({ error: "needs Supabase, AMAP_KEY and an AI key" }, { status: 503 });
   setAmapGap(400); // ~2.5 Amap requests a second, under the key's QPS limit
   try {
+    const links = await resolveManualLinks().catch((e) => ({ manual: 0, manualFailed: [], manualError: (e as Error).message }));
     const result = await refreshStaleGuides({ budgetMs: 60_000 });
-    return NextResponse.json(result);
+    return NextResponse.json({ ...result, ...links });
   } finally {
     setAmapGap(0);
   }

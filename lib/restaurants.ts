@@ -2,13 +2,13 @@ import DATA from "./data/restaurant-awards.json";
 import PLACES from "./data/restaurant-places.json";
 import CITIES from "./data/cities.json";
 import type { City } from "./cities";
-import { py, searchPlaces, type Place } from "./amap";
+import { placeById, py, searchPlaces, type Place } from "./amap";
 import { cuisineKey } from "./cuisines";
 import { restaurantNameEn } from "./restaurant-names";
 import { demo } from "./config";
 import { rest, supabaseOn, supabaseReadOn } from "./supabase";
 import { after } from "next/server";
-import { awardScore, cityAdcode, sameRestaurant, type Award, type AwardList, type AwardRestaurant } from "./restaurant-awards";
+import { awardScore, cityAdcode, pickListing, sameRestaurant, type Award, type AwardList, type AwardRestaurant } from "./restaurant-awards";
 
 type ListMeta = { name: string; edition: string; source: string; checked: string };
 
@@ -102,10 +102,16 @@ async function data(): Promise<Data> {
 }
 export const awardLists = async () => (await data()).lists;
 
+/** The city's names a map listing may add to a brand: 上海 and Shanghai for 310000. */
+function cityWords(adcode: string) {
+  const c = (CITIES as City[]).find((x) => x.a === adcode && x.t === "city");
+  return c ? [c.s, c.e] : [];
+}
+
 /** Awards for a map result, if it matches a listed restaurant in the same city. */
 function awardsFor(p: Place, restaurants: AwardRestaurant[]) {
   const city = cityAdcode(p.adcode);
-  const hits = restaurants.filter((r) => (!city || r.city === city) && sameRestaurant(r.zh, p.name));
+  const hits = restaurants.filter((r) => (!city || r.city === city) && pickListing(r, [p], cityWords(r.city)));
   return hits.flatMap((r) => r.awards);
 }
 
@@ -182,33 +188,68 @@ async function resolve(r: Known, city: string): Promise<ListedRestaurant> {
   const key = `${city}:${r.zh}`;
   const hit = resolved.get(key);
   if (hit && Date.now() - hit.at < 864e5) return listed(r, hit.poi);
-  let found: Place[];
-  try { found = await searchPlaces({ keywords: r.zh, types: "050000", city, purpose: "restaurants" }); }
-  catch { return listed(r, null); } // quota or network: try again another time, nothing saved
-  const poi = found.find((p) => sameRestaurant(r.zh, p.name)) ?? null;
+  // The Chinese name first; the English one when that finds nothing (蔻 is "Co- Restaurant").
+  const search = (keywords: string) => searchPlaces({ keywords, types: "050000", city, purpose: "restaurants" });
+  let poi: Place | null;
+  try {
+    poi = pickListing(r, await search(r.zh), cityWords(city))?.poi
+      ?? (r.en ? pickListing(r, await search(r.en), cityWords(city))?.poi : undefined) ?? null;
+  } catch { return listed(r, null); } // quota or network: try again another time, nothing saved
   resolved.set(key, { at: Date.now(), poi });
   keep(r, city, poi);
   return listed(r, poi);
 }
 
-/** Saves one lookup on the restaurant's row (migration 0005/0006) after the response is sent. */
-function keep(r: Known, city: string, poi: Place | null) {
-  const stored: Stored | undefined = poi ? {
-    id: poi.id, name: poi.name, location: poi.location, address: poi.address, district: poi.district, typecode: poi.typecode,
-    tag: poi.tag, rating: Number(poi.rating) || null, cost: Math.round(Number(poi.cost)) || null, opentime: poi.opentime,
-    confidence: "high", photos: poi.photos ?? [], photoSource: poi.photos?.length ? "Amap" : undefined,
-  } : undefined;
-  r.place = stored; r.tried = true; // this instance's cached copy
-  if (!supabaseOn) return;
-  const row = {
+const toStored = (poi: Place): Stored => ({
+  id: poi.id, name: poi.name, location: poi.location, address: poi.address, district: poi.district, typecode: poi.typecode,
+  tag: poi.tag, rating: Number(poi.rating) || null, cost: Math.round(Number(poi.cost)) || null, opentime: poi.opentime,
+  confidence: "high", photos: poi.photos ?? [], photoSource: poi.photos?.length ? "Amap" : undefined,
+});
+
+/** A restaurant row's Amap columns (migrations 0005/0006) for one lookup, found or not. */
+function placeRow(poi: Place | null, method: "live" | "manual") {
+  const stored = poi ? toStored(poi) : undefined;
+  return {
     amap_id: stored?.id ?? null, location: stored?.location ?? null, address: stored?.address ?? null, district: stored?.district ?? null,
     amap_type: stored?.typecode ?? null, tags: stored?.tag || null, rating: stored?.rating ?? null, cost: stored?.cost ?? null,
     opentime: stored?.opentime || null, photos: stored?.photos?.length ? stored.photos : null, photo_source: stored?.photoSource ?? null,
-    match: { confidence: stored ? "high" : null, method: "live", amap_name: poi?.name ?? null, matched_at: new Date().toISOString() },
+    match: { confidence: stored ? "high" : null, method, amap_name: poi?.name ?? null, matched_at: new Date().toISOString() },
   };
-  const save = () => rest(`restaurants?city=eq.${city}&name_zh=eq.${encodeURIComponent(r.zh)}`, { method: "PATCH", body: JSON.stringify(row), headers: { prefer: "return=minimal" } })
+}
+const saveRow = (city: string, zh: string, row: object) =>
+  rest(`restaurants?city=eq.${city}&name_zh=eq.${encodeURIComponent(zh)}`, { method: "PATCH", body: JSON.stringify(row), headers: { prefer: "return=minimal" } });
+
+/** Saves one lookup on the restaurant's row after the response is sent. */
+function keep(r: Known, city: string, poi: Place | null) {
+  r.place = poi ? toStored(poi) : undefined; r.tried = true; // this instance's cached copy
+  if (!supabaseOn) return;
+  const save = () => saveRow(city, r.zh, placeRow(poi, "live"))
     .catch((e) => console.error("[restaurants] save:", (e as Error).message, "(migrations 0005 and 0006 applied?)"));
   try { after(save); } catch { void save(); }
+}
+
+const AMAP_ID = /B0[0-9A-Z]{8}/;
+
+/**
+ * Restaurants fixed by hand (migration 0009): an amap.com link, or just its id, pasted into
+ * restaurants.amap_link in Supabase's table editor. The daily cron looks each new one up by id,
+ * fills the row like any other match and clears `review`. A link that doesn't resolve is left
+ * for the next run and named in the cron's result.
+ */
+export async function resolveManualLinks(limit = 20) {
+  if (!supabaseOn || demo.maps) return { manual: 0, manualFailed: [] as string[] };
+  const rows = (await rest("restaurants?select=city,name_zh,amap_link,amap_id&amap_link=not.is.null&limit=1000")) as { city: string; name_zh: string; amap_link: string; amap_id: string | null }[];
+  const todo = rows.map((r) => ({ ...r, id: r.amap_link.match(AMAP_ID)?.[0] })).filter((r) => r.id && r.id !== r.amap_id).slice(0, limit);
+  let manual = 0;
+  const manualFailed: string[] = [];
+  for (const r of todo) {
+    const poi = await placeById(r.id!).catch(() => null);
+    if (!poi) { manualFailed.push(`${r.city}:${r.name_zh}`); continue; }
+    await saveRow(r.city, r.name_zh, { ...placeRow(poi, "manual"), review: null });
+    manual++;
+  }
+  if (manual) cache = null; // this instance shows them at once; others within the hour
+  return { manual, manualFailed };
 }
 
 /** Well-rated restaurants straight from Amap, with guide badges where a listed restaurant matches. */

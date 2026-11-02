@@ -39,13 +39,81 @@ export function splitName(name: string) {
   return { brand: (m ? m[1] : n).replace(/(餐厅|饭店|酒家|餐馆|菜馆)$/, ""), branch: m?.[2] ?? "" };
 }
 
-/** Same brand, and the same branch when the guide names one (a list entry is usually one branch). */
-export function sameRestaurant(guideName: string, poiName: string) {
+// Words a map listing adds to a brand that the guide leaves out: 宝丽轩 → 宝丽轩中餐厅,
+// Da Vittorio → DA VITTORIO SHANGHAI. Stripped from the end, repeatedly.
+const GENERIC = /(中餐厅|中餐|中菜|西餐厅|餐厅|饭店|酒家|酒楼|餐馆|菜馆|私房菜|restaurant|餐吧)$/;
+
+const norm = (s: string) => s.toLowerCase().replace(/[\s·・.,'’\-–—&]/g, "");
+// Never down to nothing: a place called just 餐厅 keeps its name.
+const stripGeneric = (s: string) => { while (s.replace(GENERIC, "") && s.replace(GENERIC, "") !== s) s = s.replace(GENERIC, ""); return s; };
+
+/** A name without its bracketed branch, before splitName drops 餐厅 (宝丽轩中餐厅 must stay whole). */
+const rawBrand = (name: string) => name.replace(/[（(].*$/, "");
+
+/**
+ * Ways a brand can be written: lower case, no punctuation, generic words off. A map listing may
+ * also carry the city name (DA VITTORIO SHANGHAI), a sub-name after a dot (马旺子·川小馆) or both
+ * scripts (SIR ELLY'S艾利爵士餐厅); the guide's own name is kept whole (上海老饭店, 漾亚·雍雅合鲜).
+ */
+function brandKeys(brand: string, cityWords: string[], listing = false) {
+  const keys = new Set([stripGeneric(norm(brand))]);
+  if (!listing) return keys;
+  for (const part of [brand, brand.split(/[·・]/)[0]]) {
+    let k = stripGeneric(norm(part));
+    keys.add(k);
+    for (const c of cityWords.map(norm).filter(Boolean)) {
+      if (k.length > c.length && k.endsWith(c)) k = stripGeneric(k.slice(0, -c.length));
+      else if (k.length > c.length && k.startsWith(c)) k = stripGeneric(k.slice(c.length));
+    }
+    keys.add(k);
+  }
+  // Latin and Chinese run together (鹿园MOOSE): each half is a name of its own, unless the Latin
+  // half says it is something else (悦轩SPA is a spa).
+  for (const k of [...keys]) {
+    const m = k.match(/^([a-z0-9]{3,})([\u4e00-\u9fff]{2,})$/) ?? k.match(/^([\u4e00-\u9fff]{2,})([a-z0-9]{3,})$/);
+    if (m && !m.slice(1).some((h) => /^(spa|ktv|gym|hotel|club|shop|mall)$/.test(h))) for (const half of m.slice(1)) keys.add(stripGeneric(half));
+  }
+  return keys;
+}
+
+/**
+ * Same brand, and the same branch when the guide names one (a list entry is usually one branch).
+ * `cityWords` (the city's Chinese and English names) may be added to a map listing's brand.
+ * A guide branch can also be the listing's district (马旺子(锦江) → 锦江区) or the street in its
+ * address (阿勇面馆(东书房路) → 东书房路…号).
+ */
+export function sameRestaurant(guideName: string, poiName: string, opts: { cityWords?: string[]; district?: string; address?: string } = {}) {
   const g = splitName(guideName), p = splitName(poiName);
-  if (!g.brand || g.brand !== p.brand) return false;
-  if (!g.branch) return true;
+  const gk = brandKeys(rawBrand(guideName), []), pk = brandKeys(rawBrand(poiName), opts.cityWords ?? [], true);
+  // Both name what kind of place they are, and differently: 南园酒家 is not 南园饭店.
+  const kind = (n: string) => norm(rawBrand(n)).match(GENERIC)?.[0] ?? "";
+  if (kind(guideName) && kind(poiName) && kind(guideName) !== kind(poiName)) return false;
+  const branch = g.branch.replace(/(店|区|县)$/, "");
+  const sameBranch = Boolean(branch) && ((Boolean(p.branch) && (p.branch.includes(branch) || g.branch.includes(p.branch)))
+    || Boolean(opts.district && opts.district.replace(/(区|县)$/, "") === branch)
+    || Boolean(branch.length >= 3 && opts.address?.includes(branch)));
+  if (![...gk].some((k) => pk.has(k))) {
+    // A place-name prefix the guide drops (海宁阿月煲(海阳路店) for 阿月煲(海阳路店)): only with the
+    // same named branch, and a brand of three characters or more.
+    return sameBranch && Boolean(p.branch) && [...gk].some((k) => k.length >= 3 && [...pk].some((x) => x.endsWith(k)));
+  }
   // The guide names a branch: the map result must name the same one (an unbranded result could be any outlet).
-  return Boolean(p.branch) && (p.branch.includes(g.branch) || g.branch.includes(p.branch));
+  return !g.branch || sameBranch;
+}
+
+const CLOSED = /暂停营业|已关闭|停业|歇业|已搬迁/;
+
+/**
+ * The map result that is this listed restaurant, and which name matched: the Chinese name, or
+ * the English one (蔻 is on the map as "Co- Restaurant"). Closed listings never match.
+ */
+export function pickListing<P extends { name: string; district?: string; address?: string }>(r: { zh: string; en?: string }, found: P[], cityWords: string[]) {
+  const open = found.filter((p) => !CLOSED.test(p.name));
+  for (const [by, name] of [["zh", r.zh], ["en", r.en]] as const) {
+    const hit = name ? open.find((p) => sameRestaurant(name, p.name, { cityWords, district: p.district, address: p.address })) : undefined;
+    if (hit) return { poi: hit, by };
+  }
+  return null;
 }
 
 /** City adcode from a district adcode (municipalities: 11/12/31/50). */
