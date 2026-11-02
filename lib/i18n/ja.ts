@@ -380,6 +380,9 @@ export const ja: Dict = {
     groups: { basics: "基本", eating: "食事", around: "移動", hotel: "ホテル", emergency: "緊急" },
   },
   settings: {
+    prefs: "アプリの設定",
+    appearance: "表示モード",
+    themes: { system: "端末と同じ", light: "ライト", dark: "ダーク" },
     rideApp: "配車アプリ",
     rideAppNote: "「探す」や「今日」から配車するときに開きます。どちらのアプリも、ここから車種を選ぶことはできません。",
     datesOverstay: "出国日が滞在期限を過ぎています",
@@ -398,7 +401,7 @@ export const ja: Dict = {
     more: "ほかのアレルゲン",
     fewer: "閉じる",
     none: "なし",
-    about: "このアプリについて",
+    about: "サポートと購入",
     howWeEarn: "収益のしくみ",
     howWeEarnBody: "アプリは無料で広告もありません。リンクからホテル・列車・eSIMを予約すると、提携先から少額の手数料を受け取ります。料金は変わりません。",
     privacyTitle: "プライバシー",

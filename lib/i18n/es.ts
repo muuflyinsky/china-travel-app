@@ -380,6 +380,9 @@ export const es: Dict = {
     groups: { basics: "Básico", eating: "Comer", around: "Moverse", hotel: "Hotel", emergency: "Emergencia" },
   },
   settings: {
+    prefs: "Preferencias de la app",
+    appearance: "Apariencia",
+    themes: { system: "Igual que el teléfono", light: "Claro", dark: "Oscuro" },
     rideApp: "App de taxi",
     rideAppNote: "Se abre al pedir un coche desde Explorar o Hoy. Ninguna de las dos permite elegir el tipo de coche desde aquí.",
     datesOverstay: "La salida supera tu límite legal",
@@ -398,7 +401,7 @@ export const es: Dict = {
     more: "Más alérgenos",
     fewer: "Menos",
     none: "Ninguna",
-    about: "Acerca de",
+    about: "Ayuda y compras",
     howWeEarn: "Cómo ganamos dinero",
     howWeEarnBody: "La app es gratuita y no tiene anuncios. Si reservas un hotel, tren o eSIM con nuestros enlaces, el socio nos paga una pequeña comisión. Tu precio no cambia.",
     privacyTitle: "Privacidad",

@@ -383,6 +383,9 @@ export const en = {
     groups: { basics: "Basics", eating: "Eating", around: "Getting around", hotel: "Hotel", emergency: "Emergency" },
   },
   settings: {
+    prefs: "App preferences",
+    appearance: "Appearance",
+    themes: { system: "Same as phone", light: "Light", dark: "Dark" },
     rideApp: "Taxi app",
     rideAppNote: "Opens when you book a ride from Explore or Today. Neither app can pre-select a car type from here.",
     datesOverstay: "Departure is after your legal limit",
@@ -401,7 +404,7 @@ export const en = {
     more: "More allergens",
     fewer: "Fewer",
     none: "None",
-    about: "About",
+    about: "Support and purchases",
     howWeEarn: "How we make money",
     howWeEarnBody: "The app is free and has no ads. When you book a hotel, train or eSIM through our links, the partner pays us a small commission. Your price stays the same.",
     privacyTitle: "Privacy",

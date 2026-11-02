@@ -380,6 +380,9 @@ export const de: Dict = {
     groups: { basics: "Grundlagen", eating: "Essen", around: "Unterwegs", hotel: "Hotel", emergency: "Notfall" },
   },
   settings: {
+    prefs: "App-Einstellungen",
+    appearance: "Darstellung",
+    themes: { system: "Wie das Handy", light: "Hell", dark: "Dunkel" },
     rideApp: "Taxi-App",
     rideAppNote: "Öffnet sich, wenn du in Entdecken oder Heute eine Fahrt buchst. Keine der Apps lässt sich von hier aus auf einen Fahrzeugtyp festlegen.",
     datesOverstay: "Abreise liegt nach deiner Frist",
@@ -398,7 +401,7 @@ export const de: Dict = {
     more: "Weitere Allergene",
     fewer: "Weniger",
     none: "Keine",
-    about: "Über",
+    about: "Hilfe und Käufe",
     howWeEarn: "Wie wir Geld verdienen",
     howWeEarnBody: "Die App ist kostenlos und werbefrei. Wenn du über unsere Links ein Hotel, einen Zug oder eine eSIM buchst, zahlt uns der Partner eine kleine Provision. Dein Preis bleibt gleich.",
     privacyTitle: "Datenschutz",

@@ -380,6 +380,9 @@ export const fr: Dict = {
     groups: { basics: "Essentiel", eating: "Au restaurant", around: "Se déplacer", hotel: "Hôtel", emergency: "Urgence" },
   },
   settings: {
+    prefs: "Préférences de l’app",
+    appearance: "Apparence",
+    themes: { system: "Comme le téléphone", light: "Clair", dark: "Sombre" },
     rideApp: "Appli de taxi",
     rideAppNote: "S’ouvre quand vous réservez une course depuis Explorer ou Aujourd’hui. Aucune ne permet de choisir le type de véhicule d’ici.",
     datesOverstay: "Départ après votre limite légale",
@@ -398,7 +401,7 @@ export const fr: Dict = {
     more: "Plus d’allergènes",
     fewer: "Moins",
     none: "Aucune",
-    about: "À propos",
+    about: "Aide et achats",
     howWeEarn: "Comment nous gagnons de l’argent",
     howWeEarnBody: "L’app est gratuite et sans publicité. Quand vous réservez un hôtel, un train ou une eSIM via nos liens, le partenaire nous verse une petite commission. Votre prix ne change pas.",
     privacyTitle: "Confidentialité",
