@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useProfile } from "./useProfile";
-import { useFx, formatMoney } from "./useFx";
+import { useFx, formatMoney, formatRate } from "./useFx";
 import { useT } from "./useT";
 import { fmt } from "@/lib/i18n";
 
@@ -38,7 +38,7 @@ export function PriceCheck() {
       )}
       {fx && (
         <p className="mt-2 text-footnote text-muted">
-          {fmt(t.pay.rate, { base: p.homeCurrency, rate: fx.value.toFixed(3) })} · {fx.approx ? t.pay.approxRate : t.pay.liveRate}
+          {fmt(t.pay.rate, { base: p.homeCurrency, rate: formatRate(fx.value) })} · {fx.approx ? t.pay.approxRate : t.pay.liveRate}
         </p>
       )}
     </div>
