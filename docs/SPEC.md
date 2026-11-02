@@ -155,9 +155,9 @@ v0.4 把 Pay、Mobile data、Before you go 三个独立页面并入 Today。旧�
   3. 代表菜：模型列出 5 道本地菜 → 用菜单识别的同一套流程算过敏原、辣度、是否素食 → 用高德搜索供应这道菜的餐厅，取人均消费的中间 50% 作为价格区间。
   4. 预约：按景点名匹配 `lib/reservations.ts`。
 - **存放与刷新**：
-  - 预生成文件 `public/city-guide/<adcode>.json`（静态，走 CDN）；没有文件时前端调 `/api/city-guide`，服务器当场生成并缓存 30 天。
+  - 指南存在 Supabase（`app_cache`，ns=`city_guide`），线上只读：前端调 `/api/city-guide`，有存档就返回（不论多旧），没有就返回只含地图数据的简版，不当场调用模型。
   - 只有热门城市会生成，防止被刷接口；强制刷新需要 `CITY_GUIDE_TOKEN`。
-  - **自动刷新**：Vercel Cron（`vercel.json`）每天调用 `/api/cron/city-guides`，每次重新生成最久没更新的城市（实际约 1 个），结果写入 Supabase。高德和模型的 key 用 Vercel 环境变量。手动生成全部城市可本地运行 `scripts/build-city-guides.mjs`。（原先的 GitHub Actions 月度任务从未配置密钥，已于 2026-11-01 删除。）
+  - **自动刷新**：Vercel Cron（`vercel.json`）每天调用 `/api/cron/city-guides`，只重新生成超过 90 天的城市（最旧的优先，每次实际约 1 个），结果写入 Supabase；大部分日子什么都不做。高德和模型的 key 用 Vercel 环境变量。手动生成全部城市可本地运行 `scripts/build-city-guides.mjs`。（原先的 GitHub Actions 月度任务从未配置密钥，已于 2026-11-01 删除。）
 - **人工环节（被动）**：低置信度条目和用户 👎 写入 `data/review.jsonl`（Vercel 上写到日志），只需要偶尔看一下。
 - **成本估算**：每个城市 1 次文字生成 + 1 次菜品分析 + 约 8 次高德请求；46 个城市每月一次。
 

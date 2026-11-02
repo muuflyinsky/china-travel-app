@@ -182,10 +182,11 @@ export async function review(g: CityGuide | null, extra?: Record<string, unknown
 
 /**
  * The daily job (app/api/cron/city-guides): hot cities with no guide first, then the oldest,
- * skipping any refreshed within `maxAgeDays`. Generates one city at a time and stops starting
+ * skipping any refreshed within `maxAgeDays` (90: sights and dishes change slowly, and an
+ * old guide keeps being served, so most days the job does nothing). Generates one city at a time and stops starting
  * new ones once `budgetMs` has passed, so the run ends inside the function's time limit.
  */
-export async function refreshStaleGuides({ budgetMs, maxAgeDays = 30 }: { budgetMs: number; maxAgeDays?: number }) {
+export async function refreshStaleGuides({ budgetMs, maxAgeDays = 90 }: { budgetMs: number; maxAgeDays?: number }) {
   const t0 = Date.now();
   const stored = new Map((await cacheList("city_guide")).map((r) => [r.key, Date.parse(r.generatedAt)]));
   const due = HOT_CITIES
