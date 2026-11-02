@@ -1,5 +1,7 @@
 # v0.6 UI 改进：Today · Eat · Explore · Stay · Talk
 
+> 历史记录（2026-10-24 v0.6 改版），已合入 main。现状见工作区根目录 `PROJECT.md`。
+
 日期：2026-10-24 · 未提交（工作区改动）
 
 截图都在本目录：`before/`、`after/`（390×844，无头 Chrome，demo 数据，“在中国”状态：法国护照、第 5/30 天、花生严重过敏 + 甲壳类、已存酒店、行程城市西安 → 上海）；`after/sim/` 是 iPhone 17e 模拟器里 iOS 应用壳的实机截图；`compare/` 是逐页前后对比。

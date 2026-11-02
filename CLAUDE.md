@@ -2,7 +2,9 @@
 
 @AGENTS.md
 
-Product spec: `docs/SPEC.md` (what every screen does, integrations, open questions). Read it before proposing product changes.
+Start here: the workspace root above this repo (`../CLAUDE.md`, or `../../CLAUDE.md` from a worktree) holds `PROJECT.md` (stage, who's working on what, which checkout to use), `DECISIONS.md` and `LAUNCH-TODO.md` (the only task list). They live outside git on purpose; read them before working and update them when you finish.
+
+Product spec: `docs/SPEC.md` (what every screen does and its integrations; plans and open questions live in the workspace `PROJECT.md`). Read it before proposing product changes.
 
 ## Commands
 - `npm run dev` — local dev server (works without keys: demo data)
