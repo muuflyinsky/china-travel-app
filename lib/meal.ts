@@ -32,12 +32,13 @@ const RANK = { low: 0, medium: 1, high: 2 } as const;
 /**
  * One dish read twice (two menu pages are two AI calls, and a detail may add allergens to one
  * copy) → one set of facts, the stricter of each: every allergen and meat, alcohol if either,
- * vegetarian only if both, the lower confidence, the hotter spice. Text comes from the first.
+ * vegetarian only if both, the lower confidence, the hotter spice, both printed notes. Text comes
+ * from the first.
  */
 export function mergeDish(a: ListDish, b: ListDish): ListDish {
   const allergens = [...a.allergens, ...b.allergens.filter((x) => !a.allergens.some((y) => y.id === x.id && y.via_zh === x.via_zh && y.role === x.role))];
   return {
-    ...a, allergens, meat: [...new Set([...a.meat, ...b.meat])], alcohol: a.alcohol || b.alcohol, vegetarian: a.vegetarian && b.vegetarian,
+    ...a, allergens, printed: [...new Set([a.printed, b.printed].filter(Boolean))].join("；") || undefined, meat: [...new Set([...a.meat, ...b.meat])], alcohol: a.alcohol || b.alcohol, vegetarian: a.vegetarian && b.vegetarian,
     confidence: RANK[b.confidence] < RANK[a.confidence] ? b.confidence : a.confidence, spice: Math.max(a.spice, b.spice),
   };
 }
