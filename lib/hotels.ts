@@ -1,9 +1,49 @@
+import { mkdir, appendFile } from "node:fs/promises";
 import { searchPlaces, type Place } from "./amap";
 import { demo } from "./config";
 import { TRIP_CITY_ID } from "./affiliate";
 import * as mock from "./demo";
 import { cacheRead, cacheWrite } from "./cache";
-import { TIER_IDS, tierBounds, tierOf, type CityPicks, type HotelPick, type TierId } from "./hotel-tiers";
+import { TIER_IDS, tierBounds, tierOf, starsTier, type CityPicks, type HotelPick, type TierId } from "./hotel-tiers";
+import SEED from "./data/hotel-seeds.json";
+
+/** A hand-verified fallback hotel: brand, stars and a rough price band are enough to fill a tier. */
+type SeedHotel = {
+  city: string; // adcode
+  zh: string;
+  en?: string;
+  brand?: string;
+  stars?: number;
+  tier?: TierId;
+  location?: string; // "lng,lat" GCJ-02, optional
+  address?: string;
+  rating?: number;
+  cny?: number;
+};
+
+const seedHotels = (adcode: string): SeedHotel[] => (SEED as { hotels: SeedHotel[] }).hotels.filter((h) => h.city === adcode);
+
+/** Turns a hand-verified seed into a HotelPick. Tier order: explicit tier → price band → stars. */
+function seedPick(s: SeedHotel): HotelPick {
+  const stars = s.stars ?? (s.tier === "luxury" ? 5 : s.tier === "upscale" ? 4 : s.tier === "comfort" ? 3 : 2);
+  const cny = s.cny ?? 0;
+  const tier: TierId = s.tier ?? (cny ? tierOf(cny, tierBounds("")) : starsTier(stars));
+  return {
+    id: `seed-${s.city}-${s.zh}`, name: s.zh, pinyin: "", address: s.address ?? "", district: undefined,
+    location: s.location ?? "", rating: s.rating, cny, tier, stars, chain: null, brand: s.brand, metro: null,
+  };
+}
+
+/** Seed picks grouped by tier; each tier falls back to whatever the seed has, never empty. */
+function seedPicks(adcode: string, cityShort: string): CityPicks {
+  const tiers = Object.fromEntries(TIER_IDS.map((id) => [id, [] as HotelPick[]])) as Record<TierId, HotelPick[]>;
+  for (const s of seedHotels(adcode)) {
+    const h = seedPick(s);
+    const t = h.tier;
+    if (tiers[t].length < 3) tiers[t].push(h);
+  }
+  return { city: cityShort, generatedAt: new Date().toISOString(), source: "amap", tiers };
+}
 
 export { tierBounds };
 export type { CityPicks, HotelPick, TierId };
@@ -49,15 +89,23 @@ export function rank(a: HotelPick, b: HotelPick) {
 }
 
 export function candidate(p: Place, cityShort: string, bounds: [number, number, number]): HotelPick | null {
-  const cny = Number(p.cost);
-  if (!cny || cny < 80) return null; // no usable price → can't place it in a tier
+  // Never drop a hotel just because Amap has no "per-person cost": that field is often empty
+  // for hotels (especially 4/5-star ones). Decide by brand + star class instead, and only use
+  // cost — when present — to place the hotel in a price tier.
   const b = brandOf(p.name);
   const stars = starsOf(p.type);
   const majorCity = cityShort in TRIP_CITY_ID;
+  const known = Boolean(b) || stars >= 3;
+  if (!known) return null;
+  // Prefer chain hotels; outside the major cities require a recognised brand or ≥4 stars.
   if (!b && !(majorCity && stars >= 4)) return null;
+  const cny = Number(p.cost) || 0;
+  // Tier by price when Amap gives one; otherwise by star class so a 5-star hotel without a
+  // price still lands in "luxury" instead of "economy".
+  const tier = cny ? tierOf(cny, bounds) : starsTier(stars);
   return {
     id: p.id, name: p.name, pinyin: p.pinyin, address: p.address, district: p.district, location: p.location,
-    rating: p.rating ? Number(p.rating) : undefined, cny, tier: tierOf(cny, bounds), stars,
+    rating: p.rating ? Number(p.rating) : undefined, cny, tier, stars,
     chain: b?.kind ?? null, brand: b?.brand, metro: null,
   };
 }
@@ -101,6 +149,17 @@ export async function cityPicks(adcode: string, cityShort: string, around?: stri
     tiers[id] = short.sort(rank).slice(0, PER_TIER);
   }
   const picks: CityPicks = { city: cityShort, generatedAt: new Date().toISOString(), source: "amap", tiers };
+  // Fallback: never show an empty Stay list. If live search yields nothing (e.g. Amap has no
+  // prices for this city's hotels), serve the hand-verified seeds. Log the miss for review.
+  const empty = TIER_IDS.every((id) => picks.tiers[id].length === 0);
+  if (empty) {
+    const fallback = seedPicks(adcode, cityShort);
+    const hasSeeds = TIER_IDS.some((id) => fallback.tiers[id].length > 0);
+    if (hasSeeds) {
+      try { await mkdir("data", { recursive: true }); await appendFile("data/hotel-fallback.jsonl", JSON.stringify({ ts: new Date().toISOString(), city: adcode }) + "\n"); } catch {}
+      return fallback;
+    }
+  }
   memory.set(key, picks);
   // An empty result isn't stored: it would hide a fix (or a better Amap day) for a week.
   if (TIER_IDS.some((id) => tiers[id].length)) await cacheWrite("hotel_picks", key, picks);

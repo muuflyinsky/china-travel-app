@@ -1,0 +1,6 @@
+{
+  "$comment": "Static fallback hotels per hot city. Used ONLY when live Amap search returns nothing, so Stay never shows an empty list. Every entry must be a real hotel that reliably accepts foreign guests; fill via scripts/import-hotel-seeds.mjs and keep `checked` current. An entry without a `location` is shown without a map link.",
+  "source": "brand hotel chains (international + large domestic), manually compiled",
+  "checked": "",
+  "hotels": []
+}
