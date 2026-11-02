@@ -14,9 +14,12 @@ export const TIPS = ["com.haodego.app.tip.small", "com.haodego.app.tip.medium", 
 
 export const passDays = (id: string) => PASSES.find((p) => p.id === id)?.days;
 
-/** Free uses per phone. "day" resets at midnight Beijing time; "ever" never resets. */
+/**
+ * Free uses per phone. "day" resets at midnight Beijing time; "ever" never resets. A menu photo
+ * use is a meal: up to `pages` photos within `minutes` of the first (DECISIONS D8).
+ */
 export const FREE = {
-  menu_photo: { max: 2, per: "day" },
+  menu_photo: { max: 2, per: "day", pages: 4, minutes: 30 },
   menu_text: { max: 3, per: "day" },
   translate: { max: 10, per: "day" },
   hotel: { max: 2, per: "ever" },

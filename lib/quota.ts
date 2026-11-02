@@ -36,8 +36,11 @@ export async function useQuota(req: Request, kind: QuotaKind): Promise<NextRespo
   const device = deviceOf(req);
   if (passValid(req.headers.get("x-ctg-pass"), device)) return free;
   const p = period(kind);
+  const meal = kind === "menu_photo" ? FREE.menu_photo : null;
   try {
-    const ok = await rest("rpc/use_quota", { method: "POST", body: JSON.stringify({ p_device: device, p_kind: kind, p_period: p, p_max: FREE[kind].max }) });
+    const ok = meal
+      ? await rest("rpc/use_menu_photo", { method: "POST", body: JSON.stringify({ p_device: device, p_period: p, p_max: meal.max, p_pages: meal.pages, p_minutes: meal.minutes }) })
+      : await rest("rpc/use_quota", { method: "POST", body: JSON.stringify({ p_device: device, p_kind: kind, p_period: p, p_max: FREE[kind].max }) });
     if (ok === false) return NextResponse.json({ error: "quota", kind, max: FREE[kind].max, per: FREE[kind].per }, { status: 402 });
   } catch (e) {
     console.error("[quota]", (e as Error).message);
@@ -45,7 +48,8 @@ export async function useQuota(req: Request, kind: QuotaKind): Promise<NextRespo
   }
   return {
     refund: async () => {
-      await rest("rpc/refund_quota", { method: "POST", body: JSON.stringify({ p_device: device, p_kind: kind, p_period: p }) }).catch(() => {});
+      const body = meal ? { p_device: device, p_period: p } : { p_device: device, p_kind: kind, p_period: p };
+      await rest(meal ? "rpc/refund_menu_photo" : "rpc/refund_quota", { method: "POST", body: JSON.stringify(body) }).catch(() => {});
     },
   };
 }
