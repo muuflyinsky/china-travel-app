@@ -1,7 +1,9 @@
-// Server-side Supabase access over REST with the service role key (never sent to browsers).
+// Server-side Supabase access over REST with the secret key (never sent to browsers).
 // Optional: everything that uses it has a fallback when SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY
-// are unset. Log tables have RLS on and no policies, so the anon/public keys can read nothing;
+// are unset. Log tables have RLS on and no policies, so the publishable key can read nothing;
 // the restaurant award tables are public-read, so SUPABASE_ANON_KEY alone is enough to read them.
+// The keys can be the new ones (sb_secret_…, sb_publishable_…) or the legacy JWTs: either way the
+// key goes in the apikey header only, and Supabase's gateway sets Authorization for its role.
 const sb = {
   url: (process.env.SUPABASE_URL ?? "").replace(/\/$/, ""),
   key: (process.env.SUPABASE_SERVICE_ROLE_KEY ?? "").trim(),
@@ -15,7 +17,7 @@ export async function rest(path: string, init: RequestInit = {}) {
   const key = sb.key || sb.anon;
   const res = await fetch(`${sb.url}/rest/v1/${path}`, {
     ...init,
-    headers: { apikey: key, authorization: `Bearer ${key}`, "content-type": "application/json", ...init.headers },
+    headers: { apikey: key, "content-type": "application/json", ...init.headers },
     signal: AbortSignal.timeout(4000),
     cache: "no-store",
   });

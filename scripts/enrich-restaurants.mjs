@@ -46,7 +46,7 @@ const keyOf = (r) => `${r.city}:${r.zh}`;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 let calls = 0;
 const SB = (process.env.SUPABASE_URL ?? "").replace(/\/$/, ""), SBK = (process.env.SUPABASE_SERVICE_ROLE_KEY ?? "").trim();
-const sbHeaders = { apikey: SBK, authorization: `Bearer ${SBK}`, "content-type": "application/json" };
+const sbHeaders = { apikey: SBK, "content-type": "application/json" }; // apikey only: works for new and legacy keys
 
 // Lookups already in Supabase (the app saves its own first lookups there) count as done.
 if (SB && SBK) {

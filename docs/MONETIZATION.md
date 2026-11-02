@@ -86,7 +86,8 @@ Events before 2026-11-01 have a per-tab id, not a daily one; leave them out.
   `MainViewController.swift`. `Products.storekit` + the shared App scheme let Xcode test purchases locally.
 - `/api/pass` + `lib/passes-server.ts`: verifies Apple's signed transaction (x5c chain to Apple Root CA G3,
   bundle id, not revoked; Xcode test transactions only outside production) and returns an HMAC token
-  bound to the device until the pass ends.
+  bound to the device until the pass ends, signed with `PASS_SECRET` (its own secret, not a Supabase key;
+  without it `/api/pass` answers 503 and no token is accepted).
 - `components/Paywall.tsx`: opens on a 402 (or from Settings → Trip pass); always offers the allergy card.
   `components/TipJar.tsx`: Settings → Leave a tip.
 - The daily cron deletes daily counts older than 30 days.
@@ -97,4 +98,4 @@ Events before 2026-11-01 have a per-tab id, not a daily one; leave them out.
 2. App Store Connect: Paid Apps agreement, banking and tax; Small Business Program; create the 4 non-renewing
    subscriptions and 3 consumable tips with the ids above (prices as in the table; tips $1.99 / $4.99 / $9.99).
 3. Submit an app version built from this code, with the in-app purchases attached to it.
-4. When it's live: set `QUOTA=on` in Vercel (Production) and redeploy.
+4. When it's live: set `PASS_SECRET` (a long random string) and `QUOTA=on` in Vercel (Production) and redeploy.

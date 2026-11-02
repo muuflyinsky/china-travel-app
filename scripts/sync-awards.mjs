@@ -44,7 +44,7 @@ if (!url || !key) { console.error("Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KE
 async function rest(path, method, body, prefer = "return=minimal") {
   const res = await fetch(`${url}/rest/v1/${path}`, {
     method, body: body && JSON.stringify(body),
-    headers: { apikey: key, authorization: `Bearer ${key}`, "content-type": "application/json", prefer },
+    headers: { apikey: key, "content-type": "application/json", prefer },
   });
   if (!res.ok) throw new Error(`${method} ${path.split("?")[0]} ${res.status}: ${(await res.text()).slice(0, 300)}`);
   return prefer.includes("representation") ? res.json() : null;
