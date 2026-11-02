@@ -29,13 +29,15 @@ export type Profile = {
   cities: TripCity[];
   /** Which app "book a ride" opens (SPEC v0.5 P1.6 #24). */
   rideApp: "amap" | "didi";
+  /** Light or dark look; "system" follows the phone. Applied before first paint (app/layout.tsx). */
+  theme: "system" | "light" | "dark";
 };
 
 const DEFAULT: Profile = {
   lang: "en", allergens: [], diets: [], homeCurrency: "USD", name: "",
   locatedInChina: false, arrival: "", entryDate: "", entryType: "visa_free_30", visaDays: 30,
   departure: "", nationality: "", onwardThird: null, guests: 1, hotel: null, allergiesAsked: false,
-  severe: [], cities: [], rideApp: "amap",
+  severe: [], cities: [], rideApp: "amap", theme: "system",
 };
 const KEY = "ctg.profile";
 const EVENT = "ctg-profile";

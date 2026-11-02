@@ -33,6 +33,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className="h-full" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: 'if(/ChinaTravelBuddy-iOS/.test(navigator.userAgent))document.documentElement.classList.add("in-app")' }} />
+        {/* Dark before first paint (the saved choice, else the phone's), so the app never flashes white. */}
+        <script dangerouslySetInnerHTML={{ __html: 'try{var t=(JSON.parse(localStorage.getItem("ctg.profile")||"{}").theme)||"system";if(t==="dark"||(t!=="light"&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark")}catch(e){}' }} />
       </head>
       <body className="h-full">
         <AppShell>{children}</AppShell>

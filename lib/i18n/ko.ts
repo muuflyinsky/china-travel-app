@@ -359,6 +359,9 @@ export const ko: Dict = {
     groups: { basics: "기본", eating: "식사", around: "이동", hotel: "호텔", emergency: "긴급" },
   },
   settings: {
+    prefs: "앱 설정",
+    appearance: "화면 모드",
+    themes: { system: "휴대폰과 같게", light: "라이트", dark: "다크" },
     rideApp: "택시 앱",
     rideAppNote: "탐색이나 오늘 화면에서 택시를 부를 때 열려요. 두 앱 모두 여기서 차종을 미리 고를 수는 없어요.",
     datesOverstay: "출국일이 체류 기한을 넘습니다",
@@ -377,7 +380,7 @@ export const ko: Dict = {
     more: "다른 알레르기 항목",
     fewer: "접기",
     none: "없음",
-    about: "정보",
+    about: "지원 및 구매",
     howWeEarn: "수익 구조",
     howWeEarnBody: "앱은 무료이고 광고가 없습니다. 링크로 호텔·기차·eSIM을 예약하면 제휴사가 소액의 수수료를 지급합니다. 가격은 똑같습니다.",
     privacyTitle: "개인정보",

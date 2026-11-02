@@ -24,13 +24,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [profile] = useProfile();
   // <html lang> follows the UI language, so screen readers, hyphenation and CJK fonts are right.
   useEffect(() => { document.documentElement.lang = profile.lang in UI_DICTS ? profile.lang : "en"; }, [profile.lang]);
+  // Dark or light: the traveller's choice in Settings, or the phone's when it's "system".
   useEffect(() => {
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const apply = () => { setDark(mq.matches); document.documentElement.classList.toggle("dark", mq.matches); };
+    const apply = () => {
+      const on = profile.theme === "dark" || (profile.theme !== "light" && mq.matches);
+      setDark(on); document.documentElement.classList.toggle("dark", on);
+    };
     apply();
     mq.addEventListener("change", apply);
     return () => mq.removeEventListener("change", apply);
-  }, []);
+  }, [profile.theme]);
   // One centred column on every screen size, so navbar, content and tab bar always line up.
   return (
     <App theme="ios" dark={dark} safeAreas className="app-column">

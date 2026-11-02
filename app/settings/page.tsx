@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Check, Plus, X, Trash2 } from "lucide-react";
+import { Check, Plus, X, Trash2, Languages, Banknote, SunMoon, CarTaxiFront, IdCard, Stamp, CalendarRange, MapPinned, ShieldAlert, Salad, Ticket, HandHeart, Coins, Lock, LifeBuoy, Info } from "lucide-react";
 import { Screen } from "@/components/Shell";
-import { Section, Group, Row, Field, Note } from "@/components/ui";
+import { Section, Group, Row, Field, Note, IconTile } from "@/components/ui";
 import { EditSheet } from "@/components/EditSheet";
 import { AppIcon } from "@/components/AppIcon";
 import { CountryPicker, useCountryName } from "@/components/VisaCheck";
@@ -25,8 +25,14 @@ import { PASSES } from "@/lib/products";
 
 const CURRENCIES = ["USD", "EUR", "GBP", "JPY", "KRW", "AUD", "CAD", "SGD", "HKD", "CHF", "THB", "MYR", "NZD", "SEK", "INR", "BRL", "MXN", "RUB", "TRY", "IDR", "VND", "PHP"];
 const toggle = (list: string[], id: string) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
-type Sheet = "passport" | "language" | "currency" | "dates" | "entry" | "cities" | "allergies" | "diet" | "earn" | "privacy" | "ride" | "tips";
-const SHEETS: Sheet[] = ["passport", "language", "currency", "dates", "entry", "cities", "allergies", "diet", "earn", "privacy"];
+type Sheet = "passport" | "language" | "currency" | "theme" | "dates" | "entry" | "cities" | "allergies" | "diet" | "earn" | "privacy" | "ride" | "tips";
+const SHEETS: Sheet[] = ["passport", "language", "currency", "theme", "dates", "entry", "cities", "allergies", "diet", "earn", "privacy"];
+const THEMES = ["system", "light", "dark"] as const;
+
+/** Row icon: a lucide glyph on a tinted tile (no emoji, docs/design/CRITIQUE-v1.md). */
+const Ico = ({ I, danger }: { I: React.ComponentType<{ className?: string }>; danger?: boolean }) => (
+  <IconTile tone={danger ? "danger" : "brand"}><I className="h-5 w-5" aria-hidden /></IconTile>
+);
 
 /** A row's current value, right-aligned and truncated. */
 const Value = ({ children }: { children: React.ReactNode }) => <span className="max-w-[55%] truncate text-right text-body text-muted">{children}</span>;
@@ -88,41 +94,43 @@ export default function SettingsPage() {
 
   return (
     <Screen title={t.settings.title} back>
-      <Section title={t.settings.you}>
+      {/* Order: how the app looks and talks, then the trip, then food, then support and purchases. */}
+      <Section title={t.settings.prefs}>
         <Group>
-          <Row onClick={() => setSheet("passport")} title={t.settings.passport} after={<Value>{loaded && p.nationality ? country(p.nationality) : t.settings.add}</Value>} />
-          <Row onClick={() => setSheet("language")} title={t.settings.language} after={<Value>{langName(p.lang)}</Value>} />
-          <Row onClick={() => setSheet("currency")} title={t.settings.currency} after={<Value>{p.homeCurrency}</Value>} />
+          <Row onClick={() => setSheet("language")} icon={<Ico I={Languages} />} title={t.settings.language} after={<Value>{langName(p.lang)}</Value>} />
+          <Row onClick={() => setSheet("currency")} icon={<Ico I={Banknote} />} title={t.settings.currency} after={<Value>{p.homeCurrency}</Value>} />
+          <Row onClick={() => setSheet("theme")} icon={<Ico I={SunMoon} />} title={t.settings.appearance} after={<Value>{t.settings.themes[p.theme]}</Value>} />
+          <Row onClick={() => setSheet("ride")} icon={<Ico I={CarTaxiFront} />} title={t.settings.rideApp} after={<Value>{p.rideApp === "didi" ? "DiDi" : "Amap"}</Value>} />
         </Group>
       </Section>
 
       <Section title={t.settings.trip}>
         <Group>
-          <Row onClick={() => setSheet("dates")} title={t.settings.dates} after={<Value>{dates}</Value>}
-            sub={overstay ? <span className="font-semibold text-danger">{t.settings.datesOverstay}</span> : undefined} />
-          <Row onClick={() => setSheet("entry")} title={t.settings.entryType}
+          <Row onClick={() => setSheet("passport")} icon={<Ico I={IdCard} />} title={t.settings.passport} after={<Value>{loaded && p.nationality ? country(p.nationality) : t.settings.add}</Value>} />
+          <Row onClick={() => setSheet("entry")} icon={<Ico I={Stamp} />} title={t.settings.entryType}
             sub={derived && p.entryType === derived ? t.settings.fromPassport : undefined} after={<Value>{entryValue}</Value>} />
-          <Row onClick={() => setSheet("cities")} title={t.settings.cities} after={<Value>{p.cities.length ? list(p.cities.map((c) => c.e)) : t.settings.add}</Value>} />
-          <Row onClick={() => setSheet("ride")} title={t.settings.rideApp} after={<Value>{p.rideApp === "didi" ? "DiDi" : "Amap"}</Value>} />
+          <Row onClick={() => setSheet("dates")} icon={<Ico I={CalendarRange} />} title={t.settings.dates} after={<Value>{dates}</Value>}
+            sub={overstay ? <span className="font-semibold text-danger">{t.settings.datesOverstay}</span> : undefined} />
+          <Row onClick={() => setSheet("cities")} icon={<Ico I={MapPinned} />} title={t.settings.cities} after={<Value>{p.cities.length ? list(p.cities.map((c) => c.e)) : t.settings.add}</Value>} />
         </Group>
       </Section>
 
       <Section title={t.settings.food}>
         <Note>{t.settings.privacy}</Note>
         <Group>
-          <Row onClick={() => setSheet("allergies")} title={t.settings.allergies} after={<Value>{allergyValue}</Value>} />
-          <Row onClick={() => setSheet("diet")} title={t.settings.diet} after={<Value>{dietValue}</Value>} />
+          <Row onClick={() => setSheet("allergies")} icon={<Ico I={ShieldAlert} danger />} title={t.settings.allergies} after={<Value>{allergyValue}</Value>} />
+          <Row onClick={() => setSheet("diet")} icon={<Ico I={Salad} />} title={t.settings.diet} after={<Value>{dietValue}</Value>} />
         </Group>
       </Section>
 
       <Section title={t.settings.about}>
         <Group>
-          {store && <Row onClick={() => showPaywall()} title={t.pass.settingsRow} after={<Value>{store.ends ? fmt(t.pass.active, { date: new Date(store.ends).toLocaleDateString(p.lang, { day: "numeric", month: "short" }) }) : t.pass.settingsNone}</Value>} />}
-          {store && <Row onClick={() => setSheet("tips")} title={t.pass.tipsRow} />}
-          <Row onClick={() => setSheet("earn")} title={t.settings.howWeEarn} />
-          <Row onClick={() => setSheet("privacy")} title={t.settings.privacyTitle} />
-          <Row href="/support" title={supportText(p.lang).title} />
-          <Row title={t.settings.version} after={<Value>{pkg.version}</Value>} chevron={false} />
+          {store && <Row onClick={() => showPaywall()} icon={<Ico I={Ticket} />} title={t.pass.settingsRow} after={<Value>{store.ends ? fmt(t.pass.active, { date: new Date(store.ends).toLocaleDateString(p.lang, { day: "numeric", month: "short" }) }) : t.pass.settingsNone}</Value>} />}
+          {store && <Row onClick={() => setSheet("tips")} icon={<Ico I={HandHeart} />} title={t.pass.tipsRow} />}
+          <Row href="/support" icon={<Ico I={LifeBuoy} />} title={supportText(p.lang).title} />
+          <Row onClick={() => setSheet("privacy")} icon={<Ico I={Lock} />} title={t.settings.privacyTitle} />
+          <Row onClick={() => setSheet("earn")} icon={<Ico I={Coins} />} title={t.settings.howWeEarn} />
+          <Row icon={<Ico I={Info} />} title={t.settings.version} after={<Value>{pkg.version}</Value>} chevron={false} />
         </Group>
       </Section>
 
@@ -143,6 +151,10 @@ export default function SettingsPage() {
 
       <EditSheet open={sheet === "language"} title={t.settings.language} onClose={close}>
         <ChoiceList items={LANGUAGES.map((l) => ({ value: l.code as string, label: l.name }))} value={p.lang} onPick={(lang) => set({ lang })} />
+      </EditSheet>
+
+      <EditSheet open={sheet === "theme"} title={t.settings.appearance} onClose={close}>
+        <ChoiceList items={THEMES.map((v) => ({ value: v, label: t.settings.themes[v] }))} value={p.theme} onPick={(theme) => set({ theme })} />
       </EditSheet>
 
       <EditSheet open={sheet === "currency"} title={t.settings.currency} onClose={close}>
