@@ -145,6 +145,13 @@ function toPlace(p: RawPoi): Place {
   };
 }
 
+/** One place by its Amap id (B0FFHOVBNT, the id in an amap.com place link). */
+export async function placeById(id: string, purpose: AmapPurpose = "restaurants") {
+  if (demo.maps) return null;
+  const data = await amap<{ pois: RawPoi[] }>("/v5/place/detail", { id, show_fields: "business,photos" }, purpose);
+  return data.pois?.[0] ? toPlace(data.pois[0]) : null;
+}
+
 export async function searchPlaces(q: { keywords?: string; city?: string; around?: string; types?: string; page?: number; radius?: number; pageSize?: number; purpose?: AmapPurpose }) {
   if (demo.maps) return mock.places(q.keywords, q.types);
   const fields = { show_fields: "business,photos", page_size: String(q.pageSize ?? 20), page_num: String(q.page ?? 1) };

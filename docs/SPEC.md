@@ -169,10 +169,12 @@ v0.4 把 Pay、Mobile data、Before you go 三个独立页面并入 Today。旧�
   - 所有搜索结果和地点卡（地图结果按名称匹配上榜餐厅）。
   - “附近哪里能吃”：上榜餐厅排最前，再按评分、距离排序。
 - **统一排序**：米其林三星 > 黑珍珠三钻 > 米其林二星 > 黑珍珠二钻 > 米其林一星 > 黑珍珠一钻 > 必比登 > 必吃榜 > 米其林入选；同时上多个榜的略微加分。
-- **匹配规则**（`lib/restaurant-awards.ts`）：
-  - 品牌名必须一致（忽略“餐厅/饭店/酒家/餐馆/菜馆”后缀和全角括号）。
-  - 榜单写了分店时，地图结果也必须是同一家分店；不写分店则匹配同城所有分店。
-  - 宁可漏标，不可错标。
+- **匹配规则**（`lib/restaurant-awards.ts` 的 `sameRestaurant` / `pickListing`，2026-11 起）：
+  - 品牌名比较时忽略大小写、空格和标点（·、-、& 等），去掉“中餐厅/餐厅/饭店/酒家/酒楼/餐馆/菜馆/私房菜/restaurant”等通用词；高德名称前后多出的城市名（DA VITTORIO SHANGHAI）、“·”后面的副名（马旺子·川小馆）、中英连写的两半（鹿园MOOSE）都算同一品牌。英文“spa/ktv/club”等非餐厅词不拆。
+  - 两边都写了店的类型且不同（南园酒家 / 南园饭店）不算同一家；名称含“暂停营业/已关闭”等的地点不匹配。
+  - 榜单写了分店时，高德结果必须是同一家：分店名一致，或榜单括号里的是高德结果的所在区（马旺子(锦江) → 锦江区）或地址里的路名（阿勇面馆(东书房路)）。高德名称多一个地名前缀（海宁阿月煲）只在分店名完全一致时才算。不写分店则匹配同城所有分店。
+  - 中文名搜不到时用英文名再搜一次（蔻 → Co- Restaurant）。
+  - 宁可漏标，不可错标。2026-10-25 用这套规则离线匹配 1,209 家，自动写入 769 家（`match.source` = `match-restaurants.mjs 2026-10-25`）。
 - **数据**：存在 Supabase（`award_lists`、`restaurants`、`restaurant_awards`，见 `supabase/migrations/0004_restaurant_awards.sql`；公开只读，只有 service role 能写）。服务端读取后每个实例缓存 1 小时；Supabase 未配置或不可用时回退到打包的 `lib/data/restaurant-awards.json`。更新流程：CSV → `scripts/import-awards.mjs`（校验，写入 JSON 快照）→ `scripts/sync-awards.mjs`（写入 Supabase，数据库与文件一致）。每个榜单记录版本、来源和核对日期，页面上显示。2026 版已导入：15 城 1,209 家（米其林 833 条，必吃榜 377 条）。
 - **更新节奏**（以往的发布时间）：黑珍珠每年 1 月（2026 版：内地 32 城 263 家）；必吃榜每年 6 月（2026 版：264 城 4,279 家）；米其林中国内地各城市指南全年陆续发布。每次发布后导入一次。
 - **合规（待决）**：
@@ -190,6 +192,9 @@ v0.4 把 Pay、Mobile data、Before you go 三个独立页面并入 Today。旧�
   - 品牌名比较时去掉括号里的分店；分店名与高德名称、地址中的路名、区名比较。置信度分高 / 中 / 低，App 只用高、中；低置信度进抽查清单，确认后写进 `lib/data/restaurant-overrides.json`。
   - 保存：amap_id、坐标、地址、最多 3 张照片（https）、business.tag、评分、人均、营业时间。
   - 报告：`docs/reports/restaurant-match.md`（成功率、各城市照片覆盖率、tag 样例）、`restaurant-low-confidence.csv`、`restaurant-no-photo.csv`（没有照片的餐厅，照片列留空待补）。
+- **人工补录在 Supabase 里做**（`supabase/migrations/0009_restaurant_review.sql`）：
+  - 待办清单：Supabase 表编辑器 → `restaurants` → 筛选 `review` 不为空。`review` 用中文写明原因（没匹配上 / 多家同名店 / 名称差异大）和高德候选店名及其 ID。
+  - 补录：在那一行的 `amap_link` 粘贴高德地点页链接（或只粘 ID，如 B0FFHOVBNT）。每天的定时任务（`/api/cron/city-guides` 里的 `resolveManualLinks`）按 ID 查一次高德，填好坐标、地址、照片、评分、人均、营业时间，并清空 `review`；查不到的留到下次，并写在定时任务的返回结果里。每次最多 20 家。
 - **照片**：
   - 顺序：高德照片 → 人工补充的照片 → 菜系色块（菜系外文名 + 图标）。不用看图模型选封面。
   - 人工补充：把 `restaurant-no-photo.csv` 和 `docs/photo-research-prompt.md` 里的提示词交给能上网的 AI，只允许三种来源：高德地点页、维基共享资源（CC0 / CC BY / CC BY-SA，需写明作者和许可证）、明确允许媒体使用的餐厅官网。用 `--photos <csv>` 导入。导入时脚本会拒绝大众点评等来源、缺少来源页面的行，以及缺作者或许可证的维基图片。
