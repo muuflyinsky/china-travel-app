@@ -15,8 +15,10 @@ const MIN = 28;
  * `rest` (other allergies, smaller). The type shrinks from 36px to 28px until it fits one
  * screen; reply buttons stay pinned at the bottom so staff can always answer.
  */
-export function ShowCard({ lead, lines, rest = [], sub, explain, replies, notice, bottom, bottomKey = "", kind = "card", onClose }: {
+export function ShowCard({ lead, lines, rest = [], restFirst = false, sub, explain, replies, notice, bottom, bottomKey = "", kind = "card", onClose }: {
   lead?: string; lines: string[]; rest?: string[]; sub?: string; explain?: string; replies?: StaffReply[];
+  /** Other allergies right under the lead, before a long list (order cards), so they never scroll away. */
+  restFirst?: boolean;
   /** A line for the traveller above the card (e.g. "Order updated"). */
   notice?: string;
   /** Replaces the reply buttons (the order card asks its own question); `bottomKey` changes refit the text. */
@@ -59,8 +61,9 @@ export function ShowCard({ lead, lines, rest = [], sub, explain, replies, notice
       <div ref={box} className="mt-3 min-h-0 flex-1 overflow-auto">
         <div className="zh space-y-3 font-semibold" lang="zh-CN">
           {lead && <p className="font-bold text-danger" style={big}>{lead}</p>}
+          {restFirst && rest.map((l, i) => <p key={`r${i}`} style={small}>{l}</p>)}
           {lines.map((l, i) => <p key={i} className="font-bold" style={big}>{l}</p>)}
-          {rest.map((l, i) => <p key={i} style={small}>{l}</p>)}
+          {!restFirst && rest.map((l, i) => <p key={i} style={small}>{l}</p>)}
         </div>
         {sub && <p className="mt-2 text-subhead text-muted">{sub}</p>}
         {explain && (

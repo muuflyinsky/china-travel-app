@@ -10,6 +10,9 @@ import type { AllergenId } from "@/lib/allergens";
 import type { orderCard } from "@/lib/order-card";
 
 type Card = ReturnType<typeof orderCard>;
+
+/** "peanuts and sesame" / 「落花生、ごま」: the language's own list. */
+const list = (xs: string[], lang: string) => { try { return new Intl.ListFormat(lang, { type: "conjunction" }).format(xs); } catch { return xs.join(", "); } };
 type Step = "card" | "pick" | "handoff" | "result" | "ok";
 
 /**
@@ -32,7 +35,7 @@ export function OrderShowCard({ card, onRemove, onClose }: {
   const [marked, setMarked] = useState<string[]>([]);
   const [unsure, setUnsure] = useState(false);
   const { ask, dishes } = card;
-  const mine = p.allergens.map((a) => t.allergens[a as AllergenId].toLowerCase()).join(", ");
+  const mine = list(p.allergens.map((a) => (t.allergens[a as AllergenId] ?? a).toLowerCase()), p.lang);
   // Staff answered: marked dishes leave the order now, so closing at any later step keeps that.
   const finish = (zhs: string[]) => { setMarked(zhs); if (zhs.length) onRemove(zhs); setStep("handoff"); };
   const toggle = (zh: string) => setMarked((m) => (m.includes(zh) ? m.filter((x) => x !== zh) : [...m, zh]));
@@ -58,7 +61,7 @@ export function OrderShowCard({ card, onRemove, onClose }: {
                 <li key={d.zh}>
                   <button onClick={() => toggle(d.zh)} aria-pressed={on}
                     className={`zh flex min-h-16 w-full items-center gap-3 rounded-card border-2 px-4 text-left text-[26px] font-bold ${on ? "border-danger bg-danger-soft text-danger" : "border-line"}`}>
-                    <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full border-2 ${on ? "border-danger bg-danger text-white" : "border-line"}`}>{on && <Check className="h-5 w-5" aria-hidden />}</span>
+                    <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full border-2 ${on ? "border-danger bg-danger text-white dark:text-[#12141c]" : "border-line"}`}>{on && <Check className="h-5 w-5" aria-hidden />}</span>
                     <span className="min-w-0 flex-1">{d.zh}</span>
                     <span className="shrink-0 text-body font-semibold text-muted">×{d.qty}</span>
                   </button>
@@ -129,7 +132,7 @@ export function OrderShowCard({ card, onRemove, onClose }: {
               </li>
             ))}
           </ul>
-          <p className="text-footnote text-muted">{t.eat.markedLeave}</p>
+          <p className="text-footnote text-muted">{marked.length === 1 ? t.eat.markedLeaveOne : t.eat.markedLeave}</p>
         </div>
         <div className="mt-3 shrink-0 space-y-2 border-t border-line pt-3">
           {left.length > 0 && (
@@ -156,18 +159,18 @@ export function OrderShowCard({ card, onRemove, onClose }: {
     </div>
   ) : (
     <div lang="zh-CN">
-      <p className="zh text-[26px] leading-tight font-bold">{ask.q}</p>
-      <div className="mt-3 space-y-2">
+      <p className="zh text-[24px] leading-tight font-bold">{ask.q}</p>
+      <div className="mt-2 space-y-2">
         <button onClick={() => { track("staff_reply", { card: "order", reply: 0 }); setStep("ok"); }}
-          className="zh min-h-14 w-full rounded-control border-2 border-line px-4 text-left text-title font-bold">{ask.yes}</button>
-        <button onClick={() => { track("staff_reply", { card: "order", reply: 1 }); if (dishes.length === 1) finish([dishes[0].zh]); else { setMarked([]); setStep("pick"); } }}
-          className="zh min-h-14 w-full rounded-control border-2 border-danger px-4 text-left text-title font-bold text-danger">{ask.some}</button>
+          className="zh min-h-12 w-full rounded-control border-2 border-line px-4 text-left text-title font-bold">{ask.yes}</button>
+        <button onClick={() => { track("staff_reply", { card: "order", reply: 1 }); if (dishes.length === 1) { track("staff_reply_dish", { card: "order", n: 1 }); finish([dishes[0].zh]); } else { setMarked([]); setStep("pick"); } }}
+          className="zh min-h-12 w-full rounded-control border-2 border-danger px-4 text-left text-title font-bold text-danger">{ask.some}</button>
       </div>
       <p className="mt-2 text-footnote text-muted">{t.eat.askHint}</p>
     </div>
   );
   return (
-    <ShowCard kind="order" lead={card.lead} lines={card.lines} rest={card.rest} explain={card.explain}
+    <ShowCard kind="order" lead={card.lead} lines={card.lines} rest={card.rest} restFirst explain={card.explain}
       notice={card.again ? t.eat.orderUpdated : undefined} bottom={bottom} bottomKey={step} onClose={onClose} />
   );
 }
