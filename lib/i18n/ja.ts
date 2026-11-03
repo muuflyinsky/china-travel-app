@@ -245,7 +245,7 @@ export const ja: Dict = {
     marked: "店員さんが{n}品に印を付けました",
     markedOne: "店員さんが1品に印を付けました",
     markedWhyAllergy: "作れないか、{x}を抜けない料理です。",
-    markedWhy: "作れないか、食事制限に合わない料理です。",
+    markedWhy: "作れない料理です。",
     markedLeave: "これらは注文から外します。",
     markedLeaveOne: "この料理は注文から外します。",
     orderRest: "残りの{n}品を今注文する",

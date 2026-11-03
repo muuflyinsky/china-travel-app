@@ -248,7 +248,7 @@ export const en = {
     marked: "Staff marked {n} dishes",
     markedOne: "Staff marked 1 dish",
     markedWhyAllergy: "They can’t make them, or {x} can’t be left out.",
-    markedWhy: "They can’t make them, or they don’t fit your diet.",
+    markedWhy: "They can’t make them.",
     markedLeave: "These come out of your order.",
     markedLeaveOne: "This dish comes out of your order.",
     orderRest: "Order the other {n} now",

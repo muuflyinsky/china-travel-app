@@ -245,7 +245,7 @@ export const ko: Dict = {
     marked: "직원이 요리 {n}개를 표시했어요",
     markedOne: "직원이 요리 1개를 표시했어요",
     markedWhyAllergy: "만들 수 없거나, {x}을(를) 뺄 수 없어요.",
-    markedWhy: "만들 수 없거나, 식단에 맞지 않아요.",
+    markedWhy: "만들 수 없대요.",
     markedLeave: "이 요리들은 주문에서 빠져요.",
     markedLeaveOne: "이 요리는 주문에서 빠져요.",
     orderRest: "나머지 {n}개 지금 주문하기",

@@ -245,7 +245,7 @@ export const de: Dict = {
     marked: "Das Personal hat {n} Gerichte markiert",
     markedOne: "Das Personal hat 1 Gericht markiert",
     markedWhyAllergy: "Das Personal kann sie nicht machen, oder {x} lässt sich nicht weglassen.",
-    markedWhy: "Sie können sie nicht machen, oder sie passen nicht zu deiner Ernährung.",
+    markedWhy: "Das Personal kann sie nicht machen.",
     markedLeave: "Diese Gerichte kommen aus deiner Bestellung.",
     markedLeaveOne: "Dieses Gericht kommt aus deiner Bestellung.",
     orderRest: "Die anderen {n} jetzt bestellen",
