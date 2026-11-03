@@ -146,6 +146,7 @@ export const en = {
     metroShort: "metro {m} m",
     noMetro: "No metro within 1.5 km",
     priceRef: "Amap reference price. The live price is on Trip.com.",
+    priceOnTrip: "Live prices for your dates on Trip.com",
     checkTrip: "Check price on Trip.com",
     allTrip: "All hotels in {city} on Trip.com",
     noneTier: "No picks in this price range yet. See all hotels on Trip.com below.",

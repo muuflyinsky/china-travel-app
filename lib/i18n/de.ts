@@ -144,6 +144,7 @@ export const de: Dict = {
     metroShort: "U-Bahn {m} m",
     noMetro: "Keine U-Bahn im Umkreis von 1,5 km",
     priceRef: "Richtpreis von Amap. Den aktuellen Preis zeigt Trip.com.",
+    priceOnTrip: "Preise für deine Daten auf Trip.com",
     checkTrip: "Preis auf Trip.com prüfen",
     allTrip: "Alle Hotels in {city} auf Trip.com",
     noneTier: "In dieser Preisklasse noch keine Tipps. Alle Hotels auf Trip.com unten.",

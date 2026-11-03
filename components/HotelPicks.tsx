@@ -61,8 +61,11 @@ export function FeaturedHotel({ h, label, link, tag }: { h: HotelPick; label: st
       <h3 className="zh mt-1 text-headline">{h.name}</h3>
       <p className="text-footnote text-muted">{[h.brand, h.district && <span key="d" className="zh">{h.district}</span>].filter(Boolean).reduce<React.ReactNode[]>((a, x, i) => (i ? [...a, " · ", x] : [x]), [])}</p>
       <Facts h={h} />
-      <p className="mt-3 text-title tabular-nums">{fmt(t.stay.perNight, { price: price(h.cny) })}</p>
-      <p className="text-footnote text-muted">{t.stay.priceRef}</p>
+      {/* No reference price from Amap: say where the real one is, never invent a number. */}
+      {h.cny ? <>
+        <p className="mt-3 text-title tabular-nums">{fmt(t.stay.perNight, { price: price(h.cny) })}</p>
+        <p className="text-footnote text-muted">{t.stay.priceRef}</p>
+      </> : <p className="mt-3 text-subhead text-muted">{t.stay.priceOnTrip}</p>}
       <div className="mt-3 flex gap-2">
         <a href={goLink("trip", "hotel_search", { ...link, keyword: h.name }, "stay_pick", tag)} target="_blank" rel="noopener" onClick={() => track("hotel_pick_click", { tag })}
           className="flex min-h-control flex-1 items-center justify-center gap-2 rounded-control bg-cta px-4 text-headline text-cta-ink">
@@ -83,7 +86,7 @@ export function HotelRow({ h, link, tag }: { h: HotelPick; link: LinkParams; tag
       <div className="min-w-0 flex-1">
         <p className="zh text-body">{h.name}</p>
         <p className="text-footnote text-muted">
-          {[h.brand, h.metro ? fmt(t.stay.metroShort, { m: h.metro.meters }) : null, price(h.cny)].filter(Boolean).join(" · ")}
+          {[h.brand, h.metro ? fmt(t.stay.metroShort, { m: h.metro.meters }) : null, h.cny ? price(h.cny) : null].filter(Boolean).join(" · ")}
         </p>
       </div>
       <a href={goLink("trip", "hotel_search", { ...link, keyword: h.name }, "stay_pick", tag)} target="_blank" rel="noopener" onClick={() => track("hotel_pick_click", { tag })}

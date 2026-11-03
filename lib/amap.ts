@@ -56,6 +56,11 @@ async function slot() {
   nextSlot = at + gap;
   if (at > now) await new Promise((r) => setTimeout(r, at - now));
 }
+/** Amap answered with a web page (its firewall), not data. */
+export class AmapBlocked extends Error {
+  constructor(path: string) { super(`Amap ${path}: blocked (HTML instead of JSON)`); }
+}
+
 // Amap's "too many requests" answers (QPS limits): wait and try again, 3 times at most.
 const QPS_CODES = new Set(["10019", "10020", "10021", "10022", "10029"]);
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -68,7 +73,11 @@ async function amap<T>(path: string, params: Record<string, string | undefined>,
     await slot();
     // A QPS refusal comes back as HTTP 200, so retries skip Next's 5-minute fetch cache.
     const res = await fetch(`${BASE}${path}?${qs}`, attempt ? { cache: "no-store" } : { next: { revalidate: 300 } });
-    const data = await res.json();
+    const text = await res.text();
+    // Amap's firewall sometimes answers a server with an HTML "verify you're human" page instead
+    // of JSON (seen on /v5/place/* from Vercel, 2026-11-03). Callers can fall back to v3.
+    if (text.trimStart().startsWith("<")) { count(path, purpose, false); throw new AmapBlocked(path); }
+    const data = JSON.parse(text);
     count(path, purpose, data.status === "1");
     if (data.status === "1") return data as T;
     if (QPS_CODES.has(String(data.infocode)) && attempt < 3) { await sleep(1000 * 2 ** attempt); continue; }
@@ -145,24 +154,65 @@ function toPlace(p: RawPoi): Place {
   };
 }
 
+// ---- v3 fallback: the same search on Amap's older API, when v5 is blocked ----------------------
+
+type RawPoiV3 = {
+  id: string; name: string; address: string | []; location: string; type: string; typecode?: string;
+  cityname: string | []; citycode: string | []; adname: string | []; adcode?: string | []; distance?: string | [];
+  tel?: string | []; biz_ext?: { rating?: string | []; cost?: string | [] } | []; photos?: { url: string }[];
+};
+/** v3 writes an empty field as []. */
+const str = (v: unknown) => (typeof v === "string" && v ? v : undefined);
+const fromV3 = (p: RawPoiV3): RawPoi => {
+  const biz = Array.isArray(p.biz_ext) ? {} : p.biz_ext ?? {};
+  return {
+    id: p.id, name: p.name, address: str(p.address) ?? "", location: p.location, type: p.type, typecode: str(p.typecode),
+    cityname: str(p.cityname) ?? "", citycode: str(p.citycode) ?? "", adname: str(p.adname) ?? "", adcode: str(p.adcode), distance: str(p.distance),
+    business: { tel: str(p.tel), rating: str(biz.rating), cost: str(biz.cost) }, photos: p.photos,
+  };
+};
+// Once v5 is blocked, go straight to v3 for a while instead of paying for a failed call each time.
+let v5BlockedUntil = 0;
+async function v5OrV3<T>(v5: () => Promise<T>, v3: () => Promise<T>) {
+  if (Date.now() < v5BlockedUntil) return v3();
+  try { return await v5(); } catch (e) {
+    if (!(e instanceof AmapBlocked)) throw e;
+    console.warn("[amap] v5 blocked, using v3 for 10 min");
+    v5BlockedUntil = Date.now() + 10 * 60_000;
+    return v3();
+  }
+}
+
 /** One place by its Amap id (B0FFHOVBNT, the id in an amap.com place link). */
 export async function placeById(id: string, purpose: AmapPurpose = "restaurants") {
   if (demo.maps) return null;
-  const data = await amap<{ pois: RawPoi[] }>("/v5/place/detail", { id, show_fields: "business,photos" }, purpose);
-  return data.pois?.[0] ? toPlace(data.pois[0]) : null;
+  const pois = await v5OrV3(
+    async () => (await amap<{ pois: RawPoi[] }>("/v5/place/detail", { id, show_fields: "business,photos" }, purpose)).pois,
+    async () => ((await amap<{ pois: RawPoiV3[] }>("/v3/place/detail", { id, extensions: "all" }, purpose)).pois ?? []).map(fromV3),
+  );
+  return pois?.[0] ? toPlace(pois[0]) : null;
 }
 
 export async function searchPlaces(q: { keywords?: string; city?: string; around?: string; types?: string; page?: number; radius?: number; pageSize?: number; purpose?: AmapPurpose }) {
   if (demo.maps) return mock.places(q.keywords, q.types);
-  const fields = { show_fields: "business,photos", page_size: String(q.pageSize ?? 20), page_num: String(q.page ?? 1) };
-  const data = q.around
-    ? await amap<{ pois: RawPoi[] }>("/v5/place/around", {
-        location: q.around, keywords: q.keywords, types: q.types, radius: String(q.radius ?? 5000), sortrule: "distance", ...fields,
-      }, q.purpose ?? "nearby")
-    : await amap<{ pois: RawPoi[] }>("/v5/place/text", {
-        keywords: q.keywords, types: q.types, region: q.city, city_limit: q.city ? "true" : undefined, ...fields,
-      }, q.purpose ?? "search");
-  return data.pois.map(toPlace);
+  const size = String(q.pageSize ?? 20), page = String(q.page ?? 1), purpose = q.purpose ?? (q.around ? "nearby" : "search");
+  const pois = await v5OrV3(
+    async () => {
+      const fields = { show_fields: "business,photos", page_size: size, page_num: page };
+      const data = q.around
+        ? await amap<{ pois: RawPoi[] }>("/v5/place/around", { location: q.around, keywords: q.keywords, types: q.types, radius: String(q.radius ?? 5000), sortrule: "distance", ...fields }, purpose)
+        : await amap<{ pois: RawPoi[] }>("/v5/place/text", { keywords: q.keywords, types: q.types, region: q.city, city_limit: q.city ? "true" : undefined, ...fields }, purpose);
+      return data.pois;
+    },
+    async () => {
+      const fields = { extensions: "all", offset: size, page };
+      const data = q.around
+        ? await amap<{ pois: RawPoiV3[] }>("/v3/place/around", { location: q.around, keywords: q.keywords, types: q.types, radius: String(q.radius ?? 5000), sortrule: "distance", ...fields }, purpose)
+        : await amap<{ pois: RawPoiV3[] }>("/v3/place/text", { keywords: q.keywords, types: q.types, city: q.city, citylimit: q.city ? "true" : undefined, ...fields }, purpose);
+      return (data.pois ?? []).map(fromV3);
+    },
+  );
+  return pois.map(toPlace);
 }
 
 /** Chinese address → "lng,lat" (GCJ-02), or null when Amap can't place it. */

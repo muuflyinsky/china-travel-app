@@ -3,6 +3,8 @@ import { demo } from "./config";
 import { TRIP_CITY_ID } from "./affiliate";
 import * as mock from "./demo";
 import { cacheRead, cacheWrite } from "./cache";
+import { HOT_CITIES } from "./hot-cities";
+import { logRow } from "./supabase";
 import { TIER_IDS, tierBounds, tierOf, type CityPicks, type HotelPick, type TierId } from "./hotel-tiers";
 
 export { tierBounds };
@@ -37,6 +39,18 @@ function brandOf(name: string): { kind: "international" | "domestic"; brand: str
   for (const [frag, en] of DOMESTIC) if (name.includes(frag)) return { kind: "domestic", brand: en };
   return null;
 }
+// Without a price (Amap often has none for hotels), a brand's usual class places it in a tier.
+const BRAND_TIER: Record<string, TierId> = Object.fromEntries([
+  ...["Ritz-Carlton", "JW Marriott", "St. Regis", "W Hotels", "EDITION", "Waldorf Astoria", "Conrad", "Park Hyatt", "Grand Hyatt", "Raffles", "Fairmont",
+    "Shangri-La", "Kerry", "Peninsula", "Mandarin Oriental", "Four Seasons", "Rosewood", "Langham", "Regent"].map((b) => [b, "luxury"]),
+  ...["Sheraton", "Westin", "Le Méridien", "Renaissance", "Marriott", "DoubleTree", "Hilton", "InterContinental", "Hualuxe", "Indigo", "Kimpton",
+    "Crowne Plaza", "Andaz", "Hyatt", "Sofitel", "Pullman", "Grand Mercure", "Jianguo"].map((b) => [b, "upscale"]),
+  ...["Four Points", "Courtyard", "Aloft", "Element", "Fairfield", "Hilton Garden Inn", "Hampton", "Holiday Inn", "Holiday Inn Express", "Hyatt Place", "Hyatt House",
+    "Novotel", "Mercure", "Ji Hotel", "Atour", "Joya", "Manxin", "Orange Hotel", "Lavande", "James Joyce", "Xana", "Yitel", "New Century", "Metropark", "Golden Tulip", "Jin Jiang"].map((b) => [b, "comfort"]),
+  ...["ibis", "Hanting", "Jinjiang Inn", "Vienna", "Home Inn", "CityGo", "Qiuguo", "Echarm", "7 Days", "Campanile", "H World"].map((b) => [b, "economy"]),
+]);
+const starsTier = (stars: number): TierId => (stars >= 5 ? "luxury" : stars >= 4 ? "upscale" : stars >= 3 ? "comfort" : "economy");
+
 const starsOf = (type: string) => (type.includes("五星级") ? 5 : type.includes("四星级") ? 4 : type.includes("三星级") ? 3 : 0);
 
 /** Lower is better: how sure we are that a foreign guest can check in. */
@@ -45,19 +59,22 @@ const trust = (h: HotelPick) => (h.chain === "international" ? 0 : h.chain === "
 const metroBand = (h: HotelPick) => (!h.metro ? 3 : h.metro.meters <= 500 ? 0 : h.metro.meters <= 1000 ? 1 : 2);
 
 export function rank(a: HotelPick, b: HotelPick) {
-  return trust(a) - trust(b) || metroBand(a) - metroBand(b) || (b.rating ?? 0) - (a.rating ?? 0) || a.cny - b.cny;
+  return trust(a) - trust(b) || metroBand(a) - metroBand(b) || (b.rating ?? 0) - (a.rating ?? 0) || (a.cny || Infinity) - (b.cny || Infinity);
 }
 
 export function candidate(p: Place, cityShort: string, bounds: [number, number, number]): HotelPick | null {
-  const cny = Number(p.cost);
-  if (!cny || cny < 80) return null; // no usable price → can't place it in a tier
   const b = brandOf(p.name);
   const stars = starsOf(p.type);
   const majorCity = cityShort in TRIP_CITY_ID;
   if (!b && !(majorCity && stars >= 4)) return null;
+  // Amap's price is often missing (or a junk value): then the brand's class, or the star class,
+  // decides the tier, and the card says "price on Trip.com" (cny 0) instead of a number.
+  const raw = Number(p.cost);
+  const cny = raw >= 80 ? raw : 0;
+  const tier = cny ? tierOf(cny, bounds) : (b && BRAND_TIER[b.brand]) || starsTier(stars);
   return {
     id: p.id, name: p.name, pinyin: p.pinyin, address: p.address, district: p.district, location: p.location,
-    rating: p.rating ? Number(p.rating) : undefined, cny, tier: tierOf(cny, bounds), stars,
+    rating: p.rating ? Number(p.rating) : undefined, cny, tier, stars,
     chain: b?.kind ?? null, brand: b?.brand, metro: null,
   };
 }
@@ -105,4 +122,28 @@ export async function cityPicks(adcode: string, cityShort: string, around?: stri
   // An empty result isn't stored: it would hide a fix (or a better Amap day) for a week.
   if (TIER_IDS.some((id) => tiers[id].length)) await cacheWrite("hotel_picks", key, picks);
   return picks;
+}
+
+// Beijing, Shanghai and Guangzhou every day, plus two more hot cities in turn.
+const ALWAYS = ["110000", "310000", "440100"];
+
+/**
+ * Daily check (cron): builds or reads each city's picks and logs every empty tier as a
+ * `hotel_gap` event, so an empty Stay page shows up in the data instead of in a review.
+ */
+export async function checkHotelPicks(today = new Date()) {
+  const rest = HOT_CITIES.filter((c) => !ALWAYS.includes(c.a));
+  const day = Math.floor(today.getTime() / 864e5);
+  const cities = [...ALWAYS.map((a) => HOT_CITIES.find((c) => c.a === a)).filter((c): c is (typeof HOT_CITIES)[number] => Boolean(c)),
+    ...[0, 1].map((i) => rest[(day * 2 + i) % rest.length]).filter(Boolean)];
+  const gaps: { city: string; tiers: TierId[] }[] = [];
+  for (const c of cities) {
+    const picks = await cityPicks(c.a, c.s);
+    const empty = TIER_IDS.filter((id) => !picks.tiers[id].length);
+    if (empty.length) {
+      gaps.push({ city: c.e, tiers: empty });
+      await logRow("events", { e: "hotel_gap", p: { city: c.a, tiers: empty.join(",") }, sid: null });
+    }
+  }
+  return { checked: cities.map((c) => c.e), gaps };
 }

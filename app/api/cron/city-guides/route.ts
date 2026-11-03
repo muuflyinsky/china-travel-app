@@ -5,9 +5,10 @@ import { supabaseOn } from "@/lib/supabase";
 import { aiProvider, demo } from "@/lib/config";
 import { pruneUsage } from "@/lib/quota";
 import { resolveManualLinks } from "@/lib/restaurants";
+import { checkHotelPicks } from "@/lib/hotels";
 
 // Daily Vercel Cron (vercel.json): fills restaurants fixed by hand (an Amap link pasted into
-// Supabase, lib/restaurants.ts resolveManualLinks), then generates the stalest city guides into
+// Supabase, lib/restaurants.ts resolveManualLinks), checks hotel picks for a few hot cities, then generates the stalest city guides into
 // Supabase, a few per run.
 // Vercel calls it with `Authorization: Bearer $CRON_SECRET`; CITY_GUIDE_TOKEN works too, for a
 // manual run (curl -H "authorization: Bearer …" https://…/api/cron/city-guides).
@@ -25,8 +26,10 @@ export async function GET(req: Request) {
   setAmapGap(400); // ~2.5 Amap requests a second, under the key's QPS limit
   try {
     const links = await resolveManualLinks().catch((e) => ({ manual: 0, manualFailed: [], manualError: (e as Error).message }));
+    // Stay must never be empty: a few hot cities a day, empty tiers logged (events: hotel_gap).
+    const hotels = await checkHotelPicks().catch((e) => ({ hotelError: (e as Error).message }));
     const result = await refreshStaleGuides({ budgetMs: 60_000 });
-    return NextResponse.json({ ...result, ...links });
+    return NextResponse.json({ ...result, ...links, hotels });
   } finally {
     setAmapGap(0);
   }
