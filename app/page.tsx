@@ -513,7 +513,7 @@ function Leaving() {
         <Card>
           <h3 className="flex items-center gap-2 text-headline"><Receipt className="h-5 w-5 shrink-0 text-cobalt" aria-hidden />{t.today.taxTitle}</h3>
           <p className="mt-1 text-subhead">{t.today.taxBody}</p>
-          <Button variant="soft" href="/tax-refund" className="mt-3 w-full text-subhead!">{t.today.taxRowSub}</Button>
+          <Button variant="soft" href="/tax-refund" className="mt-3 w-full text-subhead!">{t.today.taxOpen}</Button>
         </Card>
       </Section>
     </>

@@ -80,7 +80,7 @@ export default function TaxRefundPage() {
             })}
           </ol>
         </Card>
-        <Button variant="soft" className="w-full text-subhead!" onClick={() => setCard(["您好，我要办理离境退税。", "这是我的护照和退税单（退税码）。"])}>{x.showCustoms}</Button>
+        <Button variant="soft" className="w-full text-subhead!" onClick={() => setCard(["您好，我要办理离境退税。", "这是我的护照和离境退税服务码。"])}>{x.showCustoms}</Button>
       </Section>
 
       <Section title={x.whereTitle}>
@@ -103,6 +103,7 @@ export default function TaxRefundPage() {
           </div>
         ))}
         {c.serviceMap && <Note>{x.shanghaiMap}</Note>}
+        {c.bagDropCheck && <Note>{x.gzBagDrop}</Note>}
         <p className="px-1 text-footnote text-muted">{x.otherCities}</p>
       </Section>
 

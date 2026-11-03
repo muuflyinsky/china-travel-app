@@ -5,7 +5,7 @@
 
 export const VERIFIED_ON = "2026-11-03";
 
-/** The official sign colour (Pantone 2945 C, 古蓝色) from the shop and agent sign specification. */
+/** The official sign colour (Pantone 2945 C, 古蓝色) from MOFCOM's 退税商店 / 离境退税机构 sign specifications. */
 export const SIGN_BLUE = "#004C97";
 
 /** Where the refund agent's counter is, as far as an official source says. */
@@ -25,7 +25,11 @@ export type Counter = {
 };
 
 export type Airport = { code: string; zh: string; en: string; counters: Counter[] };
-export type TaxCity = { adcode: string; airports: Airport[]; /** Shanghai's free printed refund map. */ serviceMap?: boolean };
+export type TaxCity = {
+  adcode: string; airports: Airport[];
+  /** Shanghai's free printed refund map. */ serviceMap?: boolean;
+  /** Customs checks refunds at bag drop (Guangzhou Baiyun T2), so steps 1–3 happen at check-in. */ bagDropCheck?: boolean;
+};
 
 export const TAX_CITIES: TaxCity[] = [
   {
@@ -52,6 +56,7 @@ export const TAX_CITIES: TaxCity[] = [
   },
   {
     adcode: "440100",
+    bagDropCheck: true,
     airports: [
       // Customs check is part of bag drop at T2 (Xinhua, 2026-07-08); counter locations not official yet.
       { code: "CAN", zh: "广州白云国际机场", en: "Guangzhou Baiyun", counters: [{ terminal: "T2", signs: true }, { terminal: "T3", signs: true }] },
