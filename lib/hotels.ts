@@ -34,9 +34,17 @@ const DOMESTIC: [string, string][] = [
   ["城际", "CityGo"], ["秋果", "Qiuguo"], ["宜尚", "Echarm"], ["7天", "7 Days"], ["康铂", "Campanile"], ["郁锦香", "Golden Tulip"], ["华住", "H World"],
 ];
 
+// Fragments that are also ordinary words or place names (四季青, 锦江区, 半岛, 假日广场): too
+// unsure to decide a brand, so such hotels qualify by stars only. The longer forms (皇冠假日,
+// 智选假日, 锦江之星) are listed separately and still count.
+const AMBIGUOUS = new Set(["半岛", "丽晶", "四季", "假日", "锦江", "嘉里", "开元", "维景", "城际", "美居"]);
+
 function brandOf(name: string): { kind: "international" | "domestic"; brand: string } | null {
-  for (const [frag, en] of INTERNATIONAL) if (name.includes(frag)) return { kind: "international", brand: en };
-  for (const [frag, en] of DOMESTIC) if (name.includes(frag)) return { kind: "domestic", brand: en };
+  // The branch in brackets is a place, not the brand: 汉庭酒店(杭州四季青店) is a Hanting.
+  const n = name.replace(/[(（][^)）]*[)）]/g, "");
+  for (const [list, kind] of [[INTERNATIONAL, "international"], [DOMESTIC, "domestic"]] as const) {
+    for (const [frag, en] of list) if (!AMBIGUOUS.has(frag) && n.includes(frag)) return { kind, brand: en };
+  }
   return null;
 }
 // Without a price (Amap often has none for hotels), a brand's usual class places it in a tier.
@@ -131,13 +139,17 @@ const ALWAYS = ["110000", "310000", "440100"];
  * Daily check (cron): builds or reads each city's picks and logs every empty tier as a
  * `hotel_gap` event, so an empty Stay page shows up in the data instead of in a review.
  */
-export async function checkHotelPicks(today = new Date()) {
+export async function checkHotelPicks({ today = new Date(), deadline = Infinity }: { today?: Date; deadline?: number } = {}) {
   const rest = HOT_CITIES.filter((c) => !ALWAYS.includes(c.a));
   const day = Math.floor(today.getTime() / 864e5);
   const cities = [...ALWAYS.map((a) => HOT_CITIES.find((c) => c.a === a)).filter((c): c is (typeof HOT_CITIES)[number] => Boolean(c)),
     ...[0, 1].map((i) => rest[(day * 2 + i) % rest.length]).filter(Boolean)];
   const gaps: { city: string; tiers: TierId[] }[] = [];
+  const checked: string[] = [];
+  // A cold city is ~32 Amap calls (about 15 s at the cron's pace): stop well before the deadline.
   for (const c of cities) {
+    if (Date.now() > deadline - 20_000) break;
+    checked.push(c.e);
     const picks = await cityPicks(c.a, c.s);
     const empty = TIER_IDS.filter((id) => !picks.tiers[id].length);
     if (empty.length) {
@@ -145,5 +157,5 @@ export async function checkHotelPicks(today = new Date()) {
       await logRow("events", { e: "hotel_gap", p: { city: c.a, tiers: empty.join(",") }, sid: null });
     }
   }
-  return { checked: cities.map((c) => c.e), gaps };
+  return { checked, gaps };
 }

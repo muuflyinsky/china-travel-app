@@ -144,7 +144,7 @@ export const ja: Dict = {
     metroShort: "地下鉄 {m} m",
     noMetro: "1.5 km以内に地下鉄なし",
     priceRef: "Amapの参考価格です。実際の料金はTrip.comで確認できます。",
-    priceOnTrip: "日程に合わせた料金は Trip.com で",
+    priceOnTrip: "日程ごとの料金は Trip.com で確認できます",
     checkTrip: "Trip.comで料金を見る",
     allTrip: "Trip.comで{city}のホテルをすべて見る",
     noneTier: "この価格帯のおすすめはまだありません。下のTrip.comで全ホテルを見られます。",

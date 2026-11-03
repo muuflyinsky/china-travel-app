@@ -159,7 +159,8 @@ function toPlace(p: RawPoi): Place {
 type RawPoiV3 = {
   id: string; name: string; address: string | []; location: string; type: string; typecode?: string;
   cityname: string | []; citycode: string | []; adname: string | []; adcode?: string | []; distance?: string | [];
-  tel?: string | []; biz_ext?: { rating?: string | []; cost?: string | [] } | []; photos?: { url: string }[];
+  tel?: string | []; tag?: string | []; photos?: { url: string }[];
+  biz_ext?: { rating?: string | []; cost?: string | []; open_time?: string | []; opentime2?: string | [] } | [];
 };
 /** v3 writes an empty field as []. */
 const str = (v: unknown) => (typeof v === "string" && v ? v : undefined);
@@ -168,7 +169,9 @@ const fromV3 = (p: RawPoiV3): RawPoi => {
   return {
     id: p.id, name: p.name, address: str(p.address) ?? "", location: p.location, type: p.type, typecode: str(p.typecode),
     cityname: str(p.cityname) ?? "", citycode: str(p.citycode) ?? "", adname: str(p.adname) ?? "", adcode: str(p.adcode), distance: str(p.distance),
-    business: { tel: str(p.tel), rating: str(biz.rating), cost: str(biz.cost) }, photos: p.photos,
+    // v3 keeps a restaurant's signature dishes in a top-level `tag`, opening hours in biz_ext.
+    business: { tel: str(p.tel), rating: str(biz.rating), cost: str(biz.cost), tag: str(p.tag), opentime_week: str(biz.opentime2) ?? str(biz.open_time) },
+    photos: p.photos,
   };
 };
 // Once v5 is blocked, go straight to v3 for a while instead of paying for a failed call each time.
