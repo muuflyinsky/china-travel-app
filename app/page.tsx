@@ -202,6 +202,12 @@ function BeforeTrip() {
         <CityHotels />
       </Section>
       <Alarms suggest />
+      {/* Shown from the start, so travellers know it's here before they shop (Veer, 2026-11-03). */}
+      <Section>
+        <Group>
+          <Row href="/tax-refund" icon={<IconTile><Receipt className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.taxRow} sub={t.today.taxRowSub} />
+        </Group>
+      </Section>
       {/* Not folded (SPEC v0.5 P1.5): knowing which Chinese app to install is the point. */}
       <Section title={t.today.appsTitle}>
         <div className="rounded-card border border-line bg-card px-4"><AppList /></div>
@@ -446,6 +452,7 @@ function Moments() {
           ) : (
             <Row href="/settings#entry" icon={<IconTile><CalendarClock className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.stayTrack} sub={t.today.stayTrackSub} />
           )}
+          <Row href="/tax-refund" icon={<IconTile><Receipt className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.taxRow} sub={t.today.taxRowSub} />
           <Row href="/sos" icon={<IconTile tone="danger"><Siren className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.help} sub={t.today.helpSub} />
         </Group>
         <ChinaApps />
@@ -506,6 +513,7 @@ function Leaving() {
         <Card>
           <h3 className="flex items-center gap-2 text-headline"><Receipt className="h-5 w-5 shrink-0 text-cobalt" aria-hidden />{t.today.taxTitle}</h3>
           <p className="mt-1 text-subhead">{t.today.taxBody}</p>
+          <Button variant="soft" href="/tax-refund" className="mt-3 w-full text-subhead!">{t.today.taxRowSub}</Button>
         </Card>
       </Section>
     </>
