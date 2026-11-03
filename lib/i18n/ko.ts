@@ -144,6 +144,7 @@ export const ko: Dict = {
     metroShort: "지하철 {m} m",
     noMetro: "1.5 km 안에 지하철 없음",
     priceRef: "Amap 참고 가격입니다. 실제 가격은 Trip.com에 있습니다.",
+    priceOnTrip: "날짜별 요금은 Trip.com에서",
     checkTrip: "Trip.com에서 가격 보기",
     allTrip: "Trip.com에서 {city} 호텔 모두 보기",
     noneTier: "이 가격대 추천은 아직 없습니다. 아래 Trip.com에서 모든 호텔을 보세요.",

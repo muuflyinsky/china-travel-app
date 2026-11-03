@@ -106,7 +106,7 @@ function CityHotelRow({ c }: { c: { a: string; e: string; s: string } }) {
     <Row href={`/stay?${new URLSearchParams({ city: c.a, name: c.s, en: c.e })}`}
       icon={<IconTile><BedDouble className="h-5 w-5" aria-hidden /></IconTile>}
       title={fmt(t.today.hotelsFor, { city: c.e })}
-      sub={pick ? <><span className="zh">{pick.name}</span> · {price(pick.cny)}</> : t.prepare.hotelsBody} />
+      sub={pick ? <><span className="zh">{pick.name}</span>{pick.cny ? <> · {price(pick.cny)}</> : null}</> : t.prepare.hotelsBody} />
   );
 }
 

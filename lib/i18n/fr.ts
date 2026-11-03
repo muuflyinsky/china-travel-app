@@ -144,6 +144,7 @@ export const fr: Dict = {
     metroShort: "métro {m} m",
     noMetro: "Pas de métro à moins de 1,5 km",
     priceRef: "Prix indicatif Amap. Le prix réel est sur Trip.com.",
+    priceOnTrip: "Prix pour vos dates sur Trip.com",
     checkTrip: "Voir le prix sur Trip.com",
     allTrip: "Tous les hôtels de {city} sur Trip.com",
     noneTier: "Pas encore de sélection dans cette gamme. Voir tous les hôtels sur Trip.com ci-dessous.",
