@@ -3,7 +3,7 @@
 // how often one phone uses a feature in a day (to set free daily limits) but never follow it across
 // days. Nothing about allergies, dates or locations is sent.
 export const EVENTS = [
-  "menu_scan", "order_card_shown", "staff_reply", "taxi_card_shown", "hotel_card_shown",
+  "menu_scan", "order_card_shown", "staff_reply", "staff_reply_dish", "taxi_card_shown", "hotel_card_shown",
   "hotel_pick_click", "resv_alarm_added", "app_open", "menu_first_dish", "menu_done", "dish_flagged", "restaurant_open",
   "dish_detail", "translate", "hotel_read",
 ] as const;

@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Popup, Preloader, Sheet } from "konsta/react";
-import { Camera, Flame, Info, Leaf, ShieldAlert, ShieldCheck, ShieldOff, ChevronRight, ChevronDown, Plus, Minus, ReceiptText, Keyboard, UtensilsCrossed, Volume2, X, Lightbulb, Images, ScanText, Star, Layers, RotateCcw } from "lucide-react";
+import { Camera, Flame, Info, Leaf, ShieldAlert, ShieldCheck, ShieldOff, ChevronRight, ChevronDown, Plus, Minus, ReceiptText, Keyboard, UtensilsCrossed, Volume2, X, Lightbulb, Images, ScanText, Star, Layers, RotateCcw, Ban } from "lucide-react";
 import { Screen, DemoNote } from "@/components/Shell";
 import { Section, Card, Group, Row, Field, Button, Note, IconTile, IconButton } from "@/components/ui";
 import { useProfile } from "@/components/useProfile";
@@ -10,6 +10,7 @@ import { useCity } from "@/components/useCity";
 import { useFx, parseCny, formatMoney } from "@/components/useFx";
 import { useT } from "@/components/useT";
 import { ShowCard, type StaffReply } from "@/components/ShowCard";
+import { OrderShowCard } from "@/components/OrderShowCard";
 import { LANGUAGES } from "@/lib/languages";
 import { ALLERGENS, DIETS, allergyLinesZh, type AllergenId, type DietId } from "@/lib/allergens";
 import { track } from "@/lib/track";
@@ -61,12 +62,12 @@ function Stepper({ line, onChange }: { line: Line; onChange: (l: Line | undefine
 }
 
 /** List card: name + price, Chinese + pinyin, one line, one verdict, add. Tap opens the detail. */
-function DishRow({ d, v, restricted, line, onChange, onOpen, homePrice }: {
-  d: ListDish; v: Verdict; restricted: boolean; line?: Line; onChange: (l: Line | undefined) => void; onOpen: () => void; homePrice?: string;
+function DishRow({ d, v, restricted, line, staffNo, onChange, onOpen, homePrice }: {
+  d: ListDish; v: Verdict; restricted: boolean; line?: Line; staffNo?: boolean; onChange: (l: Line | undefined) => void; onOpen: () => void; homePrice?: string;
 }) {
   const t = useT();
   return (
-    <div className={`rounded-card border bg-card ${v.kind === "no" ? "border-danger" : "border-line"}`}>
+    <div className={`rounded-card border bg-card ${v.kind === "no" || staffNo ? "border-danger" : "border-line"}`}>
       <button onClick={onOpen} className="block w-full px-4 pt-2.5 text-left">
         <span className="flex items-baseline justify-between gap-3">
           <span className="min-w-0 text-body font-semibold">{d.name}</span>
@@ -82,9 +83,11 @@ function DishRow({ d, v, restricted, line, onChange, onOpen, homePrice }: {
       </button>
       <div className="flex min-h-11 items-center justify-between gap-2 pr-1.5 pb-1 pl-4">
         <span className="min-w-0">
-          {restricted ? <VerdictTag v={v} /> : d.vegetarian ? <span className="tag"><Leaf className="h-3.5 w-3.5" aria-hidden />{t.eat.vegetarian}</span> : null}
+          {/* Staff said no on the order card: that answer wins, and there's no Add. */}
+          {staffNo ? <span className="tag tag-danger"><Ban className="h-3.5 w-3.5" aria-hidden />{t.eat.staffNoTag}</span>
+            : restricted ? <VerdictTag v={v} /> : d.vegetarian ? <span className="tag"><Leaf className="h-3.5 w-3.5" aria-hidden />{t.eat.vegetarian}</span> : null}
         </span>
-        {v.blocked.length ? (
+        {staffNo ? null : v.blocked.length ? (
           <ShieldAlert className="h-5 w-5 shrink-0 text-danger" aria-label={fmt(t.eat.blockedSevere, { x: v.blocked.map((a) => t.allergens[a as AllergenId].toLowerCase()).join(", ") })} />
         ) : line ? (
           <Stepper line={line} onChange={onChange} />
@@ -110,8 +113,8 @@ function DishSkeleton() {
 }
 
 /** Bottom sheet for one dish: why, what's usually in it, and the add actions. */
-function DishSheet({ d, v, mine, detail, line, saved, onSave, onAdd, onFlag, onClose, homePrice }: {
-  d: ListDish; v: Verdict; mine: string[]; detail?: Detail; line?: Line; saved: boolean; onSave: () => void; onAdd: (without: string[]) => void; onFlag: () => void; onClose: () => void; homePrice?: string;
+function DishSheet({ d, v, mine, detail, line, saved, staffNo, onSave, onAdd, onFlag, onClose, homePrice }: {
+  d: ListDish; v: Verdict; mine: string[]; detail?: Detail; line?: Line; saved: boolean; staffNo?: boolean; onSave: () => void; onAdd: (without: string[]) => void; onFlag: () => void; onClose: () => void; homePrice?: string;
 }) {
   const t = useT();
   const speak = () => {
@@ -192,7 +195,8 @@ function DishSheet({ d, v, mine, detail, line, saved, onSave, onAdd, onFlag, onC
         {/* Severe allergen anywhere in the usual recipe: no add button at all. "Don't order" for another
             reason (an allergen is a main ingredient, diet): only a plain, secondary Add — leaving out a
             sauce wouldn't fix it, so "add, without X" is offered only for "ask first". */}
-        {!v.blocked.length && !line && (
+        {staffNo && <p className="shrink-0 border-t border-line px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom))] text-subhead font-semibold text-danger">{t.eat.staffNoSheet}</p>}
+        {!staffNo && !v.blocked.length && !line && (
           <div className="flex shrink-0 gap-2 border-t border-line px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom))]">
             {withoutOffer && (
               <Button className="flex-1 text-subhead!" onClick={() => onAdd(v.removable.map((a) => a.via_zh).filter(Boolean))}>
@@ -308,8 +312,8 @@ function AllergySheet({ onDone }: { onDone: () => void }) {
 }
 
 /** Saved dishes, checked against today's allergy settings, with Add to put one in this meal's order. */
-function SavedSheet({ saved, restricted, restrictions, factsFor, onAdd, onClose }: {
-  saved: SavedDish[]; restricted: boolean; restrictions: Parameters<typeof verdict>[1]; factsFor: (d: ListDish) => ListDish; onAdd: (d: ListDish, v: Verdict) => void; onClose: () => void;
+function SavedSheet({ saved, restricted, restrictions, factsFor, staffNo, onAdd, onClose }: {
+  saved: SavedDish[]; restricted: boolean; restrictions: Parameters<typeof verdict>[1]; factsFor: (d: ListDish) => ListDish; staffNo: string[]; onAdd: (d: ListDish, v: Verdict) => void; onClose: () => void;
 }) {
   const t = useT();
   return (
@@ -338,8 +342,8 @@ function SavedSheet({ saved, restricted, restrictions, factsFor, onAdd, onClose 
                   </button>
                 </div>
                 <div className="flex min-h-11 items-center justify-between gap-2 pb-1">
-                  <span className="min-w-0">{restricted ? <VerdictTag v={v} /> : null}</span>
-                  {v.blocked.length ? (
+                  <span className="min-w-0">{staffNo.includes(d.zh) ? <span className="tag tag-danger"><Ban className="h-3.5 w-3.5" aria-hidden />{t.eat.staffNoTag}</span> : restricted ? <VerdictTag v={v} /> : null}</span>
+                  {staffNo.includes(d.zh) ? null : v.blocked.length ? (
                     <ShieldAlert className="h-5 w-5 shrink-0 text-danger" aria-label={fmt(t.eat.blockedSevere, { x: v.blocked.map((a) => t.allergens[a as AllergenId].toLowerCase()).join(", ") })} />
                   ) : (
                     <button onClick={() => onAdd(d, v)} className="-mr-3 flex min-h-11 shrink-0 items-center gap-1 rounded-control px-3 text-subhead font-semibold text-cobalt">
@@ -386,6 +390,9 @@ export default function MenuPage() {
   // This meal (lib/meal.ts): restored when Eat opens again, so switching tabs never loses it.
   const [pages, setPages] = useState<MealPage[]>([]);
   const [order, setOrder] = useState<Record<string, Line>>({});
+  // Dishes staff marked on the order card; `staffNote` = how many, shown once back on the list.
+  const [staffNo, setStaffNo] = useState<string[]>([]);
+  const [staffNote, setStaffNote] = useState(0);
   const [touched, setTouched] = useState(0);
   const [restored, setRestored] = useState(false);
   const [expired, setExpired] = useState(false);
@@ -397,6 +404,7 @@ export default function MenuPage() {
   const [opened, setOpened] = useState<string | null>(null);
   const [details, setDetails] = useState<Record<string, Detail>>({});
   const [card, setCard] = useState<{ kind: string; lead?: string; lines: string[]; rest?: string[]; explain?: string; replies?: StaffReply[] } | null>(null);
+  const [orderShown, setOrderShown] = useState<ReturnType<typeof orderCard> | null>(null);
   const [askAllergies, setAskAllergies] = useState(false);
   const [saved, setSaved] = useState<SavedDish[]>([]);
   const [savedOpen, setSavedOpen] = useState(false);
@@ -413,7 +421,7 @@ export default function MenuPage() {
   useEffect(() => () => { gen.current++; abort.current?.abort(); }, []);
   useEffect(() => {
     const { meal, expired } = loadMeal();
-    if (meal) { setPages(meal.pages); setOrder(meal.order); setTouched(meal.touched); setInputOpen(false); }
+    if (meal) { setPages(meal.pages); setOrder(meal.order); setStaffNo(meal.staffNo ?? []); setTouched(meal.touched); setInputOpen(false); }
     if (expired) clearMeal();
     setExpired((was) => was || expired);
     setRestored(true);
@@ -425,8 +433,8 @@ export default function MenuPage() {
   // Every change to the pages or the order is saved and restarts the 3-hour clock.
   const change = () => setTouched(Date.now());
   useEffect(() => {
-    if (restored && touched) saveMeal({ pages, order, touched });
-  }, [restored, pages, order, touched]);
+    if (restored && touched) saveMeal({ pages, order, touched, staffNo });
+  }, [restored, pages, order, touched, staffNo]);
 
   const cityLabel = `${city.e} (${city.n}, ${city.p})`;
   // Streamed dishes merge into what's on screen: allergens a dish detail added while the page was
@@ -517,7 +525,7 @@ export default function MenuPage() {
     gen.current++; setPicking(false);
     abort.current?.abort();
     clearMeal();
-    setPages([]); setOrder({}); setDetails({}); setTouched(0); setView("all"); setFilter("all"); setInputOpen(true); setExpired(false);
+    setPages([]); setOrder({}); setStaffNo([]); setStaffNote(0); setDetails({}); setTouched(0); setView("all"); setFilter("all"); setInputOpen(true); setExpired(false);
   }
 
   const restrictions = { allergens: profile.allergens, diets: profile.diets, severe: profile.severe.filter((a) => profile.allergens.includes(a)) };
@@ -548,9 +556,11 @@ export default function MenuPage() {
   }, [allRows, at]);
   const page = at === "all" ? undefined : pages.find((p) => p.id === at);
   const streaming = streamingId ? pages.find((p) => p.id === streamingId) : undefined;
-  const count = (k: VerdictKind) => rows.filter((r) => r.v.kind === k).length;
+  // A dish staff said no to counts (and filters) as "don't order".
+  const kindOf = (r: Row): VerdictKind => (staffNo.includes(r.d.zh) ? "no" : r.v.kind);
+  const count = (k: VerdictKind) => rows.filter((r) => kindOf(r) === k).length;
   // Menu order, not "ok" first: a dish at the top of the list must not read as a recommendation.
-  const shown = filter === "all" ? rows : rows.filter((r) => r.v.kind === filter);
+  const shown = filter === "all" ? rows : rows.filter((r) => kindOf(r) === filter);
   const got = (p: MealPage) => p.dishes.filter(Boolean).length;
   const pending = page && page.id === streamingId ? Math.max(0, page.total - got(page) - page.missing) : 0;
   // A page whose reading was cut short (Eat closed mid-way) counts the rest as unread.
@@ -576,6 +586,7 @@ export default function MenuPage() {
 
   /** Puts a saved dish into this meal (on its own "Saved" page) and the order. */
   function addSaved(d: ListDish, v: Verdict) {
+    if (staffNo.includes(d.zh)) { setSavedOpen(false); return; } // staff already said no here
     const sp = pages.find((p) => p.id === "saved") ?? { id: "saved", input: "saved" as const, cuisine: "", total: 0, dishes: [], tips: [], missing: 0 };
     if (!sp.dishes.some((x) => x?.zh === d.zh)) {
       const next = { ...sp, dishes: [...sp.dishes, d], total: sp.dishes.length + 1 };
@@ -622,14 +633,26 @@ export default function MenuPage() {
   const replies = (withCant: boolean) => staffReplies(t, profile, withCant);
   const allergyExplain = allergyExplainText(t, profile);
 
+  // "Without" was set when the dish was added; add whatever today's facts and settings say to
+  // leave out too (never drop what the traveller chose).
+  const buildOrder = (lines: typeof orderLines, again = false) => orderCard(t, profile, lines.map(({ row, l }) => ({
+    zh: row.d.zh, name: row.d.name, pinyin: row.d.pinyin, short: row.d.short, qty: l.qty,
+    without: [...new Set([...l.without, ...row.v.removable.map((a) => a.via_zh).filter(Boolean)])],
+  })), again);
+
   function showOrder() {
     track("order_card_shown", { dishes: orderLines.length, severe: Boolean(allergyLinesZh(profile.allergens, profile.diets, profile.severe).severe) });
-    // "Without" was set when the dish was added; add whatever today's facts and settings say to
-    // leave out too (never drop what the traveller chose).
-    setCard(orderCard(t, profile, orderLines.map(({ row, l }) => ({
-      zh: row.d.zh, name: row.d.name, qty: l.qty,
-      without: [...new Set([...l.without, ...row.v.removable.map((a) => a.via_zh).filter(Boolean)])],
-    }))));
+    setStaffNote(0);
+    setOrderShown(buildOrder(orderLines));
+  }
+
+  /** Staff marked dishes: they leave the order; then the card for the rest, or back to the menu. */
+  function removeFromCard(zhs: string[], then?: "show" | "menu") {
+    for (const zh of zhs) setLine(zh, undefined);
+    if (zhs.length) { setStaffNo((s) => [...new Set([...s, ...zhs])]); setStaffNote((n) => n + zhs.length); }
+    if (!then) return;
+    const rest = orderLines.filter((x) => !zhs.includes(x.row.d.zh) && x.row.d.zh in order);
+    setOrderShown(then === "show" && rest.length ? buildOrder(rest, true) : null);
   }
 
   function showAllergyCard() {
@@ -771,6 +794,7 @@ export default function MenuPage() {
                 </div>
               )}
             </div>
+            {staffNote > 0 && <Note tone="danger">{staffNote === 1 ? t.eat.staffMarkedNoteOne : fmt(t.eat.staffMarkedNote, { n: staffNote })}</Note>}
             <DemoNote show={pages.some((p) => p.demo)} what={t.common.aiKey} />
             {tips.length > 0 && (
               <div>
@@ -782,7 +806,7 @@ export default function MenuPage() {
               </div>
             )}
             {shown.map(({ d, k, v }) => (
-              <DishRow key={k} d={d} v={v} restricted={restricted} line={order[d.zh]} homePrice={homePrice(d.price)}
+              <DishRow key={k} d={d} v={v} restricted={restricted} line={order[d.zh]} staffNo={staffNo.includes(d.zh)} homePrice={homePrice(d.price)}
                 onOpen={() => openDish(k)} onChange={(l) => setLine(d.zh, l)} />
             ))}
             {filter === "all" && Array.from({ length: Math.min(pending, 3) }, (_, n) => <DishSkeleton key={`s${n}`} />)}
@@ -815,12 +839,14 @@ export default function MenuPage() {
       )}
       {openRow && (
         <DishSheet d={openRow.d} v={openRow.v} mine={profile.allergens} detail={details[openRow.k]} line={order[openRow.d.zh]} homePrice={homePrice(openRow.d.price)}
-          saved={isSaved(saved, openRow.d.zh)} onSave={() => toggleSaved(openRow.d)}
+          saved={isSaved(saved, openRow.d.zh)} staffNo={staffNo.includes(openRow.d.zh)} onSave={() => toggleSaved(openRow.d)}
           onAdd={(without) => { setLine(openRow.d.zh, { qty: 1, without }); setOpened(null); }}
           onFlag={() => flagDish(openRow.d)} onClose={() => setOpened(null)} />
       )}
-      {savedOpen && <SavedSheet saved={saved} restricted={restricted} restrictions={restrictions} factsFor={factsFor} onAdd={addSaved} onClose={() => setSavedOpen(false)} />}
+      {savedOpen && <SavedSheet saved={saved} restricted={restricted} restrictions={restrictions} factsFor={factsFor} staffNo={staffNo} onAdd={addSaved} onClose={() => setSavedOpen(false)} />}
       {card && <ShowCard {...card} onClose={() => setCard(null)} />}
+      {/* Keyed by its text, so an updated card starts again at the question. */}
+      {orderShown && <OrderShowCard key={orderShown.lines.join()} card={orderShown} onRemove={removeFromCard} onClose={() => setOrderShown(null)} />}
       {askAllergies && <AllergySheet onDone={() => setAskAllergies(false)} />}
       <Link href="/settings#food" className="sr-only">{t.common.settings}</Link>
     </Screen>

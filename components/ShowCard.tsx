@@ -15,8 +15,14 @@ const MIN = 28;
  * `rest` (other allergies, smaller). The type shrinks from 36px to 28px until it fits one
  * screen; reply buttons stay pinned at the bottom so staff can always answer.
  */
-export function ShowCard({ lead, lines, rest = [], sub, explain, replies, kind = "card", onClose }: {
+export function ShowCard({ lead, lines, rest = [], restFirst = false, sub, explain, replies, notice, bottom, bottomKey = "", kind = "card", onClose }: {
   lead?: string; lines: string[]; rest?: string[]; sub?: string; explain?: string; replies?: StaffReply[];
+  /** Other allergies right under the lead, before a long list (order cards), so they never scroll away. */
+  restFirst?: boolean;
+  /** A line for the traveller above the card (e.g. "Order updated"). */
+  notice?: string;
+  /** Replaces the reply buttons (the order card asks its own question); `bottomKey` changes refit the text. */
+  bottom?: React.ReactNode; bottomKey?: string;
   kind?: string; onClose: () => void;
 }) {
   const t = useT();
@@ -27,11 +33,11 @@ export function ShowCard({ lead, lines, rest = [], sub, explain, replies, kind =
   const all = [lead, ...lines, ...rest].filter(Boolean).join("。");
 
   // Fit to one screen: step the size down while the content overflows.
-  useLayoutEffect(() => { setSize(MAX); }, [all]);
+  useLayoutEffect(() => { setSize(MAX); }, [all, bottomKey, notice]);
   useLayoutEffect(() => {
     const el = box.current;
     if (el && el.scrollHeight > el.clientHeight + 1 && size > MIN) setSize(size - 2);
-  }, [size, all, open]);
+  }, [size, all, open, bottomKey, notice]);
 
   const speak = () => {
     const u = new SpeechSynthesisUtterance(all);
@@ -51,11 +57,13 @@ export function ShowCard({ lead, lines, rest = [], sub, explain, replies, kind =
         <button onClick={onClose} aria-label={t.common.close} className="grid h-11 w-11 place-items-center rounded-full bg-porcelain"><X className="h-5 w-5" /></button>
       </div>
 
+      {notice && <p className="mt-2 shrink-0 rounded-control bg-cobalt-soft px-3 py-2 text-subhead font-semibold text-cobalt" role="status">{notice}</p>}
       <div ref={box} className="mt-3 min-h-0 flex-1 overflow-auto">
         <div className="zh space-y-3 font-semibold" lang="zh-CN">
           {lead && <p className="font-bold text-danger" style={big}>{lead}</p>}
+          {restFirst && rest.map((l, i) => <p key={`r${i}`} style={small}>{l}</p>)}
           {lines.map((l, i) => <p key={i} className="font-bold" style={big}>{l}</p>)}
-          {rest.map((l, i) => <p key={i} style={small}>{l}</p>)}
+          {!restFirst && rest.map((l, i) => <p key={i} style={small}>{l}</p>)}
         </div>
         {sub && <p className="mt-2 text-subhead text-muted">{sub}</p>}
         {explain && (
@@ -68,7 +76,8 @@ export function ShowCard({ lead, lines, rest = [], sub, explain, replies, kind =
         )}
       </div>
 
-      {replies && replies.length > 0 && (
+      {bottom && <div className="mt-3 shrink-0 border-t border-line pt-3">{bottom}</div>}
+      {!bottom && replies && replies.length > 0 && (
         <div className="mt-3 shrink-0 border-t border-line pt-3">
           {answer ? (
             <button onClick={() => setAnswer(null)} className="block w-full rounded-card bg-cobalt-soft p-3 text-left" role="status">

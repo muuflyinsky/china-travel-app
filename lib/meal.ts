@@ -16,7 +16,8 @@ export type MealPage = {
 };
 
 /** Order lines by dish (Chinese name): a dish printed on two pages is one line. */
-export type Meal = { pages: MealPage[]; order: Record<string, Line>; touched: number };
+/** `staffNo`: dishes staff marked on the order card (can't make / allergen can't be left out). */
+export type Meal = { pages: MealPage[]; order: Record<string, Line>; touched: number; staffNo?: string[] };
 
 /** A meal clears this long after its last change; saved dishes stay. */
 export const MEAL_TTL = 3 * 3600_000;
