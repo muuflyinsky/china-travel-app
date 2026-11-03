@@ -85,6 +85,10 @@ const peanutGarnish = { id: "peanut", role: "garnish", via: "peanuts", via_zh: "
 const detailCases = [
   // The list says 花生 is a garnish; the detail says it's a main ingredient → don't order.
   ["garnish → main", { ...base, allergens: [peanutGarnish] }, [{ zh: "花生", name: "peanuts", role: "main", allergens: ["peanut"] }], "no"],
+  // Same, but the detail forgot the allergen id: the word list still makes 花生 a main ingredient.
+  ["garnish → main (word list)", { ...base, allergens: [peanutGarnish] }, [{ zh: "花生米", name: "peanuts", role: "main", allergens: [] }], "no"],
+  // Same ingredient, detail says sauce: nothing new, still one "leave it out".
+  ["same ingredient, not main", { ...base, allergens: [peanutGarnish] }, [{ zh: "花生", name: "peanuts", role: "sauce", allergens: ["peanut"] }], "ask"],
   // Already main: a sauce mention can't make it look removable.
   ["main stays main", { ...base, allergens: [{ ...peanutGarnish, role: "main" }] }, [{ zh: "花生酱", name: "peanut sauce", role: "sauce", allergens: ["peanut"] }], "no"],
   // An allergen the list missed, in a sauce → ask first, not ok.
@@ -92,10 +96,11 @@ const detailCases = [
 ];
 let detailFails = 0;
 for (const [name, dish, ings, want] of detailCases) {
-  const got = verdict(withDetailAllergens(dish, ings), { allergens: ["peanut"], diets: [], severe: [] }).kind;
-  if (got !== want) { detailFails++; console.log(`  DETAIL MERGE  ${name}: ${got}, expected ${want}`); }
+  const v = verdict(withDetailAllergens(dish, ings), { allergens: ["peanut"], diets: [], severe: [] });
+  // "Don't order" must also take away "add, without peanuts".
+  const ok = v.kind === want && (want !== "no" || v.removable.length === 0) && (want !== "ask" || v.removable.length === 1);
+  if (!ok) { detailFails++; console.log(`  DETAIL MERGE  ${name}: ${v.kind} (removable ${v.removable.length}), expected ${want}`); }
 }
-if (detailFails) process.exit(1);
 
 if (process.argv.includes("--write-known")) {
   await writeFile(new URL("known-leaks.json", dir), JSON.stringify(leaks.sort(), null, 1) + "\n");
@@ -104,10 +109,11 @@ if (process.argv.includes("--write-known")) {
 }
 const fresh = leaks.filter((l) => !known.has(l));
 const fixed = [...known].filter((l) => !leaks.includes(l));
+console.log(`detail merge: ${detailCases.length - detailFails}/${detailCases.length} ok`);
 console.log(`allergen check: ${checked} answers where the recipe contains it · ok ${seen.ok} · ask ${seen.ask} · no ${seen.no} · leaks ${leaks.length} (known ${leaks.length - fresh.length}, new ${fresh.length})`);
 for (const l of fresh) console.log(`  NEW LEAK  ${l}`);
 if (fixed.length) console.log(`  fixed since known-leaks.json (run --write-known): ${fixed.join("; ")}`);
-if (process.argv.includes("--strict") ? leaks.length : fresh.length) {
+if (detailFails || (process.argv.includes("--strict") ? leaks.length : fresh.length)) {
   if (process.argv.includes("--strict")) for (const l of leaks.filter((l) => known.has(l))) console.log(`  leak      ${l}`);
   process.exit(1);
 }
