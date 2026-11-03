@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { Check, Clock, MapPin, Plus, ReceiptText, ShieldAlert, Sparkles, Wallet } from "lucide-react";
+import { Check, Clock, MapPin, Plus, ReceiptText, ShieldAlert, Sparkles, Wallet, Ban } from "lucide-react";
 import { Card, Group } from "./ui";
 import { Photo } from "./Photo";
 import { CuisineTile } from "./CuisineTile";
@@ -104,6 +104,7 @@ export function RestaurantDetail({ r, aiOn = true, children }: { r: ListedRestau
   const c = cuisineInfo(r.cuisineKey, p.lang);
   const dishes = useSignatureDishes(aiOn ? r.dishes : [], p.lang, city);
   const [order, setOrder] = useState<Record<string, string[]>>({}); // dish zh → ingredients to leave out
+  const [staffNo, setStaffNo] = useState<string[]>([]); // dishes staff marked on the order card
   const [card, setCard] = useState<ReturnType<typeof orderCard> | null>(null);
   const restrictions = { allergens: p.allergens, diets: p.diets, severe: p.severe.filter((a) => p.allergens.includes(a)) };
   const restricted = restrictions.allergens.length + restrictions.diets.length > 0;
@@ -135,9 +136,10 @@ export function RestaurantDetail({ r, aiOn = true, children }: { r: ListedRestau
                     <span className="block text-body font-semibold">{d.name}</span>
                     <span className="block text-footnote text-muted"><span className="zh" lang="zh-CN">{d.zh}</span> {d.pinyin}</span>
                     <span className="block text-subhead">{d.short}</span>
-                    {restricted && <span className="mt-1 block"><VerdictTag v={v} /></span>}
+                    {staffNo.includes(d.zh) ? <span className="mt-1 block"><span className="tag tag-danger"><Ban className="h-3.5 w-3.5" aria-hidden />{t.eat.staffNoTag}</span></span>
+                      : restricted && <span className="mt-1 block"><VerdictTag v={v} /></span>}
                   </span>
-                  {v.blocked.length ? (
+                  {staffNo.includes(d.zh) ? null : v.blocked.length ? (
                     <ShieldAlert className="mt-1 h-5 w-5 shrink-0 text-danger" aria-label={t.eat.verdictNo} />
                   ) : (
                     <button aria-pressed={added}
@@ -151,7 +153,7 @@ export function RestaurantDetail({ r, aiOn = true, children }: { r: ListedRestau
             })}
           </Group>
           {ordered.length > 0 && (
-            <button onClick={() => { track("order_card_shown", { dishes: ordered.length, source: "restaurant" }); setCard(orderCard(t, restrictions, ordered.map((d) => ({ zh: d.zh, name: d.name, qty: 1, without: order[d.zh] })))); }}
+            <button onClick={() => { track("order_card_shown", { dishes: ordered.length, source: "restaurant" }); setCard(orderCard(t, restrictions, ordered.map((d) => ({ zh: d.zh, name: d.name, pinyin: d.pinyin, short: d.short, qty: 1, without: order[d.zh] })))); }}
               className="flex min-h-control w-full items-center justify-center gap-2 rounded-control bg-cobalt text-subhead font-semibold text-white dark:text-[#12141c]">
               <ReceiptText className="h-5 w-5" aria-hidden />{ordered.length === 1 ? t.eat.orderBarOne : fmt(t.eat.orderBar, { n: ordered.length })}
             </button>
@@ -183,9 +185,10 @@ export function RestaurantDetail({ r, aiOn = true, children }: { r: ListedRestau
       {card && <OrderShowCard key={card.lines.join()} card={card} onRemove={(zhs, then) => {
         // Marked dishes leave the order; the card comes back with the rest, or closes.
         setOrder((o) => { const n = { ...o }; for (const zh of zhs) delete n[zh]; return n; });
+        if (zhs.length) setStaffNo((s) => [...new Set([...s, ...zhs])]);
         if (!then) return;
         const rest = ordered.filter((d) => !zhs.includes(d.zh));
-        setCard(then === "show" && rest.length ? orderCard(t, restrictions, rest.map((d) => ({ zh: d.zh, name: d.name, qty: 1, without: order[d.zh] })), true) : null);
+        setCard(then === "show" && rest.length ? orderCard(t, restrictions, rest.map((d) => ({ zh: d.zh, name: d.name, pinyin: d.pinyin, short: d.short, qty: 1, without: order[d.zh] })), true) : null);
       }} onClose={() => setCard(null)} />}
     </>
   );

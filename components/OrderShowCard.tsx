@@ -127,8 +127,10 @@ export function OrderShowCard({ card, onRemove, onClose }: {
           <p className="text-body text-muted">{[mine && fmt(t.eat.markedWhyAllergy, { x: mine }), p.diets.length ? t.eat.markedWhyDiet : "", !mine && !p.diets.length ? t.eat.markedWhy : ""].filter(Boolean).join(" ")}</p>
           <ul className="divide-y divide-line rounded-card border border-line">
             {dishes.filter((d) => marked.includes(d.zh)).map((d) => (
-              <li key={d.zh} className="flex items-baseline justify-between gap-3 px-4 py-3">
-                <span className="text-body font-semibold">{d.name}</span><span className="zh text-subhead text-muted" lang="zh-CN">{d.zh}</span>
+              <li key={d.zh} className="px-4 py-3">
+                <span className="block text-body font-semibold">{d.name}</span>
+                <span className="block text-footnote text-muted"><span className="zh" lang="zh-CN">{d.zh}</span> {d.pinyin}</span>
+                {d.short && <span className="block text-subhead">{d.short}</span>}
               </li>
             ))}
           </ul>

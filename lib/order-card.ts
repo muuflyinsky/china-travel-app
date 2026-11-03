@@ -6,7 +6,7 @@ import { fmt, type Dict } from "./i18n";
 import type { StaffReply } from "@/components/ShowCard";
 
 type Restrictions = { allergens: string[]; diets: string[]; severe: string[] };
-export type OrderItem = { zh: string; name: string; qty: number; without: string[] };
+export type OrderItem = { zh: string; name: string; qty: number; without: string[]; pinyin?: string; short?: string };
 
 export function staffReplies(t: Dict, p: Restrictions, withCant: boolean): StaffReply[] {
   return [
@@ -54,7 +54,7 @@ export function orderCard(t: Dict, p: Restrictions, items: OrderItem[], again = 
     lead: severe || undefined,
     lines: [again ? "好的，有问题的那几道不要了。我点这些：" : "您好，我要点：", ...items.map((x) => `${x.zh} ×${x.qty}${x.without.length ? `（不要放${x.without.join("、")}）` : ""}`)],
     again,
-    dishes: items.map((x) => ({ zh: x.zh, name: x.name, qty: x.qty })),
+    dishes: items.map((x) => ({ zh: x.zh, name: x.name, qty: x.qty, pinyin: x.pinyin, short: x.short })),
     ask: orderAsk(p, items.length),
     rest,
     explain: [fmt(t.eat.orderExplain, { dishes }), allergyExplain(t, p)].filter(Boolean).join(" "),
