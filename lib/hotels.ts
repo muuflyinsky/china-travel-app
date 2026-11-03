@@ -70,7 +70,13 @@ export function rank(a: HotelPick, b: HotelPick) {
   return trust(a) - trust(b) || metroBand(a) - metroBand(b) || (b.rating ?? 0) - (a.rating ?? 0) || (a.cny || Infinity) - (b.cny || Infinity);
 }
 
+// Not a hotel room a traveller books here: serviced apartments, and duplicate POIs for a hotel's
+// lobby, entrance or car park.
+const NOT_A_HOTEL = /公寓|大堂|入口|停车场|会所|写字楼/;
+const RULES = "r2";
+
 export function candidate(p: Place, cityShort: string, bounds: [number, number, number]): HotelPick | null {
+  if (NOT_A_HOTEL.test(p.name)) return null;
   const b = brandOf(p.name);
   const stars = starsOf(p.type);
   const majorCity = cityShort in TRIP_CITY_ID;
@@ -106,12 +112,14 @@ export async function cityPicks(adcode: string, cityShort: string, around?: stri
   const key = around ? `${adcode}@${around}` : adcode;
   const fresh = (c?: CityPicks) => c && Date.now() - Date.parse(c.generatedAt) < TTL;
   if (fresh(memory.get(key))) return memory.get(key)!;
-  const stored = await cacheRead<CityPicks>("hotel_picks", key);
+  // Bump when the picking rules change, so a week of old picks isn't served.
+  const stored = await cacheRead<CityPicks>("hotel_picks", `${RULES}:${key}`);
   if (fresh(stored ?? undefined)) { memory.set(key, stored!); return stored!; }
 
   const bounds = tierBounds(cityShort);
   // A generic query plus the biggest brands, so chains aren't crowded out by guesthouses.
-  const queries = [["酒店", 1], ["酒店", 2], ["万豪", 1], ["希尔顿", 1], ["洲际", 1], ["凯悦", 1], ["全季", 1], ["亚朵", 1]] as const;
+  // Economy chains (汉庭, 如家) too: without them the economy tier can be empty in Shanghai.
+  const queries = [["酒店", 1], ["酒店", 2], ["万豪", 1], ["希尔顿", 1], ["洲际", 1], ["凯悦", 1], ["全季", 1], ["亚朵", 1], ["汉庭", 1], ["如家", 1]] as const;
   const pages = await Promise.all(queries.map(([keywords, page]) =>
     searchPlaces(around ? { keywords, types: "100100", around, radius: 2500, page, purpose: "hotels" } : { keywords, types: "100100", city: adcode, page, purpose: "hotels" }).catch(() => [])));
   const seen = new Set<string>();
@@ -128,7 +136,7 @@ export async function cityPicks(adcode: string, cityShort: string, around?: stri
   const picks: CityPicks = { city: cityShort, generatedAt: new Date().toISOString(), source: "amap", tiers };
   memory.set(key, picks);
   // An empty result isn't stored: it would hide a fix (or a better Amap day) for a week.
-  if (TIER_IDS.some((id) => tiers[id].length)) await cacheWrite("hotel_picks", key, picks);
+  if (TIER_IDS.some((id) => tiers[id].length)) await cacheWrite("hotel_picks", `${RULES}:${key}`, picks);
   return picks;
 }
 
@@ -146,7 +154,7 @@ export async function checkHotelPicks({ today = new Date(), deadline = Infinity 
     ...[0, 1].map((i) => rest[(day * 2 + i) % rest.length]).filter(Boolean)];
   const gaps: { city: string; tiers: TierId[] }[] = [];
   const checked: string[] = [];
-  // A cold city is ~32 Amap calls (about 15 s at the cron's pace): stop well before the deadline.
+  // A cold city is ~34 Amap calls (about 15 s at the cron's pace): stop well before the deadline.
   for (const c of cities) {
     if (Date.now() > deadline - 20_000) break;
     checked.push(c.e);
