@@ -774,6 +774,17 @@ export const ko: Dict = {
     showShop: "상점에 묻기: \"여기서 세금 환급이 되나요?\"",
     source: "중국 국가세무총국, 상하이시 세무국, 베이징 12345 서비스 지도",
   },
+  alerts: {
+    busyTitle: "{name}({dates}): 매우 붐벼요",
+    busyBody: "중국에서 가장 이동이 많은 시기 중 하나예요. 기차와 호텔은 일찍 예약하고, 큰 관광지는 줄이 길니 아침 일찍 가세요.",
+    shortTitle: "{name}({dates}): 공휴일",
+    shortBody: "짧은 연휴예요. 인기 관광지와 기차가 붐벼요. 예약할 수 있는 건 미리 하세요.",
+    unofficial: "법정 휴일만 표시했어요. 실제 연휴(보통 며칠 더 길어요)는 매년 11월 국무원이 발표해요.",
+    trainTitle: "기차 {from} → {to}, {date}",
+    trainOnSale: "지금 표를 살 수 있어요. 인기 열차는 금방 매진돼요.",
+    trainSoon: "표는 {date}에 판매 시작(15일 전). 인기 열차는 금방 매진되니 그날 예약하세요.",
+    names: { newYear: "신정", spring: "춘절", qingming: "청명절", labour: "노동절", dragon: "단오절", midAutumn: "중추절", national: "국경절" },
+  },
   pass: {
     out: { menu_photo: "오늘 무료 메뉴 2회를 모두 사용했어요 (회당 사진 최대 4장)", menu_text: "오늘 무료 요리 검색을 모두 사용했어요", translate: "오늘 무료 번역을 모두 사용했어요", hotel: "무료 예약 스크린샷 읽기를 모두 사용했어요", none: "여행 패스" },
     body: "여행 패스로 메뉴 촬영, 요리 검색, 번역을 무제한으로 쓸 수 있어요. 알레르기 확인과 알레르기 카드는 언제나 무료예요.",

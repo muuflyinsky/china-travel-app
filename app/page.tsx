@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { Screen, DemoNote } from "@/components/Shell";
 import { Section, Card, Group, Row, Button, IconTile } from "@/components/ui";
+import { TripAlerts } from "@/components/TripAlerts";
 import { VisaCheck } from "@/components/VisaCheck";
 import { HotelCard } from "@/components/HotelCard";
 import { useHotelPicks, usePrice } from "@/components/HotelPicks";
@@ -193,6 +194,7 @@ function BeforeTrip() {
         <VisaCheck />
         <p className="px-1 text-footnote text-muted">{t.prepare.arrivalCard}</p>
       </Section>
+      <TripAlerts section />
       <Section title={days === null || days < 0 ? undefined : fmt(t.today.arrivingIn, { n: days })}>
         {(days === null || days < 0) && (
           <Group>
@@ -492,6 +494,7 @@ function InChina() {
         <CityLine />
         <EntryConfirm />
         <MenuHero />
+        <TripAlerts />
       </Section>
       <Moments />
     </>

@@ -774,6 +774,17 @@ export const es: Dict = {
     showShop: "Preguntar en una tienda: «¿Puedo pedir aquí la devolución?»",
     source: "la Administración Tributaria Estatal de China, la oficina tributaria de Shanghái y el mapa de servicios 12345 de Pekín",
   },
+  alerts: {
+    busyTitle: "{name}, {dates}: mucha gente",
+    busyBody: "Una de las épocas de más viajes en China. Reserva trenes y hoteles pronto, espera colas largas en los grandes lugares y ve temprano.",
+    shortTitle: "{name}, {dates}: festivo",
+    shortBody: "Un puente corto: los lugares populares y los trenes se llenan. Reserva lo que puedas.",
+    unofficial: "Se muestran los días festivos legales; el puente completo (suele ser unos días más) lo anuncia el Consejo de Estado cada noviembre.",
+    trainTitle: "Tren {from} → {to}, {date}",
+    trainOnSale: "Los billetes ya están a la venta. Los trenes populares se agotan rápido.",
+    trainSoon: "Los billetes salen a la venta el {date}, 15 días antes. Reserva ese día: los trenes populares se agotan rápido.",
+    names: { newYear: "Año Nuevo", spring: "Año Nuevo chino", qingming: "Qingming", labour: "Día del Trabajo", dragon: "Festival del Bote del Dragón", midAutumn: "Festival del Medio Otoño", national: "Día Nacional" },
+  },
   pass: {
     out: { menu_photo: "Ya usaste las 2 cartas gratis de hoy (hasta 4 fotos cada una)", menu_text: "Ya usaste las búsquedas de platos gratis de hoy", translate: "Ya usaste las traducciones gratis de hoy", hotel: "Ya usaste tus capturas de reserva gratis", none: "Pase de viaje" },
     body: "Un pase de viaje te da fotos de carta, búsquedas de platos y traducciones ilimitadas. La comprobación de alergias y la tarjeta de alergias son siempre gratis.",
