@@ -102,6 +102,8 @@ for (const [name, dish, ings, want] of detailCases) {
   if (!ok) { detailFails++; console.log(`  DETAIL MERGE  ${name}: ${v.kind} (removable ${v.removable.length}), expected ${want}`); }
 }
 
+// Never rewrite the known leaks while a detail-merge case fails.
+if (process.argv.includes("--write-known") && detailFails) { console.log(`detail merge: ${detailCases.length - detailFails}/${detailCases.length} ok — fix before --write-known`); process.exit(1); }
 if (process.argv.includes("--write-known")) {
   await writeFile(new URL("known-leaks.json", dir), JSON.stringify(leaks.sort(), null, 1) + "\n");
   console.log(`known-leaks.json: ${leaks.length} leaks written`);
