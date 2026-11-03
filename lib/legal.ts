@@ -27,7 +27,7 @@ const PRIVACY: Record<string, Privacy> = {
       ] },
       { h: "What we keep", items: [
         "General facts about dishes (names, usual ingredients, allergens), so the next lookup is faster. They are never linked to you.",
-        "Anonymous usage events, such as “menu scanned” and how long it took, with a random id that changes every day, so we can see how often a feature is used in a day without following anyone over time. No name, location, allergies or dates.",
+        "Anonymous usage events, such as “menu scanned” and how long it took, with a random id that changes every day, so we can see how often a feature is used in a day without following anyone over time. Each event also carries the app language you chose, so we can see which languages our travellers use. No name, location, allergies or dates.",
         "Feedback you send on content (helpful, outdated or wrong), without anything about you.",
         "Free-use counts: how many menu photos, dish lookups, translations and booking screenshots a phone has used, under a random id the app makes for itself. Daily counts are deleted after 30 days.",
         "Trip passes and tips are paid through Apple. We only check Apple’s signed receipt (which pass, when it was bought) to unlock unlimited use; we never see your name or payment details.",
@@ -63,7 +63,7 @@ const PRIVACY: Record<string, Privacy> = {
       ] },
       { h: "Lo que guardamos", items: [
         "Datos generales sobre platos (nombres, ingredientes habituales, alérgenos) para responder más rápido la próxima vez. Nunca se vinculan contigo.",
-        "Eventos de uso anónimos, como «carta escaneada» y cuánto tardó, con un identificador aleatorio que cambia cada día, para saber cuánto se usa una función en un día sin seguir a nadie en el tiempo. Sin nombre, ubicación, alergias ni fechas.",
+        "Eventos de uso anónimos, como «carta escaneada» y cuánto tardó, con un identificador aleatorio que cambia cada día, para saber cuánto se usa una función en un día sin seguir a nadie en el tiempo. Cada evento lleva también el idioma que elegiste en la app, para saber qué idiomas usan los viajeros. Sin nombre, ubicación, alergias ni fechas.",
         "Las valoraciones que envías sobre el contenido (útil, desactualizado o incorrecto), sin nada sobre ti.",
         "Recuentos de uso gratuito: cuántas fotos de carta, búsquedas de platos, traducciones y capturas de reserva ha usado un teléfono, con un identificador aleatorio que crea la propia app. Los recuentos diarios se borran a los 30 días.",
         "Los pases de viaje y las propinas se pagan a través de Apple. Solo comprobamos el recibo firmado de Apple (qué pase y cuándo se compró) para desbloquear el uso ilimitado; nunca vemos tu nombre ni tus datos de pago.",
@@ -99,7 +99,7 @@ const PRIVACY: Record<string, Privacy> = {
       ] },
       { h: "Ce que nous conservons", items: [
         "Des informations générales sur les plats (noms, ingrédients habituels, allergènes), pour répondre plus vite la fois suivante. Elles ne sont jamais liées à vous.",
-        "Des événements d’utilisation anonymes, comme « menu scanné » et sa durée, avec un identifiant aléatoire qui change chaque jour, pour savoir combien une fonction est utilisée dans la journée sans suivre personne dans le temps. Ni nom, ni position, ni allergies, ni dates.",
+        "Des événements d’utilisation anonymes, comme « menu scanné » et sa durée, avec un identifiant aléatoire qui change chaque jour, pour savoir combien une fonction est utilisée dans la journée sans suivre personne dans le temps. Chaque événement indique aussi la langue choisie dans l’app, pour savoir quelles langues utilisent nos voyageurs. Ni nom, ni position, ni allergies, ni dates.",
         "Vos avis sur le contenu (utile, obsolète ou faux), sans rien vous concernant.",
         "Compteurs d’usage gratuit : combien de photos de menu, recherches de plats, traductions et captures de réservation un téléphone a utilisées, avec un identifiant aléatoire créé par l’app. Les compteurs quotidiens sont supprimés après 30 jours.",
         "Les pass voyage et les pourboires sont payés via Apple. Nous vérifions seulement le reçu signé d’Apple (quel pass, acheté quand) pour débloquer l’usage illimité ; nous ne voyons jamais votre nom ni vos données de paiement.",
@@ -135,7 +135,7 @@ const PRIVACY: Record<string, Privacy> = {
       ] },
       { h: "Was wir speichern", items: [
         "Allgemeine Angaben zu Gerichten (Namen, übliche Zutaten, Allergene), damit die nächste Abfrage schneller geht. Sie sind nie mit dir verknüpft.",
-        "Anonyme Nutzungsereignisse wie „Speisekarte gescannt“ und die Dauer, mit einer zufälligen ID, die sich jeden Tag ändert – so sehen wir, wie oft eine Funktion an einem Tag genutzt wird, ohne jemanden über die Zeit zu verfolgen. Kein Name, kein Standort, keine Allergien, keine Daten.",
+        "Anonyme Nutzungsereignisse wie „Speisekarte gescannt“ und die Dauer, mit einer zufälligen ID, die sich jeden Tag ändert – so sehen wir, wie oft eine Funktion an einem Tag genutzt wird, ohne jemanden über die Zeit zu verfolgen. Jedes Ereignis enthält auch die App-Sprache, die du gewählt hast, damit wir sehen, welche Sprachen Reisende nutzen. Kein Name, kein Standort, keine Allergien, keine Daten.",
         "Rückmeldungen zu Inhalten (hilfreich, veraltet oder falsch), ohne Angaben zu dir.",
         "Zähler für die kostenlose Nutzung: wie viele Speisekarten-Fotos, Gerichtsabfragen, Übersetzungen und Buchungs-Screenshots ein Telefon genutzt hat, unter einer zufälligen ID, die die App selbst erzeugt. Tageszähler werden nach 30 Tagen gelöscht.",
         "Reisepässe und Trinkgeld werden über Apple bezahlt. Wir prüfen nur Apples signierten Beleg (welcher Pass, wann gekauft), um die unbegrenzte Nutzung freizuschalten; deinen Namen oder Zahlungsdaten sehen wir nie.",
@@ -171,7 +171,7 @@ const PRIVACY: Record<string, Privacy> = {
       ] },
       { h: "当社が保存するもの", items: [
         "次回すばやく答えるための、料理に関する一般的な情報（名前、通常の材料、アレルゲン）。あなたと結びつけられることはありません。",
-        "「メニューを読み取った」とその所要時間などの匿名の利用イベント。毎日変わるランダムなIDのみで（1日に機能がどれだけ使われたかを知るためで、日をまたいで追跡はしません）、名前・位置・アレルギー・日付は含みません。",
+        "「メニューを読み取った」とその所要時間などの匿名の利用イベント。毎日変わるランダムなIDのみで（1日に機能がどれだけ使われたかを知るためで、日をまたいで追跡はしません）、アプリで選んだ言語も記録し、旅行者がどの言語を使っているかを把握します。名前・位置・アレルギー・日付は含みません。",
         "コンテンツへのフィードバック（役に立った・古い・間違い）。あなたに関する情報は含みません。",
         "無料利用の回数：その端末がメニュー撮影・料理検索・翻訳・予約スクリーンショットを何回使ったか。アプリが自分で作るランダムなIDで記録し、1日ごとの回数は30日後に削除します。",
         "トラベルパスとチップの支払いはAppleを通じて行われます。無制限利用を有効にするため、Appleの署名付きレシート（どのパスをいつ購入したか）だけを確認します。お名前や支払い情報を目にすることはありません。",
@@ -207,7 +207,7 @@ const PRIVACY: Record<string, Privacy> = {
       ] },
       { h: "저희가 보관하는 정보", items: [
         "다음 조회를 빠르게 하기 위한 요리에 관한 일반 정보(이름, 보통 들어가는 재료, 알레르기 유발 성분). 사용자와 연결되지 않습니다.",
-        "'메뉴 스캔'과 걸린 시간 같은 익명 사용 이벤트. 매일 바뀌는 무작위 ID만 있고(하루 동안 기능을 얼마나 쓰는지 보기 위한 것으로, 날을 넘어 추적하지 않습니다) 이름·위치·알레르기·날짜는 없습니다.",
+        "'메뉴 스캔'과 걸린 시간 같은 익명 사용 이벤트. 매일 바뀌는 무작위 ID만 있고(하루 동안 기능을 얼마나 쓰는지 보기 위한 것으로, 날을 넘어 추적하지 않습니다) 앱에서 고른 언어도 함께 기록해 여행자가 어떤 언어를 쓰는지 봅니다. 이름·위치·알레르기·날짜는 없습니다.",
         "콘텐츠에 대한 피드백(도움 됨, 오래됨, 틀림). 사용자에 관한 정보는 없습니다.",
         "무료 사용 횟수: 그 기기에서 메뉴 촬영, 요리 검색, 번역, 예약 스크린샷을 몇 번 썼는지를 앱이 직접 만든 무작위 ID로 기록합니다. 하루 단위 기록은 30일 후 삭제합니다.",
         "여행 패스와 팁은 Apple을 통해 결제됩니다. 무제한 사용을 열기 위해 Apple의 서명된 영수증(어떤 패스를 언제 샀는지)만 확인하며, 이름이나 결제 정보는 볼 수 없습니다.",

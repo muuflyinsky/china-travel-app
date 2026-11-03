@@ -57,7 +57,7 @@
 - **菜单评测**（`scripts/eval-menus.mjs`）：除过敏原漏报外，还检查每道菜是否有译名、拼音和至少 3 个配料，报表列出缺项。
 
 **P2 测量**
-- 匿名事件（`lib/track.ts` → `/api/t` → `data/events.jsonl`，Vercel 上写入日志）：`menu_scan`、`order_card_shown`、`staff_reply`、`taxi_card_shown`、`hotel_card_shown`、`hotel_pick_click`（带档位、区域、位置标签）、`resv_alarm_added`。
+- 匿名事件（`lib/track.ts` → `/api/t` → `data/events.jsonl`，Vercel 上写入日志）：`menu_scan`、`order_card_shown`、`staff_reply`、`taxi_card_shown`、`hotel_card_shown`、`hotel_pick_click`（带档位、区域、位置标签）、`resv_alarm_added`。每个事件的属性里都带 `lang`（用户在设置里选的语言，没设时取浏览器语言；2026-11-03 起），用来看用户语言分布，不带别的个人信息。按语言统计：`select p->>'lang' as lang, count(distinct sid) as phone_days from events where ts > now() - interval '28 days' group by 1 order by 2 desc;`
 - 只记事件名、少量基本属性和随机会话编号；不记过敏、日期、位置。服务器会丢掉未知事件和非基本类型的属性。
 
 ## 1. 产品概述
