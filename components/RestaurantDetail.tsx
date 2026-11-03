@@ -183,6 +183,7 @@ export function RestaurantDetail({ r, aiOn = true, children }: { r: ListedRestau
       {card && <OrderShowCard key={card.lines.join()} card={card} onRemove={(zhs, then) => {
         // Marked dishes leave the order; the card comes back with the rest, or closes.
         setOrder((o) => { const n = { ...o }; for (const zh of zhs) delete n[zh]; return n; });
+        if (!then) return;
         const rest = ordered.filter((d) => !zhs.includes(d.zh));
         setCard(then === "show" && rest.length ? orderCard(t, restrictions, rest.map((d) => ({ zh: d.zh, name: d.name, qty: 1, without: order[d.zh] })), true) : null);
       }} onClose={() => setCard(null)} />}

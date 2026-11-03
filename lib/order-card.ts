@@ -28,10 +28,13 @@ export function allergyExplain(t: Dict, p: Restrictions) {
  */
 export function orderAsk(p: Restrictions) {
   const x = ALLERGENS.filter((a) => p.allergens.includes(a.id)).map(zhShort).join("、");
-  const problems = ["做不了", x && `有${x}而且去不掉`, p.diets.length > 0 && "不符合我饮食要求"].filter(Boolean);
+  const diet = p.diets.length > 0;
+  // "Can every dish be made without X?": a yes is a clear promise the kitchen can act on, even for
+  // a dish where the app didn't see X (so the card has no "不要放X" line for it).
+  const problems = ["做不了", x && `${x}去不掉`, diet && "不符合我饮食要求"].filter(Boolean);
   return {
-    q: `这些菜都能做吗？${x ? `有没有含${x}、又去不掉的？` : p.diets.length ? "有没有不符合我饮食要求的？" : ""}`,
-    yes: x || p.diets.length ? "都能做，都没有" : "都能做",
+    q: `这些菜都能做吗？${x ? `每道菜都能不放${x}${diet ? "，也符合我的饮食要求" : ""}吗？` : diet ? "都符合我的饮食要求吗？" : ""}`,
+    yes: x && !diet ? `都能做，都不放${x}` : x || diet ? "都能做，都没问题" : "都能做",
     some: "有问题，我来选",
     pick: `请点出${problems.join("，或者")}的菜（可以多选）：`,
     done: "选好了",

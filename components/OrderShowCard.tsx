@@ -10,7 +10,7 @@ import type { AllergenId } from "@/lib/allergens";
 import type { orderCard } from "@/lib/order-card";
 
 type Card = ReturnType<typeof orderCard>;
-type Step = "card" | "pick" | "handoff" | "result" | "ok" | "unsure";
+type Step = "card" | "pick" | "handoff" | "result" | "ok";
 
 /**
  * The order card as a short exchange with staff (PM review #2, Veer 2026-11-03):
@@ -23,14 +23,18 @@ type Step = "card" | "pick" | "handoff" | "result" | "ok" | "unsure";
  * A staff "all fine" is their answer, never the app's check: no verdict changes (D1).
  */
 export function OrderShowCard({ card, onRemove, onClose }: {
-  card: Card; onRemove: (zhs: string[], then: "show" | "menu") => void; onClose: () => void;
+  /** Without `then`, the dishes only leave the order (the card stays); with it, show the card for the rest or go back to the menu. */
+  card: Card; onRemove: (zhs: string[], then?: "show" | "menu") => void; onClose: () => void;
 }) {
   const t = useT();
   const [p] = useProfile();
   const [step, setStep] = useState<Step>("card");
   const [marked, setMarked] = useState<string[]>([]);
+  const [unsure, setUnsure] = useState(false);
   const { ask, dishes } = card;
   const mine = p.allergens.map((a) => t.allergens[a as AllergenId].toLowerCase()).join(", ");
+  // Staff answered: marked dishes leave the order now, so closing at any later step keeps that.
+  const finish = (zhs: string[]) => { setMarked(zhs); if (zhs.length) onRemove(zhs); setStep("handoff"); };
   const toggle = (zh: string) => setMarked((m) => (m.includes(zh) ? m.filter((x) => x !== zh) : [...m, zh]));
   const left = dishes.filter((d) => !marked.includes(d.zh));
   const shell = "fixed inset-0 z-50 flex flex-col bg-card px-4 pt-[calc(12px+env(safe-area-inset-top))] pb-[calc(12px+env(safe-area-inset-bottom))] text-ink";
@@ -64,12 +68,12 @@ export function OrderShowCard({ card, onRemove, onClose }: {
           </ul>
         </div>
         <div className="mt-3 shrink-0 space-y-2 border-t border-line pt-3" lang="zh-CN">
-          <button disabled={!marked.length} onClick={() => { track("staff_reply_dish", { card: "order", n: marked.length }); setStep("handoff"); }}
+          <button disabled={!marked.length} onClick={() => { track("staff_reply_dish", { card: "order", n: marked.length }); finish(marked); }}
             className="zh flex min-h-14 w-full items-center justify-center rounded-control bg-cobalt text-title font-bold text-white disabled:opacity-40 dark:text-[#12141c]">
             {ask.done}{marked.length ? `（${marked.length}）` : ""}
           </button>
           {ask.unsure && (
-            <button onClick={() => { track("staff_reply_dish", { card: "order", n: -1 }); setMarked([]); setStep("unsure"); }}
+            <button onClick={() => { track("staff_reply_dish", { card: "order", n: -1 }); setUnsure(true); finish([]); }}
               className="zh flex min-h-control w-full items-center justify-center rounded-control border-2 border-line text-headline">{ask.unsure}</button>
           )}
         </div>
@@ -89,6 +93,25 @@ export function OrderShowCard({ card, onRemove, onClose }: {
     );
   }
 
+  if (step === "result" && unsure) {
+    return (
+      <div role="dialog" aria-modal="true" className={shell}>
+        <div className="flex shrink-0 items-center gap-2">
+          <span className="flex-1 text-footnote font-semibold text-muted">{t.eat.staffSays}</span>
+          {close}
+        </div>
+        <div className="mt-3 min-h-0 flex-1 space-y-3 overflow-auto">
+          <h2 className="text-title">{fmt(t.eat.staffUnsure, { x: mine })}</h2>
+          <p className="rounded-card bg-warn-soft p-3 text-body text-warn">{fmt(t.eat.whichDishUnsure, { x: mine })}</p>
+        </div>
+        <div className="mt-3 shrink-0 space-y-2 border-t border-line pt-3">
+          <button onClick={() => { setUnsure(false); setStep("card"); }} className="flex min-h-control w-full items-center justify-center rounded-control bg-cobalt text-headline text-white dark:text-[#12141c]">{t.eat.askAgain}</button>
+          <button onClick={onClose} className="flex min-h-control w-full items-center justify-center rounded-control bg-cobalt-soft text-headline text-cobalt">{t.eat.chooseOther}</button>
+        </div>
+      </div>
+    );
+  }
+
   if (step === "result") {
     return (
       <div role="dialog" aria-modal="true" className={shell}>
@@ -98,7 +121,7 @@ export function OrderShowCard({ card, onRemove, onClose }: {
         </div>
         <div className="mt-3 min-h-0 flex-1 space-y-3 overflow-auto">
           <h2 className="text-title">{marked.length === 1 ? t.eat.markedOne : fmt(t.eat.marked, { n: marked.length })}</h2>
-          <p className="text-body text-muted">{mine ? fmt(t.eat.markedWhyAllergy, { x: mine }) : t.eat.markedWhy}</p>
+          <p className="text-body text-muted">{[mine && fmt(t.eat.markedWhyAllergy, { x: mine }), p.diets.length ? t.eat.markedWhyDiet : "", !mine && !p.diets.length ? t.eat.markedWhy : ""].filter(Boolean).join(" ")}</p>
           <ul className="divide-y divide-line rounded-card border border-line">
             {dishes.filter((d) => marked.includes(d.zh)).map((d) => (
               <li key={d.zh} className="flex items-baseline justify-between gap-3 px-4 py-3">
@@ -110,11 +133,11 @@ export function OrderShowCard({ card, onRemove, onClose }: {
         </div>
         <div className="mt-3 shrink-0 space-y-2 border-t border-line pt-3">
           {left.length > 0 && (
-            <button onClick={() => onRemove(marked, "show")} className="flex min-h-control w-full items-center justify-center rounded-control bg-cobalt text-headline text-white dark:text-[#12141c]">
+            <button onClick={() => onRemove([], "show")} className="flex min-h-control w-full items-center justify-center rounded-control bg-cobalt text-headline text-white dark:text-[#12141c]">
               {left.length === 1 ? t.eat.orderRestOne : fmt(t.eat.orderRest, { n: left.length })}
             </button>
           )}
-          <button onClick={() => onRemove(marked, "menu")} className="flex min-h-control w-full items-center justify-center rounded-control bg-cobalt-soft text-headline text-cobalt">{t.eat.chooseOther}</button>
+          <button onClick={() => onRemove([], "menu")} className="flex min-h-control w-full items-center justify-center rounded-control bg-cobalt-soft text-headline text-cobalt">{t.eat.chooseOther}</button>
         </div>
       </div>
     );
@@ -122,19 +145,14 @@ export function OrderShowCard({ card, onRemove, onClose }: {
 
   // Step "card", plus the two answers that need no picking: all fine, or not sure.
   const bottom = step === "ok" ? (
-    <button onClick={() => setStep("card")} className="block w-full rounded-card bg-cobalt-soft p-3 text-left" role="status">
-      <span className="block text-footnote font-semibold text-cobalt">{t.eat.staffSays}</span>
-      <span className="block text-headline">{t.eat.staffAllOk}</span>
-      <span className="zh block text-subhead text-muted" lang="zh-CN">{ask.yes}</span>
-    </button>
-  ) : step === "unsure" ? (
     <div className="space-y-2">
-      <div className="rounded-card bg-warn-soft p-3" role="status">
-        <span className="block text-footnote font-semibold text-warn">{t.eat.staffSays}</span>
-        <span className="block text-headline">{fmt(t.eat.staffUnsure, { x: mine })}</span>
-        <span className="mt-1 block text-subhead">{t.eat.whichDishUnsure}</span>
-      </div>
-      <button onClick={onClose} className="flex min-h-control w-full items-center justify-center rounded-control bg-cobalt-soft text-headline text-cobalt">{t.eat.chooseOther}</button>
+      <button onClick={() => setStep("card")} className="block w-full rounded-card bg-cobalt-soft p-3 text-left" role="status">
+        <span className="block text-footnote font-semibold text-cobalt">{t.eat.staffSays}</span>
+        <span className="block text-headline">{mine ? fmt(t.eat.staffAllOkAllergy, { x: mine }) : t.eat.staffAllOk}</span>
+        <span className="zh block text-subhead text-muted" lang="zh-CN">{ask.yes}</span>
+      </button>
+      {/* Their answer, never the app's: no verdict changes (D1). */}
+      <p className="text-footnote text-muted">{t.eat.staffOkNote}</p>
     </div>
   ) : (
     <div lang="zh-CN">
@@ -142,7 +160,7 @@ export function OrderShowCard({ card, onRemove, onClose }: {
       <div className="mt-3 space-y-2">
         <button onClick={() => { track("staff_reply", { card: "order", reply: 0 }); setStep("ok"); }}
           className="zh min-h-14 w-full rounded-control border-2 border-line px-4 text-left text-title font-bold">{ask.yes}</button>
-        <button onClick={() => { track("staff_reply", { card: "order", reply: 1 }); setMarked(dishes.length === 1 ? [dishes[0].zh] : []); setStep(dishes.length === 1 ? "handoff" : "pick"); }}
+        <button onClick={() => { track("staff_reply", { card: "order", reply: 1 }); if (dishes.length === 1) finish([dishes[0].zh]); else { setMarked([]); setStep("pick"); } }}
           className="zh min-h-14 w-full rounded-control border-2 border-danger px-4 text-left text-title font-bold text-danger">{ask.some}</button>
       </div>
       <p className="mt-2 text-footnote text-muted">{t.eat.askHint}</p>

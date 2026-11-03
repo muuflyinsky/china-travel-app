@@ -637,9 +637,10 @@ export default function MenuPage() {
   }
 
   /** Staff marked dishes: they leave the order; then the card for the rest, or back to the menu. */
-  function removeFromCard(zhs: string[], then: "show" | "menu") {
+  function removeFromCard(zhs: string[], then?: "show" | "menu") {
     for (const zh of zhs) setLine(zh, undefined);
-    const rest = orderLines.filter((x) => !zhs.includes(x.row.d.zh));
+    if (!then) return;
+    const rest = orderLines.filter((x) => !zhs.includes(x.row.d.zh) && x.row.d.zh in order);
     setOrderShown(then === "show" && rest.length ? buildOrder(rest, true) : null);
   }
 
