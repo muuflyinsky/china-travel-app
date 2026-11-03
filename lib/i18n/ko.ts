@@ -253,7 +253,7 @@ export const ko: Dict = {
     chooseOther: "다른 요리 고르기",
     staffAllOk: "모두 만들 수 있대요.",
     staffNoTag: "직원: 안 됨",
-    staffNoSheet: "직원이 주문 카드에서 이 요리를 표시했어요: 만들 수 없거나 알레르기 재료를 뺄 수 없어요.",
+    staffNoSheet: "직원이 주문 카드에서 이 요리를 표시해서 주문에서 뺐어요.",
     staffMarkedNote: "직원이 요리 {n}개를 표시했어요. 주문에서 빼고 아래에 빨간색으로 표시했어요.",
     staffMarkedNoteOne: "직원이 요리 1개를 표시했어요. 주문에서 빼고 아래에 빨간색으로 표시했어요.",
     markedWhyDiet: "일부는 식단에 맞지 않을 수 있어요.",

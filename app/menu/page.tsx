@@ -312,8 +312,8 @@ function AllergySheet({ onDone }: { onDone: () => void }) {
 }
 
 /** Saved dishes, checked against today's allergy settings, with Add to put one in this meal's order. */
-function SavedSheet({ saved, restricted, restrictions, factsFor, onAdd, onClose }: {
-  saved: SavedDish[]; restricted: boolean; restrictions: Parameters<typeof verdict>[1]; factsFor: (d: ListDish) => ListDish; onAdd: (d: ListDish, v: Verdict) => void; onClose: () => void;
+function SavedSheet({ saved, restricted, restrictions, factsFor, staffNo, onAdd, onClose }: {
+  saved: SavedDish[]; restricted: boolean; restrictions: Parameters<typeof verdict>[1]; factsFor: (d: ListDish) => ListDish; staffNo: string[]; onAdd: (d: ListDish, v: Verdict) => void; onClose: () => void;
 }) {
   const t = useT();
   return (
@@ -342,8 +342,8 @@ function SavedSheet({ saved, restricted, restrictions, factsFor, onAdd, onClose 
                   </button>
                 </div>
                 <div className="flex min-h-11 items-center justify-between gap-2 pb-1">
-                  <span className="min-w-0">{restricted ? <VerdictTag v={v} /> : null}</span>
-                  {v.blocked.length ? (
+                  <span className="min-w-0">{staffNo.includes(d.zh) ? <span className="tag tag-danger"><Ban className="h-3.5 w-3.5" aria-hidden />{t.eat.staffNoTag}</span> : restricted ? <VerdictTag v={v} /> : null}</span>
+                  {staffNo.includes(d.zh) ? null : v.blocked.length ? (
                     <ShieldAlert className="h-5 w-5 shrink-0 text-danger" aria-label={fmt(t.eat.blockedSevere, { x: v.blocked.map((a) => t.allergens[a as AllergenId].toLowerCase()).join(", ") })} />
                   ) : (
                     <button onClick={() => onAdd(d, v)} className="-mr-3 flex min-h-11 shrink-0 items-center gap-1 rounded-control px-3 text-subhead font-semibold text-cobalt">
@@ -556,9 +556,11 @@ export default function MenuPage() {
   }, [allRows, at]);
   const page = at === "all" ? undefined : pages.find((p) => p.id === at);
   const streaming = streamingId ? pages.find((p) => p.id === streamingId) : undefined;
-  const count = (k: VerdictKind) => rows.filter((r) => r.v.kind === k).length;
+  // A dish staff said no to counts (and filters) as "don't order".
+  const kindOf = (r: Row): VerdictKind => (staffNo.includes(r.d.zh) ? "no" : r.v.kind);
+  const count = (k: VerdictKind) => rows.filter((r) => kindOf(r) === k).length;
   // Menu order, not "ok" first: a dish at the top of the list must not read as a recommendation.
-  const shown = filter === "all" ? rows : rows.filter((r) => r.v.kind === filter);
+  const shown = filter === "all" ? rows : rows.filter((r) => kindOf(r) === filter);
   const got = (p: MealPage) => p.dishes.filter(Boolean).length;
   const pending = page && page.id === streamingId ? Math.max(0, page.total - got(page) - page.missing) : 0;
   // A page whose reading was cut short (Eat closed mid-way) counts the rest as unread.
@@ -841,7 +843,7 @@ export default function MenuPage() {
           onAdd={(without) => { setLine(openRow.d.zh, { qty: 1, without }); setOpened(null); }}
           onFlag={() => flagDish(openRow.d)} onClose={() => setOpened(null)} />
       )}
-      {savedOpen && <SavedSheet saved={saved} restricted={restricted} restrictions={restrictions} factsFor={factsFor} onAdd={addSaved} onClose={() => setSavedOpen(false)} />}
+      {savedOpen && <SavedSheet saved={saved} restricted={restricted} restrictions={restrictions} factsFor={factsFor} staffNo={staffNo} onAdd={addSaved} onClose={() => setSavedOpen(false)} />}
       {card && <ShowCard {...card} onClose={() => setCard(null)} />}
       {/* Keyed by its text, so an updated card starts again at the question. */}
       {orderShown && <OrderShowCard key={orderShown.lines.join()} card={orderShown} onRemove={removeFromCard} onClose={() => setOrderShown(null)} />}

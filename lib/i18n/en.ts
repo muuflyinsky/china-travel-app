@@ -256,7 +256,7 @@ export const en = {
     chooseOther: "Choose other dishes",
     staffAllOk: "They say they can make all of these.",
     staffNoTag: "Staff said no",
-    staffNoSheet: "Staff marked this dish on your order card: they can’t make it, or your allergen can’t be left out.",
+    staffNoSheet: "Staff marked this dish on your order card, so it’s off your order.",
     staffMarkedNote: "Staff marked {n} dishes. They’re out of your order and marked in red below.",
     staffMarkedNoteOne: "Staff marked 1 dish. It’s out of your order and marked in red below.",
     markedWhyDiet: "Some may not fit your diet.",

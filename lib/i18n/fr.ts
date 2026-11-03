@@ -253,7 +253,7 @@ export const fr: Dict = {
     chooseOther: "Choisir d’autres plats",
     staffAllOk: "Ils disent pouvoir tous les faire.",
     staffNoTag: "Refusé par le personnel",
-    staffNoSheet: "Le personnel a marqué ce plat sur votre commande : impossible à faire, ou votre allergène ne peut pas être retiré.",
+    staffNoSheet: "Le personnel a marqué ce plat sur votre commande ; il en est retiré.",
     staffMarkedNote: "Le personnel a marqué {n} plats. Ils sont retirés de votre commande et en rouge ci-dessous.",
     staffMarkedNoteOne: "Le personnel a marqué 1 plat. Il est retiré de votre commande et en rouge ci-dessous.",
     markedWhyDiet: "Certains ne conviennent peut-être pas à votre régime.",

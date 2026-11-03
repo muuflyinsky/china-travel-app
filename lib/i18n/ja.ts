@@ -253,7 +253,7 @@ export const ja: Dict = {
     chooseOther: "別の料理を選ぶ",
     staffAllOk: "すべて作れるそうです。",
     staffNoTag: "店員さん：不可",
-    staffNoSheet: "店員さんが注文カードでこの料理に印を付けました：作れないか、アレルギーの食材を抜けません。",
+    staffNoSheet: "店員さんが注文カードでこの料理に印を付けたので、注文から外しました。",
     staffMarkedNote: "店員さんが{n}品に印を付けました。注文から外し、下に赤で表示しています。",
     staffMarkedNoteOne: "店員さんが1品に印を付けました。注文から外し、下に赤で表示しています。",
     markedWhyDiet: "食事制限に合わないものもあるかもしれません。",
