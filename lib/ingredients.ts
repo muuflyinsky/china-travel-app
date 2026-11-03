@@ -70,6 +70,7 @@ export function tighten<D extends DishLike>(d: D, extra: { zh: string; name?: st
   const meat = new Set(d.meat);
   let vegetarian = d.vegetarian, alcohol = d.alcohol;
   const has = (id: string) => allergens.some((a) => a.id === id);
+  const hasMain = (id: string) => allergens.some((a) => a.id === id && a.role === "main");
   const sources = [
     { zh: d.zh, role: "main" as Role, via: undefined as string | undefined },
     ...d.allergens.map((a) => ({ zh: a.via_zh, role: a.role, via: a.via })),
@@ -79,9 +80,12 @@ export function tighten<D extends DishLike>(d: D, extra: { zh: string; name?: st
     if (!s.zh) continue;
     const f = lookup(s.zh);
     for (const a of f.allergens) {
-      if (has(a.id)) continue;
       // From the dish name the word itself is the ingredient; otherwise the ingredient listed.
       const fromName = s === sources[0];
+      // Already there, unless a listed ingredient says main and no entry is main yet: then it's
+      // added as main too (花生 garnish + 花生 a main ingredient → main). Not from the dish name:
+      // there 蚝油 or 沙茶 name the sauce, not a main ingredient.
+      if (has(a.id) && (fromName || s.role !== "main" || hasMain(a.id))) continue;
       allergens.push({ id: a.id, role: s.role, via_zh: fromName ? a.word : s.zh, via: fromName ? a.en : s.via || a.en } as D["allergens"][number]);
     }
     for (const m of f.meat) meat.add(m);

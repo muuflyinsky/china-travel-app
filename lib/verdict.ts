@@ -68,7 +68,10 @@ export function verdict(d: ListDish, p: Restrictions): Verdict {
  * the word list too (猪油 makes the dish pork, 高汤 not vegetarian), so the verdict only gets stricter.
  */
 export function withDetailAllergens(d: ListDish, ingredients: { zh: string; name: string; role: "main" | "sauce" | "garnish"; allergens: string[] }[]): ListDish {
+  // Skip a detail entry only if it adds nothing: the allergen is already a main ingredient, or the
+  // same ingredient already brings it and the detail doesn't say it's main. 花生 listed as a garnish
+  // and the detail saying 花生 is a main ingredient must still make it main (stricter, never looser).
   const extra = ingredients.flatMap((i) => i.allergens.map((id) => ({ id, role: i.role, via: i.name, via_zh: i.zh })))
-    .filter((a) => !d.allergens.some((x) => x.id === a.id && (x.via_zh === a.via_zh || x.role === "main")));
+    .filter((a) => !d.allergens.some((x) => x.id === a.id && (x.role === "main" || (x.via_zh === a.via_zh && a.role !== "main"))));
   return tighten(extra.length ? { ...d, allergens: [...d.allergens, ...extra] } : d, ingredients);
 }
