@@ -767,6 +767,17 @@ export const de: Dict = {
     showShop: "Im Geschäft fragen: „Gibt es hier Steuerrückerstattung?“",
     source: "Chinas Staatliche Steuerverwaltung, das Steueramt Shanghai und Pekings 12345-Servicekarte",
   },
+  alerts: {
+    busyTitle: "{name}, {dates}: sehr voll",
+    busyBody: "Eine der verkehrsreichsten Reisezeiten in China. Züge und Hotels früh buchen, an großen Sehenswürdigkeiten mit langen Schlangen rechnen und früh am Tag hingehen.",
+    shortTitle: "{name}, {dates}: Feiertag",
+    shortBody: "Ein kurzer Feiertag: Beliebte Sehenswürdigkeiten und Züge werden voll. Buche, was du kannst, im Voraus.",
+    unofficial: "Gezeigt sind die gesetzlichen Feiertage; die vollständigen freien Tage (meist ein paar mehr) gibt der Staatsrat jeden November bekannt.",
+    trainTitle: "Zug {from} → {to}, {date}",
+    trainOnSale: "Tickets sind jetzt im Verkauf. Beliebte Züge sind schnell ausgebucht.",
+    trainSoon: "Tickets gibt es ab {date}, 15 Tage vorher. Am besten an dem Tag buchen: Beliebte Züge sind schnell ausgebucht.",
+    names: { newYear: "Neujahr", spring: "Frühlingsfest", qingming: "Qingming", labour: "Tag der Arbeit", dragon: "Drachenbootfest", midAutumn: "Mondfest", national: "Nationalfeiertag" },
+  },
   pass: {
     out: { menu_photo: "Die 2 kostenlosen Speisekarten für heute sind aufgebraucht (je bis zu 4 Fotos)", menu_text: "Die kostenlosen Gerichtsabfragen für heute sind aufgebraucht", translate: "Die kostenlosen Übersetzungen für heute sind aufgebraucht", hotel: "Deine kostenlosen Buchungs-Screenshots sind aufgebraucht", none: "Reisepass" },
     body: "Mit einem Reisepass hast du unbegrenzt Speisekarten-Fotos, Gerichtsabfragen und Übersetzungen. Allergie-Check und Allergiekarte sind immer kostenlos.",

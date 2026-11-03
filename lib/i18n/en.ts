@@ -770,6 +770,17 @@ export const en = {
     showShop: "Ask a shop: “Can I get a tax refund here?”",
     source: "China’s State Taxation Administration, the Shanghai tax bureau and Beijing’s 12345 service map",
   },
+  alerts: {
+    busyTitle: "{name}, {dates}: very busy",
+    busyBody: "One of China’s busiest travel times. Book trains and hotels early, expect long queues at big sights, and go early in the day.",
+    shortTitle: "{name}, {dates}: public holiday",
+    shortBody: "A short break: popular sights and city trains get crowded. Book what you can ahead.",
+    unofficial: "Legal days off shown; the full break (usually a few days longer) is announced by the State Council each November.",
+    trainTitle: "Train {from} → {to}, {date}",
+    trainOnSale: "Tickets are on sale now. Popular trains sell out fast.",
+    trainSoon: "Tickets go on sale {date}, 15 days ahead. Book that day: popular trains sell out fast.",
+    names: { newYear: "New Year", spring: "Spring Festival", qingming: "Qingming", labour: "Labour Day", dragon: "Dragon Boat Festival", midAutumn: "Mid-Autumn Festival", national: "National Day" },
+  },
   pass: {
     out: { menu_photo: "That’s today’s 2 free menus (up to 4 photos each)", menu_text: "That’s today’s free dish lookups", translate: "That’s today’s free translations", hotel: "That’s your free booking screenshots", none: "Trip pass" },
     body: "A trip pass gives you unlimited menu photos, dish lookups and translation. Your allergy check and allergy card are always free.",

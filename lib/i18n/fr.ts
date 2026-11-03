@@ -767,6 +767,17 @@ export const fr: Dict = {
     showShop: "Demander en boutique : « Puis-je avoir la détaxe ici ? »",
     source: "l’Administration fiscale d’État chinoise, le bureau des impôts de Shanghai et la carte de services 12345 de Pékin",
   },
+  alerts: {
+    busyTitle: "{name}, {dates} : très chargé",
+    busyBody: "L’une des périodes de voyage les plus chargées en Chine. Réservez trains et hôtels tôt, attendez-vous à de longues files aux grands sites et partez tôt le matin.",
+    shortTitle: "{name}, {dates} : jour férié",
+    shortBody: "Un court congé : sites populaires et trains bondés. Réservez ce que vous pouvez à l’avance.",
+    unofficial: "Jours fériés légaux indiqués ; le pont complet (souvent quelques jours de plus) est annoncé par le Conseil d’État chaque novembre.",
+    trainTitle: "Train {from} → {to}, {date}",
+    trainOnSale: "Les billets sont en vente. Les trains populaires partent vite.",
+    trainSoon: "Les billets sont en vente le {date}, 15 jours avant. Réservez ce jour-là : les trains populaires partent vite.",
+    names: { newYear: "Nouvel An", spring: "Nouvel An chinois", qingming: "Qingming", labour: "Fête du Travail", dragon: "Fête des bateaux-dragons", midAutumn: "Fête de la mi-automne", national: "Fête nationale" },
+  },
   pass: {
     out: { menu_photo: "Vos 2 menus gratuits du jour sont utilisés (jusqu’à 4 photos chacun)", menu_text: "Vos recherches de plats gratuites du jour sont épuisées", translate: "Vos traductions gratuites du jour sont épuisées", hotel: "Vos captures de réservation gratuites sont épuisées", none: "Pass voyage" },
     body: "Un pass voyage vous donne photos de menu, recherches de plats et traductions illimitées. La vérification des allergies et la carte d’allergies restent toujours gratuites.",
