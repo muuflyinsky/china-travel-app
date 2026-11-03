@@ -10,7 +10,7 @@ import { fmt } from "@/lib/i18n";
  * on an order card with several dishes staff are asked which one; `noneZh`/`none` is the answer
  * for "all of them" / "not sure which".
  */
-export type StaffReply = { zh: string; mine: string; pick?: { noneZh: string; none: string } };
+export type StaffReply = { zh: string; mine: string; pick?: { noneZh: string; none: string; advice?: string; removeOnly?: boolean } };
 export type CardDish = { zh: string; name: string };
 type Answer = { reply: StaffReply; dish?: CardDish | null; picking?: boolean };
 
@@ -31,13 +31,16 @@ export function ShowCard({ lead, lines, rest = [], sub, explain, replies, dishes
 }) {
   const t = useT();
   const [answer, setAnswer] = useState<Answer | null>(null);
+  // Set after a dish is taken out: the card now shows the updated order and asks to show it again,
+  // so one staff answer never reads as "the rest is fine".
+  const [updated, setUpdated] = useState(false);
   const [open, setOpen] = useState(false);
   const [size, setSize] = useState(MAX);
   const box = useRef<HTMLDivElement>(null);
   const all = [lead, ...lines, ...rest].filter(Boolean).join("。");
 
   // Fit to one screen: step the size down while the content overflows.
-  useLayoutEffect(() => { setSize(MAX); }, [all]);
+  useLayoutEffect(() => { setSize(MAX); setAnswer(null); }, [all]);
   useLayoutEffect(() => {
     const el = box.current;
     if (el && el.scrollHeight > el.clientHeight + 1 && size > MIN) setSize(size - 2);
@@ -61,6 +64,7 @@ export function ShowCard({ lead, lines, rest = [], sub, explain, replies, dishes
         <button onClick={onClose} aria-label={t.common.close} className="grid h-11 w-11 place-items-center rounded-full bg-porcelain"><X className="h-5 w-5" /></button>
       </div>
 
+      {updated && <p className="mt-2 shrink-0 rounded-control bg-cobalt-soft px-3 py-2 text-subhead font-semibold text-cobalt" role="status">{t.eat.orderUpdated}</p>}
       <div ref={box} className="mt-3 min-h-0 flex-1 overflow-auto">
         <div className="zh space-y-3 font-semibold" lang="zh-CN">
           {lead && <p className="font-bold text-danger" style={big}>{lead}</p>}
@@ -84,9 +88,9 @@ export function ShowCard({ lead, lines, rest = [], sub, explain, replies, dishes
             // Staff point at the dish they meant (Chinese, for them); the traveller's language is the hint.
             <>
               <p className="mb-2 text-footnote font-semibold text-muted">
-                <span lang="zh-CN" className="whitespace-nowrap">是哪一道？请点</span> · {t.eat.whichDishHint}
+                <span lang="zh-CN" className="whitespace-nowrap">是哪道菜？请在下面点一下</span> · {t.eat.whichDishHint}
               </p>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid max-h-[40vh] grid-cols-2 gap-2 overflow-auto">
                 {dishes.map((d, i) => (
                   <button key={d.zh} lang="zh-CN" onClick={() => { setAnswer({ reply: answer.reply, dish: d }); track("staff_reply_dish", { card: kind, dish: i }); }}
                     className="zh min-h-control rounded-control border-2 border-line px-3 text-left text-headline">{d.zh}</button>
@@ -108,17 +112,18 @@ export function ShowCard({ lead, lines, rest = [], sub, explain, replies, dishes
               {answer.reply.pick && dishes.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {answer.dish && onRemove && (
-                    <button onClick={() => { onRemove(answer.dish!.zh); onClose(); }}
+                    <button onClick={() => { onRemove(answer.dish!.zh); setUpdated(true); }}
                       className="flex min-h-control flex-1 items-center justify-center gap-1.5 rounded-control bg-cobalt px-3 text-subhead font-semibold text-white dark:text-[#12141c]">
                       <Minus className="h-4 w-4" aria-hidden />{fmt(t.eat.removeDish, { dish: answer.dish.name })}
                     </button>
                   )}
-                  <button onClick={onClose} className="flex min-h-control flex-1 items-center justify-center gap-1.5 rounded-control bg-cobalt-soft px-3 text-subhead font-semibold text-cobalt">
+                  {/* "Contains your allergen" about a named dish: taking it out is the only way on. */}
+                  {!(answer.dish && onRemove && answer.reply.pick.removeOnly) && <button onClick={onClose} className="flex min-h-control flex-1 items-center justify-center gap-1.5 rounded-control bg-cobalt-soft px-3 text-subhead font-semibold text-cobalt">
                     <ArrowLeft className="h-4 w-4" aria-hidden />{t.eat.changeOrder}
-                  </button>
+                  </button>}
                 </div>
               )}
-              {answer.reply.pick && dishes.length > 0 && answer.dish === null && <p className="text-footnote text-muted">{t.eat.whichDishUnsure}</p>}
+              {answer.reply.pick?.advice && dishes.length > 0 && answer.dish === null && <p className="text-subhead">{answer.reply.pick.advice}</p>}
             </div>
           ) : (
             <>
@@ -129,6 +134,7 @@ export function ShowCard({ lead, lines, rest = [], sub, explain, replies, dishes
                 {replies.map((r, i) => (
                   <button key={r.zh} lang="zh-CN" onClick={() => {
                     track("staff_reply", { card: kind, reply: i });
+                    setUpdated(false);
                     // One dish on the card: that's the one. Several: ask staff which.
                     if (r.pick && dishes.length > 1) setAnswer({ reply: r, picking: true });
                     else setAnswer({ reply: r, dish: r.pick && dishes.length === 1 ? dishes[0] : undefined });

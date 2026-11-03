@@ -180,7 +180,12 @@ export function RestaurantDetail({ r, aiOn = true, children }: { r: ListedRestau
         <p className="px-1 text-footnote text-muted">{t.awards.listedIn} {editions.join(" · ")}</p>
         <p className="px-1 text-footnote text-muted">{t.awards.note}</p>
       </div>
-      {card && <ShowCard {...card} onRemove={(zh) => setOrder((o) => { const n = { ...o }; delete n[zh]; return n; })} onClose={() => setCard(null)} />}
+      {card && <ShowCard {...card} onRemove={(zh) => {
+        // Out of the order; the card shows what's left so staff can check it again.
+        setOrder((o) => { const n = { ...o }; delete n[zh]; return n; });
+        const rest = ordered.filter((d) => d.zh !== zh);
+        setCard(rest.length ? orderCard(t, restrictions, rest.map((d) => ({ zh: d.zh, name: d.name, qty: 1, without: order[d.zh] }))) : null);
+      }} onClose={() => setCard(null)} />}
     </>
   );
 }

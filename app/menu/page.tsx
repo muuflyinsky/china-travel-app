@@ -622,14 +622,23 @@ export default function MenuPage() {
   const replies = (withCant: boolean) => staffReplies(t, profile, withCant);
   const allergyExplain = allergyExplainText(t, profile);
 
+  // "Without" was set when the dish was added; add whatever today's facts and settings say to
+  // leave out too (never drop what the traveller chose).
+  const buildOrder = (lines: typeof orderLines) => orderCard(t, profile, lines.map(({ row, l }) => ({
+    zh: row.d.zh, name: row.d.name, qty: l.qty,
+    without: [...new Set([...l.without, ...row.v.removable.map((a) => a.via_zh).filter(Boolean)])],
+  })));
+
   function showOrder() {
     track("order_card_shown", { dishes: orderLines.length, severe: Boolean(allergyLinesZh(profile.allergens, profile.diets, profile.severe).severe) });
-    // "Without" was set when the dish was added; add whatever today's facts and settings say to
-    // leave out too (never drop what the traveller chose).
-    setCard(orderCard(t, profile, orderLines.map(({ row, l }) => ({
-      zh: row.d.zh, name: row.d.name, qty: l.qty,
-      without: [...new Set([...l.without, ...row.v.removable.map((a) => a.via_zh).filter(Boolean)])],
-    }))));
+    setCard(buildOrder(orderLines));
+  }
+
+  /** Staff named a dish: it leaves the order and the card shows what's left, to show again. */
+  function removeFromCard(zh: string) {
+    setLine(zh, undefined);
+    const rest = orderLines.filter((x) => x.row.d.zh !== zh);
+    setCard(rest.length ? buildOrder(rest) : null);
   }
 
   function showAllergyCard() {
@@ -820,7 +829,7 @@ export default function MenuPage() {
           onFlag={() => flagDish(openRow.d)} onClose={() => setOpened(null)} />
       )}
       {savedOpen && <SavedSheet saved={saved} restricted={restricted} restrictions={restrictions} factsFor={factsFor} onAdd={addSaved} onClose={() => setSavedOpen(false)} />}
-      {card && <ShowCard {...card} onRemove={(zh) => setLine(zh, undefined)} onClose={() => setCard(null)} />}
+      {card && <ShowCard {...card} onRemove={removeFromCard} onClose={() => setCard(null)} />}
       {askAllergies && <AllergySheet onDone={() => setAskAllergies(false)} />}
       <Link href="/settings#food" className="sr-only">{t.common.settings}</Link>
     </Screen>
