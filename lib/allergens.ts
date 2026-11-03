@@ -54,7 +54,7 @@ export function mainAllergens(d: DishLike) {
 /** The traveller's severe allergens that are a main ingredient of this dish: don't let them order it. */
 export const blockedBySevere = (d: DishLike, severe: string[]) => mainAllergens(d).filter((a) => severe.includes(a));
 
-const zhShort = (a: { zh: string }) => a.zh.split("（")[0];
+export const zhShort = (a: { zh: string }) => a.zh.split("（")[0];
 
 /**
  * Allergy and diet lines for staff cards, most important first:

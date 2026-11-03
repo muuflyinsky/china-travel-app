@@ -1,7 +1,7 @@
 // The order card shown to restaurant staff (Simplified Chinese), shared by Eat and Explore:
 // a severe allergy first, then the dishes, then other allergies; the traveller's language only
 // in the collapsed explanation. Replies are pinned under the card (at most three).
-import { allergyLinesZh, type AllergenId } from "./allergens";
+import { ALLERGENS, allergyLinesZh, zhShort, type AllergenId } from "./allergens";
 import { fmt, type Dict } from "./i18n";
 import type { StaffReply } from "@/components/ShowCard";
 
@@ -11,9 +11,8 @@ export type OrderItem = { zh: string; name: string; qty: number; without: string
 export function staffReplies(t: Dict, p: Restrictions, withCant: boolean): StaffReply[] {
   return [
     { zh: "可以，没问题", mine: t.eat.replyOk },
-    ...(withCant ? [{ zh: "这道菜做不了", mine: t.eat.replyCant, pick: { noneZh: "都做不了", none: t.eat.replyCantAll } }] : []),
-    // On the allergy card there are no dishes to point at; on an order card staff say which.
-    ...(p.allergens.length ? [{ zh: "里面有您过敏的东西", mine: t.eat.replyContainsAny, pick: { noneZh: "不确定是哪一道", none: t.eat.replyContainsUnsure, advice: t.eat.whichDishUnsure, removeOnly: true } }] : []),
+    ...(withCant ? [{ zh: "这道菜做不了", mine: t.eat.replyCant }] : []),
+    ...(p.allergens.length ? [{ zh: "里面有您过敏的东西", mine: t.eat.replyContainsAny }] : []),
   ];
 }
 
@@ -22,16 +21,38 @@ export function allergyExplain(t: Dict, p: Restrictions) {
   return mine.length ? fmt(t.eat.orderExplainAllergy, { allergens: mine.join(", ") }) : "";
 }
 
-export function orderCard(t: Dict, p: Restrictions, items: OrderItem[]) {
+/**
+ * What the order card asks staff, in big Chinese: can they make all of it, and is any dish one
+ * where the allergen can't be left out (or that breaks the diet). Staff then mark the problem
+ * dishes, several at once (components/OrderShowCard.tsx).
+ */
+export function orderAsk(p: Restrictions) {
+  const x = ALLERGENS.filter((a) => p.allergens.includes(a.id)).map(zhShort).join("、");
+  const problems = ["做不了", x && `有${x}而且去不掉`, p.diets.length > 0 && "不符合我饮食要求"].filter(Boolean);
+  return {
+    q: `这些菜都能做吗？${x ? `有没有含${x}、又去不掉的？` : p.diets.length ? "有没有不符合我饮食要求的？" : ""}`,
+    yes: x || p.diets.length ? "都能做，都没有" : "都能做",
+    some: "有问题，我来选",
+    pick: `请点出${problems.join("，或者")}的菜（可以多选）：`,
+    done: "选好了",
+    unsure: x ? "不确定，要问厨房" : "",
+    handoff: ["好的，谢谢！", "请把手机还给客人。"],
+  };
+}
+
+/** `again`: staff marked dishes that are now out; the card says so before what's left. */
+export function orderCard(t: Dict, p: Restrictions, items: OrderItem[], again = false) {
   const { severe, rest } = allergyLinesZh(p.allergens, p.diets, p.severe);
   const dishes = items.map((x) => `${x.name} ×${x.qty}`).join(", ");
   return {
     kind: "order",
     lead: severe || undefined,
-    lines: ["您好，我要点：", ...items.map((x) => `${x.zh} ×${x.qty}${x.without.length ? `（不要放${x.without.join("、")}）` : ""}`)],
+    lines: [again ? "好的，有问题的那几道不要了。我点这些：" : "您好，我要点：", ...items.map((x) => `${x.zh} ×${x.qty}${x.without.length ? `（不要放${x.without.join("、")}）` : ""}`)],
+    again,
+    dishes: items.map((x) => ({ zh: x.zh, name: x.name, qty: x.qty })),
+    ask: orderAsk(p),
     rest,
     explain: [fmt(t.eat.orderExplain, { dishes }), allergyExplain(t, p)].filter(Boolean).join(" "),
     replies: staffReplies(t, p, true),
-    dishes: items.map((x) => ({ zh: x.zh, name: x.name })),
   };
 }

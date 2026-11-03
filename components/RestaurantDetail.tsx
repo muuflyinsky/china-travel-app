@@ -5,7 +5,7 @@ import { Card, Group } from "./ui";
 import { Photo } from "./Photo";
 import { CuisineTile } from "./CuisineTile";
 import { AwardBadges } from "./AwardBadges";
-import { ShowCard } from "./ShowCard";
+import { OrderShowCard } from "./OrderShowCard";
 import { VerdictTag } from "./VerdictTag";
 import { usePerPerson } from "./AwardRestaurants";
 import { useProfile } from "./useProfile";
@@ -180,11 +180,11 @@ export function RestaurantDetail({ r, aiOn = true, children }: { r: ListedRestau
         <p className="px-1 text-footnote text-muted">{t.awards.listedIn} {editions.join(" · ")}</p>
         <p className="px-1 text-footnote text-muted">{t.awards.note}</p>
       </div>
-      {card && <ShowCard {...card} onRemove={(zh) => {
-        // Out of the order; the card shows what's left so staff can check it again.
-        setOrder((o) => { const n = { ...o }; delete n[zh]; return n; });
-        const rest = ordered.filter((d) => d.zh !== zh);
-        setCard(rest.length ? orderCard(t, restrictions, rest.map((d) => ({ zh: d.zh, name: d.name, qty: 1, without: order[d.zh] }))) : null);
+      {card && <OrderShowCard key={card.lines.join()} card={card} onRemove={(zhs, then) => {
+        // Marked dishes leave the order; the card comes back with the rest, or closes.
+        setOrder((o) => { const n = { ...o }; for (const zh of zhs) delete n[zh]; return n; });
+        const rest = ordered.filter((d) => !zhs.includes(d.zh));
+        setCard(then === "show" && rest.length ? orderCard(t, restrictions, rest.map((d) => ({ zh: d.zh, name: d.name, qty: 1, without: order[d.zh] })), true) : null);
       }} onClose={() => setCard(null)} />}
     </>
   );

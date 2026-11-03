@@ -1,18 +1,10 @@
 "use client";
 import { useLayoutEffect, useRef, useState } from "react";
-import { Volume2, X, MessageSquareReply, ChevronDown, Minus, ArrowLeft } from "lucide-react";
+import { Volume2, X, MessageSquareReply, ChevronDown } from "lucide-react";
 import { useT } from "./useT";
 import { track } from "@/lib/track";
-import { fmt } from "@/lib/i18n";
 
-/**
- * A reply staff can tap. `pick`: it's about one dish ("can't make", "contains your allergen"), so
- * on an order card with several dishes staff are asked which one; `noneZh`/`none` is the answer
- * for "all of them" / "not sure which".
- */
-export type StaffReply = { zh: string; mine: string; pick?: { noneZh: string; none: string; advice?: string; removeOnly?: boolean } };
-export type CardDish = { zh: string; name: string };
-type Answer = { reply: StaffReply; dish?: CardDish | null; picking?: boolean };
+export type StaffReply = { zh: string; mine: string };
 
 const MAX = 36; // --text-display-zh
 const MIN = 28;
@@ -23,30 +15,27 @@ const MIN = 28;
  * `rest` (other allergies, smaller). The type shrinks from 36px to 28px until it fits one
  * screen; reply buttons stay pinned at the bottom so staff can always answer.
  */
-export function ShowCard({ lead, lines, rest = [], sub, explain, replies, dishes = [], onRemove, kind = "card", onClose }: {
+export function ShowCard({ lead, lines, rest = [], sub, explain, replies, notice, bottom, bottomKey = "", kind = "card", onClose }: {
   lead?: string; lines: string[]; rest?: string[]; sub?: string; explain?: string; replies?: StaffReply[];
-  /** Order cards: the dishes, so a "can't make" can say which; onRemove takes one out of the order. */
-  dishes?: CardDish[]; onRemove?: (zh: string) => void;
+  /** A line for the traveller above the card (e.g. "Order updated"). */
+  notice?: string;
+  /** Replaces the reply buttons (the order card asks its own question); `bottomKey` changes refit the text. */
+  bottom?: React.ReactNode; bottomKey?: string;
   kind?: string; onClose: () => void;
 }) {
   const t = useT();
-  const [answer, setAnswer] = useState<Answer | null>(null);
-  // Set after a dish is taken out: the card now shows the updated order and asks to show it again,
-  // so one staff answer never reads as "the rest is fine".
-  const [updated, setUpdated] = useState(false);
+  const [answer, setAnswer] = useState<StaffReply | null>(null);
   const [open, setOpen] = useState(false);
   const [size, setSize] = useState(MAX);
   const box = useRef<HTMLDivElement>(null);
   const all = [lead, ...lines, ...rest].filter(Boolean).join("。");
 
   // Fit to one screen: step the size down while the content overflows.
-  useLayoutEffect(() => { setSize(MAX); setAnswer(null); }, [all]);
-  // The reply area changes height (dish grid, answer, update note): fit the text again each time.
-  useLayoutEffect(() => { setSize(MAX); }, [answer, updated]);
+  useLayoutEffect(() => { setSize(MAX); }, [all, bottomKey, notice]);
   useLayoutEffect(() => {
     const el = box.current;
     if (el && el.scrollHeight > el.clientHeight + 1 && size > MIN) setSize(size - 2);
-  }, [size, all, open, answer, updated]);
+  }, [size, all, open, bottomKey, notice]);
 
   const speak = () => {
     const u = new SpeechSynthesisUtterance(all);
@@ -66,7 +55,7 @@ export function ShowCard({ lead, lines, rest = [], sub, explain, replies, dishes
         <button onClick={onClose} aria-label={t.common.close} className="grid h-11 w-11 place-items-center rounded-full bg-porcelain"><X className="h-5 w-5" /></button>
       </div>
 
-      {updated && <p className="mt-2 shrink-0 rounded-control bg-cobalt-soft px-3 py-2 text-subhead font-semibold text-cobalt" role="status">{t.eat.orderUpdated}</p>}
+      {notice && <p className="mt-2 shrink-0 rounded-control bg-cobalt-soft px-3 py-2 text-subhead font-semibold text-cobalt" role="status">{notice}</p>}
       <div ref={box} className="mt-3 min-h-0 flex-1 overflow-auto">
         <div className="zh space-y-3 font-semibold" lang="zh-CN">
           {lead && <p className="font-bold text-danger" style={big}>{lead}</p>}
@@ -84,56 +73,15 @@ export function ShowCard({ lead, lines, rest = [], sub, explain, replies, dishes
         )}
       </div>
 
-      {replies && replies.length > 0 && (
+      {bottom && <div className="mt-3 shrink-0 border-t border-line pt-3">{bottom}</div>}
+      {!bottom && replies && replies.length > 0 && (
         <div className="mt-3 shrink-0 border-t border-line pt-3">
-          {answer?.picking ? (
-            // Staff point at the dish they meant (Chinese, for them); the traveller's language is the hint.
-            <>
-              <div className="mb-2 flex items-center gap-2">
-                <p className="min-w-0 flex-1 text-footnote font-semibold text-muted">
-                  <span lang="zh-CN" className="whitespace-nowrap">是哪道菜？请在下面点一下</span> · {t.eat.whichDishHint}
-                </p>
-                {/* Tapped the wrong reply: back to the three. */}
-                <button onClick={() => setAnswer(null)} aria-label={t.common.back} className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-porcelain text-muted">
-                  <ArrowLeft className="h-5 w-5" aria-hidden />
-                </button>
-              </div>
-              {/* Five or more dishes: three short columns, so the card text above keeps its room. */}
-              <div className={`grid max-h-[40vh] gap-2 overflow-auto ${dishes.length >= 5 ? "grid-cols-3" : "grid-cols-2"}`}>
-                {dishes.map((d, i) => (
-                  <button key={d.zh} lang="zh-CN" onClick={() => { setAnswer({ reply: answer.reply, dish: d }); track("staff_reply_dish", { card: kind, dish: i }); }}
-                    className={`zh min-h-control rounded-control border-2 border-line text-left ${dishes.length >= 5 ? "px-2 text-subhead font-semibold" : "px-3 text-headline"}`}>{d.zh}</button>
-                ))}
-                <button lang="zh-CN" onClick={() => { setAnswer({ reply: answer.reply, dish: null }); track("staff_reply_dish", { card: kind, dish: -1 }); }}
-                  className={`zh min-h-control rounded-control border-2 border-line px-3 text-left text-headline text-muted ${dishes.length >= 5 ? (dishes.length % 3 === 2 ? "" : dishes.length % 3 === 1 ? "col-span-2" : "col-span-3") : dishes.length % 2 ? "" : "col-span-2"}`}>{answer.reply.pick!.noneZh}</button>
-              </div>
-            </>
-          ) : answer ? (
-            <div className="space-y-2">
-              <button onClick={() => setAnswer(null)} className="block w-full rounded-card bg-cobalt-soft p-3 text-left" role="status">
-                <span className="block text-footnote font-semibold text-cobalt">{t.eat.staffSays}</span>
-                <span className="block text-title">{answer.reply.mine}</span>
-                {answer.dish && <span className="block text-headline">{answer.dish.name} <span className="zh font-normal text-muted" lang="zh-CN">{answer.dish.zh}</span></span>}
-                {answer.dish === null && answer.reply.pick && <span className="block text-headline">{answer.reply.pick.none}</span>}
-                <span className="zh block text-subhead text-muted" lang="zh-CN">{answer.reply.zh}{answer.dish ? `：${answer.dish.zh}` : answer.dish === null && answer.reply.pick ? `：${answer.reply.pick.noneZh}` : ""}</span>
-              </button>
-              {/* What the traveller can do next. A staff "OK" is their answer, never the app's guarantee. */}
-              {answer.reply.pick && dishes.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {answer.dish && onRemove && (
-                    <button onClick={() => { onRemove(answer.dish!.zh); setUpdated(true); }}
-                      className="flex min-h-control flex-1 items-center justify-center gap-1.5 rounded-control bg-cobalt px-3 text-subhead font-semibold text-white dark:text-[#12141c]">
-                      <Minus className="h-4 w-4" aria-hidden />{fmt(t.eat.removeDish, { dish: answer.dish.name })}
-                    </button>
-                  )}
-                  {/* "Contains your allergen" about a named dish: taking it out is the only way on. */}
-                  {!(answer.dish && onRemove && answer.reply.pick.removeOnly) && <button onClick={onClose} className="flex min-h-control flex-1 items-center justify-center gap-1.5 rounded-control bg-cobalt-soft px-3 text-subhead font-semibold text-cobalt">
-                    <ArrowLeft className="h-4 w-4" aria-hidden />{t.eat.changeOrder}
-                  </button>}
-                </div>
-              )}
-              {answer.reply.pick?.advice && dishes.length > 0 && answer.dish === null && <p className="text-subhead">{answer.reply.pick.advice}</p>}
-            </div>
+          {answer ? (
+            <button onClick={() => setAnswer(null)} className="block w-full rounded-card bg-cobalt-soft p-3 text-left" role="status">
+              <span className="block text-footnote font-semibold text-cobalt">{t.eat.staffSays}</span>
+              <span className="block text-title">{answer.mine}</span>
+              <span className="zh block text-subhead text-muted" lang="zh-CN">{answer.zh}</span>
+            </button>
           ) : (
             <>
               <p className="mb-2 text-footnote font-semibold text-muted">
@@ -141,13 +89,7 @@ export function ShowCard({ lead, lines, rest = [], sub, explain, replies, dishes
               </p>
               <div className="grid grid-cols-2 gap-2">
                 {replies.map((r, i) => (
-                  <button key={r.zh} lang="zh-CN" onClick={() => {
-                    track("staff_reply", { card: kind, reply: i });
-                    setUpdated(false);
-                    // One dish on the card: that's the one. Several: ask staff which.
-                    if (r.pick && dishes.length > 1) setAnswer({ reply: r, picking: true });
-                    else setAnswer({ reply: r, dish: r.pick && dishes.length === 1 ? dishes[0] : undefined });
-                  }}
+                  <button key={r.zh} lang="zh-CN" onClick={() => { setAnswer(r); track("staff_reply", { card: kind, reply: i }); }}
                     className={`zh min-h-control rounded-control border-2 border-line px-3 text-left text-headline ${replies.length % 2 && i === replies.length - 1 ? "col-span-2" : ""}`}>
                     {r.zh}
                   </button>

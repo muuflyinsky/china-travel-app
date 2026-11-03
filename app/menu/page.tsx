@@ -9,7 +9,8 @@ import { useProfile } from "@/components/useProfile";
 import { useCity } from "@/components/useCity";
 import { useFx, parseCny, formatMoney } from "@/components/useFx";
 import { useT } from "@/components/useT";
-import { ShowCard, type CardDish, type StaffReply } from "@/components/ShowCard";
+import { ShowCard, type StaffReply } from "@/components/ShowCard";
+import { OrderShowCard } from "@/components/OrderShowCard";
 import { LANGUAGES } from "@/lib/languages";
 import { ALLERGENS, DIETS, allergyLinesZh, type AllergenId, type DietId } from "@/lib/allergens";
 import { track } from "@/lib/track";
@@ -396,7 +397,8 @@ export default function MenuPage() {
   const [tipsOpen, setTipsOpen] = useState(false);
   const [opened, setOpened] = useState<string | null>(null);
   const [details, setDetails] = useState<Record<string, Detail>>({});
-  const [card, setCard] = useState<{ kind: string; lead?: string; lines: string[]; rest?: string[]; explain?: string; replies?: StaffReply[]; dishes?: CardDish[] } | null>(null);
+  const [card, setCard] = useState<{ kind: string; lead?: string; lines: string[]; rest?: string[]; explain?: string; replies?: StaffReply[] } | null>(null);
+  const [orderShown, setOrderShown] = useState<ReturnType<typeof orderCard> | null>(null);
   const [askAllergies, setAskAllergies] = useState(false);
   const [saved, setSaved] = useState<SavedDish[]>([]);
   const [savedOpen, setSavedOpen] = useState(false);
@@ -624,21 +626,21 @@ export default function MenuPage() {
 
   // "Without" was set when the dish was added; add whatever today's facts and settings say to
   // leave out too (never drop what the traveller chose).
-  const buildOrder = (lines: typeof orderLines) => orderCard(t, profile, lines.map(({ row, l }) => ({
+  const buildOrder = (lines: typeof orderLines, again = false) => orderCard(t, profile, lines.map(({ row, l }) => ({
     zh: row.d.zh, name: row.d.name, qty: l.qty,
     without: [...new Set([...l.without, ...row.v.removable.map((a) => a.via_zh).filter(Boolean)])],
-  })));
+  })), again);
 
   function showOrder() {
     track("order_card_shown", { dishes: orderLines.length, severe: Boolean(allergyLinesZh(profile.allergens, profile.diets, profile.severe).severe) });
-    setCard(buildOrder(orderLines));
+    setOrderShown(buildOrder(orderLines));
   }
 
-  /** Staff named a dish: it leaves the order and the card shows what's left, to show again. */
-  function removeFromCard(zh: string) {
-    setLine(zh, undefined);
-    const rest = orderLines.filter((x) => x.row.d.zh !== zh);
-    setCard(rest.length ? buildOrder(rest) : null);
+  /** Staff marked dishes: they leave the order; then the card for the rest, or back to the menu. */
+  function removeFromCard(zhs: string[], then: "show" | "menu") {
+    for (const zh of zhs) setLine(zh, undefined);
+    const rest = orderLines.filter((x) => !zhs.includes(x.row.d.zh));
+    setOrderShown(then === "show" && rest.length ? buildOrder(rest, true) : null);
   }
 
   function showAllergyCard() {
@@ -829,7 +831,9 @@ export default function MenuPage() {
           onFlag={() => flagDish(openRow.d)} onClose={() => setOpened(null)} />
       )}
       {savedOpen && <SavedSheet saved={saved} restricted={restricted} restrictions={restrictions} factsFor={factsFor} onAdd={addSaved} onClose={() => setSavedOpen(false)} />}
-      {card && <ShowCard {...card} onRemove={removeFromCard} onClose={() => setCard(null)} />}
+      {card && <ShowCard {...card} onClose={() => setCard(null)} />}
+      {/* Keyed by its text, so an updated card starts again at the question. */}
+      {orderShown && <OrderShowCard key={orderShown.lines.join()} card={orderShown} onRemove={removeFromCard} onClose={() => setOrderShown(null)} />}
       {askAllergies && <AllergySheet onDone={() => setAskAllergies(false)} />}
       <Link href="/settings#food" className="sr-only">{t.common.settings}</Link>
     </Screen>
