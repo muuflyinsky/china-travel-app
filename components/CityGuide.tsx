@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Preloader } from "konsta/react";
-import { Clock, Sun, Star, Ticket, CarTaxiFront, Flame, Leaf, ExternalLink, ReceiptText, Search, ChevronRight, CalendarClock, RotateCw } from "lucide-react";
-import { Card, Group, Button, Seg, Note } from "./ui";
+import { Clock, Sun, Star, Ticket, CarTaxiFront, Flame, Leaf, ExternalLink, ReceiptText, Receipt, Search, ChevronRight, CalendarClock, RotateCw } from "lucide-react";
+import { Card, Group, Row, Button, Seg, Note, IconTile } from "./ui";
 import { SourceLine } from "./SourceLine";
 import { Feedback } from "./Feedback";
 import { AppIcon } from "./AppIcon";
@@ -16,6 +16,7 @@ import { amapNav } from "@/lib/maplinks";
 import { ALLERGENS, allergyLinesZh, blockedBySevere } from "@/lib/allergens";
 import { track } from "@/lib/track";
 import { RESERVATIONS } from "@/lib/reservations";
+import { taxCity } from "@/lib/tax-refund";
 import { pick, type CityGuide as Guide, type GuideDish, type GuideSight } from "@/lib/city-guide-types";
 import { Photo } from "./Photo";
 import type { Place } from "@/lib/amap";
@@ -192,6 +193,9 @@ export function CityGuide({ adcode, cityEn, initialTab = "see", tab: controlled,
       <a href={goLink("trip", "attraction", { cityEn }, "explore_top", "explore-top")} target="_blank" rel="noopener" className="flex min-h-11 items-center gap-1 px-1 text-subhead font-semibold text-cobalt">
         {fmt(t.guide.topTrip, { city: cityEn })}<ExternalLink className="h-3.5 w-3.5" aria-hidden />
       </a>
+      {taxCity(adcode) && (
+        <Group><Row href="/tax-refund" icon={<IconTile><Receipt className="h-5 w-5" aria-hidden /></IconTile>} title={fmt(t.guide.taxRow, { city: cityEn })} /></Group>
+      )}
       {/* Map data alone is sourced; anything with model-written text says so. */}
       {g && <SourceLine ai={!(g as { partial?: boolean }).partial} name="Amap" date={g.demo ? undefined : g.generatedAt} />}
     </>
