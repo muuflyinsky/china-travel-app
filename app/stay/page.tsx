@@ -35,6 +35,9 @@ function Stay() {
   const [city, setCity] = useState<CityLite | null>(null);
   const [checkin, setCheckin] = useState(addDays(todayIso(), 7));
   const [checkout, setCheckout] = useState(addDays(todayIso(), 9));
+  // Until the dates come from the trip or the traveller, they're only a suggestion: the bar asks
+  // to confirm them and Trip.com links carry no dates (Codex review #3).
+  const [dated, setDated] = useState(false);
   const [tier, setTier] = useState<TierId>("comfort");
   const [edit, setEdit] = useState(false);
   useEffect(() => {
@@ -44,6 +47,7 @@ function Stay() {
     if (profile.arrival && profile.arrival >= todayIso()) {
       setCheckin(profile.arrival);
       setCheckout(profile.departure > profile.arrival ? profile.departure : addDays(profile.arrival, 2));
+      setDated(true);
     }
   }, [loaded]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -54,6 +58,7 @@ function Stay() {
     const start = tc.from > todayIso() ? tc.from : todayIso();
     setCheckin(start);
     setCheckout(tc.to > start ? tc.to : addDays(start, 1));
+    setDated(true);
   }, [city?.a, profile.cities]);
 
   const c = city ?? { a: here.a, e: here.e, s: here.s };
@@ -66,7 +71,7 @@ function Stay() {
   const { data, error } = useHotelPicks(c.a, c.s, area?.location);
   const nights = Math.max(1, daysBetween(checkin, checkout));
   const guests = profile.guests;
-  const link = { city: c.s, cityEn: c.e, checkin, checkout, adults: guests };
+  const link = dated ? { city: c.s, cityEn: c.e, checkin, checkout, adults: guests } : { city: c.s, cityEn: c.e, adults: guests };
   const fmtDay = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString(profile.lang, { timeZone: "UTC", day: "numeric", month: "short" });
 
   const range = useMemo(() => {
@@ -105,7 +110,10 @@ function Stay() {
           <span className="min-w-0 flex-1">
             <span className="block text-headline">{c.e} <span className="zh font-normal text-muted">{c.s}</span></span>
             <span className="block text-footnote text-muted">
-              {fmtDay(checkin)} – {fmtDay(checkout)} · {nights === 1 ? t.stay.night1 : fmt(t.stay.nightsN, { n: nights })} · {guests === 1 ? t.stay.guest1 : fmt(t.stay.guestsN, { n: guests })}
+              {dated
+                ? <>{fmtDay(checkin)} – {fmtDay(checkout)} · {nights === 1 ? t.stay.night1 : fmt(t.stay.nightsN, { n: nights })}</>
+                : <span className="font-semibold text-cobalt">{t.stay.confirmDates}</span>}
+              {" · "}{guests === 1 ? t.stay.guest1 : fmt(t.stay.guestsN, { n: guests })}
             </span>
           </span>
           <span className="text-subhead font-semibold text-cobalt">{t.common.edit}</span>
@@ -179,8 +187,8 @@ function Stay() {
       <EditSheet open={edit} title={t.stay.trip} onClose={() => setEdit(false)}>
         <CityPicker value={asCity(c)} label={t.stay.city} onChange={(x) => setCity({ a: x.a, e: x.e, s: x.s })} />
         <Group>
-          <Field label={t.stay.checkIn}><input type="date" value={checkin} onChange={(e) => setCheckin(e.target.value)} /></Field>
-          <Field label={fmt(t.stay.checkOut, { n: nights })}><input type="date" value={checkout} min={checkin} onChange={(e) => setCheckout(e.target.value)} /></Field>
+          <Field label={t.stay.checkIn}><input type="date" value={checkin} onChange={(e) => { setCheckin(e.target.value); setDated(true); }} /></Field>
+          <Field label={fmt(t.stay.checkOut, { n: nights })}><input type="date" value={checkout} min={checkin} onChange={(e) => { setCheckout(e.target.value); setDated(true); }} /></Field>
           <li className="flex min-h-14 items-center gap-3 px-4">
             <span className="flex-1 text-body">{t.stay.guests}</span>
             <button onClick={() => setProfile({ guests: Math.max(1, guests - 1) })} aria-label={t.stay.guestLess} className="grid h-11 w-11 place-items-center rounded-full bg-cobalt-soft text-cobalt"><Minus className="h-5 w-5" /></button>
@@ -188,6 +196,7 @@ function Stay() {
             <button onClick={() => setProfile({ guests: Math.min(8, guests + 1) })} aria-label={t.stay.guestMore} className="grid h-11 w-11 place-items-center rounded-full bg-cobalt-soft text-cobalt"><Plus className="h-5 w-5" /></button>
           </li>
         </Group>
+        {!dated && <Button className="w-full" onClick={() => { setDated(true); setEdit(false); }}>{t.stay.useDates}</Button>}
       </EditSheet>
     </Screen>
   );

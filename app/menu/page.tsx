@@ -2,9 +2,9 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Popup, Preloader, Sheet } from "konsta/react";
-import { Camera, Flame, Info, Leaf, ShieldAlert, ShieldCheck, ShieldOff, ChevronRight, ChevronDown, Plus, Minus, ReceiptText, Keyboard, UtensilsCrossed, Volume2, X, Lightbulb, Images, ScanText, Star, Layers, RotateCcw, Ban } from "lucide-react";
+import { Camera, Flame, Info, Leaf, ShieldAlert, ShieldCheck, ShieldOff, ChevronRight, ChevronDown, Plus, Minus, ReceiptText, Keyboard, UtensilsCrossed, Volume2, X, Lightbulb, Images, ScanText, Star, Layers, RotateCcw, Ban, QrCode, Copy, Check } from "lucide-react";
 import { Screen, DemoNote } from "@/components/Shell";
-import { Section, Card, Group, Row, Field, Button, Note, IconTile, IconButton } from "@/components/ui";
+import { Section, Card, Group, Row, Field, Button, Note, IconTile, IconButton, Disclosure } from "@/components/ui";
 import { useProfile } from "@/components/useProfile";
 import { useCity } from "@/components/useCity";
 import { useFx, parseCny, formatMoney } from "@/components/useFx";
@@ -117,6 +117,7 @@ function DishSheet({ d, v, mine, detail, line, saved, staffNo, onSave, onAdd, on
   d: ListDish; v: Verdict; mine: string[]; detail?: Detail; line?: Line; saved: boolean; staffNo?: boolean; onSave: () => void; onAdd: (without: string[]) => void; onFlag: () => void; onClose: () => void; homePrice?: string;
 }) {
   const t = useT();
+  const [copied, setCopied] = useState(false);
   const speak = () => {
     const u = new SpeechSynthesisUtterance(d.zh);
     u.lang = "zh-CN";
@@ -143,6 +144,11 @@ function DishSheet({ d, v, mine, detail, line, saved, staffNo, onSave, onAdd, on
               <span className="zh whitespace-nowrap text-headline" lang="zh-CN">{d.zh}</span>
               <span className="text-subhead text-muted">{d.pinyin}</span>
               <button onClick={speak} aria-label={t.eat.listen} className="grid h-9 w-9 place-items-center rounded-full bg-cobalt-soft text-cobalt"><Volume2 className="h-4 w-4" /></button>
+              {/* For QR-code menus: paste the Chinese name into the mini program's search. */}
+              <button onClick={() => { navigator.clipboard?.writeText(d.zh).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1500); }, () => {}); }}
+                aria-label={copied ? t.eat.copiedZh : t.eat.copyZh} className="grid h-9 w-9 place-items-center rounded-full bg-cobalt-soft text-cobalt">
+                {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              </button>
             </p>
           </div>
           <div className="shrink-0 text-right">
@@ -714,6 +720,16 @@ export default function MenuPage() {
               </label>
             </div>
           </Card>
+          {/* Most city restaurants order by QR code: their mini-program menu shows photos, not
+              ingredients (DECISIONS D9). Screenshots go through the same allergy check. */}
+          {!hasMeal && (
+            <Disclosure title={t.eat.qrTitle} icon={<QrCode className="h-4 w-4 shrink-0 text-cobalt" aria-hidden />}>
+              <p className="text-subhead text-ink">{t.eat.qrPitch}</p>
+              <ol className="list-decimal space-y-1 pl-5 text-subhead">
+                {t.eat.qrSteps.map((x, i) => <li key={i}>{x}</li>)}
+              </ol>
+            </Disclosure>
+          )}
           {hasMeal && (
             <button onClick={() => setInputOpen(false)} className="flex min-h-touch w-full items-center justify-center text-subhead font-semibold text-cobalt">{t.eat.backToMeal}</button>
           )}
