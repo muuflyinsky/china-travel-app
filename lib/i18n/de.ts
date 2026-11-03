@@ -243,7 +243,7 @@ export const de: Dict = {
     replyCantAll: "Keines dieser Gerichte ist möglich",
     replyContainsUnsure: "Das Personal weiß nicht, welches Gericht",
     removeDish: "{dish} entfernen",
-    changeOrder: "Zurück zur Speisekarte",
+    changeOrder: "Bestellung ändern",
     whichDishUnsure: "Jedes dieser Gerichte könnte es sein. Bitte das Personal, es auf der Karte zu zeigen; bis das jemand sagen kann, iss sie nicht. Bei einer schweren Allergie bestell etwas anderes.",
     replyContains: "Das enthält {x}",
     staffSays: "Das Personal sagt",

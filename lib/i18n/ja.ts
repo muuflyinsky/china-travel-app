@@ -243,7 +243,7 @@ export const ja: Dict = {
     replyCantAll: "どれも作れないそうです",
     replyContainsUnsure: "どの料理か分からないそうです",
     removeDish: "{dish}を外す",
-    changeOrder: "メニューに戻る",
+    changeOrder: "注文を変える",
     whichDishUnsure: "どの料理にも含まれている可能性があります。メニューで指してもらい、分かるまでは食べないでください。重いアレルギーがある場合は、別の料理を注文してください。",
     replyContains: "これには{x}が入っています",
     staffSays: "店員の返事",

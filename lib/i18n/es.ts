@@ -243,7 +243,7 @@ export const es: Dict = {
     replyCantAll: "No pueden preparar ninguno",
     replyContainsUnsure: "No saben en qué plato",
     removeDish: "Quitar {dish}",
-    changeOrder: "Volver a la carta",
+    changeOrder: "Cambiar el pedido",
     whichDishUnsure: "Cualquiera de estos platos podría ser. Pide que te lo señalen en la carta; hasta que alguien lo sepa, no los comas. Con una alergia grave, pide otra cosa.",
     replyContains: "Esto lleva {x}",
     staffSays: "El personal dice",

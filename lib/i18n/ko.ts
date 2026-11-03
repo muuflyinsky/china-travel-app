@@ -243,7 +243,7 @@ export const ko: Dict = {
     replyCantAll: "이 요리 모두 안 돼요",
     replyContainsUnsure: "어느 요리인지 모른대요",
     removeDish: "{dish} 빼기",
-    changeOrder: "메뉴로 돌아가기",
+    changeOrder: "주문 바꾸기",
     whichDishUnsure: "이 요리 중 어느 것이든 해당될 수 있어요. 메뉴에서 가리켜 달라고 하고, 알 수 있을 때까지는 먹지 마세요. 심한 알레르기가 있다면 다른 요리를 주문하세요.",
     replyContains: "여기에 {x}이(가) 들어 있어요",
     staffSays: "직원 답변",

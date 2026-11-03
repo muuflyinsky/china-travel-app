@@ -41,10 +41,12 @@ export function ShowCard({ lead, lines, rest = [], sub, explain, replies, dishes
 
   // Fit to one screen: step the size down while the content overflows.
   useLayoutEffect(() => { setSize(MAX); setAnswer(null); }, [all]);
+  // The reply area changes height (dish grid, answer, update note): fit the text again each time.
+  useLayoutEffect(() => { setSize(MAX); }, [answer, updated]);
   useLayoutEffect(() => {
     const el = box.current;
     if (el && el.scrollHeight > el.clientHeight + 1 && size > MIN) setSize(size - 2);
-  }, [size, all, open]);
+  }, [size, all, open, answer, updated]);
 
   const speak = () => {
     const u = new SpeechSynthesisUtterance(all);
@@ -87,16 +89,23 @@ export function ShowCard({ lead, lines, rest = [], sub, explain, replies, dishes
           {answer?.picking ? (
             // Staff point at the dish they meant (Chinese, for them); the traveller's language is the hint.
             <>
-              <p className="mb-2 text-footnote font-semibold text-muted">
-                <span lang="zh-CN" className="whitespace-nowrap">是哪道菜？请在下面点一下</span> · {t.eat.whichDishHint}
-              </p>
-              <div className="grid max-h-[40vh] grid-cols-2 gap-2 overflow-auto">
+              <div className="mb-2 flex items-center gap-2">
+                <p className="min-w-0 flex-1 text-footnote font-semibold text-muted">
+                  <span lang="zh-CN" className="whitespace-nowrap">是哪道菜？请在下面点一下</span> · {t.eat.whichDishHint}
+                </p>
+                {/* Tapped the wrong reply: back to the three. */}
+                <button onClick={() => setAnswer(null)} aria-label={t.common.back} className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-porcelain text-muted">
+                  <ArrowLeft className="h-5 w-5" aria-hidden />
+                </button>
+              </div>
+              {/* Five or more dishes: three short columns, so the card text above keeps its room. */}
+              <div className={`grid max-h-[40vh] gap-2 overflow-auto ${dishes.length >= 5 ? "grid-cols-3" : "grid-cols-2"}`}>
                 {dishes.map((d, i) => (
                   <button key={d.zh} lang="zh-CN" onClick={() => { setAnswer({ reply: answer.reply, dish: d }); track("staff_reply_dish", { card: kind, dish: i }); }}
-                    className="zh min-h-control rounded-control border-2 border-line px-3 text-left text-headline">{d.zh}</button>
+                    className={`zh min-h-control rounded-control border-2 border-line text-left ${dishes.length >= 5 ? "px-2 text-subhead font-semibold" : "px-3 text-headline"}`}>{d.zh}</button>
                 ))}
                 <button lang="zh-CN" onClick={() => { setAnswer({ reply: answer.reply, dish: null }); track("staff_reply_dish", { card: kind, dish: -1 }); }}
-                  className={`zh min-h-control rounded-control border-2 border-line px-3 text-left text-headline text-muted ${dishes.length % 2 ? "" : "col-span-2"}`}>{answer.reply.pick!.noneZh}</button>
+                  className={`zh min-h-control rounded-control border-2 border-line px-3 text-left text-headline text-muted ${dishes.length >= 5 ? (dishes.length % 3 === 2 ? "" : dishes.length % 3 === 1 ? "col-span-2" : "col-span-3") : dishes.length % 2 ? "" : "col-span-2"}`}>{answer.reply.pick!.noneZh}</button>
               </div>
             </>
           ) : answer ? (

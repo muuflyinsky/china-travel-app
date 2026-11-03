@@ -246,7 +246,7 @@ export const en = {
     replyCantAll: "They can’t make any of these",
     replyContainsUnsure: "They aren’t sure which dish",
     removeDish: "Remove {dish}",
-    changeOrder: "Back to the menu",
+    changeOrder: "Change the order",
     whichDishUnsure: "Any of these dishes could be the one. Ask staff to point at it on the menu; until someone can say, don’t eat them. With a severe allergy, order something else.",
     replyContains: "This contains {x}",
     staffSays: "Staff says",
