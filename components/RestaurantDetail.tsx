@@ -153,7 +153,7 @@ export function RestaurantDetail({ r, aiOn = true, children }: { r: ListedRestau
           {ordered.length > 0 && (
             <button onClick={() => { track("order_card_shown", { dishes: ordered.length, source: "restaurant" }); setCard(orderCard(t, restrictions, ordered.map((d) => ({ zh: d.zh, name: d.name, qty: 1, without: order[d.zh] })))); }}
               className="flex min-h-control w-full items-center justify-center gap-2 rounded-control bg-cobalt text-subhead font-semibold text-white dark:text-[#12141c]">
-              <ReceiptText className="h-5 w-5" aria-hidden />{fmt(t.eat.orderBar, { n: ordered.length })}
+              <ReceiptText className="h-5 w-5" aria-hidden />{ordered.length === 1 ? t.eat.orderBarOne : fmt(t.eat.orderBar, { n: ordered.length })}
             </button>
           )}
           <p className="flex items-start gap-1.5 px-1 text-footnote text-muted"><Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />{t.awards.signatureNote}</p>
@@ -180,7 +180,7 @@ export function RestaurantDetail({ r, aiOn = true, children }: { r: ListedRestau
         <p className="px-1 text-footnote text-muted">{t.awards.listedIn} {editions.join(" · ")}</p>
         <p className="px-1 text-footnote text-muted">{t.awards.note}</p>
       </div>
-      {card && <ShowCard {...card} onClose={() => setCard(null)} />}
+      {card && <ShowCard {...card} onRemove={(zh) => setOrder((o) => { const n = { ...o }; delete n[zh]; return n; })} onClose={() => setCard(null)} />}
     </>
   );
 }

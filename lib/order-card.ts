@@ -11,8 +11,9 @@ export type OrderItem = { zh: string; name: string; qty: number; without: string
 export function staffReplies(t: Dict, p: Restrictions, withCant: boolean): StaffReply[] {
   return [
     { zh: "可以，没问题", mine: t.eat.replyOk },
-    ...(withCant ? [{ zh: "这道菜做不了", mine: t.eat.replyCant }] : []),
-    ...(p.allergens.length ? [{ zh: "里面有您过敏的东西", mine: t.eat.replyContainsAny }] : []),
+    ...(withCant ? [{ zh: "这道菜做不了", mine: t.eat.replyCant, pick: { noneZh: "都做不了", none: t.eat.replyCantAll } }] : []),
+    // On the allergy card there are no dishes to point at; on an order card staff say which.
+    ...(p.allergens.length ? [{ zh: "里面有您过敏的东西", mine: t.eat.replyContainsAny, pick: { noneZh: "不确定是哪一道", none: t.eat.replyContainsUnsure } }] : []),
   ];
 }
 
@@ -31,5 +32,6 @@ export function orderCard(t: Dict, p: Restrictions, items: OrderItem[]) {
     rest,
     explain: [fmt(t.eat.orderExplain, { dishes }), allergyExplain(t, p)].filter(Boolean).join(" "),
     replies: staffReplies(t, p, true),
+    dishes: items.map((x) => ({ zh: x.zh, name: x.name })),
   };
 }

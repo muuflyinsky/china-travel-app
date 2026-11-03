@@ -9,7 +9,7 @@ import { useProfile } from "@/components/useProfile";
 import { useCity } from "@/components/useCity";
 import { useFx, parseCny, formatMoney } from "@/components/useFx";
 import { useT } from "@/components/useT";
-import { ShowCard, type StaffReply } from "@/components/ShowCard";
+import { ShowCard, type CardDish, type StaffReply } from "@/components/ShowCard";
 import { LANGUAGES } from "@/lib/languages";
 import { ALLERGENS, DIETS, allergyLinesZh, type AllergenId, type DietId } from "@/lib/allergens";
 import { track } from "@/lib/track";
@@ -396,7 +396,7 @@ export default function MenuPage() {
   const [tipsOpen, setTipsOpen] = useState(false);
   const [opened, setOpened] = useState<string | null>(null);
   const [details, setDetails] = useState<Record<string, Detail>>({});
-  const [card, setCard] = useState<{ kind: string; lead?: string; lines: string[]; rest?: string[]; explain?: string; replies?: StaffReply[] } | null>(null);
+  const [card, setCard] = useState<{ kind: string; lead?: string; lines: string[]; rest?: string[]; explain?: string; replies?: StaffReply[]; dishes?: CardDish[] } | null>(null);
   const [askAllergies, setAskAllergies] = useState(false);
   const [saved, setSaved] = useState<SavedDish[]>([]);
   const [savedOpen, setSavedOpen] = useState(false);
@@ -820,7 +820,7 @@ export default function MenuPage() {
           onFlag={() => flagDish(openRow.d)} onClose={() => setOpened(null)} />
       )}
       {savedOpen && <SavedSheet saved={saved} restricted={restricted} restrictions={restrictions} factsFor={factsFor} onAdd={addSaved} onClose={() => setSavedOpen(false)} />}
-      {card && <ShowCard {...card} onClose={() => setCard(null)} />}
+      {card && <ShowCard {...card} onRemove={(zh) => setLine(zh, undefined)} onClose={() => setCard(null)} />}
       {askAllergies && <AllergySheet onDone={() => setAskAllergies(false)} />}
       <Link href="/settings#food" className="sr-only">{t.common.settings}</Link>
     </Screen>
