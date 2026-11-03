@@ -1,7 +1,7 @@
 // Anonymous product events (SPEC v0.5 P2). No personal data: an event name, a few small
 // properties (card type, tier, position…) and a random id that changes every day, so we can count
 // how often one phone uses a feature in a day (to set free daily limits) but never follow it across
-// days. Nothing about allergies, dates or locations is sent.
+// days. Each event also carries the app language. Nothing about allergies, dates or locations is sent.
 export const EVENTS = [
   "menu_scan", "order_card_shown", "staff_reply", "staff_reply_dish", "taxi_card_shown", "hotel_card_shown",
   "hotel_pick_click", "resv_alarm_added", "app_open", "menu_first_dish", "menu_done", "dish_flagged", "restaurant_open",
@@ -21,10 +21,17 @@ function dayId() {
   } catch { return ""; }
 }
 
+/** The language the traveller chose (Settings), so we can see who uses the app; never more than that. */
+function lang() {
+  try { return String(JSON.parse(localStorage.getItem("ctg.profile") ?? "{}").lang ?? "").slice(0, 5); } catch { return ""; }
+}
+
 export function track(e: EventName, p: Record<string, string | number | boolean> = {}) {
   if (typeof window === "undefined") return;
   const sid = dayId();
-  const body = JSON.stringify({ e, p, sid });
+  // First, so the server's 8-property cap never drops it.
+  const l = lang() || navigator.language.split("-")[0];
+  const body = JSON.stringify({ e, p: { lang: l, ...p }, sid });
   try {
     if (!navigator.sendBeacon?.("/api/t", new Blob([body], { type: "application/json" }))) {
       fetch("/api/t", { method: "POST", body, keepalive: true, headers: { "content-type": "application/json" } }).catch(() => {});
