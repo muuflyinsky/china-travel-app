@@ -8,7 +8,7 @@ import { GUIDES, SITE_URL } from "@/lib/site";
 
 const title = "HaodeGo: the China travel app for visa, payments, menus and getting around";
 const description =
-  "Everything you need for a trip to mainland China in one app: visa-free check, Alipay and WeChat Pay setup, menus in your language, taxi cards, metro routes and translation. Free, no account.";
+  "Everything you need for a trip to mainland China in one app: visa-free check, Alipay and WeChat Pay setup, menus in your language, taxi cards, metro routes and translation. Free to start, no account.";
 
 export const metadata: Metadata = {
   title,
@@ -67,7 +67,7 @@ const CLEAR = [
 ];
 
 const FAQ = [
-  { q: "Is HaodeGo free?", a: "Yes. Open haodego.com in your phone’s browser and start; there’s no account to create." },
+  { q: "Is HaodeGo free?", a: "You can start for free: open haodego.com in your phone’s browser, with no account to create. The allergy check, allergy card and emergency help are always free." },
   { q: "Is there an iPhone app?", a: "An iPhone app is on its way to the App Store. Until then, open haodego.com in Safari and add it to your Home Screen." },
   { q: "Which cities does it cover?", a: "All of mainland China: search, routes and taxi cards work in any city, and top picks cover the most-visited ones." },
   { q: "Does it work without internet?", a: "No. Reading menus, maps and translation need a connection, so set up a travel eSIM or a local SIM card before you rely on it." },
@@ -86,7 +86,7 @@ export default function WelcomePage() {
         alternateName: "HaodeGo: China Travel Buddy",
         url: SITE_URL,
         applicationCategory: "TravelApplication",
-        operatingSystem: "Any (web browser), iOS",
+        operatingSystem: "Any (web browser)",
         offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
         description,
       },
@@ -185,8 +185,8 @@ export default function WelcomePage() {
             <li>Allergies, travel dates and your hotel are saved only on your phone.</li>
             <li>No ads.</li>
             <li>
-              Hotel, train and ticket links are affiliate links: that’s how HaodeGo is paid for, at no extra cost to you.{" "}
-              <Link href="/privacy" className="font-semibold text-cobalt">Privacy</Link>
+              Hotel, train, ticket and eSIM links are affiliate links: that’s how HaodeGo is paid for, at no extra cost to you.{" "}
+              <a href="/privacy" className="font-semibold text-cobalt">Privacy</a>
             </li>
           </ul>
         </div>

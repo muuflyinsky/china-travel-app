@@ -4,6 +4,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { GuidePage, G } from "@/components/site/GuidePage";
+import { OG_IMAGE } from "@/lib/site";
 import { en } from "@/lib/i18n/en";
 
 const PATH = "/guide/first-trip-to-china";
@@ -15,7 +16,8 @@ export const metadata: Metadata = {
   title: `${title} | HaodeGo`,
   description,
   alternates: { canonical: PATH },
-  openGraph: { title, description, url: PATH, siteName: "HaodeGo", type: "article" },
+  openGraph: { title, description, url: PATH, siteName: "HaodeGo", type: "article", images: [OG_IMAGE] },
+  twitter: { card: "summary_large_image", title, description, images: [OG_IMAGE] },
 };
 
 const APPS: { name: string; key: keyof typeof en.prepare.appsWhy }[] = [

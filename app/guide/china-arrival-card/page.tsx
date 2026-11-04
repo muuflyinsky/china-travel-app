@@ -2,6 +2,7 @@
 // workspace (inbox/2026-11-04-product-修复方案与新需求.md §F); the link is the one the app uses (app/page.tsx).
 import type { Metadata } from "next";
 import { GuidePage, G } from "@/components/site/GuidePage";
+import { OG_IMAGE } from "@/lib/site";
 
 const PATH = "/guide/china-arrival-card";
 const ARRIVAL_CARD_URL = "https://s.nia.gov.cn/ArrivalCardFillingPhone/";
@@ -13,7 +14,8 @@ export const metadata: Metadata = {
   title: `${title} | HaodeGo`,
   description,
   alternates: { canonical: PATH },
-  openGraph: { title, description, url: PATH, siteName: "HaodeGo", type: "article" },
+  openGraph: { title, description, url: PATH, siteName: "HaodeGo", type: "article", images: [OG_IMAGE] },
+  twitter: { card: "summary_large_image", title, description, images: [OG_IMAGE] },
 };
 
 export default function ArrivalCardGuide() {

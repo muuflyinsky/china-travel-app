@@ -2,7 +2,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteFrame, Prose } from "@/components/site/SiteFrame";
-import { GUIDES } from "@/lib/site";
+import { GUIDES, OG_IMAGE } from "@/lib/site";
 
 const title = "China travel guides: clear answers before and during your trip";
 const description = "Short, checked guides for travelling in mainland China: what to sort out before you go, the online arrival card, and the departure tax refund.";
@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   description,
   alternates: { canonical: "/guide" },
   openGraph: { title, description, url: "/guide", siteName: "HaodeGo", type: "website" },
+  twitter: { card: "summary_large_image", title, description, images: [OG_IMAGE] },
 };
 
 export default function GuideIndex() {

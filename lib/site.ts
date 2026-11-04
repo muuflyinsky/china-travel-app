@@ -15,6 +15,10 @@ export const APP_STORE_LIVE = false;
 export const APP_STORE_ID = "6829347376";
 export const APP_STORE_URL = `https://apps.apple.com/app/id${APP_STORE_ID}`;
 
+/** Share image for the guides (app/guide/opengraph-image.png); articles that set their own
+ *  openGraph must list it again, or the file-based image is dropped. */
+export const OG_IMAGE = "/guide/opengraph-image.png";
+
 export type GuideLink = { href: string; title: string; blurb: string };
 
 export const GUIDES: GuideLink[] = [
