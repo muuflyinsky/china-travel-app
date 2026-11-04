@@ -151,7 +151,7 @@ function repairFacts(raw: unknown) {
   };
 }
 
-async function generateFacts(names: { zh: string; printed: string }[], lang: string, city: string | undefined, wantTips: boolean) {
+export async function generateFacts(names: { zh: string; printed: string }[], lang: string, city: string | undefined, wantTips: boolean) {
   return structured(FactsSchema, {
     system: FACTS_SYSTEM, maxTokens: 700 * names.length + 400, example: FACTS_EXAMPLE, repair: repairFacts,
     text: `Target language: ${langName(lang)}.\n` +
