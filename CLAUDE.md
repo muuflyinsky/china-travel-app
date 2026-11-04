@@ -4,6 +4,8 @@
 
 Start here: the workspace root above this repo (`../CLAUDE.md`, or `../../CLAUDE.md` from a worktree) holds `PROJECT.md` (stage, who's working on what, which checkout to use), `DECISIONS.md` and `LAUNCH-TODO.md` (the only task list). They live outside git on purpose; read them before working and update them when you finish.
 
+**No workspace folder next to the repo (cloud sessions):** the same files are in the private repo `muuflyinsky/haodego-workspace` (a read-only copy; Veer's machine is the master). Clone it and read `CLAUDE.md`, `PROJECT.md`, `DECISIONS.md`, `LAUNCH-TODO.md` and the relevant `inbox/` notes **before** proposing, questioning or changing anything. Before raising something as a problem or an open question, search those files, `docs/SPEC.md` and `git log` for an earlier answer, and cite it; only raise it if nothing covers it. Write new findings to that repo's `inbox/` (not the four files).
+
 Product spec: `docs/SPEC.md` (what every screen does and its integrations; plans and open questions live in the workspace `PROJECT.md`). Read it before proposing product changes.
 
 ## Commands
