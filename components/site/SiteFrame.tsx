@@ -1,4 +1,5 @@
 // Header and footer for the website pages (/welcome, /guide/*). Server-rendered, no app chrome.
+// Website pages are always light (globals.css :root.dark:has(.site)), so no dark: variants here.
 // Links into the app (/, /privacy, /support) are plain <a>: a full page load, so the website-only
 // analytics script is never carried over into app pages.
 import Link from "next/link";
@@ -8,7 +9,7 @@ import { APP_STORE_LIVE, APP_STORE_URL } from "@/lib/site";
 export function SiteFrame({ children }: { children: React.ReactNode }) {
   return (
     <div className="site min-h-full bg-porcelain text-ink">
-      <header className="border-b border-line bg-card/90 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b border-line bg-card/85 backdrop-blur-md">
         <div className="mx-auto flex min-h-14 max-w-5xl items-center gap-3 px-gutter">
           <Link href="/welcome" className="flex min-h-touch items-center gap-2 text-headline">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -17,7 +18,7 @@ export function SiteFrame({ children }: { children: React.ReactNode }) {
           </Link>
           <nav className="ml-auto flex items-center gap-1">
             <Link href="/guide" className="flex min-h-touch items-center px-3 text-subhead font-semibold text-cobalt">Guides</Link>
-            <a href="/" className="flex min-h-touch items-center rounded-control bg-cobalt px-4 text-subhead font-semibold text-white dark:text-[#12141c]">Open the app</a>
+            <a href="/" className="flex min-h-touch items-center rounded-control bg-cobalt px-4 text-subhead font-semibold text-white">Open HaodeGo</a>
           </nav>
         </div>
       </header>
@@ -53,7 +54,7 @@ export function Prose({ children }: { children: React.ReactNode }) {
 export function OpenAppCta({ where }: { where: string }) {
   return (
     <div className="flex flex-wrap items-center gap-stack">
-      <a href="/" data-cta={where} className="inline-flex min-h-control items-center justify-center rounded-control bg-cobalt px-6 text-headline text-white dark:text-[#12141c]">
+      <a href="/" data-cta={where} className="inline-flex min-h-control items-center justify-center rounded-control bg-cobalt px-6 text-headline text-white shadow-bar transition-transform hover:-translate-y-0.5">
         Open HaodeGo
       </a>
       {APP_STORE_LIVE ? (
@@ -61,7 +62,7 @@ export function OpenAppCta({ where }: { where: string }) {
           Get the iPhone app
         </a>
       ) : (
-        <span className="text-subhead text-muted">Works in your phone’s browser. No download, no account.</span>
+        <span className="text-subhead text-muted">Free to start · no account · works in your browser</span>
       )}
     </div>
   );

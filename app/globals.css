@@ -188,3 +188,36 @@ html.in-app, html.in-app body { overscroll-behavior: none; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+
+/* ---- Website pages (/welcome, /guide/*): always light, with CSS-only motion ----------------- */
+/* The app follows the phone's theme; the website keeps one look (Veer, 2026-11-05). */
+:root.dark:has(.site) {
+  --porcelain: #f7f8fb; --card: #ffffff; --ink: #1a1f2e; --muted: #5b6273; --line: #e3e6ee;
+  --cobalt: #2b4acb; --cobalt-soft: #eef2ff;
+  color-scheme: light;
+}
+.site-glow { background: radial-gradient(50% 60% at 72% 35%, var(--cobalt-soft), transparent 75%); }
+@keyframes site-rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+.site-rise { animation: site-rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+/* Hero phone: five real screens cross-fade, 3 s each (delays set inline: i × 3 s, shifted by 0.6 s
+   so the first screen is already showing at load). */
+@keyframes site-screen { 0% { opacity: 0; } 4% { opacity: 1; } 20% { opacity: 1; } 24% { opacity: 0; } 100% { opacity: 0; } }
+.site-screen { opacity: 0; animation: site-screen 15s linear infinite; }
+@keyframes site-float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -8px; } }
+.site-chip { animation: site-rise 0.7s both, site-float 6s ease-in-out infinite; }
+@keyframes site-card-in { from { opacity: 0; transform: rotate(-5deg) translateY(32px); } to { opacity: 1; transform: rotate(-1.5deg); } }
+.site-card { transform: rotate(-1.5deg); }
+@keyframes site-marquee { to { transform: translateX(-50%); } }
+.site-marquee { animation: site-marquee 60s linear infinite; }
+.site-marquee:hover { animation-play-state: paused; }
+/* Sections rise in as they scroll into view, where the browser supports scroll-driven animations;
+   elsewhere they are simply there. */
+@supports (animation-timeline: view()) {
+  .site-reveal { animation: site-rise linear both; animation-timeline: view(); animation-range: entry 0% entry 70%; }
+  .site-card { animation: site-card-in linear both; animation-timeline: view(); animation-range: entry 10% cover 40%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-rise, .site-chip, .site-reveal, .site-card, .site-marquee, .site-screen { animation: none !important; }
+  .site-screen:first-child { opacity: 1; }
+  section:has(> .site-marquee) { overflow-x: auto; }
+}
