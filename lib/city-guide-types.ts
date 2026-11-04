@@ -29,7 +29,9 @@ export type GuideDish = {
 export type GuideArea = {
   zh: string; name: L10n; reason: L10n;
   location: string; // "lng,lat" GCJ-02, centre used for the hotel search
-  metro: number; // metro stations within 1 km
+  metro: number; // metro points within 1 km (exits, not stations: kept for old guides)
+  /** Nearest station and how many more within 1 km, by station (lib/metro.ts); null = none. Added when served. */
+  near?: import("./metro-shared").MetroNear | null;
 };
 
 export type CityGuide = {
