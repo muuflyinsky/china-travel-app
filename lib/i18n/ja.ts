@@ -50,6 +50,11 @@ export const ja: Dict = {
     near: "{city}近郊",
   },
   today: {
+    driverElseIn: "{city}のほかの行き先",
+    driverFind: "検索",
+    driverPick: "場所をタップすると運転手に見せる画面になります。",
+    driverShowAgain: "運転手に見せる",
+    driverCardSays: "このカードは運転手に「{place}まで行ってください」と伝え、住所を中国語で表示します。",
     // v0.6
     quickActions: "クイック操作",
     essentials: "旅の基本",

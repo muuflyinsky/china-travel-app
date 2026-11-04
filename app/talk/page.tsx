@@ -189,7 +189,7 @@ export default function TalkPage() {
 
       <Section title={t.today.showTo}>
         <Group>
-          <Row href="/explore" icon={<IconTile><CarTaxiFront className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.taxiCard} />
+          <Row href="/driver" icon={<IconTile><CarTaxiFront className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.taxiCard} />
           <Row
             icon={<IconTile tone="danger"><ShieldAlert className="h-5 w-5" aria-hidden /></IconTile>}
             title={t.today.allergyCard}

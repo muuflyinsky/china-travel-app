@@ -50,6 +50,11 @@ export const en = {
     near: "near {city}",
   },
   today: {
+    driverElseIn: "Somewhere else in {city}",
+    driverFind: "Find",
+    driverPick: "Tap the place to show it to the driver.",
+    driverShowAgain: "Show the driver",
+    driverCardSays: "This card asks the driver to take you to {place} and shows the address in Chinese.",
     // v0.6
     quickActions: "Quick actions",
     essentials: "Travel essentials",
