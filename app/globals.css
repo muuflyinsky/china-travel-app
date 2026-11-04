@@ -26,6 +26,10 @@
   /* Type scale (SPEC v0.4). Components use only these: text-display-zh … text-footnote.
      Never write a pixel font size in a component. Weights: 400 / 600 / 700 (700 = large title
      and the Chinese display cards only). */
+  /* Website pages only (/welcome): the hero headline on wide screens. */
+  --text-hero: 44px;
+  --text-hero--line-height: 52px;
+  --text-hero--font-weight: 700;
   --text-display-zh: 36px;
   --text-display-zh--line-height: 46px;
   --text-display-zh--font-weight: 700;
@@ -121,6 +125,8 @@
 }
 
 html, body { background: var(--porcelain); color: var(--ink); }
+/* Website pages (/welcome, /guide/*) are full width: no tinted desktop backdrop around an app column. */
+body:has(.site) { background: var(--porcelain); }
 body { -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; }
 ::selection { background: color-mix(in srgb, var(--cobalt) 25%, transparent); }
 :focus-visible { outline: 2px solid var(--cobalt); outline-offset: 2px; border-radius: 6px; }
