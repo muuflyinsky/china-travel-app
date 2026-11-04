@@ -30,6 +30,12 @@ export function CountryPicker({ open, onClose, onPick }: { open: boolean; onClos
     const k = q.trim().toLowerCase();
     return k ? all.filter((x) => x.n.toLowerCase().includes(k) || x.c.toLowerCase() === k) : all;
   }, [q, name, p.lang]);
+  // Opening the list puts the cursor in the search box: most people type the first letters.
+  useEffect(() => {
+    if (!open) return;
+    const id = setTimeout(() => document.getElementById("country-search")?.focus(), 300);
+    return () => clearTimeout(id);
+  }, [open]);
   return (
     <Popup opened={open} onBackdropClick={onClose}>
       <div className="flex h-full flex-col bg-porcelain">
@@ -37,7 +43,7 @@ export function CountryPicker({ open, onClose, onPick }: { open: boolean; onClos
           <h2 className="text-title text-ink">{t.settings.passport}</h2>
           <button onClick={onClose} aria-label={t.common.close} className="grid h-11 w-11 place-items-center rounded-full bg-card"><X className="h-5 w-5" /></button>
         </div>
-        <Searchbar value={q} placeholder={t.visa.search} onInput={(e: React.ChangeEvent<HTMLInputElement>) => setQ(e.target.value)} onClear={() => setQ("")} disableButton={false} />
+        <Searchbar value={q} placeholder={t.visa.search} inputId="country-search" onInput={(e: React.ChangeEvent<HTMLInputElement>) => setQ(e.target.value)} onClear={() => setQ("")} disableButton={false} />
         <ul className="mx-4 mb-8 flex-1 divide-y divide-line overflow-auto rounded-card border border-line bg-card">
           {/* Country names come from the browser's ICU data, so only render them on the client. */}
           {open && list.map(({ c, n }) => (

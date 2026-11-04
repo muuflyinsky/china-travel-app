@@ -17,6 +17,6 @@ export type HotelPick = {
   id: string; name: string; pinyin: string; address: string; district?: string; location: string;
   rating?: number; cny: number; tier: TierId; stars: number; // cny 0 = no reference price
   chain: "international" | "domestic" | null; brand?: string;
-  metro: { name: string; meters: number } | null;
+  metro: { name: string; pinyin?: string; meters: number } | null;
 };
 export type CityPicks = { city: string; generatedAt: string; source: "amap"; tiers: Record<TierId, HotelPick[]> };

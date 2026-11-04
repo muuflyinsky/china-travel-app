@@ -9,6 +9,7 @@ import { useT } from "./useT";
 import { goLink, type LinkParams } from "@/lib/affiliate";
 import { amapNav } from "@/lib/maplinks";
 import { fmt } from "@/lib/i18n";
+import { walkMinutes } from "@/lib/metro-shared";
 import { track } from "@/lib/track";
 import type { CityPicks, HotelPick } from "@/lib/hotel-tiers";
 
@@ -44,7 +45,7 @@ function Facts({ h }: { h: HotelPick }) {
         {h.chain ? t.stay.foreignChain : fmt(t.stay.foreignStar, { n: h.stars })}
       </li>
       <li className="flex gap-1.5"><TrainFront className="mt-0.5 h-3.5 w-3.5 shrink-0 text-cobalt" aria-hidden />
-        {h.metro ? <span>{fmt(t.stay.metro, { m: h.metro.meters })} · <span className="zh">{h.metro.name}站</span></span> : t.stay.noMetro}
+        {h.metro ? <span>{fmt(t.stay.metroWalk, { min: walkMinutes(h.metro.meters) })} · {h.metro.pinyin} <span className="zh">{h.metro.name.endsWith("站") ? h.metro.name : `${h.metro.name}站`}</span></span> : t.stay.noMetro}
       </li>
       {h.rating !== undefined && <li className="flex gap-1.5"><Star className="mt-0.5 h-3.5 w-3.5 shrink-0 fill-current text-ink" aria-hidden />{h.rating.toFixed(1)}</li>}
     </ul>
@@ -86,7 +87,7 @@ export function HotelRow({ h, link, tag }: { h: HotelPick; link: LinkParams; tag
       <div className="min-w-0 flex-1">
         <p className="zh text-body">{h.name}</p>
         <p className="text-footnote text-muted">
-          {[h.brand, h.metro ? fmt(t.stay.metroShort, { m: h.metro.meters }) : null, h.cny ? price(h.cny) : null].filter(Boolean).join(" · ")}
+          {[h.brand, h.metro ? fmt(t.stay.metroShort, { min: walkMinutes(h.metro.meters) }) : null, h.cny ? price(h.cny) : null].filter(Boolean).join(" · ")}
         </p>
       </div>
       <a href={goLink("trip", "hotel_search", { ...link, keyword: h.name }, "stay_pick", tag)} target="_blank" rel="noopener" onClick={() => track("hotel_pick_click", { tag })}

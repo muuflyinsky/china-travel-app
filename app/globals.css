@@ -153,7 +153,8 @@ html.in-app, html.in-app body { overscroll-behavior: none; }
 .tabbar-fixed { position: fixed !important; bottom: 0; left: 50% !important; transform: translateX(-50%); width: 100% !important; max-width: 600px; }
 .sticky-bottom { position: fixed; bottom: calc(var(--tabbar-h) + 4px); left: 50%; transform: translateX(-50%); width: 100%; max-width: 600px; padding: 0 16px 8px; z-index: 10; }
 /* Room at the end of a list so a .sticky-bottom bar never covers the last item. */
-.sticky-spacer { height: 72px; }
+/* 96px: the bar (52px) and the gap above the tab bar, with the safe-area inset on iPhones. */
+.sticky-spacer { height: calc(96px + env(safe-area-inset-bottom)); }
 /* Top-level screens: the status bar area stays opaque while content scrolls under it. */
 .status-scrim { position: fixed; top: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 600px; height: env(safe-area-inset-top); z-index: 30; background: color-mix(in srgb, var(--porcelain) 88%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); pointer-events: none; }
 /* Horizontal chip rows scroll; the fade at the edge says there is more. */

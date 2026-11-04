@@ -18,6 +18,8 @@ import { useT } from "@/components/useT";
 import { goLink } from "@/lib/affiliate";
 import { fmt } from "@/lib/i18n";
 import { addDays, daysBetween, todayIso } from "@/lib/stay";
+import { walkMinutes } from "@/lib/metro-shared";
+import { loadCities, cityFromAdcode } from "@/lib/cities";
 import { TIER_IDS, type TierId } from "@/lib/hotel-tiers";
 import type { City } from "@/lib/cities";
 
@@ -43,7 +45,17 @@ function Stay() {
   useEffect(() => {
     if (!loaded) return;
     const a = params.get("city");
-    setCity(a ? { a, s: params.get("name") ?? "", e: params.get("en") ?? "" } : profile.cities[0] ?? { a: here.a, e: here.e, s: here.s });
+    if (a) {
+      // A link with only the adcode (or a trip city saved without names): fill the names from the
+      // trip, then from the city list, so "All hotels in Xi'an" never reads "All hotels in".
+      const trip = profile.cities.find((x) => x.a === a);
+      const s0 = params.get("name") || trip?.s || "", e0 = params.get("en") || trip?.e || "";
+      setCity({ a, s: s0, e: e0 });
+      if (!s0 || !e0) loadCities().then((all) => {
+        const c = cityFromAdcode(all, a);
+        if (c) setCity({ a, s: s0 || c.s, e: e0 || c.e });
+      }).catch(() => {});
+    } else setCity(profile.cities[0] ?? { a: here.a, e: here.e, s: here.s });
     if (profile.arrival && profile.arrival >= todayIso()) {
       setCheckin(profile.arrival);
       setCheckout(profile.departure > profile.arrival ? profile.departure : addDays(profile.arrival, 2));
@@ -132,7 +144,17 @@ function Stay() {
                   <span className="min-w-0 flex-1">
                     <span className="block text-body">{pick(a.name, profile.lang)} <span className="zh text-muted">{a.zh}</span></span>
                     {i === areaIdx && <span className="mt-0.5 block text-footnote text-muted">{pick(a.reason, profile.lang)}</span>}
-                    <span className="mt-0.5 flex items-center gap-1 text-footnote text-muted"><TrainFront className="h-3.5 w-3.5 text-cobalt" aria-hidden />{fmt(t.stay.metroCount, { n: a.metro })}</span>
+                    <span className="mt-0.5 flex items-start gap-1 text-footnote text-muted"><TrainFront className="mt-0.5 h-3.5 w-3.5 shrink-0 text-cobalt" aria-hidden />
+                      {/* By station, not by exit (lib/metro.ts). Older responses without `near`: say nothing rather than count exits. */}
+                      {a.near === null ? t.stay.noMetroKm : a.near ? (
+                        <span>
+                          {a.near.pinyin} <span className="zh">{a.near.name}</span>
+                          {a.near.lines.length > 0 && <> · {fmt(t.stay.lines, { n: a.near.lines.join(", ") })}</>}
+                          {" · "}{fmt(t.stay.metroWalk, { min: walkMinutes(a.near.meters) })}
+                          {a.near.others > 0 && <span className="block">{fmt(a.near.others === 1 ? t.stay.moreStationsOne : t.stay.moreStations, { n: a.near.others })}</span>}
+                        </span>
+                      ) : null}
+                    </span>
                   </span>
                 </button>
               </li>

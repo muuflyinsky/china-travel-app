@@ -4,6 +4,7 @@ import { errorResponse } from "@/lib/errors";
 import { cityGuide } from "@/lib/city-guide";
 import { HOT_CITIES } from "@/lib/hot-cities";
 import { demo } from "@/lib/config";
+import { metroNear } from "@/lib/metro";
 
 // GET /api/city-guide?city=<adcode> → top sights + signature dishes for a hot city, as stored
 // by the monthly batch job (lib/city-guide.ts). Only cities in lib/data/hot-cities.json are
@@ -22,7 +23,10 @@ export async function GET(req: Request) {
   try {
     const { guide } = await cityGuide(city.a, city.s, city.e, refresh);
     const partial = Boolean((guide as { partial?: boolean }).partial);
-    return NextResponse.json({ ...guide, demo: demo.maps }, { headers: { "cache-control": partial ? "no-store" : "public, max-age=3600" } });
+    // Metro by station for each area, looked up when served (cached 30 days), so stored guides
+    // don't need regenerating.
+    const areas = await Promise.all((guide.areas ?? []).map(async (a) => ({ ...a, near: await metroNear(a.location).catch(() => undefined) })));
+    return NextResponse.json({ ...guide, areas, demo: demo.maps }, { headers: { "cache-control": partial ? "no-store" : "public, max-age=3600" } });
   } catch (e) {
     return errorResponse(e, "city-guide");
   }

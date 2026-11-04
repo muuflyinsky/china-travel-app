@@ -1,4 +1,5 @@
-import { searchPlaces, type Place } from "./amap";
+import { py, searchPlaces, type Place } from "./amap";
+import { stationName } from "./metro";
 import { demo } from "./config";
 import { TRIP_CITY_ID } from "./affiliate";
 import * as mock from "./demo";
@@ -73,7 +74,7 @@ export function rank(a: HotelPick, b: HotelPick) {
 // Not a hotel room a traveller books here: serviced apartments, and duplicate POIs for a hotel's
 // lobby, entrance or car park.
 const NOT_A_HOTEL = /公寓|大堂|入口|停车场|会所|写字楼/;
-const RULES = "r2";
+const RULES = "r3";
 
 export function candidate(p: Place, cityShort: string, bounds: [number, number, number]): HotelPick | null {
   if (NOT_A_HOTEL.test(p.name)) return null;
@@ -95,7 +96,10 @@ export function candidate(p: Place, cityShort: string, bounds: [number, number, 
 
 async function nearestMetro(location: string) {
   const [s] = await searchPlaces({ around: location, types: "150500", radius: 1500, pageSize: 1, purpose: "hotels" }).catch(() => []);
-  return s?.distance ? { name: s.name.replace(/\(.*\)$/, ""), meters: Number(s.distance) } : null;
+  if (!s?.distance) return null;
+  // The nearest point is often an exit ("广济街地铁站D1口"): name the station.
+  const name = stationName(s.name);
+  return { name, pinyin: py(name.replace(/站$/, "")), meters: Number(s.distance) };
 }
 
 const PER_TIER = 3;
