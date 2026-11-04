@@ -151,6 +151,7 @@ export const en = {
     metroWalk: "about {min} min walk",
     noMetroKm: "No metro station within 1 km",
     lines: "Line {n}",
+    linesMany: "Lines {n}",
     moreStations: "{n} more stations within 1 km",
     moreStationsOne: "1 more station within 1 km",
     priceRef: "Amap reference price. The live price is on Trip.com.",

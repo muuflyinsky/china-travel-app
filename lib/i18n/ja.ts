@@ -149,6 +149,7 @@ export const ja: Dict = {
     metroWalk: "徒歩約{min}分",
     noMetroKm: "1 km 以内に地下鉄駅はありません",
     lines: "{n}号線",
+    linesMany: "{n}号線",
     moreStations: "1 km 以内にほかに{n}駅",
     moreStationsOne: "1 km 以内にほかに1駅",
     priceRef: "Amapの参考価格です。実際の料金はTrip.comで確認できます。",

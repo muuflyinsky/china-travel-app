@@ -2,13 +2,7 @@ node_modules
 .next
 .env
 .env.local
-data/clicks.jsonl
+# Local development caches and logs (production uses Supabase): never committed.
+data/
 next-env.d.ts
 *.tsbuildinfo
-data/hotels/
-data/hotel_picks/
-data/city-guide/
-data/review.jsonl
-data/events.jsonl
-data/content_feedback.jsonl
-data/award-duplicates.csv

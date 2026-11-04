@@ -149,7 +149,7 @@ function Stay() {
                       {a.near === null ? t.stay.noMetroKm : a.near ? (
                         <span>
                           {a.near.pinyin} <span className="zh">{a.near.name}</span>
-                          {a.near.lines.length > 0 && <> · {fmt(t.stay.lines, { n: a.near.lines.join(", ") })}</>}
+                          {a.near.lines.length > 0 && <> · {fmt(a.near.lines.length > 1 ? t.stay.linesMany : t.stay.lines, { n: a.near.lines.join(", ") })}</>}
                           {" · "}{fmt(t.stay.metroWalk, { min: walkMinutes(a.near.meters) })}
                           {a.near.others > 0 && <span className="block">{fmt(a.near.others === 1 ? t.stay.moreStationsOne : t.stay.moreStations, { n: a.near.others })}</span>}
                         </span>

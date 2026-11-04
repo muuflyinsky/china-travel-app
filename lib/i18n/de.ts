@@ -149,6 +149,7 @@ export const de: Dict = {
     metroWalk: "etwa {min} Min. zu Fuß",
     noMetroKm: "Keine Metrostation im Umkreis von 1 km",
     lines: "Linie {n}",
+    linesMany: "Linien {n}",
     moreStations: "{n} weitere Stationen im Umkreis von 1 km",
     moreStationsOne: "1 weitere Station im Umkreis von 1 km",
     priceRef: "Richtpreis von Amap. Den aktuellen Preis zeigt Trip.com.",

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { Popup, Searchbar } from "konsta/react";
 import { Check, ExternalLink, X } from "lucide-react";
 import { Card, Button, Seg } from "./ui";
@@ -30,11 +30,12 @@ export function CountryPicker({ open, onClose, onPick }: { open: boolean; onClos
     const k = q.trim().toLowerCase();
     return k ? all.filter((x) => x.n.toLowerCase().includes(k) || x.c.toLowerCase() === k) : all;
   }, [q, name, p.lang]);
-  // Opening the list puts the cursor in the search box: most people type the first letters.
-  useEffect(() => {
-    if (!open) return;
-    const id = setTimeout(() => document.getElementById("country-search")?.focus(), 300);
-    return () => clearTimeout(id);
+  // Opening the list puts the cursor in the search box: most people type the first letters. A
+  // layout effect runs in the same task as the tap that opened the list (React handles taps
+  // synchronously); iOS only raises the keyboard for a focus made while handling the tap, so a
+  // timer would focus the box without a keyboard. The popup stays mounted, so the box exists.
+  useLayoutEffect(() => {
+    if (open) document.getElementById("country-search")?.focus({ preventScroll: true });
   }, [open]);
   return (
     <Popup opened={open} onBackdropClick={onClose}>

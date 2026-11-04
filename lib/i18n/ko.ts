@@ -149,6 +149,7 @@ export const ko: Dict = {
     metroWalk: "도보 약 {min}분",
     noMetroKm: "1km 안에 지하철역이 없어요",
     lines: "{n}호선",
+    linesMany: "{n}호선",
     moreStations: "1km 안에 역 {n}개 더",
     moreStationsOne: "1km 안에 역 1개 더",
     priceRef: "Amap 참고 가격입니다. 실제 가격은 Trip.com에 있습니다.",
