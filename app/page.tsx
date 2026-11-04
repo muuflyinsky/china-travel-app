@@ -2,19 +2,18 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
-  Camera, Search, Siren, Check, CalendarClock, CalendarPlus, Plane, Smartphone, Wallet, Ticket, Lightbulb, BedDouble, CarTaxiFront,
-  Sun, CloudSun, Cloud, CloudRain, CloudLightning, Snowflake, CloudFog, ChevronRight, ChevronDown, LogIn, Receipt, PlaneTakeoff, ListChecks, QrCode, Calculator, Copy, ShieldCheck, ClipboardList } from "lucide-react";
+  Camera, Siren, Check, CalendarClock, CalendarPlus, Plane, Smartphone, Wallet, Ticket, Lightbulb, BedDouble, CarTaxiFront,
+  Sun, CloudSun, Cloud, CloudRain, CloudLightning, Snowflake, CloudFog, ChevronRight, ChevronDown, LogIn, Receipt, PlaneTakeoff, ListChecks, QrCode, Calculator, ShieldCheck, ClipboardList } from "lucide-react";
 import { Screen, DemoNote } from "@/components/Shell";
 import { Section, Card, Group, Row, Button, IconTile } from "@/components/ui";
 import { TripAlerts } from "@/components/TripAlerts";
 import { VisaCheck } from "@/components/VisaCheck";
-import { HotelCard } from "@/components/HotelCard";
 import { useHotelPicks, usePrice } from "@/components/HotelPicks";
 import { PayButtons, PAY_LINKS, WechatGuide } from "@/components/PayButtons";
 import { AppIcon } from "@/components/AppIcon";
 import { APPS, type AppId } from "@/lib/apps";
 import { openApp } from "@/lib/openApp";
-import { RideButtons } from "@/components/RideButtons";
+import { DriverPanel } from "@/components/DriverPanel";
 import { track } from "@/lib/track";
 import { PriceCheck } from "@/components/PriceCheck";
 import { PaySetup } from "@/components/prep/PaySetup";
@@ -383,40 +382,6 @@ function ChinaApps() {
   );
 }
 
-/** Driver sheet: hotel card, Amap navigation, DiDi with the address to paste. */
-function DriverApps() {
-  const t = useT();
-  const [p, set] = useProfile();
-  const [copied, setCopied] = useState(false);
-  const h = p.hotel;
-  // Hotels saved before v0.5 have no coordinates: look them up once.
-  useEffect(() => {
-    if (!h || h.location) return;
-    fetch(`/api/geocode?address=${encodeURIComponent(h.address)}`).then((r) => r.json()).then((d) => d.location && set({ hotel: { ...h, location: d.location } })).catch(() => {});
-  }, [h, set]);
-  if (!h) return null;
-  return (
-    <div className="space-y-2">
-      {h.location ? <RideButtons to={{ location: h.location, name: h.name }} address={h.address} /> : (
-        <>
-          <div className="grid grid-cols-2 gap-2">
-            <button onClick={() => openApp("amap")} className="flex min-h-control items-center justify-center gap-2 rounded-control border border-line bg-card text-subhead font-semibold"><AppIcon id="amap" size={24} />Amap</button>
-            <button onClick={() => openApp("didi")} className="flex min-h-control items-center justify-center gap-2 rounded-control border border-line bg-card text-subhead font-semibold"><AppIcon id="didi" size={24} />{t.today.openDidi}</button>
-          </div>
-          <p className="px-1 text-footnote text-muted">{t.today.didiHint}</p>
-        </>
-      )}
-      <div className="flex items-center gap-2 rounded-card bg-porcelain p-3">
-        <span className="zh min-w-0 flex-1 text-subhead" lang="zh-CN">{h.address}</span>
-        <button onClick={() => { navigator.clipboard?.writeText(h.address).then(() => setCopied(true)).catch(() => {}); }}
-          className="flex min-h-11 shrink-0 items-center gap-1 px-2 text-subhead font-semibold text-cobalt">
-          {copied ? <Check className="h-4 w-4" aria-hidden /> : <Copy className="h-4 w-4" aria-hidden />}{copied ? t.today.copied : t.today.copy}
-        </button>
-      </div>
-    </div>
-  );
-}
-
 /**
  * First screen in China (v0.6), in three tiers: the primary action (scan a menu, in InChina),
  * quick actions (driver · today · a one-row pay strip), then travel essentials (stay countdown,
@@ -428,7 +393,6 @@ function Moments({ leaving = false }: { leaving?: boolean }) {
   const [p] = useProfile();
   const { city } = useCity();
   const [sheet, setSheet] = useState<"driver" | "pay" | "today" | "stay" | null>(null);
-  const [dest, setDest] = useState("");
   const [alarms, setAlarms] = useState<Reminder[]>([]);
   useEffect(() => setAlarms(upcomingReminders()), [sheet]);
   const next = alarms[0] && RESERVATIONS.find((r) => r.id === alarms[0].id);
@@ -469,15 +433,7 @@ function Moments({ leaving = false }: { leaving?: boolean }) {
       </Section>
 
       <EditSheet open={sheet === "driver"} title={t.today.tileDriver} onClose={() => setSheet(null)}>
-        <HotelCard />
-        <DriverApps />
-        <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); if (dest.trim()) router.push(`/explore?q=${encodeURIComponent(dest.trim())}`); }}>
-          <label className="flex h-12 min-w-0 flex-1 items-center gap-2 rounded-control border border-line bg-card px-3">
-            <Search className="h-5 w-5 shrink-0 text-muted" aria-hidden />
-            <input value={dest} onChange={(e) => setDest(e.target.value)} placeholder={t.today.driverElse} aria-label={t.today.driverElse} className="h-full min-w-0 flex-1 bg-transparent text-body outline-none placeholder:text-muted" />
-          </label>
-          <Button type="submit" className="shrink-0 px-5">{t.go.go}</Button>
-        </form>
+        <DriverPanel />
       </EditSheet>
       <EditSheet open={sheet === "pay"} title={t.today.priceCheck} onClose={() => setSheet(null)}>
         <Card><PriceCheck /></Card>

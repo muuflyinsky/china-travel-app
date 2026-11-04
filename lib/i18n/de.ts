@@ -50,6 +50,11 @@ export const de: Dict = {
     near: "bei {city}",
   },
   today: {
+    driverElseIn: "Anderes Ziel in {city}",
+    driverFind: "Suchen",
+    driverPick: "Tippe auf den Ort, um ihn dem Fahrer zu zeigen.",
+    driverShowAgain: "Dem Fahrer zeigen",
+    driverCardSays: "Diese Karte bittet den Fahrer, dich zu {place} zu bringen, und zeigt die Adresse auf Chinesisch.",
     // v0.6
     quickActions: "Schnellzugriff",
     essentials: "Wichtig für die Reise",

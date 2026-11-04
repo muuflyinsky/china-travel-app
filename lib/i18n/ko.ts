@@ -50,6 +50,11 @@ export const ko: Dict = {
     near: "{city} 근처",
   },
   today: {
+    driverElseIn: "{city}의 다른 목적지",
+    driverFind: "찾기",
+    driverPick: "장소를 누르면 기사에게 보여 줄 화면이 열립니다.",
+    driverShowAgain: "기사에게 보여 주기",
+    driverCardSays: "이 카드는 기사에게 {place}(으)로 가 달라고 요청하고 주소를 중국어로 보여 줍니다.",
     // v0.6
     quickActions: "빠른 실행",
     essentials: "여행 필수 정보",
