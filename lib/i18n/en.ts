@@ -50,6 +50,7 @@ export const en = {
     near: "near {city}",
   },
   today: {
+    driverElsewhere: "Nothing with that name in {city}. These are in other cities: check the address before showing the driver.",
     driverElseIn: "Somewhere else in {city}",
     driverFind: "Find",
     driverPick: "Tap the place to show it to the driver.",
