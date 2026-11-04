@@ -50,6 +50,7 @@ export const fr: Dict = {
     near: "près de {city}",
   },
   today: {
+    driverElsewhere: "Rien de ce nom à {city}. Ces lieux sont dans d’autres villes : vérifiez l’adresse avant de la montrer au chauffeur.",
     driverElseIn: "Autre destination à {city}",
     driverFind: "Chercher",
     driverPick: "Touchez le lieu pour le montrer au chauffeur.",

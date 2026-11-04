@@ -99,6 +99,11 @@ const rank = (type: string) => {
   return i < 0 ? PRIORITY.length : i;
 };
 
+// Sights (11) and museums (1401) with no rating are usually check-in spots or side entrances.
+// Only those: the rest of 14 is schools and universities, which Amap rarely rates (北京大学 has
+// no rating and was dropped from every search, 2026-11-04).
+const UNRATED_JUNK = /^(11|1401)/;
+
 /**
  * Drops clutter from search results and puts places people go to first. A sight or museum with
  * no rating is usually a check-in spot or a sub-entrance, so it is dropped too.
@@ -106,7 +111,7 @@ const rank = (type: string) => {
 export function cleanResults(places: Place[], opts: { byRating?: boolean } = {}) {
   const typeCode = (p: Place) => p.typecode ?? "";
   const kept = places.filter((p) => !JUNK_NAME.test(p.name) && !JUNK_TYPE.test(typeCode(p)) &&
-    !(/^(11|14)/.test(typeCode(p)) && !(Number(p.rating) > 0)));
+    !(UNRATED_JUNK.test(typeCode(p)) && !(Number(p.rating) > 0)));
   return kept
     .map((p, i) => ({ p, i }))
     .sort((a, b) => opts.byRating

@@ -50,6 +50,7 @@ export const ja: Dict = {
     near: "{city}近郊",
   },
   today: {
+    driverElsewhere: "{city}にはその名前の場所がありません。以下は別の都市です。運転手に見せる前に住所を確認してください。",
     driverElseIn: "{city}のほかの行き先",
     driverFind: "検索",
     driverPick: "場所をタップすると運転手に見せる画面になります。",
