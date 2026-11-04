@@ -1,7 +1,7 @@
 // Privacy policy and support page text (App Store requires both URLs). Describes what the code
 // actually does — keep it in step with lib/track.ts, app/api/go, app/api/t, lib/dish-cache.ts
 // and docs/SPEC.md §8 when data handling changes, and bump UPDATED.
-export const UPDATED = "2026-11-01";
+export const UPDATED = "2026-11-04";
 export const SUPPORT_EMAIL = "support@haodego.com";
 
 type Section = { h: string; items: string[] };
@@ -33,6 +33,7 @@ const PRIVACY: Record<string, Privacy> = {
         "Trip passes and tips are paid through Apple. We only check Apple’s signed receipt (which pass, when it was bought) to unlock unlimited use; we never see your name or payment details.",
         "Booking link clicks: when you tap a partner link (Trip.com, eSIM providers) we record the time, partner, page, city and any travel dates in the link, and your device type (iPhone app, phone or computer), to match commissions. The partner’s own privacy policy then applies.",
         "Our hosting provider keeps standard server logs, including IP addresses, for a short time for security and troubleshooting.",
+        "On the website pages only (haodego.com/welcome and the guides, not the app), Vercel Web Analytics counts page visits without cookies or any id that follows you: the page, where the visit came from, and country and device type.",
       ] },
       { h: "Service providers", items: [
         "Vercel (hosting, Hong Kong), Alibaba Cloud Model Studio (AI), Amap (maps and places) and Supabase (database for dish facts and anonymous events). They process data only to provide this service.",
@@ -69,6 +70,7 @@ const PRIVACY: Record<string, Privacy> = {
         "Los pases de viaje y las propinas se pagan a través de Apple. Solo comprobamos el recibo firmado de Apple (qué pase y cuándo se compró) para desbloquear el uso ilimitado; nunca vemos tu nombre ni tus datos de pago.",
         "Clics en enlaces de reserva: al tocar un enlace de un socio (Trip.com, proveedores de eSIM) registramos la hora, el socio, la página, la ciudad, las fechas del enlace y el tipo de dispositivo, para cuadrar comisiones. Después se aplica la política de privacidad del socio.",
         "Nuestro proveedor de alojamiento guarda registros estándar del servidor, incluidas direcciones IP, durante poco tiempo por seguridad y para resolver problemas.",
+        "Solo en las páginas del sitio web (haodego.com/welcome y las guías, no en la app), Vercel Web Analytics cuenta las visitas sin cookies ni ningún identificador que te siga: la página, de dónde llegó la visita, el país y el tipo de dispositivo.",
       ] },
       { h: "Proveedores de servicios", items: [
         "Vercel (alojamiento, Hong Kong), Alibaba Cloud Model Studio (IA), Amap (mapas y lugares) y Supabase (base de datos de platos y eventos anónimos). Solo tratan datos para prestar este servicio.",
@@ -105,6 +107,7 @@ const PRIVACY: Record<string, Privacy> = {
         "Les pass voyage et les pourboires sont payés via Apple. Nous vérifions seulement le reçu signé d’Apple (quel pass, acheté quand) pour débloquer l’usage illimité ; nous ne voyons jamais votre nom ni vos données de paiement.",
         "Les clics sur les liens de réservation : quand vous touchez un lien partenaire (Trip.com, fournisseurs d’eSIM), nous enregistrons l’heure, le partenaire, la page, la ville, les dates éventuelles du lien et le type d’appareil, pour rapprocher les commissions. La politique de confidentialité du partenaire s’applique ensuite.",
         "Notre hébergeur conserve brièvement des journaux serveur standard, adresses IP comprises, pour la sécurité et le dépannage.",
+        "Uniquement sur les pages du site web (haodego.com/welcome et les guides, pas dans l’appli), Vercel Web Analytics compte les visites sans cookies ni identifiant qui vous suit : la page, la provenance de la visite, le pays et le type d’appareil.",
       ] },
       { h: "Prestataires", items: [
         "Vercel (hébergement, Hong Kong), Alibaba Cloud Model Studio (IA), Amap (cartes et lieux) et Supabase (base de données des plats et des événements anonymes). Ils ne traitent les données que pour fournir ce service.",
@@ -141,6 +144,7 @@ const PRIVACY: Record<string, Privacy> = {
         "Reisepässe und Trinkgeld werden über Apple bezahlt. Wir prüfen nur Apples signierten Beleg (welcher Pass, wann gekauft), um die unbegrenzte Nutzung freizuschalten; deinen Namen oder Zahlungsdaten sehen wir nie.",
         "Klicks auf Buchungslinks: Wenn du einen Partnerlink (Trip.com, eSIM-Anbieter) antippst, speichern wir Zeit, Partner, Seite, Stadt, eventuelle Reisedaten im Link und den Gerätetyp, um Provisionen abzugleichen. Danach gilt die Datenschutzerklärung des Partners.",
         "Unser Hosting-Anbieter speichert übliche Serverprotokolle einschließlich IP-Adressen für kurze Zeit für Sicherheit und Fehlersuche.",
+        "Nur auf den Website-Seiten (haodego.com/welcome und die Ratgeber, nicht in der App) zählt Vercel Web Analytics Besuche ohne Cookies und ohne eine Kennung, die dir folgt: die Seite, woher der Besuch kam, Land und Gerätetyp.",
       ] },
       { h: "Dienstleister", items: [
         "Vercel (Hosting, Hongkong), Alibaba Cloud Model Studio (KI), Amap (Karten und Orte) und Supabase (Datenbank für Gerichte und anonyme Ereignisse). Sie verarbeiten Daten nur, um diesen Dienst zu erbringen.",
@@ -177,6 +181,7 @@ const PRIVACY: Record<string, Privacy> = {
         "トラベルパスとチップの支払いはAppleを通じて行われます。無制限利用を有効にするため、Appleの署名付きレシート（どのパスをいつ購入したか）だけを確認します。お名前や支払い情報を目にすることはありません。",
         "予約リンクのクリック：提携先のリンク（Trip.com、eSIM事業者）をタップすると、手数料の照合のため、日時・提携先・ページ・都市・リンク内の日程・端末の種類を記録します。その後は提携先のプライバシーポリシーが適用されます。",
         "ホスティング事業者は、セキュリティと障害対応のため、IPアドレスを含む標準的なサーバーログを短期間保存します。",
+        "ウェブサイトのページ（haodego.com/welcome とガイド。アプリ内は対象外）に限り、Vercel Web Analytics が Cookie や追跡用の ID を使わずに訪問数を数えます：ページ、訪問元、国、端末の種類。",
       ] },
       { h: "委託先", items: [
         "Vercel（ホスティング、香港）、Alibaba Cloud Model Studio（AI）、Amap（地図・場所）、Supabase（料理情報と匿名イベントのデータベース）。いずれも本サービスの提供のためにのみデータを処理します。",
@@ -213,6 +218,7 @@ const PRIVACY: Record<string, Privacy> = {
         "여행 패스와 팁은 Apple을 통해 결제됩니다. 무제한 사용을 열기 위해 Apple의 서명된 영수증(어떤 패스를 언제 샀는지)만 확인하며, 이름이나 결제 정보는 볼 수 없습니다.",
         "예약 링크 클릭: 제휴 링크(Trip.com, eSIM 업체)를 누르면 수수료 정산을 위해 시간·제휴사·페이지·도시·링크의 여행 날짜·기기 종류를 기록합니다. 이후에는 제휴사의 개인정보 처리방침이 적용됩니다.",
         "호스팅 업체는 보안과 문제 해결을 위해 IP 주소를 포함한 일반 서버 로그를 짧은 기간 보관합니다.",
+        "웹사이트 페이지(haodego.com/welcome와 가이드, 앱은 제외)에서만 Vercel Web Analytics가 쿠키나 사용자를 추적하는 ID 없이 방문 수를 셉니다: 페이지, 유입 경로, 국가, 기기 종류.",
       ] },
       { h: "서비스 제공업체", items: [
         "Vercel(호스팅, 홍콩), Alibaba Cloud Model Studio(AI), Amap(지도·장소), Supabase(요리 정보와 익명 이벤트 데이터베이스). 이 서비스 제공을 위해서만 데이터를 처리합니다.",

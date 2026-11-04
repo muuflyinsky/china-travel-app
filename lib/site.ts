@@ -4,9 +4,10 @@
 // Copy is English only for now (workspace inbox/2026-11-04-website-官网方案.md); other languages get
 // their own URLs (/de/welcome …) when they are written, never a half-translated page.
 
-/** Canonical origin. Vercel currently redirects the bare domain to www; switch that the other way
- *  round (www → haodego.com) when this ships, so canonical URLs don't point at a redirect. */
-export const SITE_URL = "https://haodego.com";
+/** Canonical origin: www, because Vercel serves the site there (haodego.com 308-redirects to it).
+ *  Don't swap the redirect: travellers' trips, allergies and settings live in localStorage on the
+ *  www origin (browser and iOS WebView alike) and would be lost. */
+export const SITE_URL = "https://www.haodego.com";
 
 /** App Store listing (App Store Connect app 6829347376). Off until 1.0 is approved and live:
  *  showing a badge for an app you can't download would be untrue. */
