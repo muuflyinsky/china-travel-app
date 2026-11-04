@@ -9,75 +9,26 @@
 //
 // A leak is a dish the standard recipe says contains something ("D" in testset.csv) that the
 // app answers "ok" for, or, with a severe allergy, anything but "don't order".
-// It checks what the app does with the model's answer, not the model: new model output
-// (scripts-run.py in the review assets) has to be saved here to test that.
+// It checks what the app does with the model's answer, not the model: to test a prompt or model
+// change, record a new run with scripts/eval-dishes.mjs (see .claude/skills/dish-prompt-eval).
+//   node scripts/check-allergens.mjs --output eval/allergens/model-output-<run>.json
+//                                               # same check on another saved run (scripts/eval-dishes.mjs)
 import { readFile, writeFile } from "node:fs/promises";
+import { resolve } from "node:path";
+import { EVAL_DIR, appLogic, loadTests, score } from "./lib/allergen-eval.mjs";
 
-const dir = new URL("../eval/allergens/", import.meta.url);
-let createJiti;
-try { ({ createJiti } = await import("jiti")); } catch { console.error("needs jiti (installed with the app's dev dependencies)"); process.exit(2); }
-const jiti = createJiti(import.meta.url);
-const { verdict, withDetailAllergens } = await jiti.import(new URL("../lib/verdict.ts", import.meta.url).pathname);
-const { tighten } = await jiti.import(new URL("../lib/ingredients.ts", import.meta.url).pathname);
+const dir = EVAL_DIR;
+const { verdict, withDetailAllergens, tighten } = await appLogic();
+const at = process.argv.indexOf("--output");
+const outputFile = at > 0 ? resolve(process.argv[at + 1]) : new URL("model-output-2026-10-25.json", dir);
 
-function parseCsv(text) {
-  const rows = [];
-  let row = [], cell = "", q = false;
-  for (let i = 0; i < text.length; i++) {
-    const ch = text[i];
-    if (q) { if (ch === '"' && text[i + 1] === '"') { cell += '"'; i++; } else if (ch === '"') q = false; else cell += ch; }
-    else if (ch === '"') q = true;
-    else if (ch === ",") { row.push(cell); cell = ""; }
-    else if (ch === "\n") { row.push(cell.replace(/\r$/, "")); rows.push(row); row = []; cell = ""; }
-    else cell += ch;
-  }
-  if (cell || row.length) { row.push(cell); rows.push(row); }
-  const [head, ...body] = rows;
-  return body.filter((r) => r.some(Boolean)).map((r) => Object.fromEntries(head.map((h, i) => [h.replace(/^﻿/, ""), r[i] ?? ""])));
-}
-
-const tests = parseCsv(await readFile(new URL("testset.csv", dir), "utf8"));
-const output = JSON.parse(await readFile(new URL("model-output-2026-10-25.json", dir), "utf8"));
+const tests = await loadTests();
+const output = JSON.parse(await readFile(outputFile, "utf8"));
 const known = new Set(JSON.parse(await readFile(new URL("known-leaks.json", dir), "utf8").catch(() => "[]")));
-
-const ALLERGENS = ["peanut", "crustacean", "sesame", "soy", "gluten", "egg", "fish", "mollusc", "tree_nut", "milk", "celery", "mustard", "sulphites", "lupin"];
-const DIETS = ["vegetarian", "vegan", "no_pork", "halal", "no_beef", "no_spicy", "no_alcohol"];
-const words = (s) => new Set(s.split(/\s+/).filter(Boolean));
-
-/** Truth for one diet: D = the standard recipe breaks it. Same rules as the review's score.py. */
-function dietTruth(t, diet) {
-  const meat = words(t.meat_D), alc = t["alcohol(D/H/N)"], spice = Number(t["spice0-3"]);
-  if (diet === "vegetarian") return t.vegetarian !== "True" ? "D" : "N";
-  if (diet === "vegan") return t.vegan !== "True" ? "D" : "N";
-  if (diet === "no_pork") return meat.has("pork") ? "D" : "N";
-  if (diet === "no_beef") return meat.has("beef") ? "D" : "N";
-  if (diet === "halal") return meat.has("pork") || alc === "D" || [...meat].some((m) => m !== "fish" && m !== "seafood") ? "D" : "N";
-  if (diet === "no_alcohol") return alc === "D" ? "D" : "N";
-  if (diet === "no_spicy") return spice >= 2 ? "D" : "N";
-}
-
-const leaks = [], seen = { ok: 0, ask: 0, no: 0 };
-let checked = 0;
-for (const t of tests) {
-  const raw = output[t.id];
-  if (!raw) continue;
-  const dish = tighten({ ...raw, zh: t.dish_zh });
-  const D = words(t.allergens_D_standard);
-  for (const a of ALLERGENS) {
-    if (!D.has(a)) continue;
-    for (const severe of [false, true]) {
-      const v = verdict(dish, { allergens: [a], diets: [], severe: severe ? [a] : [] });
-      checked++; seen[v.kind]++;
-      if (v.kind === "ok" || (severe && v.kind !== "no")) leaks.push(`${t.dish_zh} · ${a}${severe ? " (severe)" : ""} → ${v.kind}`);
-    }
-  }
-  for (const diet of DIETS) {
-    if (dietTruth(t, diet) !== "D") continue;
-    const v = verdict(dish, { allergens: [], diets: [diet], severe: [] });
-    checked++; seen[v.kind]++;
-    if (v.kind === "ok") leaks.push(`${t.dish_zh} · ${diet} → ok`);
-  }
-}
+const { checked, seen, leaks, missing } = score(tests, output, { verdict, tighten });
+if (missing.length) console.log(`  no answer for ${missing.length} dishes: ${missing.join("、")}`);
+// known-leaks.json describes the run CI checks; a candidate run must never rewrite it.
+if (at > 0 && process.argv.includes("--write-known")) { console.log("--write-known only works on the default run"); process.exit(1); }
 
 // Dish details merged into a list answer only ever make it stricter (withDetailAllergens).
 const base = { zh: "宫保鸡丁", pinyin: "", price: "", name: "Kung Pao Chicken", short: "", spice: 1, vegetarian: false, meat: ["chicken"], alcohol: false, confidence: "high" };
