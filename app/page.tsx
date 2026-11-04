@@ -3,8 +3,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
   Camera, Search, Siren, Check, CalendarClock, CalendarPlus, Plane, Smartphone, Wallet, Ticket, Lightbulb, BedDouble, CarTaxiFront,
-  Sun, CloudSun, Cloud, CloudRain, CloudLightning, Snowflake, CloudFog, ChevronRight, ChevronDown, LogIn, Receipt, PlaneTakeoff, ListChecks, QrCode, Calculator, Copy, ShieldCheck,
-} from "lucide-react";
+  Sun, CloudSun, Cloud, CloudRain, CloudLightning, Snowflake, CloudFog, ChevronRight, ChevronDown, LogIn, Receipt, PlaneTakeoff, ListChecks, QrCode, Calculator, Copy, ShieldCheck, ClipboardList } from "lucide-react";
 import { Screen, DemoNote } from "@/components/Shell";
 import { Section, Card, Group, Row, Button, IconTile } from "@/components/ui";
 import { TripAlerts } from "@/components/TripAlerts";
@@ -50,6 +49,9 @@ function WeatherIcon({ zh }: { zh: string }) {
   if (zh.includes("多云")) return <CloudSun className={cls} aria-hidden />;
   return <Sun className={cls} aria-hidden />;
 }
+
+/** China's National Immigration Administration, mobile form (checked 2026-11-04: "入境卡填报"). */
+const ARRIVAL_CARD_URL = "https://s.nia.gov.cn/ArrivalCardFillingPhone/";
 
 const fmtDay = (iso: string, lang: string, month: "short" | "long" = "short") =>
   new Date(`${iso}T00:00:00Z`).toLocaleDateString(lang, { timeZone: "UTC", day: "numeric", month });
@@ -192,7 +194,12 @@ function BeforeTrip() {
     <>
       <Section>
         <VisaCheck />
-        <p className="px-1 text-footnote text-muted">{t.prepare.arrivalCard}</p>
+        {/* Only the official site: fake ones charge a fee for this free form. */}
+        <Group>
+          <Row href={ARRIVAL_CARD_URL} external icon={<IconTile><ClipboardList className="h-5 w-5" aria-hidden /></IconTile>}
+            title={t.prepare.arrivalCardTitle} sub={t.prepare.arrivalCardSub} />
+        </Group>
+        <p className="px-1 text-footnote text-muted">{t.prepare.arrivalCardLater}</p>
       </Section>
       <TripAlerts section />
       <Section title={days === null || days < 0 ? undefined : fmt(t.today.arrivingIn, { n: days })}>
@@ -415,7 +422,7 @@ function DriverApps() {
  * quick actions (driver · today · a one-row pay strip), then travel essentials (stay countdown,
  * emergency help, the Chinese apps).
  */
-function Moments() {
+function Moments({ leaving = false }: { leaving?: boolean }) {
   const t = useT();
   const router = useRouter();
   const [p] = useProfile();
@@ -454,7 +461,8 @@ function Moments() {
           ) : (
             <Row href="/settings#entry" icon={<IconTile><CalendarClock className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.stayTrack} sub={t.today.stayTrackSub} />
           )}
-          <Row href="/tax-refund" icon={<IconTile><Receipt className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.taxRow} sub={t.today.taxRowSub} />
+          {/* Leaving: the tax refund card is already on the first screen. */}
+          {!leaving && <Row href="/tax-refund" icon={<IconTile><Receipt className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.taxRow} sub={t.today.taxRowSub} />}
           <Row href="/sos" icon={<IconTile tone="danger"><Siren className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.help} sub={t.today.helpSub} />
         </Group>
         <ChinaApps />
@@ -501,13 +509,14 @@ function InChina() {
   );
 }
 
+/** The last days: what's left to do first (airport, tax refund), then the usual in-China screen. */
 function Leaving() {
   const t = useT();
   const [p] = useProfile();
   return (
     <>
-      <InChina />
       <Section>
+        <CityLine />
         <Card>
           <h3 className="flex items-center gap-2 text-headline"><PlaneTakeoff className="h-5 w-5 shrink-0 text-cobalt" aria-hidden />{t.today.airportTitle}</h3>
           <p className="mt-1 text-subhead">{p.departure ? fmt(t.today.airportBody, { date: fmtDay(p.departure, p.lang, "long") }) : t.today.airportBodyNoDate}</p>
@@ -518,7 +527,10 @@ function Leaving() {
           <p className="mt-1 text-subhead">{t.today.taxBody}</p>
           <Button variant="soft" href="/tax-refund" className="mt-3 w-full text-subhead!">{t.today.taxOpen}</Button>
         </Card>
+        <MenuHero />
+        <TripAlerts />
       </Section>
+      <Moments leaving />
     </>
   );
 }
