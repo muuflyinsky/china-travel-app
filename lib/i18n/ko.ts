@@ -829,4 +829,44 @@ export const ko: Dict = {
   diets: {
     vegetarian: "채식", vegan: "비건", no_pork: "돼지고기 제외", halal: "할랄", no_beef: "소고기 제외", no_spicy: "안 맵게", no_alcohol: "알코올 제외",
   },
+  guides: {
+    "hubTitle": "중국 여행 가이드",
+    "hubIntro": "중국 본토 첫 여행을 위한 실용 가이드: 결제, 이동, 인터넷 연결, 호텔 체크인. 모든 정보에 공식 기관 또는 주요 언론 출처를 달았습니다.",
+    "cityTitle": "{city} 여행 가이드",
+    "cityIntro": "{city}에 도착하기 전후에 준비할 것들.",
+    "topics": {
+      "payment": {
+        "title": "{city}에서 결제하는 법",
+        "short": "결제",
+        "desc": "해외 카드로 쓰는 알리페이·위챗페이, 은행 카드, 현금, ATM({city}). 공식 출처 포함."
+      },
+      "transport": {
+        "title": "{city} 교통 안내",
+        "short": "교통",
+        "desc": "공항 연결편, 지하철 요금 결제, 택시, 고속철도({city}). 공식 출처 포함."
+      },
+      "mobileData": {
+        "title": "{city} 모바일 데이터와 유심",
+        "short": "모바일 데이터",
+        "desc": "로밍, 여권으로 사는 현지 유심, 인터넷 연결({city}). 공식 출처 포함."
+      },
+      "hotelCheckIn": {
+        "title": "{city} 호텔 체크인",
+        "short": "호텔 체크인",
+        "desc": "준비물, 경찰 숙박 등록, 지인 집에 머물 때({city}). 공식 출처 포함."
+      }
+    },
+    "inCity": "{city}",
+    "national": "중국 본토 전역",
+    "sources": "출처",
+    "checked": "{date} 확인",
+    "translated": "영어 가이드를 번역한 것입니다. 내용이 다르면 영어판과 링크된 출처가 기준입니다.",
+    "disclaimer": "규정은 바뀔 수 있습니다. 이용 전에 링크된 출처를 확인하세요. HaodeGo는 어떤 정부 기관과도 관계가 없습니다.",
+    "appTitle": "HaodeGo로 해결하기",
+    "appBody": "무료 앱 HaodeGo가 중국에서 당신의 언어로 도와줍니다.",
+    "openApp": "HaodeGo 열기",
+    "moreGuides": "{city} 다른 가이드",
+    "allGuides": "전체 가이드",
+    "language": "언어"
+  },
 };

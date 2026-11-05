@@ -1,18 +1,21 @@
 import type { Metadata, Viewport } from "next";
-import "./globals.css";
+import "../globals.css";
 import { AppShell } from "@/components/Shell";
+import { SITE } from "@/lib/seo";
 
 const title = "HaodeGo: China Travel Buddy";
 const description = "Read Chinese menus with your allergies checked, get around, and pay in mainland China, in your language.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://haodego.com"),
-  title,
+  metadataBase: new URL(SITE),
+  // Pages set their own title; this adds the brand after it.
+  title: { default: title, template: "%s · HaodeGo" },
   description,
   manifest: "/manifest.webmanifest",
   // Opened from the iPhone home screen: full screen, no Safari bars.
   appleWebApp: { capable: true, title: "HaodeGo", statusBarStyle: "default" },
   // Link previews in chats and social posts.
+  alternates: { canonical: "/" },
   openGraph: { title, description, siteName: "HaodeGo", url: "/", type: "website" },
   twitter: { card: "summary", title, description },
 };
