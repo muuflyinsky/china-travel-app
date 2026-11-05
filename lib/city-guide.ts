@@ -48,11 +48,11 @@ async function spendFor(dish: string, adcode: string): Promise<[number, number] 
  * reservation rules. Fast (three map calls), so the page never waits for the model.
  */
 export async function basicGuide(adcode: string, cityZh: string, cityEn: string): Promise<CityGuide & { partial: true }> {
-  const top = await topSights(adcode);
+  const top = await topSights(adcode, { strict: false });
   return {
     city: cityZh, cityEn, adcode, generatedAt: new Date().toISOString(), model: "", partial: true,
     sources: sourcesFor(top),
-    sights: top.picks.map((x) => sightOf(adcode, x)),
+    sights: top.picks.map((x) => sightOf(adcode, x, false)),
     dishes: [], areas: [], ...mustSeeMeta(top),
   };
 }
@@ -66,14 +66,16 @@ type Top = { picks: SightPick[]; list: MustSee[]; unlocated: string[] };
  * its Chinese full name, then Amap's automatic picks up to 5 in all, without repeats. A city
  * without a list gets exactly the automatic top 5, as before.
  */
-async function topSights(adcode: string): Promise<Top> {
+async function topSights(adcode: string, { strict = true } = {}): Promise<Top> {
   const [pages, list] = await Promise.all([
     Promise.all([
       searchPlaces({ keywords: "景点", types: "110000", city: adcode, page: 1, purpose: "guide" }),
       searchPlaces({ keywords: "景点", types: "110000", city: adcode, page: 2, purpose: "guide" }).catch(() => []),
       searchPlaces({ keywords: "博物馆", types: "140100", city: adcode, page: 1, purpose: "guide" }).catch(() => []),
     ]),
-    mustSeeFor(adcode),
+    // strict (guides that get stored): fail rather than store a guide without the city's list.
+    // The map-only guide is never stored, so it just goes without the list while Supabase is down.
+    strict ? mustSeeFor(adcode) : mustSeeFor(adcode).catch(() => []),
   ]);
   if (!list.length) return { picks: rankSights(pages.flat()).map((p) => ({ p })), list, unlocated: [] };
   const located = [];
@@ -106,17 +108,17 @@ type Written = NonNullable<Awaited<ReturnType<typeof writeCityGuide>>>["sights"]
  * from the centre; Amap gives location, address, rating and photo when it found the place.
  * `w` is the model's text for it (absent in the map-only guide).
  */
-function sightOf(adcode: string, { p, e }: SightPick, w?: Written, why?: L10n): GuideSight {
+function sightOf(adcode: string, { p, e }: SightPick, full: boolean, w?: Written, why?: L10n): GuideSight {
   const zh = e?.zh ?? p!.name;
   const resv = reservationFor(adcode, zh) ?? (p ? reservationFor(adcode, p.name) : undefined);
   return {
     id: p?.id ?? `must-see-${adcode}-${e!.ord}`, zh,
     // Without the model there is no English name for automatic picks; the reservation data has one for the big sights.
-    en: e?.en ?? w?.en ?? resv?.en ?? p!.pinyin,
+    en: e?.en ?? (full ? w?.en ?? p!.pinyin : resv?.en ?? p!.pinyin),
     location: p?.location ?? "", address: p?.address ?? "",
     rating: p?.rating ? Number(p.rating) : undefined, national: Boolean(p?.type.includes("国家级")), photo: p?.photo,
     intro: w?.intro ?? { en: "" }, bestTime: w?.best_time ?? { en: "" },
-    hours: w ? Math.min(8, Math.max(0.5, Math.round((w.hours ?? 2) * 2) / 2)) : 0,
+    hours: full ? Math.min(8, Math.max(0.5, Math.round((w?.hours ?? 2) * 2) / 2)) : 0,
     confidence: w?.confidence === "high" ? "high" : "low",
     reservation: resv?.id,
     ...(e ? { why: why ?? { en: e.why } } : {}),
@@ -140,7 +142,9 @@ export async function generateGuide(adcode: string, cityZh: string, cityEn: stri
 
   const sights: GuideSight[] = top.picks.map((x) => {
     const zh = x.e?.zh ?? x.p!.name;
-    return sightOf(adcode, x, text.sights.find((w) => w.zh === zh), x.e && whys ? whys[top.list.indexOf(x.e)] : undefined);
+    // The model may change brackets (（） → ()): fall back to the name without them.
+    const w = text.sights.find((w) => w.zh === zh) ?? text.sights.find((w) => w.zh.replace(/[（(].*$/, "") === zh.replace(/[（(].*$/, ""));
+    return sightOf(adcode, x, true, w, x.e && whys ? whys[top.list.indexOf(x.e)] : undefined);
   });
 
   // Allergens and spice via the menu pipeline, so they match what Eat shows for the same dish.
@@ -245,7 +249,7 @@ export async function refreshStaleGuides({ budgetMs, maxAgeDays = 30 }: { budget
   const storedSig = new Map(rows.map((r) => [r.key, r.extra ?? ""]));
   const sigs = await listSigs(HOT_CITIES.map((c) => c.a));
   const due = HOT_CITIES
-    .map((c) => ({ c, at: stored.get(c.a) ?? 0, changed: stored.has(c.a) && (storedSig.get(c.a) ?? "") !== (sigs.get(c.a) ?? "") }))
+    .map((c) => ({ c, at: stored.get(c.a) ?? 0, changed: Boolean(sigs) && stored.has(c.a) && (storedSig.get(c.a) ?? "") !== (sigs!.get(c.a) ?? "") }))
     .filter(({ at, changed }) => changed || Date.now() - at > maxAgeDays * 864e5)
     .sort((a, b) => Number(b.changed) - Number(a.changed) || a.at - b.at);
   const done: { city: string; ok: boolean; s: number; error?: string; listChanged?: boolean; unlocated?: string[] }[] = [];

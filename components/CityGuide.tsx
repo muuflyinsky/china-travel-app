@@ -66,7 +66,7 @@ function SightCard({ s, city, cityEn, index, version }: { s: GuideSight; city: s
       {why && <p className="mt-2 text-body font-semibold">{why}</p>}
       {intro && <p className="mt-2 text-body">{intro}</p>}
       <ul className="mt-2 space-y-1 text-footnote text-muted">
-        {s.centreH !== undefined && <li className="flex gap-1.5"><MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-cobalt" aria-hidden />{fmt(t.guide.fromCentre, { n: s.centreH })}</li>}
+        {s.centreH !== undefined && <li className="flex gap-1.5"><MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-cobalt" aria-hidden />{fmt(t.guide.fromCentre, { n: s.centreH.toLocaleString(p.lang) })}</li>}
         {s.hours > 0 && <li className="flex gap-1.5"><Clock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-cobalt" aria-hidden />{fmt(t.guide.hours, { n: s.hours })}</li>}
         {best && <li className="flex gap-1.5"><Sun className="mt-0.5 h-3.5 w-3.5 shrink-0 text-cobalt" aria-hidden />{fmt(t.guide.best, { t: best })}</li>}
         {s.rating !== undefined && <li className="flex gap-1.5"><Star className="mt-0.5 h-3.5 w-3.5 shrink-0 fill-current text-ink" aria-hidden />{s.rating.toFixed(1)}</li>}
@@ -203,7 +203,7 @@ export function CityGuide({ adcode, cityEn, initialTab = "see", tab: controlled,
       )}
       {/* Map data alone is sourced; anything with model-written text says so. */}
       {/* A city with a reviewed must-see list says who chose what (only on the See tab: dishes are still automatic). */}
-      {g && (g.mustSee && tab === "see"
+      {g && (g.mustSee && tab === "see" && !(g as { partial?: boolean }).partial
         ? <SourceLine ai name="" text={t.guide.curated} date={g.demo ? undefined : g.generatedAt} />
         : <SourceLine ai={!(g as { partial?: boolean }).partial} name="Amap" date={g.demo ? undefined : g.generatedAt} />)}
     </>

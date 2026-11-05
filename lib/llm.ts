@@ -376,7 +376,9 @@ export async function translateLines(lines: string[]) {
     timeoutMs: 60_000,
     text: lines.map((l, i) => `${i + 1}. ${l}`).join("\n"),
   });
-  return lines.map((en, i) => ({ ...(out.lines[i] ?? {}), en }));
+  // Matched by position, so a short or reordered answer would pair a line with the wrong sight: then English only.
+  if (out.lines.length !== lines.length || out.lines.some((l, i) => l.en.trim() !== lines[i].trim())) throw new Error("translation does not match the input lines");
+  return lines.map((en, i) => ({ ...out.lines[i], en }));
 }
 
 /** Text for a city guide. Sights are given (from Amap); dishes are chosen by the model. */

@@ -55,6 +55,10 @@ ok(ms.locate({ zh: "上海博物馆（人民广场馆）" }, [P("a", "上海博�
 ok(ms.locate({ zh: "秦始皇帝陵博物院" }, [P("a", "秦始皇帝陵博物院(兵马俑)")])?.id === "a", "locate: bracketed suffix");
 ok(ms.locate({ zh: "南锣鼓巷" }, [P("a", "鼓楼"), P("b", "南锣鼓巷地铁站")]) === null, "locate: a metro station is not the sight");
 ok(ms.locate({ zh: "外滩" }, []) === null, "locate: nothing found = null");
+ok(ms.locate({ zh: "南锣鼓巷" }, [P("a", "南锣鼓巷文宇奶酪店"), P("b", "南锣鼓巷")])?.id === "b", "locate: not a shop on the street");
+ok(ms.locate({ zh: "回民街" }, [P("a", "回民街美食店")]) === null, "locate: a shop alone is not found");
+ok(ms.locate({ zh: "西安城墙（永宁门）" }, [P("a", "西安")]) === null, "locate: a shorter name is another place");
+ok(ms.locate({ zh: "天安门广场" }, [P("a", "天安门")]) === null, "locate: 天安门 is not 天安门广场");
 ok(ms.locate({ zh: "外滩" }, [P("a", "外滩观光隧道"), P("b", "外滩")])?.id === "b", "locate: the same name before a longer one");
 
 // ---- merging: list first, automatic picks fill to 5 without repeats ----
@@ -70,6 +74,8 @@ ok(m.listed.length === 3, "merge: every listed sight kept, also when Amap didn't
 ok(m.fill.map((p) => p.id).join() === "h,e", `merge: fill to 5 without the listed ones (by id, name, 500 m): got ${m.fill.map((p) => p.id)}`);
 const six = Array.from({ length: 6 }, (_, i) => ({ e: draft("610100", i + 1, `景点${i}`), poi: P(`s${i}`, `景点${i}`, `10${i},30`) }));
 ok(ms.mergePicks(six, auto).fill.length === 0, "merge: a list of 6 shows all 6, no fill");
+const square = { e: draft("110000", 1, "天安门广场", { reviewedOn: "2026-11-06" }), poi: P("sq", "天安门广场", "116.3975,39.9037") };
+ok(ms.mergePicks([square], [P("nm", "中国国家博物馆", "116.4012,39.9050")]).fill.length === 1, "merge: a neighbour 360 m away is kept");
 ok(ms.mergePicks([], auto).fill.map((p) => p.id).join() === "h,w,t2,n,e", "merge: no list = the automatic top 5 unchanged");
 
 if (failures.length) { console.error(`must-see: ${failures.length} failed\n- ${failures.join("\n- ")}`); process.exit(1); }

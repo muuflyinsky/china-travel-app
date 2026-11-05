@@ -7,7 +7,8 @@
 //   SUPABASE_URL=… SUPABASE_ANON_KEY=… node scripts/sync-must-see.mjs --pull   # Supabase → JSON (commit the result)
 //
 // --sql replaces every row of the cities in the file (rows of other cities are left alone) and
-// keeps reviewed_on / reviewed_by as the file has them: a draft stays a draft.
+// writes reviewed_on / reviewed_by as the file has them. Careful: once Veer reviews in Supabase,
+// the table is ahead of the file — run --pull first, or a stale file puts his reviews back to drafts.
 import { readFile, writeFile } from "node:fs/promises";
 
 const file = new URL("../lib/data/must-see.json", import.meta.url);
