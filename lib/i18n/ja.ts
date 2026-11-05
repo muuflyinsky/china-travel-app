@@ -625,6 +625,8 @@ export const ja: Dict = {
     taxRow: "{city}の税金還付",
     loadError: "おすすめを読み込めませんでした。接続を確認して、もう一度お試しください。",
     autoMap: "Amapの地図データから自動選定。",
+    fromCentre: "市中心から約{n}時間",
+    curated: "必見スポットは公開の旅行ガイドをもとにHaodeGoが選定。住所と評価はAmap、紹介文はAIが作成",
     "title": "{city}のおすすめ",
     "see": "見る",
     "eat": "食べる",

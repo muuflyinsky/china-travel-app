@@ -8,7 +8,8 @@
     "start": "next start",
     "typecheck": "next typegen && tsc --noEmit",
     "check:allergens": "node scripts/check-allergens.mjs",
-    "verify": "npm run typecheck && npm run check:allergens"
+    "check:must-see": "node scripts/check-must-see.mjs",
+    "verify": "npm run typecheck && npm run check:allergens && npm run check:must-see"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "1.1.0",

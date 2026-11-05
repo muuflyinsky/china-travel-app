@@ -625,6 +625,8 @@ export const ko: Dict = {
     taxRow: "{city} 세금 환급",
     loadError: "추천 정보를 불러오지 못했어요. 연결을 확인하고 다시 시도해 주세요.",
     autoMap: "Amap 지도 데이터로 자동 선정.",
+    fromCentre: "시내 중심에서 약 {n}시간",
+    curated: "필수 명소는 공개 여행 가이드를 바탕으로 HaodeGo가 선정, 주소와 평점은 Amap, 소개는 AI가 작성",
     "title": "{city} 추천",
     "see": "볼거리",
     "eat": "먹거리",
