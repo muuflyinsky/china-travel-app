@@ -909,4 +909,44 @@ export const de: Dict = {
   diets: {
     vegetarian: "Vegetarisch", vegan: "Vegan", no_pork: "Kein Schwein", halal: "Halal", no_beef: "Kein Rind", no_spicy: "Nicht scharf", no_alcohol: "Kein Alkohol",
   },
+  guides: {
+    "hubTitle": "China-Reiseführer",
+    "hubIntro": "Praktische Ratgeber für die erste Reise nach Festlandchina: bezahlen, unterwegs sein, online bleiben und im Hotel einchecken. Jede Angabe verweist auf eine offizielle Quelle oder ein großes Medium.",
+    "cityTitle": "Reiseführer {city}",
+    "cityIntro": "Was Sie vor und nach der Ankunft in {city} erledigen sollten.",
+    "topics": {
+      "payment": {
+        "title": "Bezahlen in {city}",
+        "short": "Bezahlen",
+        "desc": "Alipay und WeChat Pay mit ausländischer Karte, Bankkarten, Bargeld und Geldautomaten in {city}, mit offiziellen Quellen."
+      },
+      "transport": {
+        "title": "Unterwegs in {city}",
+        "short": "Verkehr",
+        "desc": "Flughafenverbindungen, U-Bahn bezahlen, Taxis und Schnellzüge in {city}, mit offiziellen Quellen."
+      },
+      "mobileData": {
+        "title": "Mobile Daten und SIM-Karten in {city}",
+        "short": "Mobile Daten",
+        "desc": "Roaming, lokale SIM-Karten mit Reisepass und online bleiben in {city}, mit offiziellen Quellen."
+      },
+      "hotelCheckIn": {
+        "title": "Hotel-Check-in in {city}",
+        "short": "Hotel-Check-in",
+        "desc": "Was Sie mitbringen, die polizeiliche Anmeldung und Übernachten bei Freunden in {city}, mit offiziellen Quellen."
+      }
+    },
+    "inCity": "{city}",
+    "national": "Ganz Festlandchina",
+    "sources": "Quellen",
+    "checked": "Geprüft am {date}",
+    "translated": "Aus dem englischen Ratgeber übersetzt. Bei Abweichungen gelten die englische Fassung und die verlinkten Quellen.",
+    "disclaimer": "Regeln ändern sich. Prüfen Sie die verlinkten Quellen, bevor Sie sich darauf verlassen. HaodeGo ist mit keiner Behörde verbunden.",
+    "appTitle": "Mit HaodeGo erledigen",
+    "appBody": "Die kostenlose App HaodeGo begleitet Sie in China, in Ihrer Sprache.",
+    "openApp": "HaodeGo öffnen",
+    "moreGuides": "Weitere Ratgeber für {city}",
+    "allGuides": "Alle Ratgeber",
+    "language": "Sprache"
+  },
 };

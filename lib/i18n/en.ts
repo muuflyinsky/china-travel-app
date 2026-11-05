@@ -912,6 +912,46 @@ export const en = {
   diets: {
     vegetarian: "Vegetarian", vegan: "Vegan", no_pork: "No pork", halal: "Halal", no_beef: "No beef", no_spicy: "Not spicy", no_alcohol: "No alcohol",
   },
+  guides: {
+    "hubTitle": "China travel guides",
+    "hubIntro": "Practical guides for a first trip to mainland China: paying, getting around, staying online and checking in at hotels. Every fact links to an official or major news source.",
+    "cityTitle": "{city} travel guide",
+    "cityIntro": "What to sort out before and after you land in {city}.",
+    "topics": {
+      "payment": {
+        "title": "How to pay in {city}",
+        "short": "Payment",
+        "desc": "Alipay and WeChat Pay with a foreign card, bank cards, cash and ATMs in {city}, with official sources."
+      },
+      "transport": {
+        "title": "Getting around {city}",
+        "short": "Transport",
+        "desc": "Airport links, paying for the metro, taxis and high-speed trains in {city}, with official sources."
+      },
+      "mobileData": {
+        "title": "Mobile data and SIM cards in {city}",
+        "short": "Mobile data",
+        "desc": "Roaming, local SIM cards with a passport and staying online in {city}, with official sources."
+      },
+      "hotelCheckIn": {
+        "title": "Hotel check-in in {city}",
+        "short": "Hotel check-in",
+        "desc": "What to bring, police registration and staying with friends in {city}, with official sources."
+      }
+    },
+    "inCity": "{city}",
+    "national": "All of mainland China",
+    "sources": "Sources",
+    "checked": "Checked {date}",
+    "translated": "Translated from the English guide. If anything differs, the English version and the linked sources are the reference.",
+    "disclaimer": "Rules change. Check the linked sources before you rely on them. HaodeGo is not affiliated with any government body.",
+    "appTitle": "Do it in HaodeGo",
+    "appBody": "The free HaodeGo app keeps this with you in China, in your language.",
+    "openApp": "Open HaodeGo",
+    "moreGuides": "More {city} guides",
+    "allGuides": "All guides",
+    "language": "Language"
+  },
 };
 
 type Widen<T> = T extends string ? string : T extends readonly string[] ? string[] : { [K in keyof T]: Widen<T[K]> };

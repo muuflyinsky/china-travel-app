@@ -909,4 +909,44 @@ export const ja: Dict = {
   diets: {
     vegetarian: "ベジタリアン", vegan: "ヴィーガン", no_pork: "豚肉なし", halal: "ハラール", no_beef: "牛肉なし", no_spicy: "辛くない", no_alcohol: "アルコールなし",
   },
+  guides: {
+    "hubTitle": "中国旅行ガイド",
+    "hubIntro": "初めての中国本土旅行のための実用ガイド：支払い、移動、ネット接続、ホテルのチェックイン。すべての情報に公的機関または主要メディアの出典を付けています。",
+    "cityTitle": "{city}旅行ガイド",
+    "cityIntro": "{city}に着く前と着いた後に準備しておきたいこと。",
+    "topics": {
+      "payment": {
+        "title": "{city}での支払い方法",
+        "short": "支払い",
+        "desc": "海外カードでのAlipay・WeChat Pay、銀行カード、現金、ATM（{city}）。公的な出典付き。"
+      },
+      "transport": {
+        "title": "{city}での移動",
+        "short": "交通",
+        "desc": "空港アクセス、地下鉄の支払い、タクシー、高速鉄道（{city}）。公的な出典付き。"
+      },
+      "mobileData": {
+        "title": "{city}のモバイルデータとSIM",
+        "short": "モバイルデータ",
+        "desc": "ローミング、パスポートで買える現地SIM、ネット接続（{city}）。公的な出典付き。"
+      },
+      "hotelCheckIn": {
+        "title": "{city}のホテルチェックイン",
+        "short": "チェックイン",
+        "desc": "持ち物、警察への宿泊登録、知人宅に泊まる場合（{city}）。公的な出典付き。"
+      }
+    },
+    "inCity": "{city}",
+    "national": "中国本土全域",
+    "sources": "出典",
+    "checked": "{date} 確認",
+    "translated": "英語版ガイドからの翻訳です。内容が異なる場合は英語版とリンク先の出典が基準です。",
+    "disclaimer": "規則は変わることがあります。利用前にリンク先の出典をご確認ください。HaodeGoはいかなる政府機関とも関係がありません。",
+    "appTitle": "HaodeGoで簡単に",
+    "appBody": "無料アプリHaodeGoが中国滞在中、あなたの言語でサポートします。",
+    "openApp": "HaodeGoを開く",
+    "moreGuides": "{city}のほかのガイド",
+    "allGuides": "すべてのガイド",
+    "language": "言語"
+  },
 };
