@@ -46,9 +46,11 @@ function MetroLine({ x, m, out }: { x: X; m: Metro; out?: boolean }) {
   return (
     <div className="space-y-1.5">
       <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
-        <Sign {...m.line} />
+        {!m.line && <span className="text-subhead">{x.followSign}</span>}
+        <Sign {...(m.line ?? { zh: "地铁", en: "Metro" })} />
         {m.to && <span className="text-subhead">{fmt(out ? x.fromPlace : x.toPlace, { place: m.to.en })} <span className="zh text-muted" lang="zh-CN">{m.to.zh}</span></span>}
       </p>
+      {!m.line && <p className="text-subhead text-muted">{x.metroSigns}</p>}
       {m.from && <Line icon={MapPin}>{fmt(x.station, { place: m.from.en })} <span className="zh" lang="zh-CN">{m.from.zh}</span></Line>}
       {m.at && <Line icon={MapPin}>{fmt(x.stopsAt, { t: m.at })}</Line>}
       {meta && <Line icon={Clock}>{meta}</Line>}
@@ -75,7 +77,7 @@ function WaysIn({ a, x, heading }: { a: ArrivalAirport; x: X; heading: boolean }
       {heading && <p className="px-1 pt-1 text-subhead font-semibold">{a.name.en} <span className="zh font-normal text-muted" lang="zh-CN">{a.name.zh}</span></p>}
       {a.note && <Note>{x.notes[a.note]}</Note>}
       <Way icon={TrainFront} title={x.metro}>
-        {a.metro.map((m) => <MetroLine key={m.line.zh} x={x} m={m} />)}
+        {a.metro.map((m) => <MetroLine key={m.line?.zh ?? "signs"} x={x} m={m} />)}
       </Way>
       <Way icon={CarTaxiFront} title={x.taxi}>
         <p className="flex flex-wrap items-center gap-2 text-subhead">{x.followSign} <Sign zh="出租车" en="Taxi" /></p>
@@ -84,7 +86,7 @@ function WaysIn({ a, x, heading }: { a: ArrivalAirport; x: X; heading: boolean }
         {!taxi?.doors && !taxi?.note && <p className="text-subhead text-muted">{x.taxiSigns}</p>}
         {taxi?.cny && (
           <Line icon={Clock}>
-            {fmt(x.taxiFare, { place: taxi.to?.en ?? x.centre, cny: taxi.cny[1] ? `${taxi.cny[0]}–${taxi.cny[1]}` : taxi.cny[0], n: taxi.mins ?? "" })}
+            {fmt(taxi.to ? x.taxiFare : x.taxiTime, { place: taxi.to?.en ?? "", cny: taxi.cny[1] ? `${taxi.cny[0]}–${taxi.cny[1]}` : taxi.cny[0], n: taxi.mins ?? "" })}
           </Line>
         )}
         {taxi?.someCards && <Line icon={CreditCard}>{x.someCards}</Line>}
@@ -158,7 +160,7 @@ function WayOut({ a, x, heading }: { a: ArrivalAirport; x: X; heading: boolean }
         </Button>
       </Card>
       <Way icon={TrainFront} title={x.metro}>
-        {a.metro.map((m) => <MetroLine key={m.line.zh} x={x} m={m} out />)}
+        {a.metro.map((m) => <MetroLine key={m.line?.zh ?? "signs"} x={x} m={m} out />)}
       </Way>
       <Way icon={Car} title={x.ride}>
         <p className="text-subhead">{x.rideOut} <span className="zh font-semibold" lang="zh-CN">{a.name.zh}{term ? ` ${term}` : ""}</span></p>
@@ -179,24 +181,32 @@ function Airport() {
   const [outPick, setOutPick] = useState<string | null>(null);
   useEffect(() => { track("airport_open", { dir: out ? "out" : "in" }); }, [out]);
 
+  const [covered, setCovered] = useState(true);
   // Arriving: the first city on the trip; leaving: where they are now. Either, if we cover it.
   useEffect(() => {
     if (!loaded) return;
-    const want = out ? [city.a, p.cities.at(-1)?.a] : [p.cities[0]?.a, city.a];
-    const hit = want.find((a) => a && AIRPORT_CITIES.includes(a));
+    const want = (out ? [city.a, p.cities.at(-1)?.a] : [p.cities[0]?.a, city.a]).filter(Boolean) as string[];
+    const hit = want.find((a) => AIRPORT_CITIES.includes(a));
     if (hit) setAt(hit);
+    // Their city isn't one of ours: say so at the top, not only at the bottom.
+    setCovered(Boolean(hit) || want.length === 0);
   }, [loaded, out, city.a]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const list = airportsIn(at);
-  // Two airports: ask once which (remembered for landing), or show both.
-  const choice = out ? (outPick ?? p.arrivalAirport) : p.arrivalAirport;
+  // Two airports: ask once which they land at (remembered, for the first city only), or show both.
+  // Leaving always asks: they may fly out of the other airport, and a wrong card sends them there.
+  const firstCity = !p.cities[0] || p.cities[0].a === at;
+  const [browse, setBrowse] = useState<string | null>(null);
+  const choice = out ? outPick : firstCity ? (browse ?? p.arrivalAirport) : browse;
   const picked = list.find((a) => a.code === choice);
   const shown = picked ? [picked] : list;
-  const choose = (v: string) => (out ? setOutPick(v) : set({ arrivalAirport: v }));
+  const choose = (v: string) => (out ? setOutPick(v) : firstCity ? set({ arrivalAirport: v }) : setBrowse(v));
+  useEffect(() => { setBrowse(null); setOutPick(null); }, [at]);
 
   return (
     <Screen title={out ? x.titleOut : x.title} back>
       <Section>
+        {!covered && <Note>{x.otherCities}</Note>}
         <Seg value={at} onChange={setAt} label={x.cityLabel} options={AIRPORT_CITIES.map((a) => ({ value: a, label: x.cities[a as keyof X["cities"]] }))} />
         {list.length > 1 && (
           <>
@@ -231,7 +241,7 @@ function Airport() {
       )}
 
       <Section>
-        <p className="px-1 text-footnote text-muted">{x.otherCities}</p>
+        {covered && <p className="px-1 text-footnote text-muted">{x.otherCities}</p>}
         <SourceLine name={x.source} date={VERIFIED_ON} />
       </Section>
     </Screen>

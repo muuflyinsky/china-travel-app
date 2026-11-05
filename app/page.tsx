@@ -501,6 +501,8 @@ function Leaving() {
     <>
       <Section>
         <CityLine />
+        {/* A short stay (transit) can be "leaving" on the day they land. */}
+        <FromAirport />
         <Card>
           <h3 className="flex items-center gap-2 text-headline"><PlaneTakeoff className="h-5 w-5 shrink-0 text-cobalt" aria-hidden />{t.today.airportTitle}</h3>
           <p className="mt-1 text-subhead">{p.departure ? fmt(t.today.airportBody, { date: fmtDay(p.departure, p.lang, "long") }) : t.today.airportBodyNoDate}</p>

@@ -20,7 +20,8 @@ export type Name = { en: string; zh: string };
 export type Pay = "card" | "cardPilot" | "alipay" | "ticket";
 
 export type Metro = {
-  line: Name;
+  /** Missing = nothing official on the line or station: the page says follow the 地铁 Metro signs. */
+  line?: Name;
   /** Where it goes in town, as the sign says. */
   to?: Name;
   /** The airport station, when its name differs from the airport's. */
@@ -43,7 +44,7 @@ export type Taxi = {
   doors?: Door[];
   /** Where the doors list isn't the right shape, a key of t.airport.notes. */
   note?: NoteKey;
-  /** To `to` (or the city centre): about this many yuan, a range when given. */
+  /** About this many yuan (to `to`, when a source names where), a range when given. */
   cny?: [number, number?];
   mins?: number;
   to?: Name;
@@ -116,11 +117,11 @@ export const AIRPORTS: ArrivalAirport[] = [
     ride: { parks: [{ park: "P1", floor: "B2" }, { park: "P6" }, { park: "P7" }] },
   },
   {
-    // International flights all at T5 since 2025-02 [媒]; Line 14 station 机场(T5).
-    // The change to Line 2 for the Bell Tower is only in guides: left out. Card payment, taxi and
+    // International flights all at T5 since 2025-02 [媒]. The metro line, station and the change
+    // for the Bell Tower are only in guides [三]: left out, follow the signs. Card payment, taxi and
     // ride-hailing points: nothing official.
     code: "XIY", city: XA, name: { en: "Xi’an Xianyang", zh: "西安咸阳国际机场" }, terminals: ["T5"],
-    metro: [{ line: { en: "Metro Line 14", zh: "地铁14号线" }, from: { en: "Airport (T5)", zh: "机场(T5)" }, pay: "alipay" }],
+    metro: [{ pay: "alipay" }],
     note: "xiyIntl",
   },
 ];
