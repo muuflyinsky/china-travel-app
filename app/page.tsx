@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
   Camera, Siren, Check, CalendarClock, CalendarPlus, Plane, Smartphone, Wallet, Ticket, Lightbulb, BedDouble, CarTaxiFront,
-  Sun, CloudSun, Cloud, CloudRain, CloudLightning, Snowflake, CloudFog, ChevronRight, ChevronDown, LogIn, Receipt, PlaneTakeoff, ListChecks, QrCode, Calculator, ShieldCheck, ClipboardList } from "lucide-react";
+  Sun, CloudSun, Cloud, CloudRain, CloudLightning, Snowflake, CloudFog, ChevronRight, ChevronDown, LogIn, Receipt, PlaneTakeoff, PlaneLanding, ListChecks, QrCode, Calculator, ShieldCheck, ClipboardList } from "lucide-react";
 import { Screen, DemoNote } from "@/components/Shell";
 import { Section, Card, Group, Row, Button, IconTile } from "@/components/ui";
 import { TripAlerts } from "@/components/TripAlerts";
@@ -129,7 +129,19 @@ const PREP = [
   { key: "data", Icon: Smartphone, Body: EsimPicker },
   { key: "book", Icon: Ticket, Body: TrainBooking },
   { key: "good", Icon: Lightbulb, Body: GoodToKnow },
+  { key: "airport", Icon: PlaneLanding, Body: AirportPrep },
 ] as const;
+
+/** Readable before the trip: the arrival-day guide (app/airport). */
+function AirportPrep() {
+  const t = useT();
+  return (
+    <div className="space-y-3">
+      <p className="text-subhead">{t.today.airportPrepBody}</p>
+      <Button variant="soft" href="/airport" className="w-full text-subhead!">{t.today.fromAirportOpen}</Button>
+    </div>
+  );
+}
 
 function Checklist() {
   const t = useT();
@@ -240,6 +252,21 @@ function EntryConfirm() {
         <Button onClick={() => set({ entryDate: p.arrival })} className="text-subhead!"><Check className="h-5 w-5" aria-hidden />{t.today.entryYes}</Button>
         <Button variant="soft" href="/settings#entry" className="text-subhead!">{t.today.entryOther}</Button>
       </div>
+    </Card>
+  );
+}
+
+/** Arrival day: the airport-to-hotel guide, right under the entry-date question. */
+function FromAirport() {
+  const t = useT();
+  const [p] = useProfile();
+  const today = todayIso();
+  if (p.arrival !== today && p.entryDate !== today) return null;
+  return (
+    <Card>
+      <h3 className="flex items-center gap-2 text-headline"><PlaneLanding className="h-5 w-5 shrink-0 text-cobalt" aria-hidden />{t.today.fromAirportTitle}</h3>
+      <p className="mt-1 text-subhead">{t.today.fromAirportBody}</p>
+      <Button href="/airport" className="mt-3 w-full text-subhead!">{t.today.fromAirportOpen}</Button>
     </Card>
   );
 }
@@ -457,6 +484,7 @@ function InChina() {
       <Section>
         <CityLine />
         <EntryConfirm />
+        <FromAirport />
         <MenuHero />
         <TripAlerts />
       </Section>
@@ -476,7 +504,7 @@ function Leaving() {
         <Card>
           <h3 className="flex items-center gap-2 text-headline"><PlaneTakeoff className="h-5 w-5 shrink-0 text-cobalt" aria-hidden />{t.today.airportTitle}</h3>
           <p className="mt-1 text-subhead">{p.departure ? fmt(t.today.airportBody, { date: fmtDay(p.departure, p.lang, "long") }) : t.today.airportBodyNoDate}</p>
-          <Button variant="soft" href={`/explore?q=${encodeURIComponent("机场")}`} className="mt-3 w-full text-subhead!">{t.today.airportFind}</Button>
+          <Button variant="soft" href="/airport?dir=out" className="mt-3 w-full text-subhead!">{t.today.airportFind}</Button>
         </Card>
         <Card>
           <h3 className="flex items-center gap-2 text-headline"><Receipt className="h-5 w-5 shrink-0 text-cobalt" aria-hidden />{t.today.taxTitle}</h3>

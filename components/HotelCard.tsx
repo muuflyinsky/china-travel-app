@@ -12,10 +12,14 @@ import { apiHeaders } from "@/lib/device";
 import { quotaHit } from "@/lib/passes";
 
 /** "Back to my hotel": one photo of the booking, then a one-tap taxi card forever after. */
-export function HotelCard({ bare, brief }: {
+export function HotelCard({ bare, brief, lead = "师傅您好，请带我回酒店：", title }: {
   bare?: boolean;
   /** Title only in lists; the how-to line belongs where people add the hotel. */
   brief?: boolean;
+  /** First line of the driver card; from the airport it's "take me to", not "back to". */
+  lead?: string;
+  /** Row title when a hotel is saved (default "Back to my hotel"). */
+  title?: string;
 } = {}) {
   const t = useT();
   const [p, set] = useProfile();
@@ -44,11 +48,11 @@ export function HotelCard({ bare, brief }: {
   }
 
   const input = <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => onFile(e.target.files?.[0])} />;
-  const show = card && p.hotel && <ShowCard kind="hotel" lines={["师傅您好，请带我回酒店：", p.hotel.name, `地址：${p.hotel.address}`]} sub={p.hotel.nameEn} onClose={() => setCard(false)} />;
+  const show = card && p.hotel && <ShowCard kind="hotel" lines={[lead, p.hotel.name, `地址：${p.hotel.address}`]} sub={p.hotel.nameEn} onClose={() => setCard(false)} />;
   const rows = p.hotel ? (
     <>
       <Row onClick={() => { setCard(true); track("hotel_card_shown", {}); }} icon={<IconTile><BedDouble className="h-5 w-5" aria-hidden /></IconTile>}
-        title={t.hotel.back} sub={<span className="zh">{p.hotel.nameEn ? `${p.hotel.nameEn} · ` : ""}{p.hotel.name}</span>} />
+        title={title ?? t.hotel.back} sub={<span className="zh">{p.hotel.nameEn ? `${p.hotel.nameEn} · ` : ""}{p.hotel.name}</span>} />
       <Row onClick={() => fileRef.current?.click()} icon={<Camera className="h-5 w-5 text-muted" aria-hidden />} title={<span className="text-subhead text-cobalt">{t.hotel.change}</span>} chevron={false} />
     </>
   ) : (
