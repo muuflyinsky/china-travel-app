@@ -279,7 +279,7 @@ iOS 分组列表，每行 = 图标（lucide 线性图标 + 浅色底块，不用
 4. **支持与购买**：旅行通行证和打赏（仅 iOS 新版、商品可用时显示；恢复购买在通行证面板里）· 帮助与支持 · 隐私 · 我们如何赚钱 · 版本号
 5. **清除所有数据**（红色，二次确认）
 
-外观在页面绘制前就按保存的选择设好（`app/layout.tsx` 的内联脚本），网页不再先闪白；iOS 原生壳启动时的底色仍是 `capacitor.config.ts` 的浅色 `backgroundColor`，深色模式下要改原生代码（下个 App 版本）。
+外观在页面绘制前就按保存的选择设好（`app/(app)/layout.tsx` 的内联脚本），网页不再先闪白；iOS 原生壳启动时的底色仍是 `capacitor.config.ts` 的浅色 `backgroundColor`，深色模式下要改原生代码（下个 App 版本）。
 
 没有做：离线包管理、提醒开关（对应功能还没有）、发送反馈（需要确定反馈邮箱或渠道）。所有数据只存在 localStorage。
 
@@ -329,6 +329,13 @@ iOS 分组列表，每行 = 图标（lucide 线性图标 + 浅色底块，不用
 - **界面**：英语、西班牙语、法语、德语、日语、韩语（`lib/i18n/*.ts`，TypeScript 强制每种语言字段齐全）。切换后所有页面即时生效。
 - **菜单识别与翻译输出**：15 种语言（`lib/languages.ts`）。界面不支持的语言自动用英文界面。
 - **展示给中国人看的内容**一律是中文。
+
+### 5.1 SEO 与城市攻略页（2026-11-05）
+- **主域名** `https://www.haodego.com`（`lib/seo.ts`）：`metadataBase`、canonical、og:url 都用 www；`app/robots.ts`、`app/sitemap.ts`；每个公开页有自己的标题和描述（各路由的 `layout.tsx`）；设置页 noindex。
+- **路由结构**：App 页面在 `app/(app)/`（网址不变），攻略页在 `app/(guides)/[lang]/`，两个独立的根布局，所以攻略页有正确的 `<html lang>`、不带 App 外壳；未匹配的网址走 `app/global-not-found.tsx`。
+- **攻略页** `/{en|es|fr|de|ja|ko}/guides/{city}/{payment|transport|mobile-data|hotel-check-in}`，另有 `/{lang}/guides` 和 `/{lang}/guides/{city}`。静态生成，含 hreflang（x-default=英文）、Article + BreadcrumbList JSON-LD、出处列表和核对日期；页底引导打开 App。
+- **内容规则**：只用官方和主流媒体来源，每条事实至少一个出处（`lib/guides/content/*.ts`）；城市没有出处的，只显示全国规则，不猜。来源设了 `verified` 日期（有人打开核对过）的事实才上正式站；未核对的只在预览和本地构建显示（虚线框、“unverified”、noindex），sitemap 只收已核对的页面。英文为准，其他语言是翻译，缺翻译时该条显示英文。
+- 试点城市：北京、上海、西安。Veer 审过后按每批约 10 城扩到 46 城。App 将来移到 `/app`、根目录做主页是另一个计划，未开始。
 
 ---
 

@@ -29,7 +29,7 @@ export type Profile = {
   cities: TripCity[];
   /** Which app "book a ride" opens (SPEC v0.5 P1.6 #24). */
   rideApp: "amap" | "didi";
-  /** Light or dark look; "system" follows the phone. Applied before first paint (app/layout.tsx). */
+  /** Light or dark look; "system" follows the phone. Applied before first paint (app/(app)/layout.tsx). */
   theme: "system" | "light" | "dark";
 };
 
