@@ -625,6 +625,8 @@ export const fr: Dict = {
     taxRow: "Détaxe à {city}",
     loadError: "Impossible de charger la sélection. Vérifiez la connexion et réessayez.",
     autoMap: "Sélection automatique à partir des données Amap.",
+    fromCentre: "À environ {n} h du centre-ville",
+    curated: "Incontournables sélectionnés par HaodeGo d’après des guides de voyage publics ; adresses et notes d’Amap ; descriptions rédigées par IA",
     "title": "{city} : l’essentiel",
     "see": "Voir",
     "eat": "Manger",

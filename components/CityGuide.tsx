@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Preloader } from "konsta/react";
-import { Clock, Sun, Star, Ticket, CarTaxiFront, Flame, Leaf, ExternalLink, ReceiptText, Receipt, Search, ChevronRight, CalendarClock, RotateCw } from "lucide-react";
+import { Clock, Sun, Star, MapPin, Ticket, CarTaxiFront, Flame, Leaf, ExternalLink, ReceiptText, Receipt, Search, ChevronRight, CalendarClock, RotateCw } from "lucide-react";
 import { Card, Group, Row, Button, Seg, Note, IconTile } from "./ui";
 import { SourceLine } from "./SourceLine";
 import { Feedback } from "./Feedback";
@@ -56,13 +56,17 @@ function SightCard({ s, city, cityEn, index, version }: { s: GuideSight; city: s
   const r = s.reservation ? RESERVATIONS.find((x) => x.id === s.reservation) : undefined;
   const intro = s.confidence === "high" ? pick(s.intro, p.lang) : "";
   const best = s.confidence === "high" ? pick(s.bestTime, p.lang) : "";
+  // Reviewed (lib/must-see.ts), so shown whatever the model's confidence.
+  const why = pick(s.why, p.lang);
   return (
     <Card>
       <Photo src={s.photo} alt={s.en} className="mb-3" />
       <h3 className="text-headline">{s.en}</h3>
       <p className="zh text-subhead text-muted">{s.zh}</p>
+      {why && <p className="mt-2 text-body font-semibold">{why}</p>}
       {intro && <p className="mt-2 text-body">{intro}</p>}
       <ul className="mt-2 space-y-1 text-footnote text-muted">
+        {s.centreH !== undefined && <li className="flex gap-1.5"><MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-cobalt" aria-hidden />{fmt(t.guide.fromCentre, { n: s.centreH })}</li>}
         {s.hours > 0 && <li className="flex gap-1.5"><Clock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-cobalt" aria-hidden />{fmt(t.guide.hours, { n: s.hours })}</li>}
         {best && <li className="flex gap-1.5"><Sun className="mt-0.5 h-3.5 w-3.5 shrink-0 text-cobalt" aria-hidden />{fmt(t.guide.best, { t: best })}</li>}
         {s.rating !== undefined && <li className="flex gap-1.5"><Star className="mt-0.5 h-3.5 w-3.5 shrink-0 fill-current text-ink" aria-hidden />{s.rating.toFixed(1)}</li>}
@@ -77,12 +81,13 @@ function SightCard({ s, city, cityEn, index, version }: { s: GuideSight; city: s
         className="mt-3 flex min-h-control items-center justify-center gap-2 rounded-control bg-cta px-4 text-headline text-cta-ink">
         <Ticket className="h-5 w-5" aria-hidden />{t.guide.tickets}<ExternalLink className="h-4 w-4" aria-hidden />
       </a>
-      <div className="mt-2 grid grid-cols-2 gap-2">
+      {/* A listed sight Amap couldn't find has no location: no route, and the taxi card has the name only. */}
+      <div className={`mt-2 grid gap-2 ${s.location ? "grid-cols-2" : "grid-cols-1"}`}>
         <Button variant="soft" className="text-subhead!" onClick={() => { setCard(true); track("taxi_card_shown", { source: "guide" }); }}><CarTaxiFront className="h-5 w-5" aria-hidden />{t.guide.taxi}</Button>
-        <a href={amapNav({ location: s.location, name: s.zh }, "bus")} target="_blank" rel="noopener" className="flex min-h-control items-center justify-center gap-2 rounded-control bg-cobalt-soft text-subhead font-semibold text-cobalt"><AppIcon id="amap" size={22} />{t.guide.route}</a>
+        {s.location && <a href={amapNav({ location: s.location, name: s.zh }, "bus")} target="_blank" rel="noopener" className="flex min-h-control items-center justify-center gap-2 rounded-control bg-cobalt-soft text-subhead font-semibold text-cobalt"><AppIcon id="amap" size={22} />{t.guide.route}</a>}
       </div>
       <Feedback kind="sight" id={s.id} version={version} city={city} />
-      {card && <ShowCard kind="taxi" lines={["师傅您好，请带我去：", s.zh, `地址：${s.address}`]} sub={s.en} onClose={() => setCard(false)} />}
+      {card && <ShowCard kind="taxi" lines={["师傅您好，请带我去：", s.zh, ...(s.address ? [`地址：${s.address}`] : [])]} sub={s.en} onClose={() => setCard(false)} />}
       {r && <ReservationSheet r={r} open={resv} onClose={() => setResv(false)} />}
     </Card>
   );
@@ -197,7 +202,10 @@ export function CityGuide({ adcode, cityEn, initialTab = "see", tab: controlled,
         <Group><Row href="/tax-refund" icon={<IconTile><Receipt className="h-5 w-5" aria-hidden /></IconTile>} title={fmt(t.guide.taxRow, { city: cityEn })} /></Group>
       )}
       {/* Map data alone is sourced; anything with model-written text says so. */}
-      {g && <SourceLine ai={!(g as { partial?: boolean }).partial} name="Amap" date={g.demo ? undefined : g.generatedAt} />}
+      {/* A city with a reviewed must-see list says who chose what (only on the See tab: dishes are still automatic). */}
+      {g && (g.mustSee && tab === "see"
+        ? <SourceLine ai name="" text={t.guide.curated} date={g.demo ? undefined : g.generatedAt} />
+        : <SourceLine ai={!(g as { partial?: boolean }).partial} name="Amap" date={g.demo ? undefined : g.generatedAt} />)}
     </>
   );
 }

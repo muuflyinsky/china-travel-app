@@ -368,6 +368,17 @@ Rules:
 - Areas: suggest 2–3 neighbourhoods first-time visitors usually stay in. Explain why in terms of what is nearby; do not claim hotel prices or availability.
 - Plain, friendly sentences. No superlatives you can't back up.`;
 
+/** Short reviewed English lines (must-see "why go") in all six UI languages, English kept as written. */
+export async function translateLines(lines: string[]) {
+  const out = await structured(z.object({ lines: z.array(L10nSchema) }), {
+    system: "Translate each English line for foreign visitors to China into Spanish, French, German, Japanese and Korean. Keep the meaning exactly; add nothing. Return the English unchanged in en, one item per input line, in order.",
+    maxTokens: 4000,
+    timeoutMs: 60_000,
+    text: lines.map((l, i) => `${i + 1}. ${l}`).join("\n"),
+  });
+  return lines.map((en, i) => ({ ...(out.lines[i] ?? {}), en }));
+}
+
 /** Text for a city guide. Sights are given (from Amap); dishes are chosen by the model. */
 export async function writeCityGuide(input: { cityZh: string; cityEn: string; sights: { zh: string; type: string; address: string; rating?: number }[] }) {
   return structured(GuideSchema, {
