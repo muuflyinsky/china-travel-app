@@ -695,6 +695,8 @@ export const de: Dict = {
     taxRow: "Steuerrückerstattung in {city}",
     loadError: "Die Tipps konnten nicht geladen werden. Prüf deine Verbindung und versuch es noch mal.",
     autoMap: "Automatisch aus Amap-Kartendaten ausgewählt.",
+    fromCentre: "Etwa {n} Std. vom Stadtzentrum",
+    curated: "Sehenswürdigkeiten von HaodeGo aus öffentlichen Reiseführern zusammengestellt; Adressen und Bewertungen von Amap; Beschreibungen von KI verfasst",
     "title": "{city}: Top-Tipps",
     "see": "Sehen",
     "eat": "Essen",

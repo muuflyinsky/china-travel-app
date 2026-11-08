@@ -695,6 +695,8 @@ export const es: Dict = {
     taxRow: "Devolución de impuestos en {city}",
     loadError: "No se han podido cargar las recomendaciones. Revisa la conexión y vuelve a intentarlo.",
     autoMap: "Elegido automáticamente con datos de Amap.",
+    fromCentre: "A unos {n} h del centro de la ciudad",
+    curated: "Imprescindibles seleccionados por HaodeGo a partir de guías de viaje públicas; direcciones y valoraciones de Amap; descripciones escritas por IA",
     "title": "{city}: lo mejor",
     "see": "Ver",
     "eat": "Comer",

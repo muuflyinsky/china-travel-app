@@ -698,6 +698,8 @@ export const en = {
     taxRow: "Tax refund in {city}",
     loadError: "Couldn’t load this city’s picks. Check your connection and try again.",
     autoMap: "Picked automatically from Amap map data.",
+    fromCentre: "About {n} h from the city centre",
+    curated: "Must-see sights compiled by HaodeGo from public travel guides; addresses and ratings from Amap; descriptions written by AI",
     "title": "{city}: top picks",
     "see": "See",
     "eat": "Eat",

@@ -1,0 +1,298 @@
+{
+ "note": "Bundled fallback for the Supabase table must_see (supabase/migrations/0011). Only entries with reviewedOn are shown. Sync with scripts/sync-must-see.mjs. Beijing, Shanghai and Xi'an: AI draft of 2026-11-04 (workspace inbox/2026-11-04-product-必去名单-三城样例.md), not yet reviewed.",
+ "entries": [
+  {
+   "city": "110000",
+   "ord": 1,
+   "zh": "故宫博物院",
+   "en": "Forbidden City",
+   "why": "World's largest preserved imperial palace, home to Ming and Qing emperors for five centuries.",
+   "sources": [
+    "https://en.wikivoyage.org/wiki/Beijing",
+    "https://www.lonelyplanet.com/china/beijing/top-things-to-do",
+    "https://chinahighlights.com/beijing/top-things-to-do.htm",
+    "https://www.tripadvisor.com/Attractions-g294212-Activities-Beijing.html",
+    "https://uk.trip.com/toplist/tripbest/beijing-best-things-to-do-100001406540/",
+    "https://www.travelchinaguide.com/attraction/beijing/",
+    "https://www.timeout.com/kuala-lumpur/travel/the-essential-guide-to-beijing"
+   ],
+   "reviewedOn": null,
+   "reviewedBy": null
+  },
+  {
+   "city": "110000",
+   "ord": 2,
+   "zh": "慕田峪长城",
+   "en": "Great Wall (Mutianyu)",
+   "why": "China's defining monument; Mutianyu has a restored stretch with fewer crowds than Badaling.",
+   "outside": true,
+   "centreKm": 70,
+   "centreH": 1.5,
+   "sources": [
+    "https://en.wikivoyage.org/wiki/Beijing",
+    "https://www.lonelyplanet.com/china/beijing/top-things-to-do",
+    "https://chinahighlights.com/beijing/top-things-to-do.htm",
+    "https://www.tripadvisor.com/Attractions-g294212-Activities-Beijing.html",
+    "https://uk.trip.com/toplist/tripbest/beijing-best-things-to-do-100001406540/",
+    "https://www.travelchinaguide.com/attraction/beijing/",
+    "https://www.timeout.com/kuala-lumpur/travel/the-essential-guide-to-beijing"
+   ],
+   "reviewedOn": null,
+   "reviewedBy": null
+  },
+  {
+   "city": "110000",
+   "ord": 3,
+   "zh": "天坛公园",
+   "en": "Temple of Heaven",
+   "why": "Masterpiece of Ming ritual architecture where emperors prayed for harvests; lively morning park life.",
+   "sources": [
+    "https://en.wikivoyage.org/wiki/Beijing",
+    "https://www.lonelyplanet.com/china/beijing/top-things-to-do",
+    "https://chinahighlights.com/beijing/top-things-to-do.htm",
+    "https://www.tripadvisor.com/Attractions-g294212-Activities-Beijing.html",
+    "https://uk.trip.com/toplist/tripbest/beijing-best-things-to-do-100001406540/"
+   ],
+   "reviewedOn": null,
+   "reviewedBy": null
+  },
+  {
+   "city": "110000",
+   "ord": 4,
+   "zh": "颐和园",
+   "en": "Summer Palace",
+   "why": "Vast imperial lakeside garden with pavilions, the Long Corridor and Kunming Lake.",
+   "sources": [
+    "https://en.wikivoyage.org/wiki/Beijing",
+    "https://chinahighlights.com/beijing/top-things-to-do.htm",
+    "https://www.tripadvisor.com/Attractions-g294212-Activities-Beijing.html",
+    "https://uk.trip.com/toplist/tripbest/beijing-best-things-to-do-100001406540/",
+    "https://www.timeout.com/kuala-lumpur/travel/the-essential-guide-to-beijing"
+   ],
+   "reviewedOn": null,
+   "reviewedBy": null
+  },
+  {
+   "city": "110000",
+   "ord": 5,
+   "zh": "天安门广场",
+   "en": "Tiananmen Square",
+   "why": "Symbolic heart of modern China, between the Forbidden City gate and national landmarks.",
+   "sources": [
+    "https://en.wikivoyage.org/wiki/Beijing",
+    "https://www.lonelyplanet.com/china/beijing/top-things-to-do",
+    "https://www.tripadvisor.com/Attractions-g294212-Activities-Beijing.html",
+    "https://www.travelchinaguide.com/attraction/beijing/"
+   ],
+   "reviewedOn": null,
+   "reviewedBy": null
+  },
+  {
+   "city": "110000",
+   "ord": 6,
+   "zh": "南锣鼓巷",
+   "en": "Hutongs (Nanluoguxiang)",
+   "why": "Old alley neighbourhoods of courtyard homes, best explored on foot or by bike.",
+   "sources": [
+    "https://en.wikivoyage.org/wiki/Beijing",
+    "https://www.lonelyplanet.com/china/beijing/top-things-to-do",
+    "https://chinahighlights.com/beijing/top-things-to-do.htm"
+   ],
+   "reviewedOn": null,
+   "reviewedBy": null
+  },
+  {
+   "city": "310000",
+   "ord": 1,
+   "zh": "外滩",
+   "en": "The Bund",
+   "why": "Iconic riverside row of colonial-era buildings facing the Pudong skyline, best at dusk.",
+   "sources": [
+    "https://en.wikivoyage.org/wiki/Shanghai",
+    "https://www.lonelyplanet.com/articles/things-to-do-solo-in-shanghai",
+    "https://www.chinahighlights.com/shanghai/top-things-to-do.htm",
+    "https://www.tripadvisor.com/Attractions-g308272-Activities-Shanghai.html",
+    "https://uk.trip.com/toplist/tripbest/shanghai-best-things-to-do-100001406672",
+    "https://www.travelchinaguide.com/attraction/shanghai/"
+   ],
+   "reviewedOn": null,
+   "reviewedBy": null
+  },
+  {
+   "city": "310000",
+   "ord": 2,
+   "zh": "豫园",
+   "en": "Yu Garden",
+   "why": "Ming-dynasty classical garden at the heart of Shanghai's old Chinese city.",
+   "sources": [
+    "https://en.wikivoyage.org/wiki/Shanghai",
+    "https://www.lonelyplanet.com/articles/things-to-do-solo-in-shanghai",
+    "https://www.tripadvisor.com/Attractions-g308272-Activities-Shanghai.html",
+    "https://uk.trip.com/toplist/tripbest/shanghai-best-things-to-do-100001406672",
+    "https://www.travelchinaguide.com/attraction/shanghai/"
+   ],
+   "reviewedOn": null,
+   "reviewedBy": null
+  },
+  {
+   "city": "310000",
+   "ord": 3,
+   "zh": "上海中心大厦",
+   "en": "Lujiazui skyline (Shanghai Tower)",
+   "why": "Futuristic skyline; China's tallest tower has sweeping views over the city and river.",
+   "sources": [
+    "https://en.wikivoyage.org/wiki/Shanghai",
+    "https://www.chinahighlights.com/shanghai/top-things-to-do.htm",
+    "https://www.tripadvisor.com/Attractions-g308272-Activities-Shanghai.html",
+    "https://uk.trip.com/toplist/tripbest/shanghai-best-things-to-do-100001406672",
+    "https://www.travelchinaguide.com/attraction/shanghai/"
+   ],
+   "reviewedOn": null,
+   "reviewedBy": null
+  },
+  {
+   "city": "310000",
+   "ord": 4,
+   "zh": "上海博物馆（人民广场馆）",
+   "en": "Shanghai Museum",
+   "why": "One of China's finest collections of bronzes, ceramics and calligraphy.",
+   "sources": [
+    "https://en.wikivoyage.org/wiki/Shanghai",
+    "https://www.lonelyplanet.com/articles/things-to-do-solo-in-shanghai",
+    "https://www.travelchinaguide.com/attraction/shanghai/"
+   ],
+   "reviewedOn": null,
+   "reviewedBy": null
+  },
+  {
+   "city": "310000",
+   "ord": 5,
+   "zh": "武康路",
+   "en": "Former French Concession",
+   "why": "Leafy streets of villas, lane houses and cafés from Shanghai's cosmopolitan past.",
+   "sources": [
+    "https://en.wikivoyage.org/wiki/Shanghai",
+    "https://www.chinahighlights.com/shanghai/top-things-to-do.htm",
+    "https://www.tripadvisor.com/Attractions-g308272-Activities-Shanghai.html"
+   ],
+   "reviewedOn": null,
+   "reviewedBy": null
+  },
+  {
+   "city": "310000",
+   "ord": 6,
+   "zh": "朱家角古镇",
+   "en": "Zhujiajiao Water Town",
+   "why": "Canal town of stone bridges, the easiest classic water-town trip from Shanghai.",
+   "outside": true,
+   "centreH": 1.5,
+   "sources": [
+    "https://en.wikivoyage.org/wiki/Shanghai",
+    "https://www.tripadvisor.com/Attractions-g308272-Activities-Shanghai.html",
+    "https://www.travelchinaguide.com/attraction/shanghai/"
+   ],
+   "reviewedOn": null,
+   "reviewedBy": null
+  },
+  {
+   "city": "610100",
+   "ord": 1,
+   "zh": "秦始皇帝陵博物院",
+   "en": "Terracotta Army",
+   "why": "Thousands of life-size clay warriors guarding China's first emperor: the reason most visitors come.",
+   "outside": true,
+   "centreKm": 40,
+   "centreH": 1,
+   "sources": [
+    "https://en.wikivoyage.org/wiki/Xi%27an",
+    "https://www.lonelyplanet.com/articles/guide-to-terracotta-warriors-china",
+    "https://www.chinahighlights.com/xian/",
+    "https://www.tripadvisor.com/Attractions-g298557-Activities-Xi_an_Shaanxi.html",
+    "https://www.trip.com/toplist/tripbest/xi-an-best-things-to-do-100001406738",
+    "https://www.travelchinaguide.com/attraction/shaanxi/xian/"
+   ],
+   "reviewedOn": null,
+   "reviewedBy": null
+  },
+  {
+   "city": "610100",
+   "ord": 2,
+   "zh": "西安城墙（永宁门）",
+   "en": "Xi'an City Wall",
+   "why": "China's most complete ancient city wall; cycle the 14 km loop on top.",
+   "sources": [
+    "https://en.wikivoyage.org/wiki/Xi%27an",
+    "https://www.lonelyplanet.com/articles/guide-to-terracotta-warriors-china",
+    "https://www.chinahighlights.com/xian/",
+    "https://www.tripadvisor.com/Attractions-g298557-Activities-Xi_an_Shaanxi.html",
+    "https://www.trip.com/toplist/tripbest/xi-an-best-things-to-do-100001406738",
+    "https://www.travelchinaguide.com/attraction/shaanxi/xian/"
+   ],
+   "reviewedOn": null,
+   "reviewedBy": null
+  },
+  {
+   "city": "610100",
+   "ord": 3,
+   "zh": "大慈恩寺",
+   "en": "Giant Wild Goose Pagoda",
+   "why": "Tang-era Buddhist pagoda and city emblem, with fountain shows and night streets nearby.",
+   "sources": [
+    "https://en.wikivoyage.org/wiki/Xi%27an",
+    "https://www.lonelyplanet.com/articles/guide-to-terracotta-warriors-china",
+    "https://www.chinahighlights.com/xian/",
+    "https://www.tripadvisor.com/Attractions-g298557-Activities-Xi_an_Shaanxi.html",
+    "https://www.trip.com/toplist/tripbest/xi-an-best-things-to-do-100001406738",
+    "https://www.travelchinaguide.com/attraction/shaanxi/xian/"
+   ],
+   "reviewedOn": null,
+   "reviewedBy": null
+  },
+  {
+   "city": "610100",
+   "ord": 4,
+   "zh": "回民街",
+   "en": "Muslim Quarter",
+   "why": "Lively Hui street-food lanes around a Chinese-style Ming-dynasty mosque.",
+   "sources": [
+    "https://en.wikivoyage.org/wiki/Xi%27an",
+    "https://www.lonelyplanet.com/articles/guide-to-terracotta-warriors-china",
+    "https://www.chinahighlights.com/xian/",
+    "https://www.tripadvisor.com/Attractions-g298557-Activities-Xi_an_Shaanxi.html"
+   ],
+   "reviewedOn": null,
+   "reviewedBy": null
+  },
+  {
+   "city": "610100",
+   "ord": 5,
+   "zh": "陕西历史博物馆",
+   "en": "Shaanxi History Museum",
+   "why": "Superb Tang treasures and 5,000 years of Chinese history under one roof.",
+   "sources": [
+    "https://en.wikivoyage.org/wiki/Xi%27an",
+    "https://www.tripadvisor.com/Attractions-g298557-Activities-Xi_an_Shaanxi.html",
+    "https://www.trip.com/toplist/tripbest/xi-an-best-things-to-do-100001406738",
+    "https://www.travelchinaguide.com/attraction/shaanxi/xian/"
+   ],
+   "reviewedOn": null,
+   "reviewedBy": null
+  },
+  {
+   "city": "610100",
+   "ord": 6,
+   "zh": "西安钟楼",
+   "en": "Bell & Drum Towers",
+   "why": "Ming towers marking the exact centre of the old walled city.",
+   "sources": [
+    "https://en.wikivoyage.org/wiki/Xi%27an",
+    "https://www.lonelyplanet.com/articles/guide-to-terracotta-warriors-china",
+    "https://www.tripadvisor.com/Attractions-g298557-Activities-Xi_an_Shaanxi.html",
+    "https://www.trip.com/toplist/tripbest/xi-an-best-things-to-do-100001406738",
+    "https://www.travelchinaguide.com/attraction/shaanxi/xian/"
+   ],
+   "reviewedOn": null,
+   "reviewedBy": null
+  }
+ ]
+}

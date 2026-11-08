@@ -9,8 +9,10 @@ import { fmt } from "@/lib/i18n";
  * a named source and the day it was checked, or — for anything a model wrote — "Written by AI"
  * and the day it was generated. AI text is never shown as checked.
  */
-export function SourceLine({ ai, name, href, date, extra }: {
+export function SourceLine({ ai, name, href, date, extra, text }: {
   ai?: boolean; name: React.ReactNode; href?: string; date?: string; extra?: React.ReactNode;
+  /** A whole sentence instead of "Source: {name}" / "Written by AI from {name}", for mixed sources. */
+  text?: string;
 }) {
   const t = useT();
   const [p] = useProfile();
@@ -19,12 +21,12 @@ export function SourceLine({ ai, name, href, date, extra }: {
   const label = href && name ? <a href={href} target="_blank" rel="noopener" className="underline">{name}</a> : name;
   const Icon = ai ? Sparkles : BadgeCheck;
   // "{name}" can sit anywhere in the sentence (ja/ko put it first), and the name may be a link.
-  const [before, after = ""] = (ai ? t.src.ai : t.src.source).split("{name}");
+  const [before, after = ""] = text !== undefined ? [text] : (ai ? t.src.ai : t.src.source).split("{name}");
   return (
     <p className="flex items-start gap-1.5 px-1 text-footnote text-muted">
       <Icon className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
       <span className="min-w-0">
-        {before}{label}{after}
+        {before}{text === undefined && label}{after}
         {day && <> · {fmt(ai ? t.src.updated : t.src.checked, { date: day })}</>}
         {extra && <> · {extra}</>}
       </span>
