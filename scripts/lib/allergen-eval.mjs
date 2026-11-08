@@ -97,6 +97,8 @@ export function score(tests, output, { verdict, tighten }) {
       checks[`${t.dish_zh} · ${diet}`] = v.kind;
       if (v.kind === "ok") leaks.push(`${t.dish_zh} · ${diet} → ok`);
     }
+    // Compared between runs only; not part of the leak count or the hidden-allergen figure.
+    if (t["alcohol(D/H/N)"] === "H") checks[`${t.dish_zh} · no_alcohol (hidden)`] = verdict(dish, { allergens: [], diets: ["no_alcohol"], severe: [] }).kind;
   }
   return { checked, seen, leaks: leaks.sort(), missing, hidden, hiddenCaught, extra, confidence, checks };
 }

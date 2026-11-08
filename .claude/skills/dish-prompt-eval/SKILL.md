@@ -16,7 +16,7 @@ What exists:
 | `eval/allergens/testset.csv` | 72 dishes from the 2026-10-25 safety review, with the allergens of the standard recipe (D), common hidden variants (H), meat, alcohol, spice |
 | `scripts/eval-dishes.mjs` | Calls the configured model with the app's own list prompt (`generateFacts`), same batching as `/api/menu`, and saves the answers to `eval/allergens/runs/<date>-<label>.json`. Never touches the Supabase dish cache |
 | `scripts/check-allergens.mjs --output <run>` | The CI check on any saved run: leaks against `known-leaks.json` |
-| `scripts/compare-dish-evals.mjs <baseline> <candidate> --md <file>` | Side by side: leaks, severe-allergy misses, verdicts that got less strict, hidden allergens caught and lost, extra flags, unanswered dishes, changed dish names. Exits 1 on any new leak, unanswered dish, verdict less strict than the baseline, lost hidden allergen, severe-allergy miss not in `known-leaks.json`, or runs that can't be compared (different language, more than 2 days apart) |
+| `scripts/compare-dish-evals.mjs <baseline> <candidate> --md <file>` | Side by side: leaks, severe-allergy misses, verdicts that got less strict, hidden allergens caught and lost, extra flags, unanswered dishes, changed dish names. Exits 1 on any new leak, dish unanswered in either run, verdict less strict than the baseline, lost hidden allergen, leak not in `known-leaks.json`, or runs that can't be compared (either not recorded by `eval-dishes.mjs`, different language, more than 2 days apart) |
 
 The offline CI check (`npm run verify`) only replays the answers stored on 2026-10-25. It cannot see a prompt change; this skill can.
 
@@ -41,9 +41,9 @@ The offline CI check (`npm run verify`) only replays the answers stored on 2026-
 
 ## Merge rule
 
-- **Do not merge** when the candidate has, after the noise check, a leak the baseline doesn't, a severe-allergy miss not in `known-leaks.json`, or an unanswered dish.
-- **Known severe-allergy misses:** `known-leaks.json` holds 8 from the 2026-10-25 run where a severe allergy does not get "don't order". They are open safety bugs, not accepted behaviour: they may stay until fixed, and the list may not grow. A candidate never adds to it.
-- **Less strict than the baseline, or a hidden allergen lost:** do not merge unless `haode-allergen-safety` accepts each remaining line by name in its review, saying why the new answer is correct against the recipe in the test set. "Don't order" becoming "ask first" also offers to leave out a main ingredient, so it is never a neutral change.
+- **Do not merge** when the candidate has, after the noise check, a leak the baseline doesn't, a leak not in `known-leaks.json` (even one the baseline shares), or an unanswered dish.
+- **Known severe-allergy misses:** `known-leaks.json` holds 8 from the 2026-10-25 run where a severe allergy does not get "don't order". They are open safety bugs, not accepted behaviour: they may stay until fixed, and the list may not grow. A candidate never adds to it; `check-allergens.mjs` fails above 8 (`MAX_KNOWN_SEVERE`), and raising that is a decision for Veer in its own PR.
+- **Less strict than the baseline, or a hidden allergen lost:** do not merge unless `haode-allergen-safety` accepts each remaining line by name in its review, citing an outside recipe (the `source` column of the test set or better). A model's or reviewer's own judgement is not enough. "Don't order" becoming "ask first" also offers to leave out a main ingredient, so it is never a neutral change.
 - **Fewer leaks or more hidden allergens caught**: good, but more extra flags is only acceptable when it buys fewer leaks — every extra flag is one more question to the waiter.
 - Equal on safety: decide on names and extra flags; say which way and why.
 - A merged prompt change bumps `PROMPT_VERSION` in `lib/dish-cache.ts`, so cached answers from the old prompt are regenerated. Say in the PR that this costs model calls as dishes are looked up again.

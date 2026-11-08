@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // Compares two recorded runs of the dish-list prompt (scripts/eval-dishes.mjs) on the 72-dish
 // allergen test set. Fails when the candidate leaks something the baseline didn't, misses dishes,
-// answers any check less strictly than the baseline, loses a hidden allergen, or has a severe-allergy
-// miss that isn't already in known-leaks.json.
+// answers any check less strictly than the baseline, loses a hidden allergen, or has any leak that
+// isn't already in known-leaks.json.
 // Workflow: .claude/skills/dish-prompt-eval/SKILL.md
 //
 //   node scripts/compare-dish-evals.mjs <baseline.json> <candidate.json> [--md report.md]
@@ -39,21 +39,23 @@ const RANK = { ok: 0, ask: 1, no: 2 };
 const isHidden = (k) => k.endsWith(" (hidden)");
 const stepBacks = Object.keys(a.checks).filter((k) => k in b.checks && RANK[b.checks[k]] < RANK[a.checks[k]]);
 const hiddenLost = stepBacks.filter((k) => isHidden(k) && b.checks[k] === "ok").map((k) => `${k}: ${a.checks[k]} → ok`);
-const loosened = stepBacks.filter((k) => !isHidden(k) && !newLeaks.includes(`${k} → ${b.checks[k]}`)).map((k) => `${k}: ${a.checks[k]} → ${b.checks[k]}`);
+const loosened = stepBacks.filter((k) => !(isHidden(k) && b.checks[k] === "ok") && !newLeaks.includes(`${k} → ${b.checks[k]}`)).map((k) => `${k}: ${a.checks[k]} → ${b.checks[k]}`);
 
-// The severe-allergy misses already recorded may stay until they are fixed; the list may not grow.
+// The leaks already recorded may stay until they are fixed; a leak outside that list blocks even if the baseline shares it.
 const known = new Set(JSON.parse(await readFile(new URL("known-leaks.json", EVAL_DIR), "utf8")));
-const severe = b.leaks.filter((l) => l.includes("(severe)"));
-const knownSevere = severe.filter((l) => known.has(l)), unknownSevere = severe.filter((l) => !known.has(l));
+const unknownLeaks = b.leaks.filter((l) => !known.has(l));
+const knownSevere = b.leaks.filter((l) => l.includes("(severe)") && known.has(l));
 
 // Runs are only comparable in the same language and close together (SKILL.md, "Before running").
 const metaProblems = [];
-if (base._meta && cand._meta) {
+if (!base._meta?.date || !cand._meta?.date) metaProblems.push("a run has no _meta date: only runs recorded by eval-dishes.mjs can be compared");
+else {
   if (base._meta.lang !== cand._meta.lang) metaProblems.push(`different languages: ${base._meta.lang} and ${cand._meta.lang}`);
   const days = Math.abs(new Date(base._meta.date) - new Date(cand._meta.date)) / 86400000;
   if (days > 2) metaProblems.push(`recorded ${Math.round(days)} days apart`);
 }
-const failed = newLeaks.length || b.missing.length || loosened.length || hiddenLost.length || unknownSevere.length || metaProblems.length;
+// A dish the baseline skipped has nothing to compare against, so a step back on it would go unseen.
+const failed = newLeaks.length || a.missing.length || b.missing.length || loosened.length || hiddenLost.length || unknownLeaks.length || metaProblems.length;
 
 // Names side by side, for the human spot check (the script can't judge translation quality).
 const names = tests.filter((t) => base[t.id] || cand[t.id]).map((t) => [t.id, t.dish_zh, t.english, base[t.id]?.name ?? "–", cand[t.id]?.name ?? "–"]);
@@ -68,9 +70,10 @@ const md = [
   `## Leaks fixed by the candidate (${fixed.length})`, ...(fixed.length ? fixed.map((l) => `- ${l}`) : ["- none"]), ``,
   `## Less strict than the baseline (${loosened.length})`, ...(loosened.length ? loosened.map((l) => `- ${l}`) : ["- none"]), ``,
   `## Hidden allergens the candidate lost (${hiddenLost.length})`, ...(hiddenLost.length ? hiddenLost.map((l) => `- ${l}`) : ["- none"]), ``,
-  `## Severe-allergy misses not in known-leaks.json (${unknownSevere.length})`, ...(unknownSevere.length ? unknownSevere.map((l) => `- ${l}`) : ["- none"]), ``,
+  `## Leaks not in known-leaks.json (${unknownLeaks.length})`, ...(unknownLeaks.length ? unknownLeaks.map((l) => `- ${l}`) : ["- none"]), ``,
   `## Known severe-allergy misses still present (${knownSevere.length}, may not grow)`, ...(knownSevere.length ? knownSevere.map((l) => `- ${l}`) : ["- none"]), ``,
   ...(metaProblems.length ? [`## These runs can't be compared`, ...metaProblems.map((m) => `- ${m}`), ``] : []),
+  ...(a.missing.length ? [`## Not answered by the baseline`, ...a.missing.map((m) => `- ${m}`), ``] : []),
   ...(b.missing.length ? [`## Not answered by the candidate`, ...b.missing.map((m) => `- ${m}`), ``] : []),
   `## Dish names that changed (${changedNames.length}) — check by hand`,
   `| id | 中文 | test set English | baseline | candidate |`, `|---|---|---|---|---|`,

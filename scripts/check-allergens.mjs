@@ -29,6 +29,13 @@ const { checked, seen, leaks, missing } = score(tests, output, { verdict, tighte
 if (missing.length) console.log(`  no answer for ${missing.length} dishes: ${missing.join("、")}`);
 // known-leaks.json describes the run CI checks; a candidate run must never rewrite it.
 if (at > 0 && process.argv.includes("--write-known")) { console.log("--write-known only works on the default run"); process.exit(1); }
+// Severe-allergy misses are open safety bugs. Raising this number is a decision for Veer, in its own PR.
+const MAX_KNOWN_SEVERE = 8;
+const severeCount = (list) => list.filter((l) => l.includes("(severe)")).length;
+if (Math.max(severeCount([...known]), process.argv.includes("--write-known") ? severeCount(leaks) : 0) > MAX_KNOWN_SEVERE) {
+  console.log(`known severe-allergy misses may not go above ${MAX_KNOWN_SEVERE}`);
+  process.exit(1);
+}
 
 // Dish details merged into a list answer only ever make it stricter (withDetailAllergens).
 const base = { zh: "宫保鸡丁", pinyin: "", price: "", name: "Kung Pao Chicken", short: "", spice: 1, vegetarian: false, meat: ["chicken"], alcohol: false, confidence: "high" };
