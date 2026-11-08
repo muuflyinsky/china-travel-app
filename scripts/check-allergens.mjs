@@ -66,7 +66,8 @@ console.log(`detail merge: ${detailCases.length - detailFails}/${detailCases.len
 console.log(`allergen check: ${checked} answers where the recipe contains it · ok ${seen.ok} · ask ${seen.ask} · no ${seen.no} · leaks ${leaks.length} (known ${leaks.length - fresh.length}, new ${fresh.length})`);
 for (const l of fresh) console.log(`  NEW LEAK  ${l}`);
 if (fixed.length) console.log(`  fixed since known-leaks.json (run --write-known): ${fixed.join("; ")}`);
-if (detailFails || (process.argv.includes("--strict") ? leaks.length : fresh.length)) {
+// A saved run with dishes missing can't be called clean: unanswered dishes aren't scored at all.
+if (detailFails || (at > 0 && missing.length) || (process.argv.includes("--strict") ? leaks.length : fresh.length)) {
   if (process.argv.includes("--strict")) for (const l of leaks.filter((l) => known.has(l))) console.log(`  leak      ${l}`);
   process.exit(1);
 }

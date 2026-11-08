@@ -9,7 +9,8 @@
 //   node scripts/eval-dishes.mjs --label v2 --ids 1,4,17  # only these test ids (re-checking a leak)
 //   node scripts/eval-dishes.mjs --label v2 --lang fr     # answers in another language (default en)
 //
-// Reads .env.local (then .env) when present. Costs about 36 model calls for the full set.
+// Reads .env.local (then .env) when present. Costs about 44 model calls for the full set.
+// A second run with the same date and label gets its own file (-2, -3…); nothing is overwritten.
 import { existsSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
 import { execSync } from "node:child_process";
@@ -32,11 +33,13 @@ const { generateFacts } = await jiti.import(new URL("../lib/dishes.ts", import.m
 const { currentModel } = await jiti.import(new URL("../lib/llm.ts", import.meta.url).pathname);
 const { aiProvider, config } = await jiti.import(new URL("../lib/config.ts", import.meta.url).pathname);
 const { PROMPT_VERSION } = await jiti.import(new URL("../lib/dish-cache.ts", import.meta.url).pathname);
+const { normalizeName } = await jiti.import(new URL("../lib/dish-name.ts", import.meta.url).pathname);
 const cities = (await jiti.import(new URL("../lib/data/cities.json", import.meta.url).pathname)).default;
 if (!aiProvider) { console.error("no model configured: set AI_API_KEY (or ANTHROPIC_API_KEY) in .env.local"); process.exit(2); }
 
 const tests = (await loadTests()).filter((t) => !ids || ids.has(t.id));
-const cityOf = (adcode) => cities.find((c) => c.a === adcode)?.e;
+// The test set writes municipalities as 110100; cities.json has them as 110000.
+const cityOf = (adcode) => (cities.find((c) => c.a === adcode) ?? cities.find((c) => c.a === `${adcode.slice(0, 2)}0000`))?.e;
 
 // Same batching as /api/menu (lib/dishes.ts CHUNK = 2), dishes grouped by city so each call has one region.
 const CHUNK = 2, PARALLEL = 6;
@@ -53,10 +56,11 @@ async function worker() {
     const { city, list } = batches[next++];
     try {
       const out = await generateFacts(list.map((t) => ({ zh: t.dish_zh, printed: "" })), lang, city || undefined, false);
-      for (const [j, t] of list.entries()) {
-        const d = out.dishes.find((x) => x.zh.trim() === t.dish_zh) ?? out.dishes[j];
+      for (const t of list) {
+        // By name only. Taking the answer at the same position would score one dish with another dish's allergens.
+        const d = out.dishes.find((x) => normalizeName(x.zh) === normalizeName(t.dish_zh));
         if (d) output[t.id] = { ...d, zh: t.dish_zh, price: "" };
-        else failed.push(`${t.id} ${t.dish_zh}: not in the answer`);
+        else failed.push(`${t.id} ${t.dish_zh}: not in the answer (got ${out.dishes.map((x) => x.zh).join("、") || "nothing"})`);
       }
     } catch (e) {
       for (const t of list) failed.push(`${t.id} ${t.dish_zh}: ${e.message.slice(0, 160)}`);
@@ -75,7 +79,9 @@ const meta = {
   dishes: tests.length, answered: Object.keys(output).length, failed, seconds: Math.round((Date.now() - t0) / 1000),
 };
 await mkdir(new URL("../eval/allergens/runs/", import.meta.url), { recursive: true });
-const file = `eval/allergens/runs/${meta.date.slice(0, 10)}-${label}.json`;
+const stem = `eval/allergens/runs/${meta.date.slice(0, 10)}-${label}`;
+let file = `${stem}.json`;
+for (let n = 2; existsSync(new URL(`../${file}`, import.meta.url)); n++) file = `${stem}-${n}.json`;
 await writeFile(new URL(`../${file}`, import.meta.url), JSON.stringify({ _meta: meta, ...output }, null, 1) + "\n");
 console.log(`${file}: ${meta.answered}/${meta.dishes} dishes · ${meta.model} · prompt ${PROMPT_VERSION} · ${commit} · ${meta.seconds}s`);
 for (const f of failed) console.log(`  FAILED  ${f}`);

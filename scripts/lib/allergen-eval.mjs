@@ -25,7 +25,15 @@ export function parseCsv(text) {
   return body.filter((r) => r.some(Boolean)).map((r) => Object.fromEntries(head.map((h, i) => [h.replace(/^﻿/, ""), r[i] ?? ""])));
 }
 
-export const loadTests = async () => parseCsv(await readFile(new URL("testset.csv", EVAL_DIR), "utf8"));
+const COLUMNS = ["id", "dish_zh", "english", "test_adcode", "allergens_D_standard", "allergens_H_hidden", "meat_D", "vegetarian", "vegan", "alcohol(D/H/N)", "spice0-3"];
+
+/** A renamed column would silently score as "this dish has none of it", so it stops the run instead. */
+export async function loadTests() {
+  const tests = parseCsv(await readFile(new URL("testset.csv", EVAL_DIR), "utf8"));
+  const absent = COLUMNS.filter((c) => !(c in (tests[0] ?? {})));
+  if (absent.length) throw new Error(`eval/allergens/testset.csv is missing columns: ${absent.join(", ")}`);
+  return tests;
+}
 
 /** Truth for one diet: D = the standard recipe breaks it. Same rules as the review's score.py. */
 export function dietTruth(t, diet) {
@@ -54,9 +62,10 @@ export async function appLogic() {
  * leaks: the standard recipe contains it ("D") and the app says "ok", or anything but "no" with a severe allergy.
  * hidden: allergens that are only in common variants ("H"); caught = the app does not say "ok".
  * extra: allergens the model flagged that the test set has neither as D nor H (each costs the traveller a question).
+ * checks: every verdict by name, so two runs can be compared dish by dish (a "no" becoming "ask" is not a leak but is a step back).
  */
 export function score(tests, output, { verdict, tighten }) {
-  const leaks = [], seen = { ok: 0, ask: 0, no: 0 }, missing = [], confidence = { high: 0, medium: 0, low: 0 };
+  const leaks = [], seen = { ok: 0, ask: 0, no: 0 }, missing = [], confidence = { high: 0, medium: 0, low: 0 }, checks = {};
   let checked = 0, hidden = 0, hiddenCaught = 0, extra = 0;
   for (const t of tests) {
     const raw = output[t.id];
@@ -69,11 +78,15 @@ export function score(tests, output, { verdict, tighten }) {
         for (const severe of [false, true]) {
           const v = verdict(dish, { allergens: [a], diets: [], severe: severe ? [a] : [] });
           checked++; seen[v.kind]++;
-          if (v.kind === "ok" || (severe && v.kind !== "no")) leaks.push(`${t.dish_zh} · ${a}${severe ? " (severe)" : ""} → ${v.kind}`);
+          const name = `${t.dish_zh} · ${a}${severe ? " (severe)" : ""}`;
+          checks[name] = v.kind;
+          if (v.kind === "ok" || (severe && v.kind !== "no")) leaks.push(`${name} → ${v.kind}`);
         }
       } else if (H.has(a)) {
         hidden++;
-        if (verdict(dish, { allergens: [a], diets: [], severe: [] }).kind !== "ok") hiddenCaught++;
+        const kind = verdict(dish, { allergens: [a], diets: [], severe: [] }).kind;
+        checks[`${t.dish_zh} · ${a} (hidden)`] = kind;
+        if (kind !== "ok") hiddenCaught++;
       }
     }
     for (const id of new Set((dish.allergens ?? []).map((x) => x.id))) if (ALLERGENS.includes(id) && !D.has(id) && !H.has(id)) extra++;
@@ -81,8 +94,9 @@ export function score(tests, output, { verdict, tighten }) {
       if (dietTruth(t, diet) !== "D") continue;
       const v = verdict(dish, { allergens: [], diets: [diet], severe: [] });
       checked++; seen[v.kind]++;
+      checks[`${t.dish_zh} · ${diet}`] = v.kind;
       if (v.kind === "ok") leaks.push(`${t.dish_zh} · ${diet} → ok`);
     }
   }
-  return { checked, seen, leaks: leaks.sort(), missing, hidden, hiddenCaught, extra, confidence };
+  return { checked, seen, leaks: leaks.sort(), missing, hidden, hiddenCaught, extra, confidence, checks };
 }

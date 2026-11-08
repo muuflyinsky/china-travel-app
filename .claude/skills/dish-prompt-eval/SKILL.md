@@ -16,13 +16,13 @@ What exists:
 | `eval/allergens/testset.csv` | 72 dishes from the 2026-10-25 safety review, with the allergens of the standard recipe (D), common hidden variants (H), meat, alcohol, spice |
 | `scripts/eval-dishes.mjs` | Calls the configured model with the app's own list prompt (`generateFacts`), same batching as `/api/menu`, and saves the answers to `eval/allergens/runs/<date>-<label>.json`. Never touches the Supabase dish cache |
 | `scripts/check-allergens.mjs --output <run>` | The CI check on any saved run: leaks against `known-leaks.json` |
-| `scripts/compare-dish-evals.mjs <baseline> <candidate> --md <file>` | Side by side: leaks, severe-allergy misses, hidden allergens caught, extra flags, unanswered dishes, changed dish names. Exits 1 on any new leak or unanswered dish |
+| `scripts/compare-dish-evals.mjs <baseline> <candidate> --md <file>` | Side by side: leaks, severe-allergy misses, verdicts that got less strict, hidden allergens caught and lost, extra flags, unanswered dishes, changed dish names. Exits 1 on any new leak, unanswered dish, verdict less strict than the baseline, lost hidden allergen, severe-allergy miss not in `known-leaks.json`, or runs that can't be compared (different language, more than 2 days apart) |
 
 The offline CI check (`npm run verify`) only replays the answers stored on 2026-10-25. It cannot see a prompt change; this skill can.
 
 ## Before running
 
-1. Say what will be called and what it costs: the full set is about 36 model calls per run, two runs per comparison (baseline + candidate). Use `--ids` to re-run single dishes.
+1. Say what will be called and what it costs: the full set is about 44 model calls per run, two runs per comparison (baseline + candidate). Use `--ids` to re-run single dishes.
 2. A model key must be in `.env.local` (`AI_API_KEY`, or `ANTHROPIC_API_KEY`). Cloud sessions usually have none: stop and say so instead of faking a run. Never put a key in a file that is committed or in a message.
 3. Both runs use the same model, language and day. Record them back to back; a run from another week is not a baseline.
 
@@ -35,13 +35,15 @@ The offline CI check (`npm run verify`) only replays the answers stored on 2026-
    If the change is a model switch, set `AI_MODEL_TEXT` / `CLAUDE_MODEL` for this run only and label it with the model name.
 3. **Compare**:
    `node scripts/compare-dish-evals.mjs eval/allergens/runs/<date>-main.json eval/allergens/runs/<date>-<label>.json --md eval/allergens/runs/<date>-<label>.md`
-4. **Noise check** — models are not deterministic. For every new leak and every fixed leak, re-run just those dishes twice for both sides (`--ids 3,17`). A leak that appears in any candidate run counts.
+4. **Noise check** — models are not deterministic. For every new leak, fixed leak, less-strict verdict and lost hidden allergen, re-run just those dishes twice for both sides (`--ids 3,17`; each re-run gets its own file). A problem that appears in any candidate run counts.
 5. **Name check by hand** — the script can't judge translation. Read the "Dish names that changed" table: a name that is wrong, misleading about what is in the dish, or not what a bilingual menu would say is a finding.
 6. **Safety review** — give the report to `haode-allergen-safety` (required by CLAUDE.md for anything touching dish prompts).
 
 ## Merge rule
 
-- **Do not merge** when the candidate has a leak the baseline doesn't (after the noise check), a severe-allergy dish that isn't "don't order", or an unanswered dish.
+- **Do not merge** when the candidate has, after the noise check, a leak the baseline doesn't, a severe-allergy miss not in `known-leaks.json`, or an unanswered dish.
+- **Known severe-allergy misses:** `known-leaks.json` holds 8 from the 2026-10-25 run where a severe allergy does not get "don't order". They are open safety bugs, not accepted behaviour: they may stay until fixed, and the list may not grow. A candidate never adds to it.
+- **Less strict than the baseline, or a hidden allergen lost:** do not merge unless `haode-allergen-safety` accepts each remaining line by name in its review, saying why the new answer is correct against the recipe in the test set. "Don't order" becoming "ask first" also offers to leave out a main ingredient, so it is never a neutral change.
 - **Fewer leaks or more hidden allergens caught**: good, but more extra flags is only acceptable when it buys fewer leaks — every extra flag is one more question to the waiter.
 - Equal on safety: decide on names and extra flags; say which way and why.
 - A merged prompt change bumps `PROMPT_VERSION` in `lib/dish-cache.ts`, so cached answers from the old prompt are regenerated. Say in the PR that this costs model calls as dishes are looked up again.
@@ -49,7 +51,7 @@ The offline CI check (`npm run verify`) only replays the answers stored on 2026-
 
 ## What goes in the PR
 
-The `.md` report, the two run files (`eval/allergens/runs/`), the commands run, the noise-check result, the name-check findings, and what was not tested. In particular:
+The `.md` report, the two run files (`eval/allergens/runs/` is git-ignored so stray runs don't get committed: add these with `git add -f`), the commands run, the noise-check result, the name-check findings, and what was not tested. In particular:
 
 - Only the **list** prompt (`FACTS_SYSTEM`) is scored. The detail prompt (`DETAIL_SYSTEM`) only ever makes a verdict stricter (`withDetailAllergens`, covered by the detail-merge cases in `check-allergens.mjs`), but its text is not evaluated here.
 - Answers are scored in the language of the run (default English). Test another language with `--lang` when the change is about wording.
