@@ -242,7 +242,7 @@ export const es: Dict = {
     wrongInfo: "La información de este plato es incorrecta",
     wrongThanks: "Gracias. Revisaremos este plato.",
     detailDown: "No se pudieron cargar los detalles. La valoración de arriba sigue siendo válida.",
-    missing: "No se pudieron leer {n} platos. Haz una foto más cercana de esa parte de la carta.",
+    missing: "No se pudieron leer {n} platos, así que no tienen revisión de alergias. Inténtalo de nuevo o haz una foto más cercana de esa parte de la carta.",
     whyOk: "La receta habitual no lleva nada de tus alergias ni restricciones. Cada cocina es distinta.",
     whyAsk: "Suele llevar {x}. Puedes pedir que no lo pongan.",
     listen: "Escuchar en chino",

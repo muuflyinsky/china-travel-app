@@ -6,6 +6,8 @@ const T2S: Record<string, string> = Object.fromEntries(
     .split(" ").map((p) => [p[0], p[1]]),
 );
 
+const PREFIX = /^(招牌|特色|秘制|精品|本店|特价|推荐|主厨)+/;
+
 /**
  * The cache key for a dish name: simplified characters, no spaces, punctuation, prices,
  * portion words or marketing prefixes, no "(branch)" suffix. "老" is kept on purpose: it's
@@ -16,7 +18,7 @@ export function normalizeName(zh: string) {
   n = n.replace(/[（(][^）)]*[)）]/g, "");
   n = n.replace(/[¥￥$]?\s*\d+(\.\d+)?\s*(元|块)?(\/\s*[份斤两位例只条个碗盘])?/g, "");
   n = n.replace(/(小份|中份|大份|半份|例牌|[大中小]例)/g, "");
-  n = n.replace(/^(招牌|特色|秘制|精品|本店|特价|推荐|主厨)+/, "");
+  n = n.replace(PREFIX, "");
   n = n.replace(/[\s\p{P}\p{S}]/gu, "");
   return n;
 }
@@ -25,16 +27,22 @@ export function normalizeName(zh: string) {
 export const regionOf = (adcode?: string) => (adcode && /^\d{6}$/.test(adcode) ? adcode.slice(0, 2) : "");
 
 /**
- * The model's answer for dish j of a batch, found by name. A Chinese name with no matching answer
- * returns undefined (shown as "couldn't be read"): answering it from the same position could give
- * this dish another dish's allergens. Only a typed pinyin or English name has nothing to compare,
- * so it may use its position, and only when the whole batch was answered and that answer isn't
- * another dish's.
+ * The model's answer for dish j of a batch, found by name and never by position: the answer at the
+ * same position could be another dish's, with another dish's allergens. No answer means undefined;
+ * readMenu then asks about that dish alone, where the one answer can only be for it.
  */
 export function answerFor<T extends { zh: string }>(asked: string[], j: number, answers: T[]): T | undefined {
+  if (asked.length === 1 && answers.length === 1) return answers[0];
+  const exact = answers.find((a) => a.zh.trim() === asked[j].trim());
+  if (exact) return exact;
   const name = normalizeName(asked[j]);
-  const named = name ? answers.find((a) => normalizeName(a.zh) === name) : undefined;
-  if (named || /[\u4e00-\u9fff]/.test(name) || answers.length !== asked.length) return named;
-  const other = normalizeName(answers[j].zh);
-  return asked.some((zh, k) => k !== j && normalizeName(zh) === other) ? undefined : answers[j];
+  // Two dishes that normalize alike (\u5bab\u4fdd\u9e21\u4e01\uff08\u65e0\u82b1\u751f\uff09and \u5bab\u4fdd\u9e21\u4e01, 1\u53f7\u5957\u9910 and 2\u53f7\u5957\u9910) can't be told apart this way.
+  if (!name || asked.some((zh, k) => k !== j && normalizeName(zh) === name)) return undefined;
+  return answers.find((a) => normalizeName(a.zh) === name);
 }
+
+/**
+ * A name normalizeName shortens into another dish's key: \u592b\u59bb\u80ba\u7247\uff08\u53bb\u82b1\u751f\uff09, \u62db\u724c\u7092\u996d, 1\u53f7\u5957\u9910. Its answer
+ * describes that version, so it must not be stored as the answer for the plain dish.
+ */
+export const isVariantName = (zh: string) => /[\uff08(]|\d\s*\u53f7/.test(zh) || PREFIX.test(zh.trim());

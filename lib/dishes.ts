@@ -8,7 +8,7 @@ import { structured, allergenEnum } from "./llm";
 import { langName } from "./languages";
 import { ALLERGENS } from "./allergens";
 import { cacheGet, cachePut, canonicalZh, factsGet, isChineseName, mergeFacts, PROMPT_VERSION, type Cached } from "./dish-cache";
-import { answerFor, normalizeName, regionOf } from "./dish-name";
+import { answerFor, isVariantName, normalizeName, regionOf } from "./dish-name";
 import { tighten } from "./ingredients";
 
 const ROLE = z.enum(["main", "sauce", "garnish"]);
@@ -276,7 +276,11 @@ export async function* readMenu(input: { image?: { data: string; mediaType: stri
     for (const [j, i] of b.entries()) {
       // Models occasionally reorder or skip a dish, so an answer is matched by name (and then cached under it).
       const f = answerFor(b.map((x) => items[x].zh), j, out.dishes);
-      if (!f) { console.warn(`[menu] no answer for ${items[i].zh}; got ${out.dishes.map((d) => d.zh).join("、") || "nothing"}`); failed.push(i); continue; }
+      if (!f) {
+        console.warn(`[menu] no answer for ${items[i].zh}; got ${out.dishes.map((d) => d.zh).join("、") || "nothing"}`);
+        if (b.length > 1) batches.push([i]); else failed.push(i);
+        continue;
+      }
       const drawn: Cached["facts"] = { pinyin: f.pinyin, allergens: f.allergens.map(({ id, role, via_zh }) => ({ id, role, via_zh })), spice: f.spice, vegetarian: f.vegetarian, meat: f.meat, alcohol: f.alcohol, confidence: f.confidence };
       const facts = stored.has(i) ? mergeFacts(stored.get(i)!, drawn) : drawn;
       const via: Record<string, string> = Object.fromEntries(f.allergens.map((a) => [a.via_zh, a.via]));
@@ -284,12 +288,13 @@ export async function* readMenu(input: { image?: { data: string; mediaType: stri
         ...f, ...facts, zh: items[i].zh, price: items[i].price, printed: items[i].printed || undefined,
         allergens: facts.allergens.map((a) => ({ ...a, via: via[a.via_zh] || a.via_zh })),
       });
-      if (!items[i].printed) {
+      if (!items[i].printed && !isVariantName(items[i].zh)) {
         writes.push(cachePut(items[i].zh, region, input.lang, { facts, text: { name: f.name, short: f.short, via } })
           .catch((e) => console.error("[dish-cache] write:", (e as Error).message)));
       }
       yield { type: "dish", i, dish, cached: false };
     }
+    while (running.size < PARALLEL && next < batches.length) launch(); // dishes queued above to be asked alone
   }
   // The first upstream error (no secrets in it) helps diagnose from the browser when logs aren't at hand.
   // Serverless hosts freeze the instance once the response ends, so writes still in flight would be

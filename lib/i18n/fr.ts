@@ -242,7 +242,7 @@ export const fr: Dict = {
     wrongInfo: "Les infos sur ce plat sont fausses",
     wrongThanks: "Merci. Nous allons revérifier ce plat.",
     detailDown: "Impossible de charger les détails. L’avis ci-dessus reste valable.",
-    missing: "{n} plats n’ont pas pu être lus. Reprenez cette partie du menu de plus près.",
+    missing: "{n} plats n’ont pas pu être lus : ils n’ont donc pas de contrôle des allergies. Réessayez ou reprenez cette partie du menu de plus près.",
     whyOk: "Aucune de vos allergies ou restrictions ne figure dans la recette habituelle. Chaque cuisine est différente.",
     whyAsk: "Généralement préparé avec {x}. Vous pouvez demander de ne pas en mettre.",
     listen: "Écouter en chinois",
