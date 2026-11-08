@@ -50,6 +50,7 @@ export const ko: Dict = {
     near: "{city} 근처",
   },
   today: {
+    driverElsewhere: "{city}에는 그 이름의 장소가 없습니다. 아래는 다른 도시의 장소입니다. 기사에게 보여 주기 전에 주소를 확인하세요.",
     driverElseIn: "{city}의 다른 목적지",
     driverFind: "찾기",
     driverPick: "장소를 누르면 기사에게 보여 줄 화면이 열립니다.",
