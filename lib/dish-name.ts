@@ -55,4 +55,4 @@ export function answerFor<T extends { zh: string }>(asked: string[], j: number, 
  * A name normalizeName shortens into another dish's key: 夫妻肺片（去花生）, 招牌炒饭, 1号套餐, 套餐2.
  * It is that version of the dish, so it is asked alone and never read from or written to the shared cache.
  */
-export const isVariantName = (zh: string) => /[（(]|\d/.test(zh) || PREFIX.test(zh.trim());
+export const isVariantName = (zh: string) => /[（(]|\d/.test(zh) || PREFIX.test([...zh.trim()].map((c) => T2S[c] ?? c).join(""));
