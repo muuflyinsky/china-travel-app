@@ -23,3 +23,18 @@ export function normalizeName(zh: string) {
 
 /** Province code for regional versions: the first two digits of the city adcode ('51' Sichuan). */
 export const regionOf = (adcode?: string) => (adcode && /^\d{6}$/.test(adcode) ? adcode.slice(0, 2) : "");
+
+/**
+ * The model's answer for dish j of a batch, found by name. A Chinese name with no matching answer
+ * returns undefined (shown as "couldn't be read"): answering it from the same position could give
+ * this dish another dish's allergens. Only a typed pinyin or English name has nothing to compare,
+ * so it may use its position, and only when the whole batch was answered and that answer isn't
+ * another dish's.
+ */
+export function answerFor<T extends { zh: string }>(asked: string[], j: number, answers: T[]): T | undefined {
+  const name = normalizeName(asked[j]);
+  const named = name ? answers.find((a) => normalizeName(a.zh) === name) : undefined;
+  if (named || /[\u4e00-\u9fff]/.test(name) || answers.length !== asked.length) return named;
+  const other = normalizeName(answers[j].zh);
+  return asked.some((zh, k) => k !== j && normalizeName(zh) === other) ? undefined : answers[j];
+}

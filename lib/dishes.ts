@@ -8,7 +8,7 @@ import { structured, allergenEnum } from "./llm";
 import { langName } from "./languages";
 import { ALLERGENS } from "./allergens";
 import { cacheGet, cachePut, canonicalZh, factsGet, isChineseName, mergeFacts, PROMPT_VERSION, type Cached } from "./dish-cache";
-import { normalizeName, regionOf } from "./dish-name";
+import { answerFor, normalizeName, regionOf } from "./dish-name";
 import { tighten } from "./ingredients";
 
 const ROLE = z.enum(["main", "sauce", "garnish"]);
@@ -274,9 +274,9 @@ export async function* readMenu(input: { image?: { data: string; mediaType: stri
     if (!cuisine && out.cuisine) { cuisine = out.cuisine; yield { type: "meta", cuisine, total: items.length }; }
     if (!tipsSent && out.tips.length) { tipsSent = true; yield { type: "tips", tips: out.tips.slice(0, 2) }; }
     for (const [j, i] of b.entries()) {
-      // Models occasionally reorder, so prefer an exact name match over the position.
-      const f = out.dishes.find((d) => normalizeName(d.zh) === normalizeName(items[i].zh)) ?? out.dishes[j];
-      if (!f) { failed.push(i); continue; }
+      // Models occasionally reorder or skip a dish, so an answer is matched by name (and then cached under it).
+      const f = answerFor(b.map((x) => items[x].zh), j, out.dishes);
+      if (!f) { console.warn(`[menu] no answer for ${items[i].zh}; got ${out.dishes.map((d) => d.zh).join("、") || "nothing"}`); failed.push(i); continue; }
       const drawn: Cached["facts"] = { pinyin: f.pinyin, allergens: f.allergens.map(({ id, role, via_zh }) => ({ id, role, via_zh })), spice: f.spice, vegetarian: f.vegetarian, meat: f.meat, alcohol: f.alcohol, confidence: f.confidence };
       const facts = stored.has(i) ? mergeFacts(stored.get(i)!, drawn) : drawn;
       const via: Record<string, string> = Object.fromEntries(f.allergens.map((a) => [a.via_zh, a.via]));
