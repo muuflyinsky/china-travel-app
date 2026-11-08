@@ -31,15 +31,20 @@ const cases = [
   ["typed name in a batch, answers in order", ["kung pao", "mapo tofu"], 0, [A, B], undefined],
   ["typed name in a batch, answers swapped", ["kung pao", "mapo tofu"], 0, [B, A], undefined],
   ["typed name, that answer belongs to another dish", ["kung pao", "麻婆豆腐"], 0, [B, A], undefined],
-  // Asked alone, the one answer can only be for this dish.
+  // Asked alone, the one answer is used only if its name fits the dish.
   ["asked alone, typed name", ["kung pao"], 0, [A], A],
-  ["asked alone, name changed by the model", ["宫爆鸡丁"], 0, [A], A],
+  ["asked alone, small change by the model", ["宫爆鸡丁"], 0, [A], A],
+  ["asked alone, traditional characters", ["宮保雞丁"], 0, [A], A],
+  ["asked alone, bracket dropped by the model", ["宫保鸡丁（无花生）"], 0, [A], A],
+  ["asked alone, unrelated dish", ["炸虾球"], 0, [{ zh: "清炒时蔬" }], undefined],
+  ["asked alone, only one word in common", ["炸虾球"], 0, [{ zh: "炸鸡" }], undefined],
+  ["asked alone, no name in the answer", ["炸虾球"], 0, [{ zh: "" }], undefined],
   ["asked alone, two answers that don't match", ["宫爆鸡丁"], 0, [A, B], undefined],
 ];
 
 const variants = [
-  ["夫妻肺片（去花生）", true], ["夫妻肺片(去花生)", true], ["招牌炒饭", true], ["秘制红烧肉", true], ["1号套餐", true],
-  ["夫妻肺片", false], ["宫保鸡丁 ¥48", false], ["宮保雞丁", false], ["小份水煮鱼", false], ["老醋花生", false],
+  ["夫妻肺片（去花生）", true], ["夫妻肺片(去花生)", true], ["招牌炒饭", true], ["秘制红烧肉", true], ["1号套餐", true], ["套餐2", true], ["12 招牌牛排", true], ["蛋炒饭（含海鲜）", true],
+  ["夫妻肺片", false], ["宮保雞丁", false], ["小份水煮鱼", false], ["老醋花生", false],
 ];
 
 let fails = 0;

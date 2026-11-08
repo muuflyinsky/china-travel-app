@@ -27,22 +27,32 @@ export function normalizeName(zh: string) {
 export const regionOf = (adcode?: string) => (adcode && /^\d{6}$/.test(adcode) ? adcode.slice(0, 2) : "");
 
 /**
+ * Whether an answer to a question about one dish is about that dish: at least half of the name's
+ * Chinese characters appear in it. A typed pinyin or English name has nothing to compare.
+ */
+function sameDishName(asked: string, answer: string) {
+  const chars = (zh: string) => new Set(normalizeName(zh).match(/[一-鿿]/g) ?? []);
+  const want = chars(asked), got = chars(answer);
+  return !want.size || [...want].filter((c) => got.has(c)).length * 2 >= want.size;
+}
+
+/**
  * The model's answer for dish j of a batch, found by name and never by position: the answer at the
  * same position could be another dish's, with another dish's allergens. No answer means undefined;
- * readMenu then asks about that dish alone, where the one answer can only be for it.
+ * readMenu then asks about that dish alone.
  */
 export function answerFor<T extends { zh: string }>(asked: string[], j: number, answers: T[]): T | undefined {
-  if (asked.length === 1 && answers.length === 1) return answers[0];
+  if (asked.length === 1 && answers.length === 1) return sameDishName(asked[0], answers[0].zh) ? answers[0] : undefined;
   const exact = answers.find((a) => a.zh.trim() === asked[j].trim());
   if (exact) return exact;
   const name = normalizeName(asked[j]);
-  // Two dishes that normalize alike (\u5bab\u4fdd\u9e21\u4e01\uff08\u65e0\u82b1\u751f\uff09and \u5bab\u4fdd\u9e21\u4e01, 1\u53f7\u5957\u9910 and 2\u53f7\u5957\u9910) can't be told apart this way.
+  // Two dishes that normalize alike can't be told apart this way.
   if (!name || asked.some((zh, k) => k !== j && normalizeName(zh) === name)) return undefined;
   return answers.find((a) => normalizeName(a.zh) === name);
 }
 
 /**
- * A name normalizeName shortens into another dish's key: \u592b\u59bb\u80ba\u7247\uff08\u53bb\u82b1\u751f\uff09, \u62db\u724c\u7092\u996d, 1\u53f7\u5957\u9910. Its answer
- * describes that version, so it must not be stored as the answer for the plain dish.
+ * A name normalizeName shortens into another dish's key: 夫妻肺片（去花生）, 招牌炒饭, 1号套餐, 套餐2.
+ * It is that version of the dish, so it is asked alone and never read from or written to the shared cache.
  */
-export const isVariantName = (zh: string) => /[\uff08(]|\d\s*\u53f7/.test(zh) || PREFIX.test(zh.trim());
+export const isVariantName = (zh: string) => /[（(]|\d/.test(zh) || PREFIX.test(zh.trim());

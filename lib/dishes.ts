@@ -233,8 +233,8 @@ export async function* readMenu(input: { image?: { data: string; mediaType: stri
   yield { type: "meta", cuisine, total: items.length };
   if (!items.length) return;
 
-  // Cache first. Dishes with menu-printed text are the house version, so they skip the cache.
-  const hits = await Promise.all(items.map((it) => (it.printed ? null : cacheGet(it.zh, region, input.lang))));
+  // Cache first. Dishes with menu-printed text are the house version, and variants aren't the plain dish, so they skip the cache.
+  const hits = await Promise.all(items.map((it) => (it.printed || isVariantName(it.zh) ? null : cacheGet(it.zh, region, input.lang))));
   const tCache = Date.now();
   const misses: number[] = [];
   for (let i = 0; i < items.length; i++) {
@@ -246,7 +246,7 @@ export async function* readMenu(input: { image?: { data: string; mediaType: stri
   // Facts another language already stored: a new language merges into them instead of replacing them.
   const stored = new Map<number, Cached["facts"]>();
   await Promise.all(misses.map(async (i) => {
-    const f = items[i].printed ? null : await factsGet(items[i].zh, region);
+    const f = items[i].printed || isVariantName(items[i].zh) ? null : await factsGet(items[i].zh, region);
     if (f) stored.set(i, f);
   }));
 
@@ -254,7 +254,11 @@ export async function* readMenu(input: { image?: { data: string; mediaType: stri
   type Facts = z.infer<typeof FactsSchema>;
   type Done = { id: number; b: number[]; out: Facts | null; err?: string };
   const batches: number[][] = [];
-  for (let k = 0; k < misses.length; k += CHUNK) batches.push(misses.slice(k, k + CHUNK));
+  // Variants and typed names can't be matched to an answer safely inside a batch, so they are asked alone.
+  const alone = (i: number) => isVariantName(items[i].zh) || !isChineseName(items[i].zh);
+  const together = misses.filter((i) => !alone(i));
+  for (let k = 0; k < together.length; k += CHUNK) batches.push(together.slice(k, k + CHUNK));
+  batches.push(...misses.filter(alone).map((i) => [i]));
   const running = new Map<number, Promise<Done>>();
   const failed: number[] = [];
   const writes: Promise<unknown>[] = [];
@@ -308,7 +312,7 @@ export async function* readMenu(input: { image?: { data: string; mediaType: stri
 export async function dishDetail(input: { zh: string; printed?: string; lang: string; city?: string; adcode?: string }): Promise<DishDetail & { cached: boolean }> {
   const t0 = Date.now();
   const region = regionOf(input.adcode);
-  const hit = input.printed ? null : await cacheGet(input.zh, region, input.lang);
+  const hit = input.printed || isVariantName(input.zh) ? null : await cacheGet(input.zh, region, input.lang);
   if (hit?.detail) {
     console.log(`[dish] cache hit ${normalizeName(input.zh)} ${Date.now() - t0}ms`);
     return { ...hit.detail, cached: true };
