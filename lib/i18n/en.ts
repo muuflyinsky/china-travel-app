@@ -314,6 +314,7 @@ export const en = {
     copyZh: "Copy Chinese name",
     noZh: "No Chinese name found",
     noZhNote: "We couldn’t find this dish’s Chinese name, so it can’t go on the order card. Show staff the dish on the menu, or a photo of it, instead.",
+    matchedFrom: "Matched from “{x}”",
     copiedZh: "Copied",
     backToMeal: "Back to this meal",
     mealSummary: "{n} dishes · {pages} pages",

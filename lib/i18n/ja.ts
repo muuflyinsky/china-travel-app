@@ -311,6 +311,7 @@ export const ja: Dict = {
     copyZh: "中国語名をコピー",
     noZh: "中国語名が見つかりません",
     noZhNote: "この料理の中国語名が見つからないため、注文カードに入れられません。メニューのこの料理か、料理の写真を店員に見せてください。",
+    matchedFrom: "「{x}」から判断",
     copiedZh: "コピーしました",
     backToMeal: "この食事に戻る",
     mealSummary: "{n}品 · {pages}ページ",

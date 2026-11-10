@@ -311,6 +311,7 @@ export const ko: Dict = {
     copyZh: "중국어 이름 복사",
     noZh: "중국어 이름을 찾지 못했어요",
     noZhNote: "이 요리의 중국어 이름을 찾지 못해 주문 카드에 넣을 수 없어요. 대신 메뉴에서 이 요리를 가리키거나 사진을 직원에게 보여 주세요.",
+    matchedFrom: "입력한 “{x}” 기준",
     copiedZh: "복사됨",
     backToMeal: "이 식사로 돌아가기",
     mealSummary: "요리 {n}개 · {pages}페이지",

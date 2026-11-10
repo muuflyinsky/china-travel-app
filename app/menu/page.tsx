@@ -80,6 +80,7 @@ function DishRow({ d, v, restricted, line, staffNo, onChange, onOpen, homePrice 
             : <span className="min-w-0 truncate text-footnote text-muted">{t.eat.noZh}</span>}
           {homePrice && <span className="shrink-0 text-footnote text-muted tabular-nums">{fmt(t.eat.approx, { amount: homePrice })}</span>}
         </span>
+        {d.typed && <span className="block truncate text-footnote text-muted">{fmt(t.eat.matchedFrom, { x: d.typed })}</span>}
         <span className="mt-1 flex items-center gap-1.5 text-subhead">
           <span className="min-w-0 truncate">{d.short}</span><Spice n={d.spice} />
         </span>
@@ -153,6 +154,7 @@ function DishSheet({ d, v, mine, detail, line, saved, staffNo, onSave, onAdd, on
                 {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
               </button>
             </p> : <p className="mt-1 text-subhead text-muted">{t.eat.noZhNote}</p>}
+            {d.typed && <p className="mt-0.5 text-footnote text-muted">{fmt(t.eat.matchedFrom, { x: d.typed })}</p>}
           </div>
           <div className="shrink-0 text-right">
             {d.price && <p className="text-headline tabular-nums">{d.price}</p>}

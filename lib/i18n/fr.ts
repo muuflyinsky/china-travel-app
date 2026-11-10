@@ -311,6 +311,7 @@ export const fr: Dict = {
     copyZh: "Copier le nom chinois",
     noZh: "Nom chinois introuvable",
     noZhNote: "Nous n’avons pas trouvé le nom chinois de ce plat : il ne peut pas aller sur la fiche de commande. Montrez plutôt le plat au personnel sur le menu ou en photo.",
+    matchedFrom: "D’après « {x} »",
     copiedZh: "Copié",
     backToMeal: "Retour à ce repas",
     mealSummary: "{n} plats · {pages} pages",

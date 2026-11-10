@@ -24,6 +24,8 @@ export type ListDish = {
   zh: string; pinyin: string; price: string; name: string; short: string;
   allergens: DishAllergen[]; spice: number; vegetarian: boolean; meat: string[]; alcohol: boolean;
   confidence: "high" | "medium" | "low"; printed?: string;
+  /** What the traveller typed, when the Chinese name came from the model: shown so a misreading can be noticed. */
+  typed?: string;
 };
 
 export type DishDetail = {
@@ -293,7 +295,7 @@ export async function* readMenu(input: { image?: { data: string; mediaType: stri
       const via: Record<string, string> = Object.fromEntries(f.allergens.map((a) => [a.via_zh, a.via]));
       const dish: ListDish = tighten({
         // A typed name takes the model's Chinese name; without one it stays as typed and can't go on the order card.
-        ...f, ...facts, zh: hasChinese(items[i].zh) || !hasChinese(cleanZh(f.zh)) ? items[i].zh : cleanZh(f.zh), price: items[i].price, printed: items[i].printed || undefined,
+        ...f, ...facts, ...(hasChinese(items[i].zh) || !hasChinese(cleanZh(f.zh)) ? { zh: items[i].zh } : { zh: cleanZh(f.zh), typed: items[i].zh }), price: items[i].price, printed: items[i].printed || undefined,
         allergens: facts.allergens.map((a) => ({ ...a, via: via[a.via_zh] || a.via_zh })),
       });
       if (!items[i].printed && !isVariantName(items[i].zh)) {
