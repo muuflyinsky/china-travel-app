@@ -1,5 +1,6 @@
-// Apps and services we point travellers to. Icons are fetched from the App Store at runtime by
-// /api/app-icon/[id] (cached), with a brand-coloured monogram as the fallback.
+// Apps and services we point travellers to. Icons are bundled in public/app-icons (written by
+// scripts/fetch-app-icons.mjs); /api/app-icon/[id] fetches from the App Store when one is missing,
+// with a brand-coloured monogram as the last fallback.
 export type AppInfo = {
   id: string;
   name: string;
@@ -22,9 +23,9 @@ export const APPS = {
   fliggy: { id: "fliggy", name: "Fliggy", zh: "飞猪", color: "#ffc300", mono: "飞", ios: { term: "飞猪旅行", country: "cn" } },
   dianping: { id: "dianping", name: "Dianping", zh: "大众点评", color: "#ff6633", mono: "点", ios: { bundleId: "com.dianping.dpscope", country: "cn" }, android: "com.dianping.v1" },
   applemaps: { id: "applemaps", name: "Apple Maps", color: "#34c759", mono: "M", ios: { term: "Apple Maps", country: "us" } },
-  airalo: { id: "airalo", name: "Airalo", color: "#1b1e3d", mono: "A", ios: { term: "Airalo eSIM", country: "us" }, web: "https://www.airalo.com" },
-  holafly: { id: "holafly", name: "Holafly", color: "#e8467c", mono: "H", ios: { term: "Holafly eSIM", country: "us" }, web: "https://esim.holafly.com" },
-  saily: { id: "saily", name: "Saily", color: "#121212", mono: "S", ios: { term: "Saily eSIM", country: "us" }, web: "https://saily.com" },
+  airalo: { id: "airalo", name: "Airalo", color: "#1b1e3d", mono: "A", ios: { bundleId: "com.mobillium.airalo", country: "us" }, web: "https://www.airalo.com" },
+  holafly: { id: "holafly", name: "Holafly", color: "#e8467c", mono: "H", ios: { bundleId: "com.holafly.Customers", country: "us" }, web: "https://esim.holafly.com" },
+  saily: { id: "saily", name: "Saily", color: "#121212", mono: "S", ios: { bundleId: "com.saily.ios", country: "us" }, web: "https://saily.com" },
   nomad: { id: "nomad", name: "Nomad", color: "#ff6a3d", mono: "N", ios: { term: "Nomad eSIM travel data", country: "us" }, web: "https://www.getnomad.app" },
   klook: { id: "klook", name: "Klook", color: "#ff5b00", mono: "K", ios: { term: "Klook travel", country: "us" }, web: "https://www.klook.com" },
 } satisfies Record<string, AppInfo>;
@@ -32,6 +33,8 @@ export const APPS = {
 export type AppId = keyof typeof APPS;
 
 export const appIconUrl = (id: AppId) => `/api/app-icon/${id}`;
+/** The bundled copy of the icon (shown at once); appIconUrl is the fallback. */
+export const bundledIconUrl = (id: AppId) => `/app-icons/${id}.jpg`;
 export const appStoreUrl = (id: AppId) => `/api/app-icon/${id}?store=1`;
 export const playStoreUrl = (id: AppId) => {
   const pkg = (APPS[id] as AppInfo).android;
