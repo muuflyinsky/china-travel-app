@@ -312,6 +312,8 @@ export const en = {
     qrPitch: "QR menus show photos, not ingredients. HaodeGo tells you what’s inside.",
     qrSteps: ["Scan the table’s QR code with WeChat or Alipay.", "Take screenshots of the menu pages.", "Here, tap “Choose photo” and pick them: every dish is checked for your allergies.", "Order in the menu: find the dish by its Chinese name (copy it from the dish here)."],
     copyZh: "Copy Chinese name",
+    noZh: "No Chinese name found",
+    noZhNote: "We couldn’t find this dish’s Chinese name, so it can’t go on the order card. Point to it on the menu instead.",
     copiedZh: "Copied",
     backToMeal: "Back to this meal",
     mealSummary: "{n} dishes · {pages} pages",

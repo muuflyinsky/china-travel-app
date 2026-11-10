@@ -309,6 +309,8 @@ export const fr: Dict = {
     qrPitch: "Les menus QR montrent des photos, pas les ingrédients. HaodeGo vous dit ce qu’il y a dedans.",
     qrSteps: ["Scannez le QR code de la table avec WeChat ou Alipay.", "Faites des captures d’écran des pages du menu.", "Ici, touchez « Choisir une photo » et sélectionnez-les : chaque plat est vérifié selon vos allergies.", "Commandez dans ce menu : cherchez le plat par son nom chinois (copiez-le depuis le plat ici)."],
     copyZh: "Copier le nom chinois",
+    noZh: "Nom chinois introuvable",
+    noZhNote: "Nous n’avons pas trouvé le nom chinois de ce plat : il ne peut pas aller sur la carte de commande. Montrez-le plutôt sur le menu.",
     copiedZh: "Copié",
     backToMeal: "Retour à ce repas",
     mealSummary: "{n} plats · {pages} pages",

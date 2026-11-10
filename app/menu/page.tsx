@@ -22,6 +22,7 @@ import type { ListDish, DishDetail, MenuEvent } from "@/lib/dishes";
 import { SourceLine } from "@/components/SourceLine";
 import { Feedback } from "@/components/Feedback";
 import { verdict, withDetailAllergens, type Verdict, type VerdictKind } from "@/lib/verdict";
+import { hasChinese } from "@/lib/dish-name";
 import { VerdictTag, reasonText, verdictLabel } from "@/components/VerdictTag";
 import { orderCard, staffReplies, allergyExplain as allergyExplainText } from "@/lib/order-card";
 import { MEAL_TTL, clearMeal, isSaved, loadMeal, loadSaved, mergeDish, pageId, refreshSaved, saveMeal, thumbnail, toggleSaved, SAVED_EVENT, type Line, type MealPage, type SavedDish } from "@/lib/meal";
@@ -74,7 +75,9 @@ function DishRow({ d, v, restricted, line, staffNo, onChange, onOpen, homePrice 
           {d.price && <span className="shrink-0 text-subhead font-semibold tabular-nums">{d.price}</span>}
         </span>
         <span className="flex items-baseline justify-between gap-3">
-          <span className="min-w-0 truncate text-footnote text-muted"><span className="zh" lang="zh-CN">{d.zh}</span> {d.pinyin}</span>
+          {hasChinese(d.zh)
+            ? <span className="min-w-0 truncate text-footnote text-muted"><span className="zh" lang="zh-CN">{d.zh}</span> {d.pinyin}</span>
+            : <span className="min-w-0 truncate text-footnote text-muted">{t.eat.noZh}</span>}
           {homePrice && <span className="shrink-0 text-footnote text-muted tabular-nums">{fmt(t.eat.approx, { amount: homePrice })}</span>}
         </span>
         <span className="mt-1 flex items-center gap-1.5 text-subhead">
@@ -87,7 +90,7 @@ function DishRow({ d, v, restricted, line, staffNo, onChange, onOpen, homePrice 
           {staffNo ? <span className="tag tag-danger"><Ban className="h-3.5 w-3.5" aria-hidden />{t.eat.staffNoTag}</span>
             : restricted ? <VerdictTag v={v} /> : d.vegetarian ? <span className="tag"><Leaf className="h-3.5 w-3.5" aria-hidden />{t.eat.vegetarian}</span> : null}
         </span>
-        {staffNo ? null : v.blocked.length ? (
+        {staffNo || !hasChinese(d.zh) ? null : v.blocked.length ? (
           <ShieldAlert className="h-5 w-5 shrink-0 text-danger" aria-label={fmt(t.eat.blockedSevere, { x: v.blocked.map((a) => t.allergens[a as AllergenId].toLowerCase()).join(", ") })} />
         ) : line ? (
           <Stepper line={line} onChange={onChange} />
@@ -140,7 +143,7 @@ function DishSheet({ d, v, mine, detail, line, saved, staffNo, onSave, onAdd, on
         <div className="flex shrink-0 items-start gap-3 px-4 pt-3">
           <div className="min-w-0 flex-1">
             <h2 className="text-title">{d.name}</h2>
-            <p className="mt-0.5 flex flex-wrap items-center gap-x-2">
+            {hasChinese(d.zh) ? <p className="mt-0.5 flex flex-wrap items-center gap-x-2">
               <span className="zh whitespace-nowrap text-headline" lang="zh-CN">{d.zh}</span>
               <span className="text-subhead text-muted">{d.pinyin}</span>
               <button onClick={speak} aria-label={t.eat.listen} className="grid h-9 w-9 place-items-center rounded-full bg-cobalt-soft text-cobalt"><Volume2 className="h-4 w-4" /></button>
@@ -149,7 +152,7 @@ function DishSheet({ d, v, mine, detail, line, saved, staffNo, onSave, onAdd, on
                 aria-label={copied ? t.eat.copiedZh : t.eat.copyZh} className="grid h-9 w-9 place-items-center rounded-full bg-cobalt-soft text-cobalt">
                 {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
               </button>
-            </p>
+            </p> : <p className="mt-1 text-subhead text-muted">{t.eat.noZhNote}</p>}
           </div>
           <div className="shrink-0 text-right">
             {d.price && <p className="text-headline tabular-nums">{d.price}</p>}
@@ -202,7 +205,7 @@ function DishSheet({ d, v, mine, detail, line, saved, staffNo, onSave, onAdd, on
             reason (an allergen is a main ingredient, diet): only a plain, secondary Add — leaving out a
             sauce wouldn't fix it, so "add, without X" is offered only for "ask first". */}
         {staffNo && <p className="shrink-0 border-t border-line px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom))] text-subhead font-semibold text-danger">{t.eat.staffNoSheet}</p>}
-        {!staffNo && !v.blocked.length && !line && (
+        {!staffNo && hasChinese(d.zh) && !v.blocked.length && !line && (
           <div className="flex shrink-0 gap-2 border-t border-line px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom))]">
             {withoutOffer && (
               <Button className="flex-1 text-subhead!" onClick={() => onAdd(v.removable.map((a) => a.via_zh).filter(Boolean))}>
@@ -341,7 +344,7 @@ function SavedSheet({ saved, restricted, restrictions, factsFor, staffNo, onAdd,
                 <div className="flex items-start gap-2">
                   <div className="min-w-0 flex-1">
                     <p className="text-body font-semibold">{d.name}</p>
-                    <p className="truncate text-footnote text-muted"><span className="zh" lang="zh-CN">{d.zh}</span> {d.pinyin}</p>
+                    <p className="truncate text-footnote text-muted">{hasChinese(d.zh) ? <><span className="zh" lang="zh-CN">{d.zh}</span> {d.pinyin}</> : t.eat.noZh}</p>
                   </div>
                   <button onClick={() => toggleSaved(d)} aria-label={t.eat.unsaveDish} className="-mr-2 grid h-11 w-11 shrink-0 place-items-center text-cobalt">
                     <Star className="h-5 w-5" fill="currentColor" aria-hidden />
@@ -349,7 +352,7 @@ function SavedSheet({ saved, restricted, restrictions, factsFor, staffNo, onAdd,
                 </div>
                 <div className="flex min-h-11 items-center justify-between gap-2 pb-1">
                   <span className="min-w-0">{staffNo.includes(d.zh) ? <span className="tag tag-danger"><Ban className="h-3.5 w-3.5" aria-hidden />{t.eat.staffNoTag}</span> : restricted ? <VerdictTag v={v} /> : null}</span>
-                  {staffNo.includes(d.zh) ? null : v.blocked.length ? (
+                  {staffNo.includes(d.zh) || !hasChinese(d.zh) ? null : v.blocked.length ? (
                     <ShieldAlert className="h-5 w-5 shrink-0 text-danger" aria-label={fmt(t.eat.blockedSevere, { x: v.blocked.map((a) => t.allergens[a as AllergenId].toLowerCase()).join(", ") })} />
                   ) : (
                     <button onClick={() => onAdd(d, v)} className="-mr-3 flex min-h-11 shrink-0 items-center gap-1 rounded-control px-3 text-subhead font-semibold text-cobalt">
@@ -585,9 +588,9 @@ export default function MenuPage() {
   // The order is by dish (its Chinese name), so a dish printed on two pages is one line. A dish
   // added before an allergy was marked severe drops out, if any copy of it is blocked.
   const orderLines = Object.entries(order).map(([zh, l]) => ({ row: allRows.find((r) => r.d.zh === zh), l }))
-    .filter((x): x is { row: Row; l: Line } => Boolean(x.row && !allRows.some((r) => r.d.zh === x.row!.d.zh && r.v.blocked.length)));
+    .filter((x): x is { row: Row; l: Line } => Boolean(x.row && hasChinese(x.row.d.zh) && !allRows.some((r) => r.d.zh === x.row!.d.zh && r.v.blocked.length)));
   const dishCount = orderLines.reduce((n, x) => n + x.l.qty, 0);
-  const setLine = (zh: string, l?: Line) => { setOrder((o) => { const n = { ...o }; if (l) n[zh] = l; else delete n[zh]; return n; }); change(); };
+  const setLine = (zh: string, l?: Line) => { if (l && !hasChinese(zh)) return; setOrder((o) => { const n = { ...o }; if (l) n[zh] = l; else delete n[zh]; return n; }); change(); };
   const pageLabel = (p: MealPage) => p.input === "saved" ? t.eat.savedPage : fmt(t.eat.pageN, { n: pages.filter((x) => x.input !== "saved").indexOf(p) + 1 });
   const clearsAt = touched ? new Date(touched + MEAL_TTL).toLocaleTimeString(profile.lang, { hour: "numeric", minute: "2-digit" }) : "";
 

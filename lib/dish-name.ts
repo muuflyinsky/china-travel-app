@@ -23,6 +23,9 @@ export function normalizeName(zh: string) {
   return n;
 }
 
+/** Whether a dish name has Chinese in it: only such a name may be shown to staff. Safe in the browser. */
+export const hasChinese = (zh: string) => /[\u4e00-\u9fff]/.test(zh);
+
 /** Province code for regional versions: the first two digits of the city adcode ('51' Sichuan). */
 export const regionOf = (adcode?: string) => (adcode && /^\d{6}$/.test(adcode) ? adcode.slice(0, 2) : "");
 
