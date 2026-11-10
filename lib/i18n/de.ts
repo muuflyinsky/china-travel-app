@@ -693,6 +693,11 @@ export const de: Dict = {
     reading: "Buchung wird gelesen…",
     error: "Name und Adresse konnten nicht gelesen werden. Versuche einen schärferen Screenshot.",
     change: "Hotel ändern",
+    shotTitle: "Diesen Screenshot an einen KI-Dienst senden?",
+    shotBody: "Um Name und Adresse des Hotels zu finden, geht der Screenshot über unseren Server an einen KI-Dienst eines Drittanbieters, Alibaba Cloud Model Studio (Qwen). Er wird nicht gespeichert.",
+    shotTip: "Buchungs-Screenshots zeigen oft deinen Namen und die Buchungsnummer. Wenn du willst, schneide sie vorher ab oder decke sie ab: Hotelname und Adresse reichen.",
+    shotSend: "Weiter",
+    shotCancel: "Abbrechen",
   },
   guide: {
     taxRow: "Steuerrückerstattung in {city}",

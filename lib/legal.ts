@@ -1,7 +1,7 @@
 // Privacy policy and support page text (App Store requires both URLs). Describes what the code
 // actually does — keep it in step with lib/track.ts, app/api/go, app/api/t, lib/dish-cache.ts
 // and docs/SPEC.md §8 when data handling changes, and bump UPDATED.
-export const UPDATED = "2026-11-01";
+export const UPDATED = "2026-11-10";
 export const SUPPORT_EMAIL = "support@haodego.com";
 
 type Section = { h: string; items: string[] };
@@ -22,7 +22,8 @@ const PRIVACY: Record<string, Privacy> = {
       ] },
       { h: "What is sent when you use a feature", items: [
         "Menu photos and dish names you type, with your language and city, go to an AI service (Alibaba Cloud Model Studio, Qwen) to be read. Photos are discarded after reading and never stored.",
-        "Text you translate and hotel booking screenshots you add go to the same AI service and are not stored.",
+        "Text you translate goes to the same AI service and is not stored.",
+        "Hotel booking screenshots you add go to the same AI service only to read the hotel’s name and address, and are not stored. Before each upload the app asks you to confirm and suggests covering your name and booking number first.",
         "Your location, only if you allow it, and the places you search for go to Amap (高德地图) to find your city, places and routes. We don’t store your location.",
       ] },
       { h: "What we keep", items: [
@@ -58,7 +59,8 @@ const PRIVACY: Record<string, Privacy> = {
       ] },
       { h: "Lo que se envía al usar una función", items: [
         "Las fotos de cartas y los nombres de platos que escribes, con tu idioma y ciudad, se envían a un servicio de IA (Alibaba Cloud Model Studio, Qwen) para leerlos. Las fotos se descartan tras leerlas y nunca se guardan.",
-        "El texto que traduces y las capturas de reservas de hotel que añades van al mismo servicio de IA y no se guardan.",
+        "El texto que traduces va al mismo servicio de IA y no se guarda.",
+        "Las capturas de reservas de hotel que añades van al mismo servicio de IA solo para leer el nombre y la dirección del hotel, y no se guardan. Antes de cada envío la app te pide confirmación y te sugiere tapar antes tu nombre y el número de reserva.",
         "Tu ubicación, solo si lo permites, y los lugares que buscas se envían a Amap (高德地图) para encontrar tu ciudad, lugares y rutas. No guardamos tu ubicación.",
       ] },
       { h: "Lo que guardamos", items: [
@@ -94,7 +96,8 @@ const PRIVACY: Record<string, Privacy> = {
       ] },
       { h: "Ce qui est envoyé quand vous utilisez une fonction", items: [
         "Les photos de menus et les noms de plats que vous saisissez, avec votre langue et votre ville, sont envoyés à un service d’IA (Alibaba Cloud Model Studio, Qwen) pour être lus. Les photos sont supprimées après lecture et jamais conservées.",
-        "Le texte que vous traduisez et les captures de réservation d’hôtel que vous ajoutez passent par le même service d’IA et ne sont pas conservés.",
+        "Le texte que vous traduisez passe par le même service d’IA et n’est pas conservé.",
+        "Les captures de réservation d’hôtel que vous ajoutez passent par le même service d’IA uniquement pour lire le nom et l’adresse de l’hôtel, et ne sont pas conservées. Avant chaque envoi, l’app vous demande de confirmer et vous suggère de masquer d’abord votre nom et le numéro de réservation.",
         "Votre position, seulement si vous l’autorisez, et les lieux que vous cherchez sont envoyés à Amap (高德地图) pour trouver votre ville, des lieux et des itinéraires. Nous ne conservons pas votre position.",
       ] },
       { h: "Ce que nous conservons", items: [
@@ -130,7 +133,8 @@ const PRIVACY: Record<string, Privacy> = {
       ] },
       { h: "Was gesendet wird, wenn du eine Funktion nutzt", items: [
         "Fotos von Speisekarten und eingegebene Gerichtnamen werden mit deiner Sprache und Stadt an einen KI-Dienst (Alibaba Cloud Model Studio, Qwen) gesendet und gelesen. Fotos werden danach verworfen und nie gespeichert.",
-        "Text, den du übersetzt, und Screenshots von Hotelbuchungen gehen an denselben KI-Dienst und werden nicht gespeichert.",
+        "Text, den du übersetzt, geht an denselben KI-Dienst und wird nicht gespeichert.",
+        "Screenshots von Hotelbuchungen gehen an denselben KI-Dienst, nur um Name und Adresse des Hotels zu lesen, und werden nicht gespeichert. Vor jedem Hochladen fragt die App nach und schlägt vor, deinen Namen und die Buchungsnummer vorher abzudecken.",
         "Dein Standort, nur wenn du ihn erlaubst, und Orte, nach denen du suchst, gehen an Amap (高德地图), um Stadt, Orte und Routen zu finden. Wir speichern deinen Standort nicht.",
       ] },
       { h: "Was wir speichern", items: [
@@ -166,7 +170,8 @@ const PRIVACY: Record<string, Privacy> = {
       ] },
       { h: "機能を使うときに送信されるもの", items: [
         "メニューの写真や入力した料理名は、言語と都市とともにAIサービス（Alibaba Cloud Model Studio、Qwen）に送られ、読み取られます。写真は読み取り後に破棄され、保存されません。",
-        "翻訳するテキストや、追加したホテル予約のスクリーンショットも同じAIサービスに送られ、保存されません。",
+        "翻訳するテキストも同じAIサービスに送られ、保存されません。",
+        "追加したホテル予約のスクリーンショットは、ホテルの名前と住所を読み取るためだけに同じAIサービスに送られ、保存されません。送信の前に毎回確認し、氏名や予約番号を先に隠すようおすすめします。",
         "位置情報（許可した場合のみ）と検索した場所は、都市・場所・ルートを調べるためにAmap（高德地图）に送られます。位置情報は保存しません。",
       ] },
       { h: "当社が保存するもの", items: [
@@ -202,7 +207,8 @@ const PRIVACY: Record<string, Privacy> = {
       ] },
       { h: "기능을 쓸 때 전송되는 정보", items: [
         "메뉴 사진과 입력한 요리 이름은 언어·도시와 함께 AI 서비스(Alibaba Cloud Model Studio, Qwen)로 보내져 읽힙니다. 사진은 읽은 뒤 폐기되며 저장되지 않습니다.",
-        "번역하는 텍스트와 추가한 호텔 예약 스크린샷도 같은 AI 서비스로 보내지며 저장되지 않습니다.",
+        "번역하는 텍스트도 같은 AI 서비스로 보내지며 저장되지 않습니다.",
+        "추가한 호텔 예약 스크린샷은 호텔 이름과 주소를 읽기 위해서만 같은 AI 서비스로 보내지며 저장되지 않습니다. 보낼 때마다 앱이 먼저 확인을 받고, 이름과 예약 번호를 가리도록 안내합니다.",
         "위치(허용한 경우에만)와 검색한 장소는 도시·장소·경로를 찾기 위해 Amap(高德地图)으로 보내집니다. 위치는 저장하지 않습니다.",
       ] },
       { h: "저희가 보관하는 정보", items: [

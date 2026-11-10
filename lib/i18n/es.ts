@@ -693,6 +693,11 @@ export const es: Dict = {
     reading: "Leyendo tu reserva…",
     error: "No pudimos leer el nombre y la dirección. Prueba con una captura más clara.",
     change: "Cambiar hotel",
+    shotTitle: "¿Enviar esta captura a un servicio de IA?",
+    shotBody: "Para encontrar el nombre y la dirección del hotel, la captura pasa por nuestro servidor a un servicio de IA de terceros, Alibaba Cloud Model Studio (Qwen). No se guarda.",
+    shotTip: "Las capturas de reservas suelen mostrar tu nombre y el número de reserva. Si quieres, recórtalos o tápalos antes: basta con el nombre y la dirección del hotel.",
+    shotSend: "Continuar",
+    shotCancel: "Cancelar",
   },
   guide: {
     taxRow: "Devolución de impuestos en {city}",

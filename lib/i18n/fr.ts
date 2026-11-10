@@ -693,6 +693,11 @@ export const fr: Dict = {
     reading: "Lecture de votre réservation…",
     error: "Impossible de lire le nom et l’adresse. Essayez une capture plus nette.",
     change: "Changer d’hôtel",
+    shotTitle: "Envoyer cette capture à un service d’IA ?",
+    shotBody: "Pour trouver le nom et l’adresse de l’hôtel, la capture passe par notre serveur vers un service d’IA tiers, Alibaba Cloud Model Studio (Qwen). Elle n’est pas conservée.",
+    shotTip: "Les captures de réservation montrent souvent votre nom et le numéro de réservation. Si vous voulez, recadrez-les ou masquez-les avant : le nom et l’adresse de l’hôtel suffisent.",
+    shotSend: "Continuer",
+    shotCancel: "Annuler",
   },
   guide: {
     taxRow: "Détaxe à {city}",
