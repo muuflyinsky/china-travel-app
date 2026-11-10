@@ -702,7 +702,7 @@ export default function MenuPage() {
         <Section>
           {expired && !hasMeal && <Note>{t.eat.mealExpired}</Note>}
           {ai.state === "denied" ? (
-            <AiOff title={t.aiConsent.offMenuTitle} body={t.aiConsent.offMenuBody} works={!hasMeal} onAllergyCard={showAllergyCard} />
+            <AiOff title={t.aiConsent.offMenu} works={!hasMeal} onAllergyCard={showAllergyCard} />
           ) : <Card>
             {mode === "photo" ? (
               <>

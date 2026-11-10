@@ -17,8 +17,9 @@ export default function PrivacyPage() {
         <p className="px-1 text-footnote text-muted">{fmt(x.updated, { date })}</p>
         <p className="px-1 text-body">{x.intro}</p>
       </Section>
-      {x.sections.map((s) => (
-        <Section key={s.h} title={s.h}>
+      {/* The second section is what the AI service receives; the consent sheet links to #ai. */}
+      {x.sections.map((s, i) => (
+        <Section key={s.h} title={s.h} id={i === 1 ? "ai" : undefined}>
           <ul className="list-disc space-y-2 pr-1 pl-6 text-body">{s.items.map((i) => <li key={i}>{i}</li>)}</ul>
         </Section>
       ))}

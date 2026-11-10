@@ -10,7 +10,7 @@ import { compressImage } from "@/lib/image";
 import { track } from "@/lib/track";
 import { apiHeaders } from "@/lib/device";
 import { quotaHit } from "@/lib/passes";
-import { withAi } from "@/lib/ai-consent";
+import { useAiConsent, withAi } from "@/lib/ai-consent";
 
 /** "Back to my hotel": one photo of the booking, then a one-tap taxi card forever after. */
 export function HotelCard({ bare, brief, lead = "师傅您好，请带我回酒店：", title }: {
@@ -28,6 +28,8 @@ export function HotelCard({ bare, brief, lead = "师傅您好，请带我回酒�
   const [error, setError] = useState<boolean | "unavailable">(false);
   const [card, setCard] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  // After a "no" to the AI service the add row says so; tapping it asks again (lib/ai-consent.ts).
+  const aiOff = useAiConsent().state === "denied";
 
   async function onFile(f?: File) {
     if (!f) return;
@@ -58,7 +60,7 @@ export function HotelCard({ bare, brief, lead = "师傅您好，请带我回酒�
     </>
   ) : (
     <Row onClick={() => withAi(() => fileRef.current?.click())} icon={<IconTile>{busy ? <Preloader className="h-5! w-5!" /> : <BedDouble className="h-5 w-5" aria-hidden />}</IconTile>}
-      title={busy ? t.hotel.reading : t.hotel.add} sub={brief ? undefined : t.hotel.addSub} />
+      title={busy ? t.hotel.reading : aiOff ? t.aiConsent.offHotel : t.hotel.add} sub={aiOff ? t.aiConsent.offBody : brief ? undefined : t.hotel.addSub} />
   );
 
   // `bare` renders list items only, for use inside another grouped list.

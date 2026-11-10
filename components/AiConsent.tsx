@@ -6,6 +6,7 @@ import { ArrowUpRight, Send, Server, Smartphone, WifiOff, ShieldAlert, Siren, Ca
 import { Button, Card } from "./ui";
 import { useT } from "./useT";
 import { AI_CONSENT_ASK, setAiConsent, withAi, type AskDetail } from "@/lib/ai-consent";
+import { track } from "@/lib/track";
 
 /** The three facts: what is sent, who reads it, what stays on the phone. Also shown in Settings. */
 export function AiConsentFacts() {
@@ -49,29 +50,35 @@ export function AiConsentSheet() {
   const close = () => { then.current = undefined; setOpen(false); };
   const allow = () => {
     setAiConsent("granted");
+    track("ai_consent", { choice: "allow" });
     const run = then.current;
     close();
     run?.(); // inside the tap, so a photo picker is still allowed to open
   };
-  const deny = () => { setAiConsent("denied"); close(); };
+  const deny = () => { setAiConsent("denied"); track("ai_consent", { choice: "deny" }); close(); };
 
   // Its own backdrop and a higher layer than other sheets, so it shows over a dish sheet already open on Eat.
   return (<>
     <div onClick={close} aria-hidden className={`fixed inset-0 z-[60] bg-black/40 transition-opacity duration-300 ${open ? "opacity-100" : "pointer-events-none opacity-0"}`} />
     <Sheet opened={open} backdrop={false} className="pb-safe z-[61]! mx-auto max-w-[600px]" style={{ maxHeight: "92vh" }}>
-      <div role="dialog" aria-modal="true" aria-labelledby="ai-consent-title" className="max-h-[92vh] overflow-auto bg-card px-5 pt-2 pb-[calc(20px+env(safe-area-inset-bottom))] text-ink">
-        <div className="mx-auto mb-4 h-1.5 w-10 rounded-full bg-line" aria-hidden />
-        <h2 id="ai-consent-title" className="text-title">{t.title}</h2>
-        <p className="mt-1 text-subhead text-muted">{t.sub}</p>
-        <div className="mt-4"><AiConsentFacts /></div>
-        <NextLink href="/privacy" onClick={close} className="mt-3 inline-flex min-h-touch items-center gap-1 text-subhead font-semibold text-cobalt">
-          {t.policy}<ArrowUpRight className="h-4 w-4" aria-hidden />
-        </NextLink>
-        <div className="mt-2 flex flex-col gap-2">
-          <Button onClick={allow} className="w-full">{t.allow}</Button>
-          <Button variant="soft" onClick={deny} className="w-full">{t.deny}</Button>
+      {/* Text scrolls (German and French run long); the two buttons always stay on screen. */}
+      <div role="dialog" aria-modal="true" aria-labelledby="ai-consent-title" className="flex max-h-[92vh] flex-col bg-card text-ink">
+        <div className="mx-auto mt-2 mb-2 h-1.5 w-10 shrink-0 rounded-full bg-line" aria-hidden />
+        <div className="min-h-0 flex-1 overflow-auto px-5 pt-2">
+          <h2 id="ai-consent-title" className="text-title">{t.title}</h2>
+          <p className="mt-1 text-subhead text-muted">{t.sub}</p>
+          <div className="mt-4"><AiConsentFacts /></div>
+          <NextLink href="/privacy#ai" onClick={close} className="mt-3 inline-flex min-h-touch items-center gap-1 text-subhead font-semibold text-cobalt">
+            {t.policy}<ArrowUpRight className="h-4 w-4" aria-hidden />
+          </NextLink>
         </div>
-        <p className="mt-3 text-center text-footnote text-muted">{t.later}</p>
+        <div className="shrink-0 px-5 pt-2 pb-[calc(16px+env(safe-area-inset-bottom))]">
+          <div className="flex flex-col gap-2">
+            <Button onClick={allow} className="w-full">{t.allow}</Button>
+            <Button variant="soft" onClick={deny} className="w-full">{t.deny}</Button>
+          </div>
+          <p className="mt-3 text-center text-footnote text-muted">{t.later}</p>
+        </div>
       </div>
     </Sheet>
   </>);
@@ -81,8 +88,9 @@ export function AiConsentSheet() {
  * Shown where an AI feature would be, once the traveller said no: nothing was sent, a way to
  * allow it, and (on Eat) what still works without it.
  */
-export function AiOff({ title, body, works, onAllergyCard }: { title: string; body: string; works?: boolean; onAllergyCard?: () => void }) {
-  const t = useT().aiConsent;
+export function AiOff({ title, works, onAllergyCard }: { title: string; works?: boolean; onAllergyCard?: () => void }) {
+  const all = useT();
+  const t = all.aiConsent;
   const link = "flex min-h-touch w-full items-center gap-3 text-left text-body";
   const ico = "h-5 w-5 shrink-0 text-cobalt";
   return (
@@ -91,7 +99,7 @@ export function AiOff({ title, body, works, onAllergyCard }: { title: string; bo
         <span className="grid h-9 w-9 shrink-0 place-items-center rounded-control bg-porcelain text-muted"><WifiOff className="h-5 w-5" aria-hidden /></span>
         <div className="min-w-0">
           <h2 className="text-headline">{title}</h2>
-          <p className="mt-0.5 text-subhead text-muted">{body}</p>
+          <p className="mt-0.5 text-subhead text-muted">{t.offBody}</p>
         </div>
       </div>
       <Button variant="soft" className="mt-3 w-full" onClick={() => withAi()}>{t.allowBtn}</Button>
@@ -99,10 +107,10 @@ export function AiOff({ title, body, works, onAllergyCard }: { title: string; bo
         <div className="mt-3 border-t border-line pt-3">
           <p className="text-footnote font-semibold text-muted">{t.stillWorks}</p>
           <ul>
-            {onAllergyCard && <li><button onClick={onAllergyCard} className={link}><ShieldAlert className={ico} aria-hidden />{t.worksAllergy}</button></li>}
-            <li><NextLink href="/sos" className={link}><Siren className={ico} aria-hidden />{t.worksSos}</NextLink></li>
+            {onAllergyCard && <li><button onClick={onAllergyCard} className={link}><ShieldAlert className={ico} aria-hidden />{all.today.allergyCard}</button></li>}
+            <li><NextLink href="/sos" className={link}><Siren className={ico} aria-hidden />{all.today.help}</NextLink></li>
             <li><NextLink href="/driver" className={link}><CarTaxiFront className={ico} aria-hidden />{t.worksTaxi}</NextLink></li>
-            <li><NextLink href="/talk" className={link}><BookOpen className={ico} aria-hidden />{t.worksPhrases}</NextLink></li>
+            <li><NextLink href="/talk" className={link}><BookOpen className={ico} aria-hidden />{all.talk.phrasebook}</NextLink></li>
             <li><NextLink href="/explore" className={link}><Compass className={ico} aria-hidden />{t.worksExplore}</NextLink></li>
           </ul>
         </div>

@@ -142,7 +142,7 @@ export default function TalkPage() {
   return (
     <Screen title={t.talk.title}>
       <Section>
-        {ai.state === "denied" && <AiOff title={t.aiConsent.offTalkTitle} body={t.aiConsent.offTalkBody} />}
+        {ai.state === "denied" && <AiOff title={t.aiConsent.offTalk} />}
         <Card className="p-0!">
           {/* Direction: what you type → what they read. Tap either side, or the arrows, to swap. */}
           <div className="flex items-center gap-1 border-b border-line p-1.5" role="group" aria-label={t.talk.swap}>

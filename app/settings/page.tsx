@@ -22,7 +22,7 @@ import { privacyText, supportText } from "@/lib/legal";
 import { TipJar } from "@/components/TipJar";
 import { hasPasses, products, savedPass, showPaywall } from "@/lib/passes";
 import { PASSES } from "@/lib/products";
-import { setAiConsent, useAiConsent, withAi } from "@/lib/ai-consent";
+import { setAiConsent, useAiConsent } from "@/lib/ai-consent";
 import { AiConsentFacts } from "@/components/AiConsent";
 
 const CURRENCIES = ["USD", "EUR", "GBP", "JPY", "KRW", "AUD", "CAD", "SGD", "HKD", "CHF", "THB", "MYR", "NZD", "SEK", "INR", "BRL", "MXN", "RUB", "TRY", "IDR", "VND", "PHP"];
@@ -132,7 +132,7 @@ export default function SettingsPage() {
           <Row icon={<Ico I={Sparkles} />} title={t.aiConsent.row} chevron={false}
             after={ai.loaded ? (
               <button type="button" role="switch" aria-checked={ai.state === "granted"} aria-label={t.aiConsent.row}
-                onClick={() => (ai.state === "granted" ? setAiConsent("denied") : withAi())}
+                onClick={() => setAiConsent(ai.state === "granted" ? "denied" : "granted")}
                 className={`relative h-[31px] w-[51px] shrink-0 rounded-full transition-colors ${ai.state === "granted" ? "bg-cobalt" : "bg-line"}`}>
                 <span className={`absolute top-0.5 h-[27px] w-[27px] rounded-full bg-white shadow transition-[left] ${ai.state === "granted" ? "left-[22px]" : "left-0.5"}`} aria-hidden />
               </button>
@@ -141,9 +141,10 @@ export default function SettingsPage() {
           <Row onClick={() => setSheet("privacy")} icon={<Ico I={Lock} />} title={t.settings.privacyTitle} />
         </Group>
         <p className="px-4 text-footnote text-muted">
+          {t.aiConsent.foot}{" "}
           {ai.state === "granted"
-            ? fmt(t.aiConsent.footerOn, { date: ai.at ? new Date(ai.at).toLocaleDateString(p.lang, { day: "numeric", month: "short", year: "numeric" }) : "" })
-            : ai.state === "denied" ? t.aiConsent.footerOff : t.aiConsent.footerAsk}
+            ? fmt(t.aiConsent.on, { date: ai.at ? new Date(ai.at).toLocaleDateString(p.lang, { day: "numeric", month: "short", year: "numeric" }) : "" })
+            : t.aiConsent.off}
         </p>
       </Section>
 
