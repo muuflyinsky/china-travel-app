@@ -310,7 +310,7 @@ export const fr: Dict = {
     qrSteps: ["Scannez le QR code de la table avec WeChat ou Alipay.", "Faites des captures d’écran des pages du menu.", "Ici, touchez « Choisir une photo » et sélectionnez-les : chaque plat est vérifié selon vos allergies.", "Commandez dans ce menu : cherchez le plat par son nom chinois (copiez-le depuis le plat ici)."],
     copyZh: "Copier le nom chinois",
     noZh: "Nom chinois introuvable",
-    noZhNote: "Nous n’avons pas trouvé le nom chinois de ce plat : il ne peut pas aller sur la carte de commande. Montrez-le plutôt sur le menu.",
+    noZhNote: "Nous n’avons pas trouvé le nom chinois de ce plat : il ne peut pas aller sur la fiche de commande. Montrez plutôt le plat au personnel sur le menu ou en photo.",
     copiedZh: "Copié",
     backToMeal: "Retour à ce repas",
     mealSummary: "{n} plats · {pages} pages",

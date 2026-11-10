@@ -8,7 +8,7 @@ import { structured, allergenEnum } from "./llm";
 import { langName } from "./languages";
 import { ALLERGENS } from "./allergens";
 import { cacheGet, cachePut, canonicalZh, factsGet, isChineseName, mergeFacts, PROMPT_VERSION, type Cached } from "./dish-cache";
-import { answerFor, hasChinese, isVariantName, normalizeName, regionOf } from "./dish-name";
+import { answerFor, cleanZh, hasChinese, isVariantName, normalizeName, regionOf } from "./dish-name";
 import { tighten } from "./ingredients";
 
 const ROLE = z.enum(["main", "sauce", "garnish"]);
@@ -293,7 +293,7 @@ export async function* readMenu(input: { image?: { data: string; mediaType: stri
       const via: Record<string, string> = Object.fromEntries(f.allergens.map((a) => [a.via_zh, a.via]));
       const dish: ListDish = tighten({
         // A typed name takes the model's Chinese name; without one it stays as typed and can't go on the order card.
-        ...f, ...facts, zh: hasChinese(items[i].zh) || !hasChinese(f.zh) ? items[i].zh : f.zh.trim(), price: items[i].price, printed: items[i].printed || undefined,
+        ...f, ...facts, zh: hasChinese(items[i].zh) || !hasChinese(cleanZh(f.zh)) ? items[i].zh : cleanZh(f.zh), price: items[i].price, printed: items[i].printed || undefined,
         allergens: facts.allergens.map((a) => ({ ...a, via: via[a.via_zh] || a.via_zh })),
       });
       if (!items[i].printed && !isVariantName(items[i].zh)) {
