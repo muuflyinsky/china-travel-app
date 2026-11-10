@@ -8,6 +8,7 @@ import { HotelCard } from "./HotelCard";
 import { RideButtons } from "./RideButtons";
 import { ShowCard } from "./ShowCard";
 import { useCity } from "./useCity";
+import { cityInAddress, loadCities, type City } from "@/lib/cities";
 import { useProfile } from "./useProfile";
 import { useT } from "./useT";
 import { fmt } from "@/lib/i18n";
@@ -56,7 +57,19 @@ function HotelRide() {
  */
 function Destination() {
   const t = useT();
-  const { city } = useCity();
+  const { city: current, detected } = useCity();
+  const [p] = useProfile();
+  // Without a location fix or a pick today, the saved hotel says where the traveller is better than a
+  // trip city or the Shanghai default (a hotel in Xi'an showed "Somewhere else in Shanghai").
+  const [hotelCity, setHotelCity] = useState<City | null>(null);
+  const address = p.hotel?.address ?? "";
+  useEffect(() => {
+    let on = true;
+    if (!address) { setHotelCity(null); return; }
+    loadCities().then((all) => { if (on) setHotelCity(cityInAddress(all, address) ?? null); });
+    return () => { on = false; };
+  }, [address]);
+  const city = detected ? current : hotelCity ?? current;
   const [q, setQ] = useState("");
   const [busy, setBusy] = useState(false);
   const [results, setResults] = useState<Place[] | null>(null);
