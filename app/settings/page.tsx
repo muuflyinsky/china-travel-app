@@ -110,7 +110,7 @@ export default function SettingsPage() {
           <Row onClick={() => setSheet("entry")} icon={<Ico I={Stamp} />} title={t.settings.entryType}
             sub={derived && p.entryType === derived ? t.settings.fromPassport : undefined} after={<Value>{entryValue}</Value>} />
           <Row onClick={() => setSheet("dates")} icon={<Ico I={CalendarRange} />} title={t.settings.dates} after={<Value>{dates}</Value>}
-            sub={overstay ? <span className="font-semibold text-danger">{t.settings.datesOverstay}</span> : undefined} />
+            sub={overstay ? <span className="font-semibold text-ink">{t.settings.datesOverstay}</span> : undefined} />
           <Row onClick={() => setSheet("cities")} icon={<Ico I={MapPinned} />} title={t.settings.cities} after={<Value>{p.cities.length ? list(p.cities.map((c) => c.e)) : t.settings.add}</Value>} />
         </Group>
       </Section>
