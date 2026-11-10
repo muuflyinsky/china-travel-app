@@ -56,4 +56,12 @@ export function cityFromAdcode(all: City[], adcode: string): City | undefined {
   );
 }
 
+/**
+ * The city named in a Chinese address ("陕西省西安市碑林区…" → 西安), by its full official name so a
+ * province (吉林省) isn't read as its city (吉林市). The longest match wins.
+ */
+export function cityInAddress(all: City[], address: string): City | undefined {
+  return all.filter((c) => c.t === "city" && address.includes(c.n)).sort((a, b) => b.n.length - a.n.length)[0];
+}
+
 export const cityLabel = (c: City) => `${c.e} · ${c.s}`;
