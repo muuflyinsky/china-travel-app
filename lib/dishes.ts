@@ -8,7 +8,7 @@ import { structured, allergenEnum } from "./llm";
 import { langName } from "./languages";
 import { ALLERGENS } from "./allergens";
 import { cacheGet, cachePut, canonicalZh, factsGet, isChineseName, mergeFacts, PROMPT_VERSION, type Cached } from "./dish-cache";
-import { answerFor, isVariantName, normalizeName, regionOf } from "./dish-name";
+import { answerFor, cleanZh, hasChinese, isVariantName, normalizeName, regionOf } from "./dish-name";
 import { tighten } from "./ingredients";
 
 const ROLE = z.enum(["main", "sauce", "garnish"]);
@@ -24,6 +24,8 @@ export type ListDish = {
   zh: string; pinyin: string; price: string; name: string; short: string;
   allergens: DishAllergen[]; spice: number; vegetarian: boolean; meat: string[]; alcohol: boolean;
   confidence: "high" | "medium" | "low"; printed?: string;
+  /** What the traveller typed, when the Chinese name came from the model: shown so a misreading can be noticed. */
+  typed?: string;
 };
 
 export type DishDetail = {
@@ -151,13 +153,16 @@ function repairFacts(raw: unknown) {
   };
 }
 
+// A name typed in English or pinyin: staff can only read the order card in Chinese.
+const TYPED = ` (typed by the traveller, not Chinese: in "zh" give this dish's usual Chinese name; if you don't recognise the dish, copy the name as given)`;
+
 export async function generateFacts(names: { zh: string; printed: string }[], lang: string, city: string | undefined, wantTips: boolean) {
   return structured(FactsSchema, {
     system: FACTS_SYSTEM, maxTokens: 700 * names.length + 400, example: FACTS_EXAMPLE, repair: repairFacts,
     text: `Target language: ${langName(lang)}.\n` +
       (city ? `The restaurant is in ${city}; use that region's version of each dish.\n` : "") +
       (wantTips ? "" : "Leave tips empty.\n") +
-      `Dishes:\n${names.map((n, i) => `${i + 1}. ${n.zh}${n.printed ? ` (menu says: ${n.printed})` : ""}`).join("\n")}`,
+      `Dishes:\n${names.map((n, i) => `${i + 1}. ${n.zh}${n.printed ? ` (menu says: ${n.printed})` : ""}${hasChinese(n.zh) ? "" : TYPED}`).join("\n")}`,
   });
 }
 
@@ -289,7 +294,8 @@ export async function* readMenu(input: { image?: { data: string; mediaType: stri
       const facts = stored.has(i) ? mergeFacts(stored.get(i)!, drawn) : drawn;
       const via: Record<string, string> = Object.fromEntries(f.allergens.map((a) => [a.via_zh, a.via]));
       const dish: ListDish = tighten({
-        ...f, ...facts, zh: items[i].zh, price: items[i].price, printed: items[i].printed || undefined,
+        // A typed name takes the model's Chinese name; without one it stays as typed and can't go on the order card.
+        ...f, ...facts, ...(hasChinese(items[i].zh) || !hasChinese(cleanZh(f.zh)) ? { zh: items[i].zh } : { zh: cleanZh(f.zh), typed: items[i].zh }), price: items[i].price, printed: items[i].printed || undefined,
         allergens: facts.allergens.map((a) => ({ ...a, via: via[a.via_zh] || a.via_zh })),
       });
       if (!items[i].printed && !isVariantName(items[i].zh)) {
