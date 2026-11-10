@@ -101,7 +101,8 @@ export function sameRestaurant(guideName: string, poiName: string, opts: { cityW
   return !g.branch || sameBranch;
 }
 
-const CLOSED = /暂停营业|已关闭|停业|歇业|已搬迁/;
+/** A closed or moved place, as Amap marks it in the name. Shared with hotel picks (lib/hotels.ts). */
+export const CLOSED = /暂停营业|已关闭|停业|歇业|已搬迁/;
 
 /**
  * The map result that is this listed restaurant, and which name matched: the Chinese name, or
