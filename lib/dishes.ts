@@ -8,7 +8,7 @@ import { structured, allergenEnum } from "./llm";
 import { langName } from "./languages";
 import { ALLERGENS } from "./allergens";
 import { cacheGet, cachePut, canonicalZh, factsGet, isChineseName, mergeFacts, PROMPT_VERSION, type Cached } from "./dish-cache";
-import { normalizeName, regionOf } from "./dish-name";
+import { answerFor, isVariantName, normalizeName, regionOf } from "./dish-name";
 import { tighten } from "./ingredients";
 
 const ROLE = z.enum(["main", "sauce", "garnish"]);
@@ -233,8 +233,8 @@ export async function* readMenu(input: { image?: { data: string; mediaType: stri
   yield { type: "meta", cuisine, total: items.length };
   if (!items.length) return;
 
-  // Cache first. Dishes with menu-printed text are the house version, so they skip the cache.
-  const hits = await Promise.all(items.map((it) => (it.printed ? null : cacheGet(it.zh, region, input.lang))));
+  // Cache first. Dishes with menu-printed text are the house version, and variants aren't the plain dish, so they skip the cache.
+  const hits = await Promise.all(items.map((it) => (it.printed || isVariantName(it.zh) ? null : cacheGet(it.zh, region, input.lang))));
   const tCache = Date.now();
   const misses: number[] = [];
   for (let i = 0; i < items.length; i++) {
@@ -246,7 +246,7 @@ export async function* readMenu(input: { image?: { data: string; mediaType: stri
   // Facts another language already stored: a new language merges into them instead of replacing them.
   const stored = new Map<number, Cached["facts"]>();
   await Promise.all(misses.map(async (i) => {
-    const f = items[i].printed ? null : await factsGet(items[i].zh, region);
+    const f = items[i].printed || isVariantName(items[i].zh) ? null : await factsGet(items[i].zh, region);
     if (f) stored.set(i, f);
   }));
 
@@ -254,7 +254,11 @@ export async function* readMenu(input: { image?: { data: string; mediaType: stri
   type Facts = z.infer<typeof FactsSchema>;
   type Done = { id: number; b: number[]; out: Facts | null; err?: string };
   const batches: number[][] = [];
-  for (let k = 0; k < misses.length; k += CHUNK) batches.push(misses.slice(k, k + CHUNK));
+  // Variants and typed names can't be matched to an answer safely inside a batch, so they are asked alone.
+  const alone = (i: number) => isVariantName(items[i].zh) || !isChineseName(items[i].zh);
+  const together = misses.filter((i) => !alone(i));
+  for (let k = 0; k < together.length; k += CHUNK) batches.push(together.slice(k, k + CHUNK));
+  batches.push(...misses.filter(alone).map((i) => [i]));
   const running = new Map<number, Promise<Done>>();
   const failed: number[] = [];
   const writes: Promise<unknown>[] = [];
@@ -274,9 +278,13 @@ export async function* readMenu(input: { image?: { data: string; mediaType: stri
     if (!cuisine && out.cuisine) { cuisine = out.cuisine; yield { type: "meta", cuisine, total: items.length }; }
     if (!tipsSent && out.tips.length) { tipsSent = true; yield { type: "tips", tips: out.tips.slice(0, 2) }; }
     for (const [j, i] of b.entries()) {
-      // Models occasionally reorder, so prefer an exact name match over the position.
-      const f = out.dishes.find((d) => normalizeName(d.zh) === normalizeName(items[i].zh)) ?? out.dishes[j];
-      if (!f) { failed.push(i); continue; }
+      // Models occasionally reorder or skip a dish, so an answer is matched by name (and then cached under it).
+      const f = answerFor(b.map((x) => items[x].zh), j, out.dishes);
+      if (!f) {
+        console.warn(`[menu] no answer for ${items[i].zh}; got ${out.dishes.map((d) => d.zh).join("、") || "nothing"}`);
+        if (b.length > 1) batches.push([i]); else failed.push(i);
+        continue;
+      }
       const drawn: Cached["facts"] = { pinyin: f.pinyin, allergens: f.allergens.map(({ id, role, via_zh }) => ({ id, role, via_zh })), spice: f.spice, vegetarian: f.vegetarian, meat: f.meat, alcohol: f.alcohol, confidence: f.confidence };
       const facts = stored.has(i) ? mergeFacts(stored.get(i)!, drawn) : drawn;
       const via: Record<string, string> = Object.fromEntries(f.allergens.map((a) => [a.via_zh, a.via]));
@@ -284,12 +292,13 @@ export async function* readMenu(input: { image?: { data: string; mediaType: stri
         ...f, ...facts, zh: items[i].zh, price: items[i].price, printed: items[i].printed || undefined,
         allergens: facts.allergens.map((a) => ({ ...a, via: via[a.via_zh] || a.via_zh })),
       });
-      if (!items[i].printed) {
+      if (!items[i].printed && !isVariantName(items[i].zh)) {
         writes.push(cachePut(items[i].zh, region, input.lang, { facts, text: { name: f.name, short: f.short, via } })
           .catch((e) => console.error("[dish-cache] write:", (e as Error).message)));
       }
       yield { type: "dish", i, dish, cached: false };
     }
+    while (running.size < PARALLEL && next < batches.length) launch(); // dishes queued above to be asked alone
   }
   // The first upstream error (no secrets in it) helps diagnose from the browser when logs aren't at hand.
   // Serverless hosts freeze the instance once the response ends, so writes still in flight would be
@@ -303,7 +312,7 @@ export async function* readMenu(input: { image?: { data: string; mediaType: stri
 export async function dishDetail(input: { zh: string; printed?: string; lang: string; city?: string; adcode?: string }): Promise<DishDetail & { cached: boolean }> {
   const t0 = Date.now();
   const region = regionOf(input.adcode);
-  const hit = input.printed ? null : await cacheGet(input.zh, region, input.lang);
+  const hit = input.printed || isVariantName(input.zh) ? null : await cacheGet(input.zh, region, input.lang);
   if (hit?.detail) {
     console.log(`[dish] cache hit ${normalizeName(input.zh)} ${Date.now() - t0}ms`);
     return { ...hit.detail, cached: true };

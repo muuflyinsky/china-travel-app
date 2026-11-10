@@ -9,7 +9,8 @@
     "typecheck": "next typegen && tsc --noEmit",
     "check:allergens": "node scripts/check-allergens.mjs",
     "check:must-see": "node scripts/check-must-see.mjs",
-    "verify": "npm run typecheck && npm run check:allergens && npm run check:must-see"
+    "check:dish-names": "node scripts/check-dish-names.mjs",
+    "verify": "npm run typecheck && npm run check:allergens && npm run check:must-see && npm run check:dish-names"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "1.1.0",

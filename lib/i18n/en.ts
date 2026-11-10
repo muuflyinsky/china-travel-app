@@ -245,7 +245,7 @@ export const en = {
     wrongInfo: "This dish info is wrong",
     wrongThanks: "Thanks. We’ll check this dish again.",
     detailDown: "Couldn’t load the details. The verdict above still applies.",
-    missing: "{n} dishes couldn’t be read. Try a closer photo of that part of the menu.",
+    missing: "{n} dishes couldn’t be read, so they have no allergy check. Try again, or take a closer photo of that part of the menu.",
     whyOk: "None of your allergies or diet rules are in the usual recipe. Kitchens vary.",
     whyAsk: "Usually made with {x}. You can ask them to leave it out.",
     listen: "Hear it in Chinese",

@@ -570,7 +570,8 @@ export default function MenuPage() {
   const got = (p: MealPage) => p.dishes.filter(Boolean).length;
   const pending = page && page.id === streamingId ? Math.max(0, page.total - got(page) - page.missing) : 0;
   // A page whose reading was cut short (Eat closed mid-way) counts the rest as unread.
-  const missing = page ? (page.id === streamingId ? page.missing : Math.max(page.missing, page.total - got(page))) : 0;
+  const unread = (p: MealPage) => (p.id === streamingId ? p.missing : Math.max(p.missing, p.total - got(p)));
+  const missing = page ? unread(page) : pages.reduce((n, p) => n + unread(p), 0);
   const tips = [...new Set((page ? [page] : pages).flatMap((p) => p.tips))];
   const restrictionNames = [...profile.allergens.map((a) => t.allergens[a as AllergenId]), ...profile.diets.map((d) => t.diets[d as DietId])];
   const restrictionLabels = [

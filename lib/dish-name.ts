@@ -6,6 +6,8 @@ const T2S: Record<string, string> = Object.fromEntries(
     .split(" ").map((p) => [p[0], p[1]]),
 );
 
+const PREFIX = /^(招牌|特色|秘制|精品|本店|特价|推荐|主厨)+/;
+
 /**
  * The cache key for a dish name: simplified characters, no spaces, punctuation, prices,
  * portion words or marketing prefixes, no "(branch)" suffix. "老" is kept on purpose: it's
@@ -16,10 +18,41 @@ export function normalizeName(zh: string) {
   n = n.replace(/[（(][^）)]*[)）]/g, "");
   n = n.replace(/[¥￥$]?\s*\d+(\.\d+)?\s*(元|块)?(\/\s*[份斤两位例只条个碗盘])?/g, "");
   n = n.replace(/(小份|中份|大份|半份|例牌|[大中小]例)/g, "");
-  n = n.replace(/^(招牌|特色|秘制|精品|本店|特价|推荐|主厨)+/, "");
+  n = n.replace(PREFIX, "");
   n = n.replace(/[\s\p{P}\p{S}]/gu, "");
   return n;
 }
 
 /** Province code for regional versions: the first two digits of the city adcode ('51' Sichuan). */
 export const regionOf = (adcode?: string) => (adcode && /^\d{6}$/.test(adcode) ? adcode.slice(0, 2) : "");
+
+/**
+ * Whether an answer to a question about one dish is about that dish: at least half of the name's
+ * Chinese characters appear in it. A typed pinyin or English name has nothing to compare.
+ */
+function sameDishName(asked: string, answer: string) {
+  const chars = (zh: string) => new Set(normalizeName(zh).match(/[一-鿿]/g) ?? []);
+  const want = chars(asked), got = chars(answer);
+  return !want.size || [...want].filter((c) => got.has(c)).length * 2 >= want.size;
+}
+
+/**
+ * The model's answer for dish j of a batch, found by name and never by position: the answer at the
+ * same position could be another dish's, with another dish's allergens. No answer means undefined;
+ * readMenu then asks about that dish alone.
+ */
+export function answerFor<T extends { zh: string }>(asked: string[], j: number, answers: T[]): T | undefined {
+  if (asked.length === 1 && answers.length === 1) return sameDishName(asked[0], answers[0].zh) ? answers[0] : undefined;
+  const exact = answers.find((a) => a.zh.trim() === asked[j].trim());
+  if (exact) return exact;
+  const name = normalizeName(asked[j]);
+  // Two dishes that normalize alike can't be told apart this way.
+  if (!name || asked.some((zh, k) => k !== j && normalizeName(zh) === name)) return undefined;
+  return answers.find((a) => normalizeName(a.zh) === name);
+}
+
+/**
+ * A name normalizeName shortens into another dish's key: 夫妻肺片（去花生）, 招牌炒饭, 1号套餐, 套餐2.
+ * It is that version of the dish, so it is asked alone and never read from or written to the shared cache.
+ */
+export const isVariantName = (zh: string) => /[（(]|\d/.test(zh) || PREFIX.test([...zh.trim()].map((c) => T2S[c] ?? c).join(""));
