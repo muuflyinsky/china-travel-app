@@ -693,6 +693,11 @@ export const ko: Dict = {
     reading: "예약 정보 읽는 중…",
     error: "호텔 이름과 주소를 읽지 못했어요. 더 선명한 스크린샷으로 해 보세요.",
     change: "호텔 변경",
+    shotTitle: "이 스크린샷을 AI 서비스로 보낼까요?",
+    shotBody: "호텔 이름과 주소를 찾기 위해 스크린샷은 저희 서버를 거쳐 외부 AI 서비스 Alibaba Cloud Model Studio(Qwen)로 보내집니다. 저장되지 않습니다.",
+    shotTip: "예약 스크린샷에는 이름과 예약 번호가 보이는 경우가 많습니다. 원하면 먼저 잘라내거나 가려 주세요. 호텔 이름과 주소만 있으면 됩니다.",
+    shotSend: "계속",
+    shotCancel: "취소",
   },
   guide: {
     taxRow: "{city} 세금 환급",

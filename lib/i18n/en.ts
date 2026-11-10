@@ -696,6 +696,11 @@ export const en = {
     reading: "Reading your booking…",
     error: "Couldn't read the hotel name and address. Try a clearer screenshot.",
     change: "Change hotel",
+    shotTitle: "Send this screenshot to an AI service?",
+    shotBody: "To find the hotel’s name and address, the screenshot goes through our server to a third-party AI service, Alibaba Cloud Model Studio (Qwen). It isn’t stored.",
+    shotTip: "Booking screenshots often show your name and booking number. If you like, crop or cover them first: the hotel name and address are enough.",
+    shotSend: "Continue",
+    shotCancel: "Cancel",
   },
   guide: {
     taxRow: "Tax refund in {city}",
