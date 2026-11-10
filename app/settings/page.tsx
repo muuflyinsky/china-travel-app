@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Check, Plus, X, Trash2, Languages, Banknote, SunMoon, CarTaxiFront, IdCard, Stamp, CalendarRange, MapPinned, ShieldAlert, Salad, Ticket, HandHeart, Coins, Lock, LifeBuoy, Info } from "lucide-react";
+import { Check, Plus, X, Trash2, Languages, Banknote, SunMoon, CarTaxiFront, IdCard, Stamp, CalendarRange, MapPinned, ShieldAlert, Salad, Ticket, HandHeart, Coins, Lock, LifeBuoy, Info, Sparkles, Send } from "lucide-react";
 import { Screen } from "@/components/Shell";
-import { Section, Group, Row, Field, Note, IconTile } from "@/components/ui";
+import { Section, Group, Row, Field, Note, IconTile, Card } from "@/components/ui";
 import { EditSheet } from "@/components/EditSheet";
 import { AppIcon } from "@/components/AppIcon";
 import { CountryPicker, useCountryName } from "@/components/VisaCheck";
@@ -22,11 +22,13 @@ import { privacyText, supportText } from "@/lib/legal";
 import { TipJar } from "@/components/TipJar";
 import { hasPasses, products, savedPass, showPaywall } from "@/lib/passes";
 import { PASSES } from "@/lib/products";
+import { setAiConsent, useAiConsent, withAi } from "@/lib/ai-consent";
+import { AiConsentFacts } from "@/components/AiConsent";
 
 const CURRENCIES = ["USD", "EUR", "GBP", "JPY", "KRW", "AUD", "CAD", "SGD", "HKD", "CHF", "THB", "MYR", "NZD", "SEK", "INR", "BRL", "MXN", "RUB", "TRY", "IDR", "VND", "PHP"];
 const toggle = (list: string[], id: string) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
-type Sheet = "passport" | "language" | "currency" | "theme" | "dates" | "entry" | "cities" | "allergies" | "diet" | "earn" | "privacy" | "ride" | "tips";
-const SHEETS: Sheet[] = ["passport", "language", "currency", "theme", "dates", "entry", "cities", "allergies", "diet", "earn", "privacy"];
+type Sheet = "passport" | "language" | "currency" | "theme" | "dates" | "entry" | "cities" | "allergies" | "diet" | "earn" | "privacy" | "ride" | "tips" | "ai";
+const SHEETS: Sheet[] = ["passport", "language", "currency", "theme", "dates", "entry", "cities", "allergies", "diet", "earn", "privacy", "ai"];
 const THEMES = ["system", "light", "dark"] as const;
 
 /** Row icon: a lucide glyph on a tinted tile (no emoji, docs/design/CRITIQUE-v1.md). */
@@ -56,6 +58,7 @@ export default function SettingsPage() {
   const t = useT();
   const [p, set, loaded] = useProfile();
   const country = useCountryName(p.lang);
+  const ai = useAiConsent();
   const [sheet, setSheet] = useState<Sheet | null>(null);
   // Passes and tips show only in an app version with the StoreKit plugin, and only once the App
   // Store returns the products (never a purchase row that can't work).
@@ -123,12 +126,32 @@ export default function SettingsPage() {
         </Group>
       </Section>
 
+      {/* Third-party AI consent (App Store 5.1.2(i)): on/off any time, and what is sent. */}
+      <Section title={t.aiConsent.section}>
+        <Group>
+          <Row icon={<Ico I={Sparkles} />} title={t.aiConsent.row} chevron={false}
+            after={ai.loaded ? (
+              <button type="button" role="switch" aria-checked={ai.state === "granted"} aria-label={t.aiConsent.row}
+                onClick={() => (ai.state === "granted" ? setAiConsent("denied") : withAi())}
+                className={`relative h-[31px] w-[51px] shrink-0 rounded-full transition-colors ${ai.state === "granted" ? "bg-cobalt" : "bg-line"}`}>
+                <span className={`absolute top-0.5 h-[27px] w-[27px] rounded-full bg-white shadow transition-[left] ${ai.state === "granted" ? "left-[22px]" : "left-0.5"}`} aria-hidden />
+              </button>
+            ) : undefined} />
+          <Row onClick={() => setSheet("ai")} icon={<Ico I={Send} />} title={t.aiConsent.whatSent} />
+          <Row onClick={() => setSheet("privacy")} icon={<Ico I={Lock} />} title={t.settings.privacyTitle} />
+        </Group>
+        <p className="px-4 text-footnote text-muted">
+          {ai.state === "granted"
+            ? fmt(t.aiConsent.footerOn, { date: ai.at ? new Date(ai.at).toLocaleDateString(p.lang, { day: "numeric", month: "short", year: "numeric" }) : "" })
+            : ai.state === "denied" ? t.aiConsent.footerOff : t.aiConsent.footerAsk}
+        </p>
+      </Section>
+
       <Section title={t.settings.about}>
         <Group>
           {store && <Row onClick={() => showPaywall()} icon={<Ico I={Ticket} />} title={t.pass.settingsRow} after={<Value>{store.ends ? fmt(t.pass.active, { date: new Date(store.ends).toLocaleDateString(p.lang, { day: "numeric", month: "short" }) }) : t.pass.settingsNone}</Value>} />}
           {store && <Row onClick={() => setSheet("tips")} icon={<Ico I={HandHeart} />} title={t.pass.tipsRow} />}
           <Row href="/support" icon={<Ico I={LifeBuoy} />} title={supportText(p.lang).title} />
-          <Row onClick={() => setSheet("privacy")} icon={<Ico I={Lock} />} title={t.settings.privacyTitle} />
           <Row onClick={() => setSheet("earn")} icon={<Ico I={Coins} />} title={t.settings.howWeEarn} />
           <Row icon={<Ico I={Info} />} title={t.settings.version} after={<Value>{pkg.version}</Value>} chevron={false} />
         </Group>
@@ -278,6 +301,11 @@ export default function SettingsPage() {
 
       <EditSheet open={sheet === "earn"} title={t.settings.howWeEarn} onClose={close}>
         <p className="text-body">{t.settings.howWeEarnBody}</p>
+      </EditSheet>
+
+      <EditSheet open={sheet === "ai"} title={t.aiConsent.whatSent} onClose={close}>
+        <Card><AiConsentFacts /></Card>
+        <Link href="/privacy" className="flex min-h-11 items-center px-1 text-subhead font-semibold text-cobalt">{privacyText(p.lang).title} ›</Link>
       </EditSheet>
 
       <EditSheet open={sheet === "privacy"} title={t.settings.privacyTitle} onClose={close}>

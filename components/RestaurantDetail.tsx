@@ -20,6 +20,7 @@ import { track } from "@/lib/track";
 import type { ListedRestaurant } from "@/lib/restaurants";
 import type { ListDish, MenuEvent } from "@/lib/dishes";
 import { hasChinese } from "@/lib/dish-name";
+import { aiConsent } from "@/lib/ai-consent";
 
 /**
  * Signature dishes through the menu pipeline (/api/menu with typed names): dish knowledge base
@@ -30,7 +31,9 @@ function useSignatureDishes(names: string[], lang: string, city: { e: string; n:
   const [dishes, setDishes] = useState<(ListDish | undefined)[] | null>(null);
   const key = names.join("\n");
   useEffect(() => {
-    if (!key) { setDishes(null); return; }
+    // Our own list of this restaurant's dishes, with the app language: no traveller content, so it
+    // isn't held back before the AI question is asked, only after a "no" (lib/ai-consent.ts).
+    if (!key || aiConsent() === "denied") { setDishes(null); return; }
     const ctl = new AbortController();
     setDishes(names.map(() => undefined));
     (async () => {

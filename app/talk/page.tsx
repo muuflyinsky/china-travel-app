@@ -16,6 +16,8 @@ import { useT } from "@/components/useT";
 import { ShowCard } from "@/components/ShowCard";
 import { PHRASES } from "@/lib/phrases";
 import { langName } from "@/lib/languages";
+import { aiConsent, useAiConsent, withAi } from "@/lib/ai-consent";
+import { AiOff } from "@/components/AiConsent";
 
 type Result = { translation: string; pinyin: string; note: string; demo?: boolean };
 
@@ -66,6 +68,8 @@ export default function TalkPage() {
 
   async function go(input = text) {
     if (!input.trim()) { setError(t.talk.typeFirst); inputRef.current?.focus(); return; }
+    // The sentence goes to the AI service: ask first (lib/ai-consent.ts); nothing is sent on "no".
+    if (aiConsent() !== "granted") { withAi(() => go(input)); return; }
     setLoading(true); setRes(null); setError(undefined);
     let d: Result;
     try {
@@ -133,10 +137,12 @@ export default function TalkPage() {
   }
 
   const phrases = PHRASES.find((g) => g.group === group)!.items;
+  const ai = useAiConsent();
 
   return (
     <Screen title={t.talk.title}>
       <Section>
+        {ai.state === "denied" && <AiOff title={t.aiConsent.offTalkTitle} body={t.aiConsent.offTalkBody} />}
         <Card className="p-0!">
           {/* Direction: what you type → what they read. Tap either side, or the arrows, to swap. */}
           <div className="flex items-center gap-1 border-b border-line p-1.5" role="group" aria-label={t.talk.swap}>

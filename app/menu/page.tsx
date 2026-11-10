@@ -25,6 +25,8 @@ import { verdict, withDetailAllergens, type Verdict, type VerdictKind } from "@/
 import { hasChinese } from "@/lib/dish-name";
 import { VerdictTag, reasonText, verdictLabel } from "@/components/VerdictTag";
 import { orderCard, staffReplies, allergyExplain as allergyExplainText } from "@/lib/order-card";
+import { aiConsent, useAiConsent, withAi } from "@/lib/ai-consent";
+import { AiOff } from "@/components/AiConsent";
 import { MEAL_TTL, clearMeal, isSaved, loadMeal, loadSaved, mergeDish, pageId, refreshSaved, saveMeal, thumbnail, toggleSaved, SAVED_EVENT, type Line, type MealPage, type SavedDish } from "@/lib/meal";
 
 /** Photos picked from the library at once: one meal's worth (DECISIONS D8: 4 photos per free use). */
@@ -32,7 +34,7 @@ const MAX_PICK = 4;
 
 const toggle = (list: string[], id: string) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
 
-type Detail = DishDetail | "loading" | "error";
+type Detail = DishDetail | "loading" | "error" | "off";
 
 // Details already fetched this session, by dish + language: reopening a dish is instant.
 const detailCache = new Map<string, DishDetail>();
@@ -117,8 +119,8 @@ function DishSkeleton() {
 }
 
 /** Bottom sheet for one dish: why, what's usually in it, and the add actions. */
-function DishSheet({ d, v, mine, detail, line, saved, staffNo, onSave, onAdd, onFlag, onClose, homePrice }: {
-  d: ListDish; v: Verdict; mine: string[]; detail?: Detail; line?: Line; saved: boolean; staffNo?: boolean; onSave: () => void; onAdd: (without: string[]) => void; onFlag: () => void; onClose: () => void; homePrice?: string;
+function DishSheet({ d, v, mine, detail, line, saved, staffNo, onSave, onAdd, onFlag, onClose, onAllowAi, homePrice }: {
+  d: ListDish; v: Verdict; mine: string[]; detail?: Detail; line?: Line; saved: boolean; staffNo?: boolean; onSave: () => void; onAdd: (without: string[]) => void; onFlag: () => void; onClose: () => void; onAllowAi: () => void; homePrice?: string;
 }) {
   const t = useT();
   const [copied, setCopied] = useState(false);
@@ -180,6 +182,12 @@ function DishSheet({ d, v, mine, detail, line, saved, staffNo, onSave, onAdd, on
           {typeof detail === "object" && detail.description && <p className="text-body">{detail.description}</p>}
           {detail === "loading" && <div className="flex items-center gap-3 text-muted" role="status"><Preloader className="h-5! w-5!" />{t.common.loading}</div>}
           {detail === "error" && <Note tone="warn">{t.eat.detailDown}</Note>}
+          {detail === "off" && (
+            <div className="space-y-2">
+              <Note>{t.aiConsent.offDish}</Note>
+              <Button variant="soft" className="w-full" onClick={onAllowAi}>{t.aiConsent.allowBtn}</Button>
+            </div>
+          )}
 
           {groups.map((g) => (
             <div key={g.title}>
@@ -612,7 +620,14 @@ export default function MenuPage() {
   async function openDish(k: string) {
     setOpened(k);
     const d = allRows.find((r) => r.k === k)?.d;
-    if (!d || details[k]) return;
+    if (!d || (details[k] && details[k] !== "off")) return;
+    // Dish details go to the AI service: only once the traveller has allowed it (lib/ai-consent.ts).
+    if (aiConsent() !== "granted") {
+      setDetails((x) => ({ ...x, [k]: "off" }));
+      // Not asked yet: ask now. After a "no", the sheet shows a note and an "Allow" button instead.
+      if (aiConsent() === null) withAi(() => { setDetails((x) => ({ ...x, [k]: "loading" })); openDish(k); });
+      return;
+    }
     const ck = `${d.zh}|${profile.lang}|${city.a}`;
     const got = (detail: Detail) => {
       setDetails((x) => ({ ...x, [k]: detail }));
@@ -675,6 +690,7 @@ export default function MenuPage() {
   const openRow = opened == null ? undefined : allRows.find((r) => r.k === opened);
   const lastThumb = [...pages].reverse().find((p) => p.thumb)?.thumb;
   const hasMeal = pages.length > 0;
+  const ai = useAiConsent();
 
   return (
     <Screen title={t.eat.title}>
@@ -685,7 +701,9 @@ export default function MenuPage() {
       {(!hasMeal || inputOpen) && (
         <Section>
           {expired && !hasMeal && <Note>{t.eat.mealExpired}</Note>}
-          <Card>
+          {ai.state === "denied" ? (
+            <AiOff title={t.aiConsent.offMenuTitle} body={t.aiConsent.offMenuBody} works={!hasMeal} onAllergyCard={showAllergyCard} />
+          ) : <Card>
             {mode === "photo" ? (
               <>
                 <div className="flex items-center gap-3">
@@ -698,8 +716,8 @@ export default function MenuPage() {
                   </div>
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-2">
-                  <Button onClick={() => fileRef.current?.click()} disabled={busy} className="min-w-0 px-2.5! py-1.5 text-subhead! leading-tight"><Camera className="h-5 w-5 shrink-0" aria-hidden /><span>{t.eat.takePhotoBtn}</span></Button>
-                  <Button variant="soft" onClick={() => libraryRef.current?.click()} disabled={busy} className="min-w-0 px-2.5! py-1.5 text-subhead! leading-tight"><Images className="h-5 w-5 shrink-0" aria-hidden /><span>{t.eat.choosePhoto}</span></Button>
+                  <Button onClick={() => withAi(() => fileRef.current?.click())} disabled={busy} className="min-w-0 px-2.5! py-1.5 text-subhead! leading-tight"><Camera className="h-5 w-5 shrink-0" aria-hidden /><span>{t.eat.takePhotoBtn}</span></Button>
+                  <Button variant="soft" onClick={() => withAi(() => libraryRef.current?.click())} disabled={busy} className="min-w-0 px-2.5! py-1.5 text-subhead! leading-tight"><Images className="h-5 w-5 shrink-0" aria-hidden /><span>{t.eat.choosePhoto}</span></Button>
                 </div>
               </>
             ) : (
@@ -709,7 +727,7 @@ export default function MenuPage() {
                   <textarea rows={4} placeholder={"宫保鸡丁\n鱼香肉丝"} value={text} onChange={(e) => setText(e.target.value)}
                     className="zh mt-2 w-full resize-none rounded-control bg-porcelain p-3 text-body outline-none placeholder:text-muted" />
                 </label>
-                <Button className="mt-3 w-full" disabled={busy || !text.trim()} onClick={() => { gen.current++; setPicking(false); run({ text }); }}>{t.eat.lookUp}</Button>
+                <Button className="mt-3 w-full" disabled={busy || !text.trim()} onClick={() => withAi(() => { gen.current++; setPicking(false); run({ text }); })}>{t.eat.lookUp}</Button>
               </>
             )}
             <div className="mt-2 -mb-2 flex flex-wrap items-center justify-between gap-x-3">
@@ -725,7 +743,7 @@ export default function MenuPage() {
                 </select>
               </label>
             </div>
-          </Card>
+          </Card>}
           {/* Most city restaurants order by QR code: their mini-program menu shows photos, not
               ingredients (DECISIONS D9). Screenshots go through the same allergy check. */}
           {!hasMeal && (
@@ -775,8 +793,8 @@ export default function MenuPage() {
                 </div>
                 {/* Add a page / type instead, folded into the summary line so dishes start higher. */}
                 <div className="flex shrink-0 gap-2">
-                  <IconButton label={t.eat.addPage} onClick={() => fileRef.current?.click()} disabled={busy}><Camera className="h-5 w-5" /></IconButton>
-                  <IconButton label={t.eat.choosePhoto} onClick={() => libraryRef.current?.click()} disabled={busy}><Images className="h-5 w-5" /></IconButton>
+                  <IconButton label={t.eat.addPage} onClick={() => withAi(() => fileRef.current?.click())} disabled={busy}><Camera className="h-5 w-5" /></IconButton>
+                  <IconButton label={t.eat.choosePhoto} onClick={() => withAi(() => libraryRef.current?.click())} disabled={busy}><Images className="h-5 w-5" /></IconButton>
                   <IconButton label={t.eat.type} onClick={() => { setMode("type"); setInputOpen(true); }}><Keyboard className="h-5 w-5" /></IconButton>
                 </div>
               </div>
@@ -789,7 +807,7 @@ export default function MenuPage() {
               <div className="chip-row py-0.5" role="group" aria-label={t.eat.pages}>
                 {pages.length > 1 && <PageChip n={new Set(allRows.map((r) => r.d.zh)).size} label={t.eat.allPages} pressed={view === "all"} onClick={() => { setView("all"); setFilter("all"); }} />}
                 {pages.map((p) => <PageChip key={p.id} page={p} n={got(p)} label={pageLabel(p)} pressed={at === p.id} onClick={() => { setView(p.id); setFilter("all"); }} />)}
-                <button onClick={() => fileRef.current?.click()} disabled={busy}
+                <button onClick={() => withAi(() => fileRef.current?.click())} disabled={busy}
                   className="flex min-h-touch shrink-0 items-center gap-1.5 rounded-control px-3 text-subhead font-semibold text-cobalt ring-1 ring-line ring-inset disabled:opacity-50">
                   <Plus className="h-4 w-4" aria-hidden />{t.eat.addPage}
                 </button>
@@ -863,7 +881,7 @@ export default function MenuPage() {
         <DishSheet d={openRow.d} v={openRow.v} mine={profile.allergens} detail={details[openRow.k]} line={order[openRow.d.zh]} homePrice={homePrice(openRow.d.price)}
           saved={isSaved(saved, openRow.d.zh)} staffNo={staffNo.includes(openRow.d.zh)} onSave={() => toggleSaved(openRow.d)}
           onAdd={(without) => { setLine(openRow.d.zh, { qty: 1, without }); setOpened(null); }}
-          onFlag={() => flagDish(openRow.d)} onClose={() => setOpened(null)} />
+          onFlag={() => flagDish(openRow.d)} onClose={() => setOpened(null)} onAllowAi={() => withAi(() => openDish(openRow.k))} />
       )}
       {savedOpen && <SavedSheet saved={saved} restricted={restricted} restrictions={restrictions} factsFor={factsFor} staffNo={staffNo} onAdd={addSaved} onClose={() => setSavedOpen(false)} />}
       {card && <ShowCard {...card} onClose={() => setCard(null)} />}

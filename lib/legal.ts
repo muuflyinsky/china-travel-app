@@ -1,7 +1,7 @@
 // Privacy policy and support page text (App Store requires both URLs). Describes what the code
 // actually does — keep it in step with lib/track.ts, app/api/go, app/api/t, lib/dish-cache.ts
 // and docs/SPEC.md §8 when data handling changes, and bump UPDATED.
-export const UPDATED = "2026-11-01";
+export const UPDATED = "2026-11-10";
 export const SUPPORT_EMAIL = "support@haodego.com";
 
 type Section = { h: string; items: string[] };
@@ -21,7 +21,8 @@ const PRIVACY: Record<string, Privacy> = {
         "Delete everything at any time in Settings → Clear all data, or by deleting the app.",
       ] },
       { h: "What is sent when you use a feature", items: [
-        "Menu photos and dish names you type, with your language and city, go to an AI service (Alibaba Cloud Model Studio, Qwen) to be read. Photos are discarded after reading and never stored.",
+        "Before anything goes to the AI service, the app asks once whether you allow it. If you don’t, nothing is sent: menu reading, dish details, translation and booking screenshots stay off, and everything else works. Change it any time in Settings → Privacy → AI service.",
+        "Menu photos and dish names you type, with your language and city, go to a third-party AI service (Alibaba Cloud Model Studio, Qwen; Anthropic, Claude, as backup) to be read. Photos are discarded after reading and never stored.",
         "Text you translate and hotel booking screenshots you add go to the same AI service and are not stored.",
         "Your location, only if you allow it, and the places you search for go to Amap (高德地图) to find your city, places and routes. We don’t store your location.",
       ] },
@@ -35,7 +36,7 @@ const PRIVACY: Record<string, Privacy> = {
         "Our hosting provider keeps standard server logs, including IP addresses, for a short time for security and troubleshooting.",
       ] },
       { h: "Service providers", items: [
-        "Vercel (hosting, Hong Kong), Alibaba Cloud Model Studio (AI), Amap (maps and places) and Supabase (database for dish facts and anonymous events). They process data only to provide this service.",
+        "Vercel (hosting, Hong Kong), Alibaba Cloud Model Studio (AI) with Anthropic as backup, Amap (maps and places) and Supabase (database for dish facts and anonymous events). They process data only to provide this service.",
       ] },
       { h: "Children", items: ["The app is not directed at children under 13."] },
       { h: "Your rights and changes", items: [
@@ -57,7 +58,8 @@ const PRIVACY: Record<string, Privacy> = {
         "Puedes borrarlo todo cuando quieras en Ajustes → Borrar todos los datos, o eliminando la app.",
       ] },
       { h: "Lo que se envía al usar una función", items: [
-        "Las fotos de cartas y los nombres de platos que escribes, con tu idioma y ciudad, se envían a un servicio de IA (Alibaba Cloud Model Studio, Qwen) para leerlos. Las fotos se descartan tras leerlas y nunca se guardan.",
+        "Antes de enviar nada al servicio de IA, la app te pregunta una vez si lo permites. Si no, no se envía nada: la lectura de cartas, los detalles de platos, la traducción y las capturas de reservas quedan desactivados, y todo lo demás funciona. Cámbialo cuando quieras en Ajustes → Privacidad → Servicio de IA.",
+        "Las fotos de cartas y los nombres de platos que escribes, con tu idioma y ciudad, se envían a un servicio de IA de terceros (Alibaba Cloud Model Studio, Qwen; Anthropic, Claude, como respaldo) para leerlos. Las fotos se descartan tras leerlas y nunca se guardan.",
         "El texto que traduces y las capturas de reservas de hotel que añades van al mismo servicio de IA y no se guardan.",
         "Tu ubicación, solo si lo permites, y los lugares que buscas se envían a Amap (高德地图) para encontrar tu ciudad, lugares y rutas. No guardamos tu ubicación.",
       ] },
@@ -71,7 +73,7 @@ const PRIVACY: Record<string, Privacy> = {
         "Nuestro proveedor de alojamiento guarda registros estándar del servidor, incluidas direcciones IP, durante poco tiempo por seguridad y para resolver problemas.",
       ] },
       { h: "Proveedores de servicios", items: [
-        "Vercel (alojamiento, Hong Kong), Alibaba Cloud Model Studio (IA), Amap (mapas y lugares) y Supabase (base de datos de platos y eventos anónimos). Solo tratan datos para prestar este servicio.",
+        "Vercel (alojamiento, Hong Kong), Alibaba Cloud Model Studio (IA) con Anthropic como respaldo, Amap (mapas y lugares) y Supabase (base de datos de platos y eventos anónimos). Solo tratan datos para prestar este servicio.",
       ] },
       { h: "Menores", items: ["La app no está dirigida a menores de 13 años."] },
       { h: "Tus derechos y cambios", items: [
@@ -93,7 +95,8 @@ const PRIVACY: Record<string, Privacy> = {
         "Supprimez tout à tout moment dans Réglages → Effacer toutes les données, ou en supprimant l’appli.",
       ] },
       { h: "Ce qui est envoyé quand vous utilisez une fonction", items: [
-        "Les photos de menus et les noms de plats que vous saisissez, avec votre langue et votre ville, sont envoyés à un service d’IA (Alibaba Cloud Model Studio, Qwen) pour être lus. Les photos sont supprimées après lecture et jamais conservées.",
+        "Avant tout envoi au service d’IA, l’app vous demande une fois si vous l’autorisez. Sinon, rien n’est envoyé : lecture des menus, détails des plats, traduction et captures de réservation restent désactivés, et tout le reste fonctionne. Modifiable à tout moment dans Réglages → Confidentialité → Service d’IA.",
+        "Les photos de menus et les noms de plats que vous saisissez, avec votre langue et votre ville, sont envoyés à un service d’IA tiers (Alibaba Cloud Model Studio, Qwen ; Anthropic, Claude, en secours) pour être lus. Les photos sont supprimées après lecture et jamais conservées.",
         "Le texte que vous traduisez et les captures de réservation d’hôtel que vous ajoutez passent par le même service d’IA et ne sont pas conservés.",
         "Votre position, seulement si vous l’autorisez, et les lieux que vous cherchez sont envoyés à Amap (高德地图) pour trouver votre ville, des lieux et des itinéraires. Nous ne conservons pas votre position.",
       ] },
@@ -107,7 +110,7 @@ const PRIVACY: Record<string, Privacy> = {
         "Notre hébergeur conserve brièvement des journaux serveur standard, adresses IP comprises, pour la sécurité et le dépannage.",
       ] },
       { h: "Prestataires", items: [
-        "Vercel (hébergement, Hong Kong), Alibaba Cloud Model Studio (IA), Amap (cartes et lieux) et Supabase (base de données des plats et des événements anonymes). Ils ne traitent les données que pour fournir ce service.",
+        "Vercel (hébergement, Hong Kong), Alibaba Cloud Model Studio (IA) avec Anthropic en secours, Amap (cartes et lieux) et Supabase (base de données des plats et des événements anonymes). Ils ne traitent les données que pour fournir ce service.",
       ] },
       { h: "Enfants", items: ["L’appli ne s’adresse pas aux enfants de moins de 13 ans."] },
       { h: "Vos droits et modifications", items: [
@@ -129,7 +132,8 @@ const PRIVACY: Record<string, Privacy> = {
         "Lösche alles jederzeit unter Einstellungen → Alle Daten löschen oder indem du die App löschst.",
       ] },
       { h: "Was gesendet wird, wenn du eine Funktion nutzt", items: [
-        "Fotos von Speisekarten und eingegebene Gerichtnamen werden mit deiner Sprache und Stadt an einen KI-Dienst (Alibaba Cloud Model Studio, Qwen) gesendet und gelesen. Fotos werden danach verworfen und nie gespeichert.",
+        "Bevor etwas an den KI-Dienst geht, fragt die App einmal, ob du das erlaubst. Wenn nicht, wird nichts gesendet: Speisekarten lesen, Gerichtdetails, Übersetzen und Buchungs-Screenshots bleiben aus, alles andere funktioniert. Jederzeit änderbar unter Einstellungen → Datenschutz → KI-Dienst.",
+        "Fotos von Speisekarten und eingegebene Gerichtnamen werden mit deiner Sprache und Stadt an einen KI-Dienst eines Drittanbieters (Alibaba Cloud Model Studio, Qwen; Anthropic, Claude, als Ersatz) gesendet und gelesen. Fotos werden danach verworfen und nie gespeichert.",
         "Text, den du übersetzt, und Screenshots von Hotelbuchungen gehen an denselben KI-Dienst und werden nicht gespeichert.",
         "Dein Standort, nur wenn du ihn erlaubst, und Orte, nach denen du suchst, gehen an Amap (高德地图), um Stadt, Orte und Routen zu finden. Wir speichern deinen Standort nicht.",
       ] },
@@ -143,7 +147,7 @@ const PRIVACY: Record<string, Privacy> = {
         "Unser Hosting-Anbieter speichert übliche Serverprotokolle einschließlich IP-Adressen für kurze Zeit für Sicherheit und Fehlersuche.",
       ] },
       { h: "Dienstleister", items: [
-        "Vercel (Hosting, Hongkong), Alibaba Cloud Model Studio (KI), Amap (Karten und Orte) und Supabase (Datenbank für Gerichte und anonyme Ereignisse). Sie verarbeiten Daten nur, um diesen Dienst zu erbringen.",
+        "Vercel (Hosting, Hongkong), Alibaba Cloud Model Studio (KI) mit Anthropic als Ersatz, Amap (Karten und Orte) und Supabase (Datenbank für Gerichte und anonyme Ereignisse). Sie verarbeiten Daten nur, um diesen Dienst zu erbringen.",
       ] },
       { h: "Kinder", items: ["Die App richtet sich nicht an Kinder unter 13 Jahren."] },
       { h: "Deine Rechte und Änderungen", items: [
@@ -165,7 +169,8 @@ const PRIVACY: Record<string, Privacy> = {
         "設定 →「すべてのデータを消去」、またはアプリの削除で、いつでもすべて削除できます。",
       ] },
       { h: "機能を使うときに送信されるもの", items: [
-        "メニューの写真や入力した料理名は、言語と都市とともにAIサービス（Alibaba Cloud Model Studio、Qwen）に送られ、読み取られます。写真は読み取り後に破棄され、保存されません。",
+        "AIサービスに何かを送る前に、アプリが一度だけ許可を確認します。許可しない場合は何も送信されず、メニューの読み取り、料理の詳細、翻訳、予約スクリーンショットはオフのまま、その他の機能は使えます。設定 → プライバシー → AIサービスでいつでも変更できます。",
+        "メニューの写真や入力した料理名は、言語と都市とともに第三者のAIサービス（Alibaba Cloud Model Studio、Qwen。予備としてAnthropic、Claude）に送られ、読み取られます。写真は読み取り後に破棄され、保存されません。",
         "翻訳するテキストや、追加したホテル予約のスクリーンショットも同じAIサービスに送られ、保存されません。",
         "位置情報（許可した場合のみ）と検索した場所は、都市・場所・ルートを調べるためにAmap（高德地图）に送られます。位置情報は保存しません。",
       ] },
@@ -179,7 +184,7 @@ const PRIVACY: Record<string, Privacy> = {
         "ホスティング事業者は、セキュリティと障害対応のため、IPアドレスを含む標準的なサーバーログを短期間保存します。",
       ] },
       { h: "委託先", items: [
-        "Vercel（ホスティング、香港）、Alibaba Cloud Model Studio（AI）、Amap（地図・場所）、Supabase（料理情報と匿名イベントのデータベース）。いずれも本サービスの提供のためにのみデータを処理します。",
+        "Vercel（ホスティング、香港）、Alibaba Cloud Model Studio（AI、予備としてAnthropic）、Amap（地図・場所）、Supabase（料理情報と匿名イベントのデータベース）。いずれも本サービスの提供のためにのみデータを処理します。",
       ] },
       { h: "お子さまについて", items: ["本アプリは13歳未満のお子さまを対象としていません。"] },
       { h: "あなたの権利と変更", items: [
@@ -201,7 +206,8 @@ const PRIVACY: Record<string, Privacy> = {
         "설정 → 모든 데이터 삭제 또는 앱 삭제로 언제든 모두 지울 수 있습니다.",
       ] },
       { h: "기능을 쓸 때 전송되는 정보", items: [
-        "메뉴 사진과 입력한 요리 이름은 언어·도시와 함께 AI 서비스(Alibaba Cloud Model Studio, Qwen)로 보내져 읽힙니다. 사진은 읽은 뒤 폐기되며 저장되지 않습니다.",
+        "AI 서비스로 무언가를 보내기 전에 앱이 한 번 허용 여부를 묻습니다. 허용하지 않으면 아무것도 보내지 않으며, 메뉴 읽기·요리 상세·번역·예약 스크린샷은 꺼진 채로 두고 나머지 기능은 그대로 쓸 수 있습니다. 설정 → 개인정보 → AI 서비스에서 언제든 바꿀 수 있습니다.",
+        "메뉴 사진과 입력한 요리 이름은 언어·도시와 함께 제3자 AI 서비스(Alibaba Cloud Model Studio, Qwen; 예비로 Anthropic, Claude)로 보내져 읽힙니다. 사진은 읽은 뒤 폐기되며 저장되지 않습니다.",
         "번역하는 텍스트와 추가한 호텔 예약 스크린샷도 같은 AI 서비스로 보내지며 저장되지 않습니다.",
         "위치(허용한 경우에만)와 검색한 장소는 도시·장소·경로를 찾기 위해 Amap(高德地图)으로 보내집니다. 위치는 저장하지 않습니다.",
       ] },
@@ -215,7 +221,7 @@ const PRIVACY: Record<string, Privacy> = {
         "호스팅 업체는 보안과 문제 해결을 위해 IP 주소를 포함한 일반 서버 로그를 짧은 기간 보관합니다.",
       ] },
       { h: "서비스 제공업체", items: [
-        "Vercel(호스팅, 홍콩), Alibaba Cloud Model Studio(AI), Amap(지도·장소), Supabase(요리 정보와 익명 이벤트 데이터베이스). 이 서비스 제공을 위해서만 데이터를 처리합니다.",
+        "Vercel(호스팅, 홍콩), Alibaba Cloud Model Studio(AI, 예비로 Anthropic), Amap(지도·장소), Supabase(요리 정보와 익명 이벤트 데이터베이스). 이 서비스 제공을 위해서만 데이터를 처리합니다.",
       ] },
       { h: "아동", items: ["이 앱은 13세 미만 아동을 대상으로 하지 않습니다."] },
       { h: "권리와 변경", items: [

@@ -10,6 +10,7 @@ import { compressImage } from "@/lib/image";
 import { track } from "@/lib/track";
 import { apiHeaders } from "@/lib/device";
 import { quotaHit } from "@/lib/passes";
+import { withAi } from "@/lib/ai-consent";
 
 /** "Back to my hotel": one photo of the booking, then a one-tap taxi card forever after. */
 export function HotelCard({ bare, brief, lead = "师傅您好，请带我回酒店：", title }: {
@@ -53,10 +54,10 @@ export function HotelCard({ bare, brief, lead = "师傅您好，请带我回酒�
     <>
       <Row onClick={() => { setCard(true); track("hotel_card_shown", {}); }} icon={<IconTile><BedDouble className="h-5 w-5" aria-hidden /></IconTile>}
         title={title ?? t.hotel.back} sub={<span className="zh">{p.hotel.nameEn ? `${p.hotel.nameEn} · ` : ""}{p.hotel.name}</span>} />
-      <Row onClick={() => fileRef.current?.click()} icon={<Camera className="h-5 w-5 text-muted" aria-hidden />} title={<span className="text-subhead text-cobalt">{t.hotel.change}</span>} chevron={false} />
+      <Row onClick={() => withAi(() => fileRef.current?.click())} icon={<Camera className="h-5 w-5 text-muted" aria-hidden />} title={<span className="text-subhead text-cobalt">{t.hotel.change}</span>} chevron={false} />
     </>
   ) : (
-    <Row onClick={() => fileRef.current?.click()} icon={<IconTile>{busy ? <Preloader className="h-5! w-5!" /> : <BedDouble className="h-5 w-5" aria-hidden />}</IconTile>}
+    <Row onClick={() => withAi(() => fileRef.current?.click())} icon={<IconTile>{busy ? <Preloader className="h-5! w-5!" /> : <BedDouble className="h-5 w-5" aria-hidden />}</IconTile>}
       title={busy ? t.hotel.reading : t.hotel.add} sub={brief ? undefined : t.hotel.addSub} />
   );
 
