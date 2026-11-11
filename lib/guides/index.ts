@@ -37,6 +37,8 @@ export type CityGuide = {
   sources: NumberedSource[];
   /** Some facts on the page aren't verified yet (preview builds only). */
   draft: boolean;
+  /** Checked facts specific to this city. Without any, the page repeats the national rules: noindex. */
+  cityFacts: number;
 };
 
 /**
@@ -58,31 +60,35 @@ export function cityGuide(city: CityId, topic: TopicId, drafts = SHOW_DRAFTS): C
       title: s.title,
       facts: [...s.facts.filter((f) => f.applies === city), ...s.facts.filter((f) => f.applies === "national")]
         .filter(shown)
-        .map((f) => ({ ...f, refs: f.src.map(ref), draft: !isVerified(c, f) })),
+        .map((f) => ({ ...f, refs: f.src.map(ref).sort((a, b) => a - b), draft: !isVerified(c, f) })),
     }))
     .filter((s) => s.facts.length > 0);
   return {
     checked: c.checked, appPath: c.appPath, sections,
     sources: order.map((id, i) => ({ ...c.sources[id], n: i + 1 })),
     draft: sections.some((s) => s.facts.some((f) => f.draft)),
+    cityFacts: sections.reduce((n, s) => n + s.facts.filter((f) => f.applies === city && !f.draft).length, 0),
   };
 }
 
 /** A page exists when it has at least one fact to show on this build. */
 export const hasGuide = (city: CityId, topic: TopicId, drafts = SHOW_DRAFTS) => cityGuide(city, topic, drafts).sections.length > 0;
 export const cityTopics = (city: CityId, drafts = SHOW_DRAFTS) => TOPICS.filter((t) => hasGuide(city, t, drafts));
+/** Worth indexing: checked facts only, and at least one of them about this city. */
+export const indexable = (city: CityId, topic: TopicId) => cityGuide(city, topic, false).cityFacts > 0;
+const indexableTopics = (city: CityId) => TOPICS.filter((t) => indexable(city, t));
 
 /** Every indexable guide URL (verified facts only, whatever the build), for the sitemap. */
 export function guideUrls() {
   const out: { url: string; languages: Record<string, string> }[] = [];
   const abs = (m: Record<string, string>) => Object.fromEntries(Object.entries(m).map(([k, v]) => [k, SITE + v]));
-  const cities = CITY_IDS.filter((c) => cityTopics(c, false).length > 0);
+  const cities = CITY_IDS.filter((c) => indexableTopics(c).length > 0);
   if (!cities.length) return out;
   for (const l of LANGS) {
     out.push({ url: SITE + guidePath(l), languages: abs(languageAlternates()) });
     for (const c of cities) {
       out.push({ url: SITE + guidePath(l, c), languages: abs(languageAlternates(c)) });
-      for (const t of cityTopics(c, false)) out.push({ url: SITE + guidePath(l, c, t), languages: abs(languageAlternates(c, t)) });
+      for (const t of indexableTopics(c)) out.push({ url: SITE + guidePath(l, c, t), languages: abs(languageAlternates(c, t)) });
     }
   }
   return out;

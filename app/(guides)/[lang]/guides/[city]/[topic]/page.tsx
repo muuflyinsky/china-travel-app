@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CITIES, CITY_IDS, TOPICS, cityGuide, cityName, cityTopics, guidePath, hasGuide, isLang, type CityId, type Lang, type TopicId } from "@/lib/guides";
+import { CITIES, CITY_IDS, TOPICS, cityGuide, cityName, cityTopics, guidePath, hasGuide, indexable, isLang, type CityId, type Lang, type TopicId } from "@/lib/guides";
 import { formatDate, guideMeta } from "@/lib/guides/meta";
 import { AppCta, GuideFooter, GuideHeader, JsonLd, topicKey } from "@/components/guides/Chrome";
 import { SITE } from "@/lib/seo";
@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: P) {
   const [lang, city, topic] = p;
   const t = getDict(lang).guides.topics[topicKey(topic)];
   const name = cityName(city, lang);
-  return guideMeta(lang, fmt(t.title, { city: name }), fmt(t.desc, { city: name }), { city, topic, noindex: cityGuide(city, topic).draft });
+  return guideMeta(lang, fmt(t.title, { city: name }), fmt(t.desc, { city: name }), { city, topic, noindex: cityGuide(city, topic).draft || !indexable(city, topic) });
 }
 
 export default async function GuidePage({ params }: P) {
