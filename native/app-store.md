@@ -2,6 +2,8 @@
 
 Copy these into App Store Connect → your app. Limits are Apple's; every field below fits.
 
+> Synced with App Store Connect on 2026-11-11, after 1.0 was resubmitted for Guideline 3.2.2(i) (DECISIONS D19). When ASC and this file differ, ASC is right: update this file to match.
+
 ## App information
 
 | Field | Value |
@@ -13,7 +15,7 @@ Copy these into App Store Connect → your app. Limits are Apple's; every field 
 | Primary language | English (U.S.) |
 | Category | Travel · secondary: Food & Drink |
 | Content rights | **Yes, contains third-party content, and we have the rights**: map data, place photos and ratings come from Amap's API under its terms, with attribution; restaurant awards (MICHELIN, Black Pearl, must-eat lists) are factual listings with the source named |
-| Age rating | Answer each question as the app is: no violence, mature themes, gambling, user-generated content, chat or ads. If asked about medical or health information, the allergy verdicts are health-related information, so don't answer "none" there. Entered 2026-11-01: alcohol references infrequent (menus), medical/treatment info infrequent, health topics yes, everything else none/no → 13+ (12+ in some regions) |
+| Age rating | Answer each question as the app is: no violence, mature themes, gambling, user-generated content, chat or ads. If asked about medical or health information, the allergy verdicts are health-related information, so don't answer "none" there. Entered 2026-11-01: alcohol references infrequent (menus), medical/treatment info infrequent, health topics yes, everything else none/no. App Store Connect shows **Global rating of 12+ with regional exceptions** (App Information, read 2026-11-02); ASC is the source of truth |
 | Price | Free |
 | Availability | All countries **except China mainland** (needs MIIT app filing / APP 备案 and generative-AI compliance first) |
 
@@ -51,10 +53,10 @@ PAY AND PREPARE
 • Open your Alipay pay code in one tap; step-by-step WeChat Pay help
 • Price converter with the foreign-card fee
 • Visa-free checker and a stay countdown that warns you before your legal limit
-• Apps to install, eSIM options and ticket-release alarms for sights that need booking
+• A before-you-go checklist and ticket-release alarms for sights that need booking
 
 TALK
-• Two-way translation with voice and pinyin, and a phrasebook for taxis, restaurants and pharmacies
+• Two-way translation with pinyin, and a phrasebook for taxis, restaurants and pharmacies
 • Emergency numbers and an "I need help" card
 
 Your allergies, trip dates and hotel stay on your phone. No account, no ads.
@@ -71,6 +73,8 @@ No other companies' names (Alipay, WeChat, DiDi, Amap, Trip.com): Guideline 2.3.
 
 **Copyright**: 2026 HaodeGo
 
+**Version release**: Automatically release this version (it goes live as soon as App Review approves it).
+
 ## App Review information
 
 - Sign-in required: **No**
@@ -79,13 +83,17 @@ No other companies' names (Alipay, WeChat, DiDi, Amap, Trip.com): Guideline 2.3.
 ```
 No account is needed.
 
-To try the main feature without being in China: Eat tab → "Type names" → enter 宫保鸡丁 and 麻婆豆腐 → "Look up dishes". Dishes appear one by one with a verdict. Settings → Allergies → Peanuts (severe is the default) changes the verdict for Kung Pao Chicken to "Don't order", with no add button. A severe allergy never gets a green answer; the best a dish can show is "Not in usual recipe — confirm with your card".
+To try the main feature without being in China: Eat tab → "Type dish names" → enter 宫保鸡丁 and 麻婆豆腐 → "Look up dishes". Dishes appear one by one with a verdict. Settings → Allergies → Peanuts (marked severe by default) changes the verdict for Kung Pao Chicken to "Don't order", with no add button. A severe allergy never gets a green answer; the best a dish can show is "Not in usual recipe — confirm with your card".
 
 Explore works for any Chinese city (pick one with "Other city"); routes need location or a saved hotel, so outside China use search and the taxi card.
 
-The app opens Alipay, WeChat, Amap and DiDi when they are installed (App Store page otherwise). Hotel, train, ticket and eSIM links open the partner's site in Safari; these are affiliate links and are disclosed in Settings → How we make money.
+Today is the traveller's trip dashboard (visa-free stay countdown, emergency help, holiday alerts, arrival and airport guides). It does not list or recommend other apps. A few buttons open Alipay, WeChat, Amap or DiDi to finish a task the traveller started (show a pay code, book a taxi, navigate); they appear only inside that task, never as a list. If the app isn't installed, HaodeGo explains what to do and offers its own fallback (for example a Chinese card to show the driver); it never links to App Store pages.
 
-The camera is used to read menus and hotel booking screenshots; location to find the city, nearby places and routes; the microphone and speech recognition for voice translation.
+Hotel, train and ticket links open the partner's website in Safari; these are affiliate links and are disclosed in Settings → How we make money. Before a hotel booking screenshot is sent to read the hotel's name and address, the app asks for confirmation and names the AI service.
+
+The camera is used to read menus and hotel booking screenshots; location to find the city, nearby places and routes.
+
+Menu photos, booking screenshots and text to translate are sent to Alibaba Cloud Model Studio (Qwen) only to be read, and are not stored. This is stated in the privacy policy (haodego.com/privacy) and in Settings → Privacy.
 ```
 
 ## App Privacy ("nutrition label")
