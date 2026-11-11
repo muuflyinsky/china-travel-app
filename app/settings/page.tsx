@@ -277,7 +277,9 @@ export default function SettingsPage() {
       </EditSheet>
 
       <EditSheet open={sheet === "earn"} title={t.settings.howWeEarn} onClose={close}>
-        <p className="text-body">{t.settings.howWeEarnBody}</p>
+        {/* No eSIM partner inside the iOS app (D19), so it isn't named there. */}
+        <p className="web-only text-body">{t.settings.howWeEarnBody}</p>
+        <p className="app-only text-body">{t.inapp.earnBody}</p>
       </EditSheet>
 
       <EditSheet open={sheet === "privacy"} title={t.settings.privacyTitle} onClose={close}>

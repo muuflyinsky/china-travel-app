@@ -11,14 +11,19 @@ import { fmt } from "@/lib/i18n";
 /** The one provider we recommend; it gets the screen's single gold button. */
 const RECOMMENDED = "airalo";
 
-/** Travel eSIM: one recommendation, the rest behind "Other options" (was the Mobile data page). */
+/**
+ * Travel eSIM: one recommendation, the rest behind "Other options" (was the Mobile data page).
+ * Website only: in the iOS app there is one sentence and no provider (App Review 3.2.2(i), D19).
+ */
 export function EsimPicker() {
   const t = useT();
   const [more, setMore] = useState(false);
   const top = ESIM_PROVIDERS.find((p) => p.id === RECOMMENDED)!;
   const rest = ESIM_PROVIDERS.filter((p) => p.id !== RECOMMENDED);
   return (
-    <div className="space-y-3">
+    <>
+    <p className="app-only text-subhead">{t.inapp.esim}</p>
+    <div className="web-only space-y-3">
       <p className="text-subhead">{t.esim.intro}</p>
       <div className="rounded-card border border-line p-4">
         <p className="text-footnote text-muted">{fmt(t.esim.recommended, { name: APPS[top.app].name })}</p>
@@ -56,5 +61,6 @@ export function EsimPicker() {
       <p className="text-footnote text-muted">{t.esim.localBody}</p>
       <p className="text-footnote text-muted">{t.common.commission}</p>
     </div>
+    </>
   );
 }

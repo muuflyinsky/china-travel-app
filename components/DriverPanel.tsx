@@ -13,6 +13,8 @@ import { useProfile } from "./useProfile";
 import { useT } from "./useT";
 import { fmt } from "@/lib/i18n";
 import { openApp } from "@/lib/openApp";
+import { AppMissing } from "./AppMissing";
+import type { AppId } from "@/lib/apps";
 import { track } from "@/lib/track";
 import type { Place } from "@/lib/amap";
 
@@ -21,6 +23,7 @@ function HotelRide() {
   const t = useT();
   const [p, set] = useProfile();
   const [copied, setCopied] = useState(false);
+  const [missing, setMissing] = useState<AppId | null>(null);
   const h = p.hotel;
   // Hotels saved before v0.5 have no coordinates: look them up once.
   useEffect(() => {
@@ -33,9 +36,10 @@ function HotelRide() {
       {h.location ? <RideButtons to={{ location: h.location, name: h.name }} address={h.address} /> : (
         <>
           <div className="grid grid-cols-2 gap-2">
-            <button onClick={() => openApp("amap")} className="flex min-h-control items-center justify-center gap-2 rounded-control border border-line bg-card text-subhead font-semibold"><AppIcon id="amap" size={24} />Amap</button>
-            <button onClick={() => openApp("didi")} className="flex min-h-control items-center justify-center gap-2 rounded-control border border-line bg-card text-subhead font-semibold"><AppIcon id="didi" size={24} />{t.today.openDidi}</button>
+            <button onClick={() => { setMissing(null); openApp("amap", undefined, setMissing); }} className="flex min-h-control items-center justify-center gap-2 rounded-control border border-line bg-card text-subhead font-semibold"><AppIcon id="amap" size={24} />Amap</button>
+            <button onClick={() => { setMissing(null); openApp("didi", undefined, setMissing); }} className="flex min-h-control items-center justify-center gap-2 rounded-control border border-line bg-card text-subhead font-semibold"><AppIcon id="didi" size={24} />{t.today.openDidi}</button>
           </div>
+          <AppMissing app={missing} />
           <p className="px-1 text-footnote text-muted">{t.today.didiHint}</p>
         </>
       )}

@@ -6,6 +6,8 @@ import { Button } from "./ui";
 import { AppIcon } from "./AppIcon";
 import { useT } from "./useT";
 import { openApp } from "@/lib/openApp";
+import { AppMissing } from "./AppMissing";
+import type { AppId } from "@/lib/apps";
 
 // App deep links. Alipay's documented platformapi routes open the pay code (20000056) and the
 // scanner (10000007); WeChat only exposes "open app", so we tell the traveller where to tap.
@@ -21,7 +23,7 @@ export { LINKS as PAY_LINKS };
  * WeChat can't be opened at its pay code from outside (SPEC v0.5 P1.6 #25), so the two taps are
  * shown first, then WeChat opens. Drawn steps, not screenshots: WeChat's own UI isn't ours to copy.
  */
-export function WechatGuide({ onClose }: { onClose: () => void }) {
+export function WechatGuide({ onClose, onMissing }: { onClose: () => void; onMissing?: (app: AppId) => void }) {
   const t = useT();
   const steps = [
     { n: 1, text: t.pay.wechatStep1, art: <CirclePlus className="h-7 w-7" aria-hidden /> },
@@ -45,39 +47,43 @@ export function WechatGuide({ onClose }: { onClose: () => void }) {
           ))}
         </ol>
         <p className="mt-3 px-1 text-footnote text-muted">{t.pay.wechatWhy}</p>
-        <Button className="mt-4 w-full" onClick={() => { onClose(); openApp("wechat", LINKS.wechat); }}>{t.pay.wechatOpen}</Button>
+        <Button className="mt-4 w-full" onClick={() => { onClose(); openApp("wechat", LINKS.wechat, onMissing); }}>{t.pay.wechatOpen}</Button>
       </div>
     </Sheet>
   );
 }
 
-export function PayButtons({ compact }: { compact?: boolean }) {
+/** `scan`: also offer Alipay's scanner (the Pay page shows only the two pay codes). */
+export function PayButtons({ compact, scan = true }: { compact?: boolean; scan?: boolean }) {
   const t = useT();
   const [guide, setGuide] = useState(false);
+  const [missing, setMissing] = useState<AppId | null>(null);
   const btn = "flex min-h-14 w-full flex-1 items-center gap-3 rounded-card border border-line bg-card px-3 text-left";
   return (
     <div className="space-y-2">
       <div className={compact ? "grid grid-cols-2 gap-2" : "space-y-2"}>
-        <button className={btn} onClick={() => openApp("alipay", LINKS.alipayPay)}>
+        <button className={btn} onClick={() => { setMissing(null); openApp("alipay", LINKS.alipayPay, setMissing); }}>
           <AppIcon id="alipay" size={36} />
           <span className="min-w-0 flex-1 text-subhead font-semibold">{compact ? "Alipay" : t.pay.openAlipay}</span>
           <QrCode className="h-5 w-5 shrink-0 text-cobalt" aria-hidden />
         </button>
-        {!compact && (
-          <button className={btn} onClick={() => openApp("alipay", LINKS.alipayScan)}>
+        {!compact && scan && (
+          <button className={btn} onClick={() => { setMissing(null); openApp("alipay", LINKS.alipayScan, setMissing); }}>
             <AppIcon id="alipay" size={36} />
             <span className="flex-1 text-subhead font-semibold">{t.pay.scanAlipay}</span>
             <ScanLine className="h-5 w-5 text-cobalt" aria-hidden />
           </button>
         )}
-        <button className={btn} onClick={() => setGuide(true)}>
+        <button className={btn} onClick={() => { setMissing(null); setGuide(true); }}>
           <AppIcon id="wechat" size={36} />
           <span className="min-w-0 flex-1 text-subhead font-semibold">{compact ? "WeChat Pay" : t.pay.openWechat}</span>
           <QrCode className="h-5 w-5 shrink-0 text-cobalt" aria-hidden />
         </button>
       </div>
-      {!compact && <p className="px-1 text-footnote text-muted">{t.pay.notInstalled}</p>}
-      {guide && <WechatGuide onClose={() => setGuide(false)} />}
+      {/* "Install the app first" is website advice; the iOS app says what to do instead (D19). */}
+      {!compact && <p className="web-only px-1 text-footnote text-muted">{t.pay.notInstalled}</p>}
+      <AppMissing app={missing} />
+      {guide && <WechatGuide onClose={() => setGuide(false)} onMissing={setMissing} />}
     </div>
   );
 }
