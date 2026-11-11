@@ -1,10 +1,10 @@
 import type { TopicContent } from "../types";
 
-// Imported from the research draft (33 facts). Sources were only seen in search results:
-// open each one, check the facts that cite it, then set `verified: "YYYY-MM-DD"`. Until then the facts
-// show on preview builds only. Gaps the research couldn't source: see the workspace inbox note.
+// Imported from the research draft: 22 of 33 facts checked against the fetched
+// source pages on 2026-11-11. Facts without `checked` are drafts (preview builds only); their
+// `note` says why. Gaps the research couldn't source: see the workspace inbox note.
 export const mobileData: TopicContent = {
-  "checked": "2026-11-05",
+  "checked": "2026-11-11",
   "appPath": "/#data",
   "sources": {
     "s1": {
@@ -166,31 +166,33 @@ export const mobileData: TopicContent = {
         {
           "applies": "national",
           "text": {
-            "en": "China Daily's visitor guide lists three ways to get online: keep your home plan on international roaming, buy a local SIM or eSIM, or use Wi-Fi."
-          },
-          "src": [
-            "s5"
-          ]
-        },
-        {
-          "applies": "national",
-          "text": {
-            "en": "China Daily's 2025 guide says eSIMs can be set up before departure and activated on arrival, which it describes as suiting short stays."
+            "en": "You have three ways to get online in China: international roaming on your home plan, a local SIM card or eSIM, or Wi-Fi."
           },
           "src": [
             "s5"
           ],
-          "note": "The guide does not say which carrier offers this to foreigners; it may refer to non-carrier products, which we must not recommend."
+          "checked": "2026-11-11"
         },
         {
           "applies": "national",
           "text": {
-            "en": "China Mobile, China Unicom and China Telecom launched domestic eSIM phone service nationwide in October 2025, activated at a store or by booking in the carrier app then visiting a store."
+            "en": "If your phone supports eSIM, you can buy and install an international eSIM plan before you leave and activate it on arrival, which suits short stays or multi-city trips."
+          },
+          "src": [
+            "s5"
+          ],
+          "checked": "2026-11-11"
+        },
+        {
+          "applies": "national",
+          "text": {
+            "en": "China Telecom, China Mobile and China Unicom launched domestic eSIM phone service nationwide in October 2025. China Telecom activates it in store, or you book in its app and then visit a store."
           },
           "src": [
             "s6",
             "s7"
-          ]
+          ],
+          "checked": "2026-11-11"
         },
         {
           "applies": "national",
@@ -201,7 +203,7 @@ export const mobileData: TopicContent = {
             "s6",
             "s7"
           ],
-          "note": "Coverage does not say whether foreign-bought phones or passport holders can use domestic eSIM. Treat as unknown."
+          "note": "Coverage does not say whether foreign-bought phones or passport holders can use domestic eSIM. Treat as unknown. Not live: no fetched source states it. Model counts unsupported by both pages; drop."
         },
         {
           "applies": "national",
@@ -210,18 +212,19 @@ export const mobileData: TopicContent = {
           },
           "src": [
             "s4"
-          ]
+          ],
+          "note": "Not live: no fetched source states it. The 2025 expat guide does not mention eSIM at all; drop or re-source."
         },
         {
           "applies": "national",
           "text": {
-            "en": "In February 2026, 11 departments including the Cyberspace Administration and PBOC issued 14 measures for overseas visitors, including more accessible telecom services."
+            "en": "In February 2026, 11 national departments issued 14 measures for overseas visitors, including easier telecom services: simpler carrier websites for foreigners and service outlets at major airports and ports."
           },
           "src": [
             "s15",
             "s16"
           ],
-          "note": "Snippets give no detail on SIM, eSIM or roaming."
+          "checked": "2026-11-11"
         }
       ]
     },
@@ -239,11 +242,12 @@ export const mobileData: TopicContent = {
         {
           "applies": "national",
           "text": {
-            "en": "Visitors can use their home plan in China on roaming, but China Daily warns fees can be high and speeds vary; check coverage, data caps and cost with your provider first."
+            "en": "You can roam on your home plan, but fees can be high and speeds vary; check coverage, data limits and costs with your provider before you go."
           },
           "src": [
             "s5"
-          ]
+          ],
+          "checked": "2026-11-11"
         }
       ]
     },
@@ -261,42 +265,43 @@ export const mobileData: TopicContent = {
         {
           "applies": "national",
           "text": {
-            "en": "Foreigners can get a SIM by taking a passport with a valid entry stamp, or a Foreign Permanent Resident ID Card, to a China Telecom, China Mobile or China Unicom service office."
+            "en": "To get a SIM card, take your passport (with a valid entry stamp) or Foreign Permanent Resident ID Card to a China Telecom, China Mobile or China Unicom service office."
           },
           "src": [
             "s4",
             "s3"
-          ]
+          ],
+          "checked": "2026-11-11"
         },
         {
           "applies": "national",
           "text": {
-            "en": "An MIIT guide for foreign nationals says applications are made in person, with valid ID, at the carriers' own (self-operated) business halls."
+            "en": "Apply in person with your passport at a hall run by the carrier itself; nobody else can apply for you using your documents."
           },
           "src": [
             "s1"
           ],
-          "note": "Page under a 2026 URL path; exact publication date not seen."
+          "checked": "2026-11-11"
         },
         {
           "applies": "national",
           "text": {
-            "en": "Per MIIT, one person may hold at most five active SIM cards with the same carrier nationwide; at ten or more across all carriers, new cards are only issued at carrier-run halls."
+            "en": "You can hold at most five active SIM cards with any one carrier; if you hold ten or more across all carriers, new cards are only issued at carrier-run halls."
           },
           "src": [
             "s1"
           ],
-          "note": "Beijing's guide gives a simpler 'up to five cards per passport' rule (f12); not a conflict, but worded differently."
+          "checked": "2026-11-11"
         },
         {
           "applies": "national",
           "text": {
-            "en": "The MIIT guide says the phone used with the new card needs to support 5G or VoLTE."
+            "en": "Your phone must support 5G or VoLTE to use a Chinese SIM card; if it doesn't fit, a carrier-run hall can advise or swap the card."
           },
           "src": [
             "s1"
           ],
-          "note": "From snippet only; check wording on the page."
+          "checked": "2026-11-11"
         },
         {
           "applies": "national",
@@ -305,34 +310,38 @@ export const mobileData: TopicContent = {
           },
           "src": [
             "s21"
-          ]
+          ],
+          "note": "Not live: no fetched source states it. Unsupported. Passport-required is covered by s1/s2/s5 instead; 'downtown store more likely to accept passports' has no source (s2 only says call ahead to ask)."
         },
         {
           "applies": "national",
           "text": {
-            "en": "Prepaid SIMs from the three carriers are sold at international airports and city service outlets, with passport registration required."
+            "en": "China Mobile, China Telecom and China Unicom sell prepaid SIM cards with data packages at international airports and city service outlets; you register with your passport."
           },
           "src": [
             "s5"
-          ]
+          ],
+          "checked": "2026-11-11"
         },
         {
           "applies": "beijing",
           "text": {
-            "en": "Beijing's official guide: anyone with a valid passport can apply for up to five SIM cards, each with its own number, with no processing fee; plan prices follow the carrier's rates."
+            "en": "In Beijing, anyone with a valid passport can get up to five SIM cards, each with its own number. There's no processing fee; plans cost the carrier's normal rates."
           },
           "src": [
             "s2"
-          ]
+          ],
+          "checked": "2026-11-11"
         },
         {
           "applies": "beijing",
           "text": {
-            "en": "Beijing's guide advises using a hall run directly by the carrier and phoning ahead to ask whether it serves foreign nationals."
+            "en": "Use a hall run directly by the carrier, and phone ahead to check it serves foreign nationals (China Mobile 10086, China Unicom 10010, China Telecom 10000)."
           },
           "src": [
             "s2"
-          ]
+          ],
+          "checked": "2026-11-11"
         },
         {
           "applies": "shanghai",
@@ -342,7 +351,7 @@ export const mobileData: TopicContent = {
           "src": [
             "s11"
           ],
-          "note": "Snippet does not clearly name the carrier (article centres on China Telecom). 2024 prices; may have changed."
+          "note": "Snippet does not clearly name the carrier (article centres on China Telecom). 2024 prices; may have changed. Not live: stale (old source for a price or limit). Carrier is clearly named: 'Issued by the Shanghai branch of China Telecom'. Prices are from March 2024 (not pre-2024, so not flagged stale by rule) but are 2.5 years old; re-check before showing prices. Held back: Prices from March 2024; recheck."
         }
       ]
     },
@@ -360,43 +369,44 @@ export const mobileData: TopicContent = {
         {
           "applies": "beijing",
           "text": {
-            "en": "'Beijing Service' counters at Beijing Capital and Daxing airports (launched January 2025) issue SIM cards; visitors can book China Mobile or China Unicom cards online and collect them at the counter."
+            "en": "Since January 2025, 'Beijing Service' counters at Capital Airport T3 and Daxing international arrivals issue SIM cards. Book a China Mobile or China Unicom card online and collect it there."
           },
           "src": [
             "s9",
             "s2"
           ],
-          "note": "January 2025 source; check counters still operate."
+          "checked": "2026-11-11"
         },
         {
           "applies": "beijing",
           "text": {
-            "en": "China Unicom Beijing offers inbound visitors plans of 7, 10, 15 or 30 days, which the city says cost less than international roaming; a passport and visa are needed."
+            "en": "China Unicom Beijing sells visitor SIM plans for 7, 10, 15 or 30 days, priced below international roaming (as of March 2025). Bring your passport and visa."
           },
           "src": [
             "s8"
           ],
-          "note": "March 2025; prices not in the snippet."
+          "checked": "2026-11-11"
         },
         {
           "applies": "beijing",
           "text": {
-            "en": "These China Unicom cards are issued at Unicom's hall at Capital Airport, and at the Beijing Service mobile counter and Unicom hall at Daxing Airport."
+            "en": "Get these Unicom cards at Unicom's hall at Capital Airport, or at Daxing Airport's Beijing Service mobile counter or Unicom hall."
           },
           "src": [
             "s8",
             "s10"
-          ]
+          ],
+          "checked": "2026-11-11"
         },
         {
           "applies": "beijing",
           "text": {
-            "en": "The cards can be topped up at a China Unicom hall or in its app; when the plan expires, any remaining balance is not refunded."
+            "en": "Top up at a China Unicom hall or in the China Unicom app. When the plan expires, any balance left is not refunded."
           },
           "src": [
-            "s8",
             "s10"
-          ]
+          ],
+          "checked": "2026-11-11"
         },
         {
           "applies": "beijing",
@@ -407,36 +417,37 @@ export const mobileData: TopicContent = {
             "s10",
             "s8"
           ],
-          "note": "The free rental ran until a 30 June (2025) date; current status unknown. Probably too niche for the guide."
+          "note": "The free rental ran until a 30 June (2025) date; current status unknown. Probably too niche for the guide. Not live: stale (old source for a price or limit). Trial / rent-free period ended 30 June 2025; current status unknown. Niche; consider dropping. Held back: TRAVEL PASS free rental was a trial to 30 Jun 2025; current status unknown."
         },
         {
           "applies": "beijing",
           "text": {
-            "en": "As of April 2026, one-stop counters in Beijing's airport international arrival areas offer over 20 services, including communications."
+            "en": "One-stop counters in the international arrival areas of both Beijing airports offer over 20 services, including mobile communications (operating as of April 2026)."
           },
           "src": [
             "s20"
-          ]
+          ],
+          "checked": "2026-11-11"
         },
         {
           "applies": "shanghai",
           "text": {
-            "en": "In May 2024 Shanghai designated 14 points at Pudong and Hongqiao airports selling SIM cards and data packages right after customs, accepting foreign currency and bank cards."
+            "en": "At Shanghai's Pudong and Hongqiao airports, 14 points sell SIM cards and data packages right after customs, taking foreign currency and bank cards (as of May 2024)."
           },
           "src": [
             "s12"
           ],
-          "note": "2024 source."
+          "checked": "2026-11-11"
         },
         {
           "applies": "shanghai",
           "text": {
-            "en": "Pudong and Hongqiao arrival halls have an 'Inbound Facilitation Service Point' bundling Wi-Fi registration, SIM and transport cards, currency exchange and mobile payment help."
+            "en": "Pudong and Hongqiao arrival halls have an 'Inbound Facilitation Service Point' for Wi-Fi registration, SIM and transport cards, currency exchange and mobile payment help."
           },
           "src": [
             "s12"
           ],
-          "note": "2024 source."
+          "checked": "2026-11-11"
         },
         {
           "applies": "shanghai",
@@ -446,7 +457,7 @@ export const mobileData: TopicContent = {
           "src": [
             "s11"
           ],
-          "note": "Planned only; opening not confirmed by any source found."
+          "note": "Planned only; opening not confirmed by any source found. Not live: stale (old source for a price or limit). s12 (May 2024) also says operator service centres are planned in Pudong T1 and T2. Still only plans. Held back: Outlet was only announced as planned."
         }
       ]
     },
@@ -469,7 +480,7 @@ export const mobileData: TopicContent = {
           "src": [
             "s19"
           ],
-          "note": "Article date not seen."
+          "note": "Article date not seen. Not live: no fetched source states it."
         },
         {
           "applies": "national",
@@ -478,7 +489,8 @@ export const mobileData: TopicContent = {
           },
           "src": [
             "s17"
-          ]
+          ],
+          "note": "Not live: no fetched source states it."
         },
         {
           "applies": "national",
@@ -488,7 +500,7 @@ export const mobileData: TopicContent = {
           "src": [
             "s18"
           ],
-          "note": "2017; no 2025-2026 major-media source found describing roaming vs local SIM access. Do not present as current."
+          "note": "2017; no 2025-2026 major-media source found describing roaming vs local SIM access. Do not present as current. Not live: no fetched source states it."
         },
         {
           "applies": "national",
@@ -497,7 +509,8 @@ export const mobileData: TopicContent = {
           },
           "src": [
             "s19"
-          ]
+          ],
+          "note": "Not live: no fetched source states it."
         }
       ]
     },
@@ -515,21 +528,22 @@ export const mobileData: TopicContent = {
         {
           "applies": "national",
           "text": {
-            "en": "Free Wi-Fi is common at airports, hotels, cafés, malls and sights, but login often needs SMS or phone verification and sometimes a Chinese mobile number."
+            "en": "Free Wi-Fi is common at airports, hotels, cafés, malls and sights, but logging in often needs SMS or phone verification, sometimes with a Chinese number."
           },
           "src": [
             "s5"
-          ]
+          ],
+          "checked": "2026-11-11"
         },
         {
           "applies": "beijing",
           "text": {
-            "en": "Both Beijing airports have free Wi-Fi; without a Chinese number, a kiosk scans your passport and prints a login good for five hours."
+            "en": "Both Beijing airports have free Wi-Fi. Without a Chinese number, scan your passport at a Wi-Fi kiosk for a printed login valid five hours (up to three print-outs per passport)."
           },
           "src": [
             "s13"
           ],
-          "note": "August 2024 source."
+          "checked": "2026-11-11"
         },
         {
           "applies": "beijing",
@@ -538,17 +552,18 @@ export const mobileData: TopicContent = {
           },
           "src": [
             "s14"
-          ]
+          ],
+          "note": "Not live: stale (old source for a price or limit). Network name 'BDIA-FREE-WIFI' unverified and conflicts with s13's 'Green Airport' for Daxing (2024). Held back: Wi-Fi name conflicts with another official page."
         },
         {
           "applies": "shanghai",
           "text": {
-            "en": "Shanghai's airports offer a 'Passport Identification Login' so travellers without a Chinese SIM can use free airport Wi-Fi."
+            "en": "At Shanghai's airports, if you have no Chinese SIM, use 'Passport Identification Login': photograph your passport on the free Wi-Fi login page to get online."
           },
           "src": [
             "s12"
           ],
-          "note": "2024 source."
+          "checked": "2026-11-11"
         }
       ]
     }

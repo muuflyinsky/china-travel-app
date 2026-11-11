@@ -1,10 +1,10 @@
 import type { TopicContent } from "../types";
 
-// Imported from the research draft (32 facts). Sources were only seen in search results:
-// open each one, check the facts that cite it, then set `verified: "YYYY-MM-DD"`. Until then the facts
-// show on preview builds only. Gaps the research couldn't source: see the workspace inbox note.
+// Imported from the research draft: 24 of 32 facts checked against the fetched
+// source pages on 2026-11-11. Facts without `checked` are drafts (preview builds only); their
+// `note` says why. Gaps the research couldn't source: see the workspace inbox note.
 export const payment: TopicContent = {
-  "checked": "2026-11-05",
+  "checked": "2026-11-11",
   "appPath": "/#pay",
   "sources": {
     "s1": {
@@ -82,13 +82,6 @@ export const payment: TopicContent = {
       "published": "2022 (Q4 2021 data)",
       "kind": "official"
     },
-    "s12": {
-      "title": "China fines KFC and other businesses for rejecting cash payments",
-      "publisher": "Caixin Global",
-      "url": "https://www.caixinglobal.com/2024-05-15/china-fines-kfc-and-other-businesses-for-rejecting-cash-payments-102196668.html",
-      "published": "2024-05-15",
-      "kind": "media"
-    },
     "s13": {
       "title": "Convenience of Payment Services for Foreigners in Beijing Significantly Improved",
       "publisher": "Beijing Municipal People's Government",
@@ -129,13 +122,6 @@ export const payment: TopicContent = {
       "publisher": "Shanghai Municipal People's Government",
       "url": "https://english.shanghai.gov.cn/en-Latest-WhatsNew/20240415/20606ed2f43c4c86aa44c3df45e82541.html",
       "published": "2024-04-15",
-      "kind": "official"
-    },
-    "s19": {
-      "title": "Beijing Optimizes Payment Services to Offer More Convenience for Foreign Tourists",
-      "publisher": "Beijing Municipal People's Government",
-      "url": "https://english.beijing.gov.cn/latest/news/202407/t20240712_3744760.html",
-      "published": "2024-07-12",
       "kind": "official"
     },
     "s20": {
@@ -224,46 +210,48 @@ export const payment: TopicContent = {
         {
           "applies": "national",
           "text": {
-            "en": "Visitors can link a foreign Visa, Mastercard or other international card to Alipay or WeChat Pay and pay without a Chinese bank account."
+            "en": "You can link a foreign bank card (Visa, Mastercard and other major networks) to Alipay or WeChat Pay and pay with it, without opening a Chinese bank account."
           },
           "src": [
             "s4",
             "s6",
             "s24"
-          ]
+          ],
+          "checked": "2026-11-11"
         },
         {
           "applies": "national",
           "text": {
-            "en": "In March 2024 the central bank had Alipay and Tenpay (WeChat Pay) raise the foreign-visitor cap per payment from US$1,000 to US$5,000 and the yearly cap from US$10,000 to US$50,000."
+            "en": "In March 2024 China's central bank had Alipay and WeChat Pay raise foreign visitors' limits from US$1,000 to US$5,000 per payment and from US$10,000 to US$50,000 a year."
           },
           "src": [
             "s1",
             "s2"
-          ]
+          ],
+          "checked": "2026-11-11"
         },
         {
           "applies": "national",
           "text": {
-            "en": "Shanghai's official payment page (Sept 2026) still lists up to US$5,000 per transaction and up to US$50,000 per year for overseas cards linked to Alipay or WeChat Pay."
+            "en": "With a foreign card linked to Alipay or WeChat Pay you can pay up to US$5,000 per transaction and US$50,000 a year. Check the app for your account's actual limits."
           },
           "src": [
             "s4",
             "s3"
           ],
-          "note": "Conflict: a Beijing Chaoyang district page (undated) lists RMB 6,000 per transaction, RMB 50,000 per month and RMB 60,000 per year. Possibly an older rule or a different account tier; prefer the USD figures."
+          "checked": "2026-11-11"
         },
         {
           "applies": "national",
           "text": {
-            "en": "Paying with a linked foreign card costs nothing up to 200 yuan; above 200 yuan a 3% fee applies, charged on the whole amount, not just the part above 200."
+            "en": "Payments of 200 yuan or less with a linked foreign card are generally fee-free. Above 200 yuan a 3% fee on the whole amount may apply; check the payment page before confirming."
           },
           "src": [
             "s4",
             "s3",
             "s5"
           ],
-          "note": "Shanghai page says the fee 'may' apply and is on the full amount. Your card issuer may add its own foreign transaction fee (not in official sources)."
+          "checked": "2026-11-11"
         },
         {
           "applies": "national",
@@ -273,17 +261,18 @@ export const payment: TopicContent = {
           "src": [
             "s5"
           ],
-          "note": "Promotion; check it is still running."
+          "note": "Promotion; check it is still running. Not live: stale (old source for a price or limit). Time-limited promotion; confirm it is still running before publishing. Held back: Fee waiver is a time-limited promotion; confirm it is still running."
         },
         {
           "applies": "national",
           "text": {
-            "en": "You can sign up with a foreign phone number as long as it receives SMS codes."
+            "en": "You can sign up for WeChat or Alipay with a foreign phone number, as long as it can receive SMS verification codes."
           },
           "src": [
             "s6",
-            "s24"
-          ]
+            "s3"
+          ],
+          "checked": "2026-11-11"
         },
         {
           "applies": "national",
@@ -293,16 +282,17 @@ export const payment: TopicContent = {
           "src": [
             "s7"
           ],
-          "note": "Official Alipay help page is undated; exact current flow not confirmed."
+          "note": "Official Alipay help page is undated; exact current flow not confirmed. Not live: no fetched source states it. Not supported for Alipay. s6 does support the WeChat Pay equivalent: 'If you use your passport to verify your identity, you will get a notification asking you to upload a copy of your passport' (documents: passport). Consider rewriting the fact for WeChat Pay citing s6."
         },
         {
           "applies": "national",
           "text": {
-            "en": "UnionPay cards issued outside the Chinese mainland can also be linked to Alipay and WeChat Pay."
+            "en": "Since November 2024, UnionPay cards issued outside the Chinese mainland can also be linked to Alipay and WeChat Pay."
           },
           "src": [
             "s23"
-          ]
+          ],
+          "checked": "2026-11-11"
         }
       ]
     },
@@ -320,22 +310,22 @@ export const payment: TopicContent = {
         {
           "applies": "national",
           "text": {
-            "en": "A PBOC-led circular says domestic and overseas bank cards should be accepted at three-star-plus hotels and 4A/5A tourist attractions, among other key venues."
+            "en": "Under an April 2024 rule, tourist hotels rated three stars and up, 4A and 5A attractions, and national and provincial tourist resorts should accept both Chinese and foreign bank cards."
           },
           "src": [
             "s24"
           ],
-          "note": "Snippet wording; underlying circular is the 2024 payment-services push."
+          "checked": "2026-11-11"
         },
         {
           "applies": "national",
           "text": {
-            "en": "Foreign cards work at card terminals showing your card's network logo (UnionPay, Visa, Mastercard, Amex, JCB, Diners, Discover); if no logo shows, ask the cashier."
+            "en": "Foreign cards work at terminals showing your card's network logo (UnionPay, Visa, Mastercard, Amex, JCB, Diners Club, Discover). If no logo is shown, ask the cashier."
           },
           "src": [
             "s4"
           ],
-          "note": "Source is Shanghai's official page; logo rule is general."
+          "checked": "2026-11-11"
         },
         {
           "applies": "national",
@@ -345,7 +335,7 @@ export const payment: TopicContent = {
           "src": [
             "s25"
           ],
-          "note": "Official caution that contrasts with upbeat city figures; keep a backup payment method."
+          "note": "Official caution that contrasts with upbeat city figures; keep a backup payment method. Not live: no fetched source states it. Cautionary claim unverifiable from downloaded text; re-fetch before using."
         }
       ]
     },
@@ -363,31 +353,33 @@ export const payment: TopicContent = {
         {
           "applies": "national",
           "text": {
-            "en": "Renminbi cash is legal tender: PBOC rules bar any business or person from refusing cash, including via notices or terms; violators can be investigated and fined."
+            "en": "Renminbi cash is legal tender. No business or person may refuse cash, including through notices or terms, and businesses that do can be penalised."
           },
           "src": [
             "s8",
             "s9"
-          ]
+          ],
+          "checked": "2026-11-11"
         },
         {
           "applies": "national",
           "text": {
-            "en": "The 2024 State Council payment opinions keep up the crackdown on refusing cash, with heavier penalties and public naming, and ask banks to supply small-denomination change kits."
+            "en": "Under 2024 State Council rules, businesses that refuse cash face harsher penalties and public reprimand, and banks must offer small-change kits."
           },
           "src": [
             "s9"
-          ]
+          ],
+          "checked": "2026-11-11"
         },
         {
           "applies": "national",
           "text": {
-            "en": "Fines are real: in Q4 2021 the PBOC penalised 32 businesses with fines of 1,000 to 100,000 yuan; in 2024 it fined a KFC franchise 30,000 yuan for refusing cash."
+            "en": "Refusing cash brings real fines: in the last quarter of 2021 the central bank fined 32 businesses between 1,000 and 100,000 yuan."
           },
           "src": [
-            "s11",
-            "s12"
-          ]
+            "s11"
+          ],
+          "checked": "2026-11-11"
         }
       ]
     },
@@ -405,11 +397,12 @@ export const payment: TopicContent = {
         {
           "applies": "national",
           "text": {
-            "en": "State Council 2024 opinions direct banks to upgrade ATMs so foreign visitors can withdraw renminbi with overseas cards."
+            "en": "China's 2024 payment rules tell banks to upgrade ATMs so foreign visitors can withdraw renminbi with overseas bank cards."
           },
           "src": [
             "s9"
-          ]
+          ],
+          "checked": "2026-11-11"
         },
         {
           "applies": "national",
@@ -418,18 +411,19 @@ export const payment: TopicContent = {
           },
           "src": [
             "s4"
-          ]
+          ],
+          "note": "Not live: stale (old source for a price or limit). Source is Shanghai's page; generalising nationwide is an inference. Held back: ATM limit only stated on a Shanghai page; may not apply nationwide."
         },
         {
           "applies": "beijing",
           "text": {
-            "en": "Beijing reported (2024) about 11,600 self-service machines taking overseas cards for cash, and some ICBC ATMs dispensing 10-yuan notes for Visa/Mastercard holders."
+            "en": "Beijing reported in 2024 about 11,600 machines that let you withdraw cash with overseas cards, and some ICBC ATMs, including at Daxing airport, give out 10-yuan notes."
           },
           "src": [
             "s13",
             "s14"
           ],
-          "note": "2024 counts; no newer figure found."
+          "checked": "2026-11-11"
         }
       ]
     },
@@ -447,77 +441,84 @@ export const payment: TopicContent = {
         {
           "applies": "national",
           "text": {
-            "en": "Ride-hailing apps such as DiDi and Shouyue have English versions that accept international Visa and Mastercard cards."
-          },
-          "src": [
-            "s19"
-          ]
-        },
-        {
-          "applies": "beijing",
-          "text": {
-            "en": "Beijing subway gates accept tap-to-pay with overseas Visa and Mastercard on all lines, including both airport expresses, since 13 September 2024; fares match local rates."
-          },
-          "src": [
-            "s15"
-          ]
-        },
-        {
-          "applies": "beijing",
-          "text": {
-            "en": "Since June 2025 Beijing subway also takes JCB and American Express taps; as of March 2026 gates, ticket purchases and top-ups accept UnionPay, Visa, Mastercard, JCB and Amex."
-          },
-          "src": [
-            "s16"
-          ]
-        },
-        {
-          "applies": "beijing",
-          "text": {
-            "en": "A SCIO briefing noted some Beijing taxi drivers would not take cash or lacked change; the city later put 'cash accepted' signs and small-change wallets in taxis."
-          },
-          "src": [
-            "s10",
-            "s19"
-          ]
-        },
-        {
-          "applies": "beijing",
-          "text": {
-            "en": "BEIJING PASS, a prepaid card sold at the airports and stations since July 2024, works on buses, rail lines and over 20,000 taxis."
+            "en": "Ride-hailing apps such as DiDi and Shouyue have English versions that accept major international cards like Visa and Mastercard."
           },
           "src": [
             "s20"
-          ]
+          ],
+          "checked": "2026-11-11"
+        },
+        {
+          "applies": "beijing",
+          "text": {
+            "en": "Since 13 September 2024 you can tap an overseas Visa or Mastercard at every Beijing subway gate, including both airport lines, and pay the same fares as locals."
+          },
+          "src": [
+            "s15"
+          ],
+          "checked": "2026-11-11"
+        },
+        {
+          "applies": "beijing",
+          "text": {
+            "en": "As of March 2026, Beijing subway gates, ticket purchases and top-ups accept contactless UnionPay, Visa, Mastercard, JCB and American Express cards; just hold your card to the gate."
+          },
+          "src": [
+            "s16"
+          ],
+          "checked": "2026-11-11"
+        },
+        {
+          "applies": "beijing",
+          "text": {
+            "en": "Beijing taxis were found refusing cash or lacking change in 2024; the city has since put 'Cash Payment Accepted' signs in taxis and given drivers small-change wallets."
+          },
+          "src": [
+            "s10",
+            "s13"
+          ],
+          "checked": "2026-11-11"
+        },
+        {
+          "applies": "beijing",
+          "text": {
+            "en": "BEIJING PASS, a prepaid card launched in July 2024, is sold at both Beijing airports, subway and railway stations for 20 yuan (bring your passport) and is used mainly on public transport."
+          },
+          "src": [
+            "s20"
+          ],
+          "checked": "2026-11-11"
         },
         {
           "applies": "shanghai",
           "text": {
-            "en": "Since 28 June 2025 the whole Shanghai Metro network accepts tap-in with contactless Visa, Mastercard, Amex, JCB and UnionPay cards."
+            "en": "Since 28 June 2025 you can tap a contactless Visa, Mastercard, Amex, JCB or UnionPay card at any Shanghai Metro gate."
           },
           "src": [
             "s17"
-          ]
+          ],
+          "checked": "2026-11-11"
         },
         {
           "applies": "shanghai",
           "text": {
-            "en": "For Shanghai Metro taps, turn on small-amount no-PIN payment on your card; Type-B chip cards and cards without ODA are not supported."
+            "en": "For Shanghai Metro, turn on small-amount no-PIN payment on your card. Cards with Type-B chips or without ODA are not supported."
           },
           "src": [
             "s17"
-          ]
+          ],
+          "checked": "2026-11-11"
         },
         {
           "applies": "shanghai",
           "text": {
-            "en": "Only some Shanghai taxis with suitable POS terminals take overseas cards; the scheme started in April 2024 with Dazhong taxis."
+            "en": "Only some Shanghai taxis with suitable card terminals take overseas cards. The scheme started in April 2024 with Dazhong taxis."
           },
           "src": [
             "s4",
             "s18"
           ],
-          "note": "Current number of equipped taxis unknown."
+          "checked": "2026-11-11"
         },
         {
           "applies": "xian",
@@ -527,7 +528,7 @@ export const payment: TopicContent = {
           "src": [
             "s27"
           ],
-          "note": "Does not say whether this is gate tap-in or ticket-machine/counter purchase. Unconfirmed."
+          "note": "Does not say whether this is gate tap-in or ticket-machine/counter purchase. Unconfirmed. Not live: no fetched source states it."
         }
       ]
     },
@@ -545,31 +546,33 @@ export const payment: TopicContent = {
         {
           "applies": "beijing",
           "text": {
-            "en": "Capital and Daxing airports have payment-service demonstration areas and help desks for foreign visitors; Beijing said all airport merchants accept overseas cards."
+            "en": "Beijing Capital and Daxing airports have payment service areas for foreign visitors, and Beijing said in 2024 that all merchants at both airports accept overseas cards."
           },
           "src": [
             "s22",
             "s13"
           ],
-          "note": "2024 figures."
+          "checked": "2026-11-11"
         },
         {
           "applies": "beijing",
           "text": {
-            "en": "A 'Visa-UnionPay Zone' along the Central Axis (launched March 2025) commits key businesses there to take overseas cards and its ATMs to give cash on foreign cards."
+            "en": "Along Beijing's Central Axis, a 'Visa-UnionPay Zone' launched in March 2025 means key businesses take overseas cards and nearby ATMs give cash on foreign cards."
           },
           "src": [
             "s21"
-          ]
+          ],
+          "checked": "2026-11-11"
         },
         {
           "applies": "shanghai",
           "text": {
-            "en": "The PBOC said in March 2024 that foreign cards were accepted at Shanghai airports, train stations, star-rated hotels and major shopping districts."
+            "en": "In March 2024 China's central bank said foreign cards were accepted at more Shanghai airports, train stations, star-rated hotels and major shopping districts."
           },
           "src": [
             "s30"
-          ]
+          ],
+          "checked": "2026-11-11"
         },
         {
           "applies": "xian",
@@ -578,7 +581,8 @@ export const payment: TopicContent = {
           },
           "src": [
             "s26"
-          ]
+          ],
+          "note": "Not live: no fetched source states it."
         },
         {
           "applies": "xian",
@@ -587,7 +591,8 @@ export const payment: TopicContent = {
           },
           "src": [
             "s27"
-          ]
+          ],
+          "note": "Not live: no fetched source states it."
         },
         {
           "applies": "xian",
@@ -597,7 +602,8 @@ export const payment: TopicContent = {
           "src": [
             "s28",
             "s26"
-          ]
+          ],
+          "note": "Not live: no fetched source states it."
         }
       ]
     }
