@@ -538,6 +538,7 @@ export const en = {
     missing: { didi: "DiDi isn’t on this phone. Show this card to any taxi driver instead.", amap: "Amap isn’t on this phone. See the route in HaodeGo instead.", alipay: "Alipay isn’t on this phone. Pay with WeChat Pay or cash.", wechat: "WeChat isn’t on this phone. Pay with Alipay or cash." },
     driverCard: "Show the driver",
     seeRoute: "See route",
+    earnBody: "The app is free and has no ads. When you book a hotel or train through our links, the partner pays us a small commission. Your price stays the same.",
   },
   esim: {
     recommended: "Most travellers pick {name}",

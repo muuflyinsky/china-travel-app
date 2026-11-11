@@ -535,6 +535,7 @@ export const ko: Dict = {
     missing: { didi: "이 휴대폰에 DiDi가 없습니다. 택시 기사님께 이 카드를 보여 주세요.", amap: "이 휴대폰에 Amap이 없습니다. HaodeGo에서 경로를 확인하세요.", alipay: "이 휴대폰에 Alipay가 없습니다. WeChat Pay나 현금으로 결제하세요.", wechat: "이 휴대폰에 WeChat이 없습니다. Alipay나 현금으로 결제하세요." },
     driverCard: "기사에게 보여주기",
     seeRoute: "경로 보기",
+    earnBody: "앱은 무료이고 광고가 없습니다. 링크로 호텔·기차를 예약하면 제휴사가 소액의 수수료를 지급합니다. 가격은 똑같습니다.",
   },
   esim: {
     recommended: "대부분의 여행자는 {name}을(를) 선택해요",

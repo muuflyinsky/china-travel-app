@@ -181,13 +181,19 @@ function Checklist() {
     try { localStorage.setItem("ctg.prep", JSON.stringify(n)); } catch {}
   };
   const count = items.filter((x) => done.includes(x.key)).length;
+  // Before mount `app` is still false: the collapsed row shows both versions and CSS picks one,
+  // so the iOS app never flashes the website's "0 of 5".
+  const both = (f: (list: readonly { key: string }[]) => React.ReactNode) => (
+    <><span className="web-only">{f(PREP)}</span><span className="app-only">{f(PREP_IN_APP)}</span></>
+  );
+  const readyTitle = both((list) => fmt(t.today.getReady, { done: list.filter((x) => done.includes(x.key)).length, total: list.length }));
   // Collapsed to one row until opened: the prep list matters, but less than visa and hotels.
   if (!expanded) {
     return (
       <Section>
         <Group>
           <Row onClick={() => setExpanded(true)} icon={<IconTile><ListChecks className="h-5 w-5" aria-hidden /></IconTile>}
-            title={fmt(t.today.getReady, { done: count, total: items.length })} sub={app ? t.inapp.getReadySub : t.today.getReadySub} />
+            title={readyTitle} sub={<><span className="web-only">{t.today.getReadySub}</span><span className="app-only">{t.inapp.getReadySub}</span></>} />
         </Group>
       </Section>
     );

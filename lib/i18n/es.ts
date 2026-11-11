@@ -535,6 +535,7 @@ export const es: Dict = {
     missing: { didi: "DiDi no está en este teléfono. Enseña esta tarjeta a cualquier taxista.", amap: "Amap no está en este teléfono. Mira la ruta en HaodeGo.", alipay: "Alipay no está en este teléfono. Paga con WeChat Pay o en efectivo.", wechat: "WeChat no está en este teléfono. Paga con Alipay o en efectivo." },
     driverCard: "Mostrar al taxista",
     seeRoute: "Ver ruta",
+    earnBody: "La app es gratuita y no tiene anuncios. Si reservas un hotel o un tren con nuestros enlaces, el socio nos paga una pequeña comisión. Tu precio no cambia.",
   },
   esim: {
     recommended: "La mayoría elige {name}",
