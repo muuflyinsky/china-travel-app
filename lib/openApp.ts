@@ -1,6 +1,7 @@
 "use client";
 import { appStoreUrl, playStoreUrl, type AppId } from "./apps";
 import { track } from "./track";
+import { inApp } from "./passes";
 
 // URL schemes that open each app's home screen. Alipay and WeChat are documented; Amap's are
 // its published URI schemes; DiDi's is widely used but not documented by DiDi (verify on a
@@ -19,17 +20,19 @@ const store = (app: AppId) => (isAndroid() && playStoreUrl(app)) || appStoreUrl(
 
 /**
  * Open a Chinese app (optionally at `url`, e.g. Alipay's pay code); if the page is still
- * visible 1.6 s later the app isn't installed, so open its store page instead.
+ * visible 1.6 s later the app isn't installed. On the website that opens its store page; in the
+ * iOS app it never does (App Review 3.2.2(i), D19): `onMissing` shows our own note instead.
  */
-export function openApp(app: AppId, url?: string) {
+export function openApp(app: AppId, url?: string, onMissing?: (app: AppId) => void) {
+  const missing = () => { if (inApp()) onMissing?.(app); else window.location.href = store(app); };
   track("app_open", { app });
   const s = SCHEMES[app];
   if (!url && s?.web) { window.open(s.web, "_blank", "noopener"); return; }
   const target = url ?? (isAndroid() ? s?.android : s?.ios);
-  if (!target) { window.location.href = store(app); return; }
+  if (!target) { missing(); return; }
   const started = Date.now();
   window.location.href = target;
   setTimeout(() => {
-    if (document.visibilityState === "visible" && Date.now() - started < 2500) window.location.href = store(app);
+    if (document.visibilityState === "visible" && Date.now() - started < 2500) missing();
   }, 1600);
 }

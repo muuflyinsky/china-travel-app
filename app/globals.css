@@ -130,6 +130,10 @@ body { -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transpa
 html.in-app body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 html.in-app :is(input, textarea, [contenteditable="true"], .select-text) { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
 html.in-app, html.in-app body { overscroll-behavior: none; }
+/* App Review 3.2.2(i), DECISIONS D19: no app directory, store links or app recommendations inside the
+   iOS app. .web-only is hidden there, .app-only on the website. The class is set before first paint. */
+html.in-app .web-only { display: none !important; }
+html:not(.in-app) .app-only { display: none !important; }
 .zh { font-family: "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif; }
 /* Japanese and Korean UI text needs its own system fonts, or Han characters render as Chinese forms. */
 :lang(ja) { font-family: -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; }

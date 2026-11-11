@@ -5,17 +5,21 @@ import { AppIcon } from "../AppIcon";
 import { useT } from "../useT";
 import { appStoreUrl } from "@/lib/apps";
 
-/** How to set up Alipay and WeChat Pay with a foreign card (was the Pay page). */
+/**
+ * How to set up Alipay and WeChat Pay with a foreign card (was the Pay page). In the iOS app the
+ * steps stay but the app icons and store links don't (App Review 3.2.2(i), D19).
+ */
 export function PaySetup() {
   const t = useT();
   return (
     <div className="space-y-4">
+      <p className="app-only text-subhead">{t.inapp.payIntro}</p>
       {([["alipay", "Alipay 支付宝", t.pay.alipaySteps], ["wechat", "WeChat 微信", t.pay.wechatSteps]] as const).map(([id, name, steps]) => (
         <div key={id}>
           <div className="flex items-center gap-3">
-            <AppIcon id={id} size={40} />
+            <AppIcon id={id} size={40} className="web-only" />
             <h3 className="zh flex-1 text-headline">{name}</h3>
-            <a href={appStoreUrl(id)} target="_blank" rel="noopener" className="flex min-h-11 items-center text-subhead font-semibold text-cobalt">{t.common.getApp}</a>
+            <a href={appStoreUrl(id)} target="_blank" rel="noopener" className="web-only flex min-h-11 items-center text-subhead font-semibold text-cobalt">{t.common.getApp}</a>
           </div>
           <ol className="mt-2 list-decimal space-y-1 pl-5 text-subhead">
             {steps.map((s) => <li key={s}>{s}</li>)}

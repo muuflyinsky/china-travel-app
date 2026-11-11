@@ -5,7 +5,8 @@ import {
   Camera, Siren, Check, CalendarClock, CalendarPlus, Plane, Smartphone, Wallet, Ticket, Lightbulb, BedDouble, CarTaxiFront,
   Sun, CloudSun, Cloud, CloudRain, CloudLightning, Snowflake, CloudFog, ChevronRight, ChevronDown, LogIn, Receipt, PlaneTakeoff, PlaneLanding, ListChecks, QrCode, Calculator, ShieldCheck, ClipboardList } from "lucide-react";
 import { Screen, DemoNote } from "@/components/Shell";
-import { Section, Card, Group, Row, Button, IconTile } from "@/components/ui";
+import { Section, Card, Group, Row, Button, IconTile, Note } from "@/components/ui";
+import { useInApp } from "@/components/useInApp";
 import { TripAlerts } from "@/components/TripAlerts";
 import { VisaCheck } from "@/components/VisaCheck";
 import { useHotelPicks, usePrice } from "@/components/HotelPicks";
@@ -132,6 +133,24 @@ const PREP = [
   { key: "airport", Icon: PlaneLanding, Body: AirportPrep },
 ] as const;
 
+/** In the iOS app the list is things to get done, not apps to install (App Review 3.2.2(i), D19). */
+const PREP_IN_APP = [
+  PREP[0], PREP[1],
+  { key: "around", Icon: CarTaxiFront, Body: GettingAround },
+  PREP[2], PREP[4], PREP[3],
+] as const;
+
+/** Taxis and maps, in words only: app names without icons or store links. */
+function GettingAround() {
+  const t = useT();
+  return (
+    <div className="space-y-3">
+      <p className="text-subhead">{t.inapp.aroundBody}</p>
+      <Note>{t.inapp.aroundNote}</Note>
+    </div>
+  );
+}
+
 /** Readable before the trip: the arrival-day guide (app/airport). */
 function AirportPrep() {
   const t = useT();
@@ -145,46 +164,49 @@ function AirportPrep() {
 
 function Checklist() {
   const t = useT();
+  const app = useInApp();
+  const items = app ? PREP_IN_APP : PREP;
+  const title = (key: (typeof PREP_IN_APP)[number]["key"]) => (app && key in t.inapp.prep ? t.inapp.prep[key as keyof typeof t.inapp.prep] : t.today.prep[key as keyof typeof t.today.prep]);
   const [done, setDone] = useState<string[]>([]);
   const [open, setOpen] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(false);
   useEffect(() => {
     try { setDone(JSON.parse(localStorage.getItem("ctg.prep") ?? "[]")); } catch {}
     const h = location.hash.slice(1);
-    if (PREP.some((x) => x.key === h)) { setExpanded(true); setOpen(h); setTimeout(() => document.getElementById(h)?.scrollIntoView({ block: "start" }), 50); }
+    if (PREP_IN_APP.some((x) => x.key === h)) { setExpanded(true); setOpen(h); setTimeout(() => document.getElementById(h)?.scrollIntoView({ block: "start" }), 50); }
   }, []);
   const tick = (k: string) => {
     const n = done.includes(k) ? done.filter((x) => x !== k) : [...done, k];
     setDone(n);
     try { localStorage.setItem("ctg.prep", JSON.stringify(n)); } catch {}
   };
-  const count = PREP.filter((x) => done.includes(x.key)).length;
+  const count = items.filter((x) => done.includes(x.key)).length;
   // Collapsed to one row until opened: the prep list matters, but less than visa and hotels.
   if (!expanded) {
     return (
       <Section>
         <Group>
           <Row onClick={() => setExpanded(true)} icon={<IconTile><ListChecks className="h-5 w-5" aria-hidden /></IconTile>}
-            title={fmt(t.today.getReady, { done: count, total: PREP.length })} sub={t.today.getReadySub} />
+            title={fmt(t.today.getReady, { done: count, total: items.length })} sub={app ? t.inapp.getReadySub : t.today.getReadySub} />
         </Group>
       </Section>
     );
   }
   return (
-    <Section title={fmt(t.today.getReady, { done: count, total: PREP.length })}>
+    <Section title={fmt(t.today.getReady, { done: count, total: items.length })}>
       <ul className="divide-y divide-line overflow-hidden rounded-card border border-line bg-card">
-        {PREP.map(({ key, Icon, Body }) => {
+        {items.map(({ key, Icon, Body }) => {
           const isOpen = open === key, isDone = done.includes(key);
           return (
             <li key={key} id={key} className="scroll-mt-4">
               <div className="flex min-h-14 items-center gap-3 pl-4">
-                <button onClick={() => tick(key)} aria-pressed={isDone} aria-label={t.today.prep[key]}
+                <button onClick={() => tick(key)} aria-pressed={isDone} aria-label={title(key)}
                   className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border-2 ${isDone ? "border-cobalt bg-cobalt text-white dark:text-porcelain" : "border-line"}`}>
                   {isDone && <Check className="h-4 w-4" strokeWidth={3} />}
                 </button>
                 <button onClick={() => setOpen(isOpen ? null : key)} aria-expanded={isOpen} className="flex flex-1 items-center gap-3 py-3 pr-4 text-left">
                   <Icon className="h-5 w-5 shrink-0 text-cobalt" aria-hidden />
-                  <span className={`flex-1 text-body ${isDone ? "text-muted line-through" : ""}`}>{t.today.prep[key]}</span>
+                  <span className={`flex-1 text-body ${isDone ? "text-muted line-through" : ""}`}>{title(key)}</span>
                   <ChevronDown className={`h-5 w-5 shrink-0 text-muted transition-transform ${isOpen ? "rotate-180" : ""}`} aria-hidden />
                 </button>
               </div>
@@ -229,7 +251,7 @@ function BeforeTrip() {
         </Group>
       </Section>
       {/* Not folded (SPEC v0.5 P1.5): knowing which Chinese app to install is the point. */}
-      <Section title={t.today.appsTitle}>
+      <Section title={t.today.appsTitle} className="web-only">
         <div className="rounded-card border border-line bg-card px-4"><AppList /></div>
         <AppSetupNote />
       </Section>
@@ -349,17 +371,17 @@ function MenuHero() {
 }
 
 /** Tier 2 — a quick action: icon, title, one line of context. */
-function Tile({ icon, title, sub, onClick, href, apps }: {
-  icon: React.ReactNode; title: string; sub?: React.ReactNode; onClick?: () => void; href?: string;
+function Tile({ icon, title, sub, onClick, href, apps, className = "" }: {
+  icon: React.ReactNode; title: string; sub?: React.ReactNode; onClick?: () => void; href?: string; className?: string;
   /** Brand icons of the Chinese apps this moment uses — the only colour besides allergy colours. */
   apps?: AppId[];
 }) {
-  const cls = "flex min-h-[108px] flex-col items-start gap-1.5 rounded-card border border-line bg-card p-3.5 text-left";
+  const cls = `flex min-h-[108px] flex-col items-start gap-1.5 rounded-card border border-line bg-card p-3.5 text-left ${className}`;
   const body = (
     <>
       <span className="flex w-full items-center justify-between">
         <span className="grid h-9 w-9 place-items-center rounded-[10px] bg-cobalt-soft text-cobalt">{icon}</span>
-        {apps && <span className="flex -space-x-1.5">{apps.map((a) => <AppIcon key={a} id={a} size={22} />)}</span>}
+        {apps && <span className="web-only flex -space-x-1.5">{apps.map((a) => <AppIcon key={a} id={a} size={22} />)}</span>}
       </span>
       <span className="text-headline">{title}</span>
       {sub && <span className="line-clamp-2 text-footnote text-muted">{sub}</span>}
@@ -436,8 +458,11 @@ function Moments({ leaving = false }: { leaving?: boolean }) {
             sub={p.hotel && <span className="zh">{p.hotel.name}</span>} />
           <Tile onClick={() => (alarms.length ? setSheet("today") : router.push("/explore"))} icon={<CalendarClock className="h-5 w-5" aria-hidden />}
             title={t.today.tileToday} sub={next ? fmt(t.today.tileTodayAlarm, { name: next.en, when: nextWhen! }) : fmt(t.today.tileTodaySub, { city: city.e })} />
+          {/* In the iOS app the pay buttons live on our own Pay page, not on the home screen (D19). */}
+          <Tile className="app-only" href="/pay-codes" icon={<Wallet className="h-5 w-5" aria-hidden />} title={t.inapp.tilePay} sub={t.inapp.tilePaySub} />
+          <Tile className="app-only" onClick={() => setSheet("pay")} icon={<Calculator className="h-5 w-5" aria-hidden />} title={t.today.priceCheck} sub={`¥ → ${p.homeCurrency}`} />
         </div>
-        <PayStrip onConvert={() => setSheet("pay")} />
+        <div className="web-only"><PayStrip onConvert={() => setSheet("pay")} /></div>
       </Section>
 
       <Section title={t.today.essentials}>
@@ -456,7 +481,7 @@ function Moments({ leaving = false }: { leaving?: boolean }) {
           {!leaving && <Row href="/tax-refund" icon={<IconTile><Receipt className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.taxRow} sub={t.today.taxRowSub} />}
           <Row href="/sos" icon={<IconTile tone="danger"><Siren className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.help} sub={t.today.helpSub} />
         </Group>
-        <ChinaApps />
+        <div className="web-only"><ChinaApps /></div>
       </Section>
 
       <EditSheet open={sheet === "driver"} title={t.today.tileDriver} onClose={() => setSheet(null)}>
@@ -464,7 +489,7 @@ function Moments({ leaving = false }: { leaving?: boolean }) {
       </EditSheet>
       <EditSheet open={sheet === "pay"} title={t.today.priceCheck} onClose={() => setSheet(null)}>
         <Card><PriceCheck /></Card>
-        <PayButtons />
+        <div className="web-only"><PayButtons /></div>
       </EditSheet>
       <EditSheet open={sheet === "today"} title={t.today.tileToday} onClose={() => setSheet(null)}>
         <Alarms suggest={false} />
