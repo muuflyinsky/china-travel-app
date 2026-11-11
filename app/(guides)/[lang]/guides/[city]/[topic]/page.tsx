@@ -53,8 +53,8 @@ export default async function GuidePage({ params }: P) {
         {g.draft && (
           // Reviewer-only (never on production builds), so English and not translated.
           <p className="mt-stack rounded-card border border-dashed border-line bg-card p-card text-subhead">
-            <strong>Draft for review.</strong> Facts marked “unverified” were only seen in search results; open each source and set
-            <code> verified</code> in lib/guides/content before they appear on the live site.
+            <strong>Draft for review.</strong> Facts marked “unverified” aren’t confirmed against their sources yet; check them against the cited pages and set
+            <code> checked</code> in lib/guides/content before they appear on the live site.
           </p>
         )}
 

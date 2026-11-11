@@ -356,7 +356,7 @@ iOS 分组列表，每行 = 图标（lucide 线性图标 + 浅色底块，不用
 - **主域名** `https://www.haodego.com`（`lib/seo.ts`）：`metadataBase`、canonical、og:url 都用 www；`app/robots.ts`、`app/sitemap.ts`；每个公开页有自己的标题和描述（各路由的 `layout.tsx`）；设置页 noindex。
 - **路由结构**：App 页面在 `app/(app)/`（网址不变），攻略页在 `app/(guides)/[lang]/`，两个独立的根布局，所以攻略页有正确的 `<html lang>`、不带 App 外壳；未匹配的网址走 `app/global-not-found.tsx`。
 - **攻略页** `/{en|es|fr|de|ja|ko}/guides/{city}/{payment|transport|mobile-data|hotel-check-in}`，另有 `/{lang}/guides` 和 `/{lang}/guides/{city}`。静态生成，含 hreflang（x-default=英文）、Article + BreadcrumbList JSON-LD、出处列表和核对日期；页底引导打开 App。
-- **内容规则**：只用官方和主流媒体来源，每条事实至少一个出处（`lib/guides/content/*.ts`）；城市没有出处的，只显示全国规则，不猜。来源设了 `verified` 日期（有人打开核对过）的事实才上正式站；未核对的只在预览和本地构建显示（虚线框、“unverified”、noindex），sitemap 只收已核对的页面。英文为准，其他语言是翻译，缺翻译时该条显示英文。
+- **内容规则**：只用官方和主流媒体来源，每条事实至少一个出处（`lib/guides/content/*.ts`）；城市没有出处的，只显示全国规则，不猜。事实设了 `checked` 日期（有人读过所引页面、确认写的是这句话）才上正式站；未核对的只在预览和本地构建显示（虚线框、“unverified”、noindex），sitemap 只收已核对的页面。英文为准，其他语言是翻译，缺翻译时该条显示英文。
 - 试点城市：北京、上海、西安。Veer 审过后按每批约 10 城扩到 46 城。App 将来移到 `/app`、根目录做主页是另一个计划，未开始。
 
 ---

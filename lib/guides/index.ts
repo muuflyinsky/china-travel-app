@@ -27,7 +27,7 @@ export function languageAlternates(city?: CityId, topic?: TopicId) {
  * can be reviewed, and never on production.
  */
 export const SHOW_DRAFTS = process.env.VERCEL_ENV !== "production";
-const isVerified = (c: TopicContent, f: Fact) => f.src.some((id) => Boolean(c.sources[id]?.verified));
+const isVerified = (_c: TopicContent, f: Fact) => Boolean(f.checked);
 
 export type NumberedSource = Source & { n: number };
 export type CityGuide = {

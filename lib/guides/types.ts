@@ -30,16 +30,18 @@ export type Source = {
   /** Publication date if the source shows one (YYYY-MM-DD). */
   published?: string;
   kind: "official" | "media";
-  /**
-   * Date someone opened this page and confirmed it says what the facts citing it say (YYYY-MM-DD).
-   * Unset = only seen in search results. Production shows a fact only if one of its sources is verified.
-   */
-  verified?: string;
 };
 
 /** One fact. `src` are keys of the topic's `sources`; at least one is required. */
 export type Fact = {
-  applies: "national" | CityId; text: FactText; src: string[];
+  applies: "national" | CityId; text: FactText;
+  /** Sources that state this fact (for a checked fact: only the ones that were confirmed to). */
+  src: string[];
+  /**
+   * Date someone read the cited pages and confirmed they state this text (YYYY-MM-DD).
+   * Unset = draft: shown on preview/local builds only, never on production.
+   */
+  checked?: string;
   /** For reviewers only (conflicts, dates to recheck); shown on draft builds, never in production. */
   note?: string;
 };
