@@ -535,6 +535,8 @@ export const de: Dict = {
     missing: { didi: "DiDi ist nicht auf diesem Handy. Zeig diese Karte einem Taxifahrer.", amap: "Amap ist nicht auf diesem Handy. Sieh dir die Route in HaodeGo an.", alipay: "Alipay ist nicht auf diesem Handy. Zahl mit WeChat Pay oder bar.", wechat: "WeChat ist nicht auf diesem Handy. Zahl mit Alipay oder bar." },
     driverCard: "Dem Fahrer zeigen",
     seeRoute: "Route ansehen",
+    locationOff: "Standort ist aus. Die Suche in {city} funktioniert weiter; für Routen und „In der Nähe“ schalte ihn ein unter Einstellungen → Datenschutz & Sicherheit → Ortungsdienste → HaodeGo.",
+    support: "Hilfe",
     earnBody: "Die App ist kostenlos und werbefrei. Wenn du über unsere Links ein Hotel oder einen Zug buchst, zahlt uns der Partner eine kleine Provision. Dein Preis bleibt gleich.",
   },
   esim: {

@@ -16,7 +16,11 @@ function bridge(): Bridge | null {
 }
 
 export const inApp = () => typeof navigator !== "undefined" && /ChinaTravelBuddy-iOS/.test(navigator.userAgent);
-/** The app version can sell passes (1.0 can't: it has no Passes plugin). */
+/**
+ * True when the app has the native Passes plugin, which every build so far does, 1.0 (1) included.
+ * Purchase rows still only appear once the App Store returns the products, and none exist in App
+ * Store Connect before 1.0 is approved (LAUNCH-TODO §三), so 1.0 shows nothing to buy.
+ */
 export const hasPasses = () => Boolean(bridge()?.PluginHeaders?.some((h) => h.name === "Passes"));
 const call = <T,>(method: string, options?: object) => bridge()!.nativePromise!<T>("Passes", method, options);
 

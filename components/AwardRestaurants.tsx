@@ -5,7 +5,7 @@ import { Preloader } from "konsta/react";
 import { Button, EmptyState } from "./ui";
 import { SourceLine } from "./SourceLine";
 import { AwardIcon, BibGourmand, MichelinStar } from "./AwardIcon";
-import { AppIcon } from "./AppIcon";
+import { BadgeCheck } from "lucide-react";
 import { CuisineTile } from "./CuisineTile";
 import { useCity } from "./useCity";
 import { useProfile } from "./useProfile";
@@ -101,7 +101,7 @@ export function AwardRestaurants({ adcode, cityEn, listedOnly, onPick }: {
   const chip = (f: (typeof filters)[number]) =>
     f.id === "stars" ? <><MichelinStar />{t.awards.starsShort}</>
     : f.id === "bib" ? <><BibGourmand />{t.awards.bibShort}</>
-    : f.id === "must_eat" ? <><AppIcon id="dianping" size={16} className="border-0" />{t.awards.mustEatShort}</>
+    : f.id === "must_eat" ? <><BadgeCheck className="h-4 w-4 shrink-0 text-ink" aria-hidden />{t.awards.mustEatShort}</>
     : <>{fmt(t.awards.blackPearl, { d: "" }).trim()}</>;
   const others = d.cities.filter((c) => c.city.a !== adcode).slice(0, 6);
   const pickFilter = (id: FilterId) => { setFilter(filter === id ? "all" : id); setCuisine(null); setShown(PAGE); };
