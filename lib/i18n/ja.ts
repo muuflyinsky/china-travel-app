@@ -535,6 +535,8 @@ export const ja: Dict = {
     missing: { didi: "この端末に DiDi がありません。このカードをタクシー運転手に見せてください。", amap: "この端末に Amap がありません。HaodeGo でルートを確認してください。", alipay: "この端末に Alipay がありません。WeChat Pay か現金で支払ってください。", wechat: "この端末に WeChat がありません。Alipay か現金で支払ってください。" },
     driverCard: "運転手に見せる",
     seeRoute: "ルートを見る",
+    locationOff: "位置情報がオフです。{city} での検索は使えます。ルートと「近く」を使うには、設定 → プライバシーとセキュリティ → 位置情報サービス → HaodeGo でオンにしてください。",
+    support: "サポート",
     earnBody: "アプリは無料で広告もありません。リンクからホテル・列車を予約すると、提携先から少額の手数料を受け取ります。料金は変わりません。",
   },
   esim: {

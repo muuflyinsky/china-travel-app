@@ -24,6 +24,7 @@ import { amapNav, appleNav } from "@/lib/maplinks";
 import { goLink } from "@/lib/affiliate";
 import { track } from "@/lib/track";
 import { fmt } from "@/lib/i18n";
+import { inApp } from "@/lib/passes";
 import type { Place } from "@/lib/amap";
 import categoryDefs from "@/lib/data/categories.json";
 
@@ -81,7 +82,8 @@ function Explore() {
     try {
       setHere(await detect());
     } catch {
-      setNotice(fmt(t.go.locationOff, { city: city.e }));
+      // In the iOS app there are no "browser settings": point to the iOS setting instead.
+      setNotice(fmt(inApp() ? t.inapp.locationOff : t.go.locationOff, { city: city.e }));
     }
     setBusy("");
   }
