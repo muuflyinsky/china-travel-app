@@ -473,6 +473,6 @@ docs/                设计调研、评审记录、截图
 > 2026-11-01 状态注：域名、开发者账号、Bundle ID、隐私政策网址已就绪；1.0 (1) 已上传 App Store Connect，尚未提交审核（来源：LAUNCH-TODO，本次未登录核验）。下面“上架前需要”一句是当时的清单。
 - Capacitor 8 原生壳（`capacitor.config.ts`、`ios/App/`，Swift Package Manager）。WebView 加载线上站点 `CAP_SERVER_URL`（API 路由需要服务器）；只有断网页 `native/www/offline.html`（6 种语言）打包在 App 里。
 - 只支持 iPhone、竖屏；权限说明：相机（拍菜单/订单）、相册、定位、麦克风和语音识别（翻译）；可打开支付宝、微信、高德、滴滴。User-Agent 末尾带 `ChinaTravelBuddy-iOS`。
-- 图标：`native/make-icon.swift` 生成 1024px 图标（与网页图标一致）；启动屏为纯青花瓷底色。
+- 图标：`native/make-icon.swift` 生成 1024px 图标（1.0 仍是“游”字；网页图标 2026-11-11 已换成标志 v3.1 的 go，D12，App 图标随 1.1 重新打包时更换）；启动屏为纯青花瓷底色。
 - 已在 iOS 模拟器（iPhone 17e，iOS 27）跑通，连本地开发服务器。
 - 发布步骤和 App Store Connect 清单见 `native/README.md`。上架前需要：自有 HTTPS 域名、Apple 开发者账号和 Bundle ID、隐私政策网址、真机测试。中国大陆区先不上架（需要 APP 备案和生成式 AI 合规）。
