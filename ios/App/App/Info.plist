@@ -38,12 +38,8 @@
 	<string>Take a photo of a menu to translate it and check it for your allergies, or of a hotel booking to make a taxi card.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Shows your city, nearby metro stations, toilets and pharmacies, and directions from where you are.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Speak a sentence to translate it into Chinese.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Choose a photo of a menu or a hotel booking screenshot to read it.</string>
-	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>Turns what you say into text so it can be translated into Chinese.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

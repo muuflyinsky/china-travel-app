@@ -9,9 +9,13 @@ connection.
 ```
 capacitor.config.ts        app id, name, server URL (https://haodego.com; CAP_SERVER_URL overrides), user agent suffix
 ios/App/                   Xcode project (Swift Package Manager, no CocoaPods)
-ios/App/App/Info.plist     permission texts, iPhone-only portrait, app schemes (alipays, weixin, iosamap, diditaxi)
+ios/App/App/Info.plist     permission texts (camera, photos, location), iPhone-only portrait, app schemes (alipays, weixin, iosamap, diditaxi)
 native/www/offline.html    no-connection page (6 languages)
-native/make-icon.swift     renders native/assets/icon-1024.png (the App Store icon)
+native/assets/icon-1024.png  App Store icon: logo v3.1, copied from the workspace brand kit (haodego-brand-kit-v3.1/app-icon.png;
+                           1024 px, opaque, square corners); the same file is ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png
+ios/App/App/PassesPlugin.swift   trip passes and tips (StoreKit 2), for lib/passes.ts
+ios/App/App/ReviewPlugin.swift   App Store rating prompt, for lib/review.ts (from 1.1)
+ios/App/App/PrivacyInfo.xcprivacy  the app's privacy manifest: keep it in step with the App Privacy label in app-store.md
 ```
 
 The web app can tell it's inside the iOS app: the user agent ends with `ChinaTravelBuddy-iOS`.
