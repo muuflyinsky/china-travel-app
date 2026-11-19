@@ -485,7 +485,9 @@ docs/                设计调研、评审记录、截图
 
 > 2026-11-01 状态注：域名、开发者账号、Bundle ID、隐私政策网址已就绪；1.0 (1) 已上传 App Store Connect，尚未提交审核（来源：LAUNCH-TODO，本次未登录核验）。下面“上架前需要”一句是当时的清单。
 - Capacitor 8 原生壳（`capacitor.config.ts`、`ios/App/`，Swift Package Manager）。WebView 加载线上站点 `CAP_SERVER_URL`（API 路由需要服务器）；只有断网页 `native/www/offline.html`（6 种语言）打包在 App 里。
-- 只支持 iPhone、竖屏；权限说明：相机（拍菜单/订单）、相册、定位、麦克风和语音识别（翻译）；可打开支付宝、微信、高德、滴滴。User-Agent 末尾带 `ChinaTravelBuddy-iOS`。
-- 图标：`native/make-icon.swift` 生成 1024px 图标（1.0 仍是“游”字；网页图标 2026-11-11 已换成标志 v3.1 的 go，D12，App 图标随 1.1 重新打包时更换）；启动屏为纯青花瓷底色。
+- **断网回酒店卡**（1.1 起，Veer 11-19）：用户存过酒店时，断网打开 App 的断网页最上面直接显示大字卡“师傅您好，请带我回酒店：”+ 酒店中文名 + 地址（+ 英文名小字），下面一句说明和“重试”。数据来自网页 `lib/offline-hotel.ts` 用 `@capacitor/preferences` 存在手机上的一份**纯文字**（中文名、地址、英文名、界面语言；不存坐标、不存地图或图片，高德协议 3.5）；改酒店或清除数据时跟着更新或删除。没存过酒店时断网页和以前一样。
+- 只支持 iPhone、竖屏；权限说明：相机（拍菜单/订单）、相册、定位（1.1 起删掉麦克风和语音识别：App 内麦克风已隐藏，原生语音等 Veer 定）；可打开支付宝、微信、高德、滴滴。User-Agent 末尾带 `ChinaTravelBuddy-iOS`。
+- 原生插件（App target 里）：`PassesPlugin`（StoreKit 2 通行证和打赏）、`ReviewPlugin`（1.1 起，系统评分弹窗，何时弹由网页 `lib/review.ts` 决定）。App 自己的隐私清单 `ios/App/App/PrivacyInfo.xcprivacy`（1.1 起）：不追踪，收集的数据和 App Store 隐私标签（`native/app-store.md`）一致；需要说明理由的 API 只有 UserDefaults（CA92.1，`@capacitor/preferences` 存断网回酒店卡用）。
+- 图标：1.1 起用标志 v3.1（`haodego-brand-kit-v3.1/app-icon.png`，1024px、不透明、不带圆角，复制到 `native/assets/icon-1024.png` 和 `AppIcon.appiconset`）；1.0 是“游”字。启动屏为纯青花瓷底色。
 - 已在 iOS 模拟器（iPhone 17e，iOS 27）跑通，连本地开发服务器。
 - 发布步骤和 App Store Connect 清单见 `native/README.md`。上架前需要：自有 HTTPS 域名、Apple 开发者账号和 Bundle ID、隐私政策网址、真机测试。中国大陆区先不上架（需要 APP 备案和生成式 AI 合规）。

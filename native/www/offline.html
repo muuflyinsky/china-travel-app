@@ -5,32 +5,81 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>HaodeGo</title>
 <style>
-  :root { --bg: #f7f8fb; --ink: #1a1f2e; --muted: #5b6275; --cobalt: #2b4acb; }
-  @media (prefers-color-scheme: dark) { :root { --bg: #12141c; --ink: #eef0f6; --muted: #9aa1b4; --cobalt: #8fa3ff; } }
+  :root { --bg: #f7f8fb; --card: #fff; --line: #e3e6ee; --ink: #1a1f2e; --muted: #5b6275; --cobalt: #2b4acb; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #12141c; --card: #1c1f2a; --line: #2c3040; --ink: #eef0f6; --muted: #9aa1b4; --cobalt: #8fa3ff; } }
   body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: var(--bg); color: var(--ink);
-         font: 17px/1.5 -apple-system, "PingFang SC", sans-serif; text-align: center; padding: 24px; box-sizing: border-box; }
+         font: 17px/1.5 -apple-system, "PingFang SC", sans-serif; text-align: center; padding: 24px;
+         padding-top: max(24px, env(safe-area-inset-top)); padding-bottom: max(24px, env(safe-area-inset-bottom)); box-sizing: border-box; }
+  main { width: 100%; max-width: 480px; }
   h1 { font-size: 22px; margin: 0 0 8px; }
   p { color: var(--muted); margin: 0 0 24px; }
   button { min-height: 48px; padding: 0 24px; border: 0; border-radius: 16px; background: var(--cobalt); color: #fff; font: 600 17px -apple-system, sans-serif; }
+  /* "Back to my hotel": the same words and order as the in-app hotel card (components/HotelCard.tsx). */
+  #card { display: none; text-align: left; background: var(--card); border: 1px solid var(--line); border-radius: 24px; padding: 24px; margin: 0 0 20px; }
+  #card p { color: var(--ink); }
+  #card .lead { font-size: 24px; line-height: 1.4; margin: 0 0 12px; }
+  #card .name { font-size: 36px; line-height: 1.25; font-weight: 700; margin: 0 0 12px; word-break: break-all; }
+  #card .addr { font-size: 24px; line-height: 1.4; margin: 0; word-break: break-all; }
+  #card p.en { font-size: 15px; color: var(--muted); margin: 12px 0 0; }
+  body.hotel h1 { font-size: 17px; }
+  body.hotel p { font-size: 15px; }
 </style>
 </head>
 <body>
 <main>
+  <!-- Filled in from the hotel the traveller saved in the app (text only, never a map image). -->
+  <section id="card" lang="zh-CN" aria-live="polite">
+    <p class="lead">师傅您好，请带我回酒店：</p>
+    <p class="name" id="hn"></p>
+    <p class="addr" id="ha"></p>
+    <p class="en" id="he" lang="en"></p>
+  </section>
   <h1 id="h">No connection</h1>
   <p id="p">HaodeGo needs the internet to read menus, find places and check prices. Check Wi-Fi or mobile data, then try again.</p>
   <button id="b" onclick="history.length > 1 ? history.back() : location.reload()">Try again</button>
 </main>
 <script>
-  // The few words this page needs, in the six interface languages.
+  // The few words this page needs, in the six interface languages: title, text, button, and the
+  // title and text used above a saved hotel card.
   var T = {
-    es: ["Sin conexión", "HaodeGo necesita internet para leer cartas, buscar lugares y consultar precios. Revisa el wifi o los datos móviles e inténtalo de nuevo.", "Reintentar"],
-    fr: ["Pas de connexion", "HaodeGo a besoin d’internet pour lire les menus, trouver des lieux et vérifier les prix. Vérifiez le Wi-Fi ou les données mobiles, puis réessayez.", "Réessayer"],
-    de: ["Keine Verbindung", "HaodeGo braucht Internet, um Speisekarten zu lesen, Orte zu finden und Preise zu prüfen. Prüfe WLAN oder mobile Daten und versuche es erneut.", "Erneut versuchen"],
-    ja: ["接続できません", "メニューの読み取り、場所の検索、価格の確認にはインターネットが必要です。Wi-Fiまたはモバイルデータを確認して、もう一度お試しください。", "再試行"],
-    ko: ["연결 없음", "메뉴 읽기, 장소 찾기, 가격 확인에는 인터넷이 필요해요. Wi-Fi나 모바일 데이터를 확인한 뒤 다시 시도해 주세요.", "다시 시도"],
+    en: ["No connection", "HaodeGo needs the internet to read menus, find places and check prices. Check Wi-Fi or mobile data, then try again.", "Try again",
+         "No connection: your hotel card still works", "Show it to a taxi driver to get back to your hotel. Menus, maps and prices need the internet."],
+    es: ["Sin conexión", "HaodeGo necesita internet para leer cartas, buscar lugares y consultar precios. Revisa el wifi o los datos móviles e inténtalo de nuevo.", "Reintentar",
+         "Sin conexión: la tarjeta de tu hotel sigue funcionando", "Enséñasela a un taxista para volver al hotel. Las cartas, los mapas y los precios necesitan internet."],
+    fr: ["Pas de connexion", "HaodeGo a besoin d’internet pour lire les menus, trouver des lieux et vérifier les prix. Vérifiez le Wi-Fi ou les données mobiles, puis réessayez.", "Réessayer",
+         "Pas de connexion : la carte de votre hôtel reste disponible", "Montrez-la à un chauffeur de taxi pour rentrer à l’hôtel. Les menus, les cartes et les prix ont besoin d’internet."],
+    de: ["Keine Verbindung", "HaodeGo braucht Internet, um Speisekarten zu lesen, Orte zu finden und Preise zu prüfen. Prüfe WLAN oder mobile Daten und versuche es erneut.", "Erneut versuchen",
+         "Keine Verbindung: deine Hotelkarte funktioniert trotzdem", "Zeig sie einem Taxifahrer, um zurück ins Hotel zu kommen. Speisekarten, Karten und Preise brauchen Internet."],
+    ja: ["接続できません", "メニューの読み取り、場所の検索、価格の確認にはインターネットが必要です。Wi-Fiまたはモバイルデータを確認して、もう一度お試しください。", "再試行",
+         "オフラインでもホテルカードは使えます", "タクシーの運転手に見せれば、ホテルに戻れます。メニュー・地図・価格にはインターネットが必要です。"],
+    ko: ["연결 없음", "메뉴 읽기, 장소 찾기, 가격 확인에는 인터넷이 필요해요. Wi-Fi나 모바일 데이터를 확인한 뒤 다시 시도해 주세요.", "다시 시도",
+         "오프라인이어도 호텔 카드는 쓸 수 있어요", "택시 기사에게 보여 주면 호텔로 돌아갈 수 있어요. 메뉴, 지도, 가격은 인터넷이 필요해요."],
   };
-  var t = T[(navigator.language || "en").slice(0, 2)];
-  if (t) { document.documentElement.lang = navigator.language; h.textContent = t[0]; p.textContent = t[1]; b.textContent = t[2]; }
+  function show(lang, hotel) {
+    var t = T[lang] || T[(navigator.language || "en").slice(0, 2)] || T.en;
+    document.documentElement.lang = lang || navigator.language || "en";
+    h.textContent = hotel ? t[3] : t[0];
+    p.textContent = hotel ? t[4] : t[1];
+    b.textContent = t[2];
+    if (!hotel) return;
+    hn.textContent = hotel.name;
+    ha.textContent = hotel.address ? "地址：" + hotel.address : "";
+    he.textContent = hotel.nameEn && hotel.nameEn !== hotel.name ? hotel.nameEn : "";
+    card.style.display = "block";
+    document.body.className = "hotel";
+  }
+  show(null, null);
+  // From app 1.1: the web app keeps a text-only copy of the saved hotel in native storage
+  // (lib/offline-hotel.ts, @capacitor/preferences), because the site's localStorage can't be read here.
+  try {
+    var cap = window.Capacitor;
+    if (cap && cap.nativePromise) {
+      cap.nativePromise("Preferences", "get", { key: "offlineHotel" }).then(function (r) {
+        var v = r && r.value ? JSON.parse(r.value) : null;
+        if (v && typeof v.name === "string" && v.name) show(typeof v.lang === "string" ? v.lang : null, v);
+      }).catch(function () {});
+    }
+  } catch (e) {}
 </script>
 </body>
 </html>
