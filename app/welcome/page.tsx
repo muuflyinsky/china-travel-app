@@ -53,7 +53,7 @@ const TRUST = [
 
 const FAQ = [
   { q: "Is HaodeGo free?", a: "You can start for free: open haodego.com in your phone’s browser, with no account to create. The allergy check, allergy card and emergency help are always free." },
-  { q: "Is there an iPhone app?", a: "An iPhone app is on its way to the App Store. Until then, open haodego.com in Safari and add it to your Home Screen." },
+  { q: "Is there an iPhone app?", a: "Yes, HaodeGo is on the App Store. Where it isn’t offered yet (the EU and mainland China), open haodego.com in Safari and add it to your Home Screen." },
   { q: "Does it work without internet?", a: "No. Reading menus, maps and translation need a connection, so set up a travel eSIM or a local SIM card first." },
   { q: "Can I rely on the allergy check?", a: "Use it as a guide, not a guarantee. Ingredients are inferred from common recipes, and a severe allergy never gets a green answer. Always show your allergy card and confirm with staff." },
 ];
