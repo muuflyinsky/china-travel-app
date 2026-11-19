@@ -10,7 +10,8 @@
     "check:allergens": "node scripts/check-allergens.mjs",
     "check:must-see": "node scripts/check-must-see.mjs",
     "check:dish-names": "node scripts/check-dish-names.mjs",
-    "verify": "npm run typecheck && npm run check:allergens && npm run check:must-see && npm run check:dish-names"
+    "check:visa": "node scripts/check-visa.mjs",
+    "verify": "npm run typecheck && npm run check:allergens && npm run check:must-see && npm run check:dish-names && npm run check:visa"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "1.1.0",

@@ -1,6 +1,10 @@
 // How long a traveller may stay, from the entry date and the kind of entry.
 // China counts the permitted stay from 00:00 on the day AFTER entry, so a 30-day stay that
 // starts on 1 May ends at 24:00 on 31 May. Always double-check the date on the entry stamp.
+import { visaFreeDays } from "./visa";
+
+// "visa_free_30" is the stored name for any visa-free entry; its length comes from the passport
+// (lib/visa.ts visaFreeDays: 30 for most, 60 for Mauritius, 90 for Albania …).
 export type EntryType = "visa_free_30" | "transit_240" | "visa";
 
 export const ENTRY_DAYS: Record<Exclude<EntryType, "visa">, number> = {
@@ -23,9 +27,10 @@ export const todayIso = (now = new Date()) =>
 export const addDays = (iso: string, n: number) => fromDayNum(dayNum(iso) + n);
 export const daysBetween = (from: string, to: string) => dayNum(to) - dayNum(from);
 
-export const allowedDays = (type: EntryType, visaDays: number) => (type === "visa" ? Math.max(1, visaDays) : ENTRY_DAYS[type]);
+export const allowedDays = (type: EntryType, visaDays: number, nationality?: string | null) =>
+  type === "visa" ? Math.max(1, visaDays) : type === "visa_free_30" ? visaFreeDays(nationality) : ENTRY_DAYS[type];
 
-type TripDates = { entryDate: string; arrival: string; departure: string; entryType: EntryType; visaDays: number };
+type TripDates = { entryDate: string; arrival: string; departure: string; entryType: EntryType; visaDays: number; nationality?: string | null };
 
 /**
  * The stay that counts (SPEC v0.5 · P0-6). `legal` is the latest legal exit day, from the entry
@@ -36,7 +41,7 @@ type TripDates = { entryDate: string; arrival: string; departure: string; entryT
 export function stayWindow(p: TripDates, today = new Date()) {
   const base = p.entryDate || p.arrival;
   if (!base) return null;
-  const allowed = allowedDays(p.entryType, p.visaDays);
+  const allowed = allowedDays(p.entryType, p.visaDays, p.nationality);
   const legal = addDays(base, allowed);
   const overstay = Boolean(p.departure && p.departure > legal);
   const lastDay = p.departure && p.departure < legal ? p.departure : legal;

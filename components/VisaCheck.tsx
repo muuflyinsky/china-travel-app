@@ -117,12 +117,13 @@ export function VisaCheck() {
   const r = rule!;
   const headline =
     r.kind === "unilateral" ? fmt(t.visa.result.unilateral, { n: r.days })
-    : r.kind === "mutual" ? fmt(t.visa.result.mutual, { n: r.days })
+    // A cap with no per-visit limit (Albania, Bosnia, Armenia: 90 in any 180) reads "up to".
+    : r.kind === "mutual" ? fmt(r.days === 90 && r.cap === "180" ? t.visa.result.unilateral : t.visa.result.mutual, { n: r.days })
     : r.kind === "transit240" ? t.visa.result.transit240
     : t.visa.result.visa;
   const conditions =
     r.kind === "unilateral" ? [t.visa.cond.ordinary, t.visa.cond.purposes]
-    : r.kind === "mutual" ? [t.visa.cond.ordinary, t.visa.cond.mutual90]
+    : r.kind === "mutual" ? [t.visa.cond.ordinary, ...(r.cap === "180" ? [t.visa.cond.mutual90] : r.cap === "year" ? [t.visa.cond.mutualYear] : [])]
     : r.kind === "transit240" ? [t.visa.cond.onward, t.visa.cond.ports, t.visa.cond.ordinary]
     : [t.visa.cond.applyVisa, t.visa.cond.transit24];
   const fmtDate = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString(p.lang, { timeZone: "UTC", day: "numeric", month: "long", year: "numeric" });
