@@ -48,7 +48,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // The offline page shows the saved hotel as a taxi card (app 1.1; lib/offline-hotel.ts).
   useEffect(() => { if (loaded) syncOfflineHotel(profile.hotel, profile.lang); }, [loaded, profile.hotel, profile.lang]);
   // Rating prompt: only on Today, the calm screen between tasks (lib/review.ts decides the rest).
-  useEffect(() => (path === "/" ? maybeAskForReview() : undefined), [path]);
+  // Today is "/" until the app moves to "/app" (iOS 1.1); lib/review.ts checks again before asking.
+  useEffect(() => (path === "/" || path === "/app" ? maybeAskForReview() : undefined), [path]);
   if (isSitePath(path)) return <>{children}</>;
   // One centred column on every screen size, so navbar, content and tab bar always line up.
   return (
