@@ -917,6 +917,8 @@ export const de: Dict = {
     active: "Unbegrenzt bis {date}",
     thanks: "Danke! Unbegrenzt bis {date}.",
     failed: "Der Kauf hat nicht geklappt. Dir wurde nichts berechnet.",
+    unlinked: "Kauf abgeschlossen, aber dein Pass ist noch nicht aktiv. Sobald du online bist, tippe auf Käufe wiederherstellen. Es wird dir nichts erneut berechnet.",
+    unreachable: "HaodeGo ist gerade nicht erreichbar. Sobald du online bist, tippe noch einmal auf Käufe wiederherstellen.",
     pending: "Wartet auf Freigabe.",
     getApp: "Unbegrenzte Nutzung gibt es mit einem Reisepass in der HaodeGo-App fürs iPhone.",
     loading: "Preise werden geladen…",

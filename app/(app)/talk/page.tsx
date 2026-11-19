@@ -11,6 +11,7 @@ import { allergyLinesZh } from "@/lib/allergens";
 import { track } from "@/lib/track";
 import { apiHeaders } from "@/lib/device";
 import { inApp, quotaHit } from "@/lib/passes";
+import { noteWin } from "@/lib/review";
 import { useProfile } from "@/components/useProfile";
 import { useT } from "@/components/useT";
 import { ShowCard } from "@/components/ShowCard";
@@ -81,6 +82,7 @@ export default function TalkPage() {
     }
     setRes(d); setCopied(false);
     track("translate", { to });
+    noteWin();
     // Playback can fail (e.g. iOS right after the microphone was in use); that isn't a
     // translation failure, so it must not show the "translation unavailable" message.
     try { play(d.translation); } catch { setSpeaking(false); }

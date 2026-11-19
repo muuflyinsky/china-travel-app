@@ -920,6 +920,8 @@ export const en = {
     active: "Unlimited until {date}",
     thanks: "Thanks! Unlimited until {date}.",
     failed: "The purchase didn’t go through. You haven’t been charged.",
+    unlinked: "Purchase complete, but we couldn’t switch your pass on yet. When you’re online, tap Restore purchases. You won’t be charged again.",
+    unreachable: "Couldn’t reach HaodeGo. When you’re online, tap Restore purchases again.",
     pending: "Waiting for approval.",
     getApp: "Unlimited use comes with a trip pass in the HaodeGo iPhone app.",
     loading: "Loading prices…",

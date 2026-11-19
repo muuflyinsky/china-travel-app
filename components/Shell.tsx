@@ -9,6 +9,7 @@ import { useProfile } from "./useProfile";
 import { Paywall } from "./Paywall";
 import { fmt, UI_DICTS } from "@/lib/i18n";
 import { trackSession } from "@/lib/track";
+import { maybeAskForReview } from "@/lib/review";
 
 // Five top-level sections (iOS HIG: 2–5 tabs, always visible). Settings and Emergency are pushed
 // screens with a back button; Pay, Mobile data and Before you go live inside Today.
@@ -43,6 +44,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     mq.addEventListener("change", apply);
     return () => mq.removeEventListener("change", apply);
   }, [profile.theme]);
+  // Rating prompt: only on Today, the calm screen between tasks (lib/review.ts decides the rest).
+  useEffect(() => { if (path === "/") maybeAskForReview(); }, [path]);
   if (isSitePath(path)) return <>{children}</>;
   // One centred column on every screen size, so navbar, content and tab bar always line up.
   return (

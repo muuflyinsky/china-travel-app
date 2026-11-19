@@ -1,8 +1,9 @@
 "use client";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Volume2, X, MessageSquareReply, ChevronDown } from "lucide-react";
 import { useT } from "./useT";
 import { track } from "@/lib/track";
+import { holdReview } from "@/lib/review";
 
 export type StaffReply = { zh: string; mine: string };
 
@@ -31,6 +32,8 @@ export function ShowCard({ lead, lines, rest = [], restFirst = false, sub, expla
   const [size, setSize] = useState(MAX);
   const box = useRef<HTMLDivElement>(null);
   const all = [lead, ...lines, ...rest].filter(Boolean).join("。");
+  // Someone else is reading this card: no rating prompt on top of it (lib/review.ts).
+  useEffect(() => holdReview(), []);
 
   // Fit to one screen: step the size down while the content overflows.
   useLayoutEffect(() => { setSize(MAX); }, [all, bottomKey, notice]);
