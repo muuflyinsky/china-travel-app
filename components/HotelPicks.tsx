@@ -37,6 +37,26 @@ export function usePrice() {
   };
 }
 
+/** English first: the brand and district ("Hampton by Hilton · Huangpu"); the Chinese name stays for the driver. Without a known brand, the Chinese name. */
+function title(h: HotelPick) {
+  return h.brand ? [h.brand, h.area].filter(Boolean).join(" · ") : null;
+}
+
+/** Placeholder cards while picks load (a cold city can take about 10 seconds). */
+export function HotelSkeleton() {
+  return (
+    <div className="space-y-3" aria-hidden>
+      {[0, 1, 2].map((i) => (
+        <div key={i} className="animate-pulse rounded-card border border-line bg-card p-4">
+          <div className="h-4 w-2/3 rounded bg-line" />
+          <div className="mt-2 h-3 w-1/2 rounded bg-line" />
+          <div className="mt-3 h-3 w-5/6 rounded bg-line" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function Facts({ h }: { h: HotelPick }) {
   const t = useT();
   return (
@@ -59,8 +79,10 @@ export function FeaturedHotel({ h, label, link, tag }: { h: HotelPick; label: st
   return (
     <Card>
       <p className="text-footnote font-semibold text-cobalt">{label}</p>
-      <h3 className="zh mt-1 text-headline">{h.name}</h3>
-      <p className="text-footnote text-muted">{[h.brand, h.district && <span key="d" className="zh">{h.district}</span>].filter(Boolean).reduce<React.ReactNode[]>((a, x, i) => (i ? [...a, " · ", x] : [x]), [])}</p>
+      {title(h) ? <>
+        <h3 className="mt-1 text-headline">{title(h)}</h3>
+        <p className="zh text-footnote text-muted">{h.name}</p>
+      </> : <h3 className="zh mt-1 text-headline">{h.name}</h3>}
       <Facts h={h} />
       {/* No reference price from Amap: say where the real one is, never invent a number. */}
       {h.cny ? <>
@@ -85,9 +107,12 @@ export function HotelRow({ h, link, tag }: { h: HotelPick; link: LinkParams; tag
   return (
     <li className="flex items-center gap-3 px-4 py-3">
       <div className="min-w-0 flex-1">
-        <p className="zh text-body">{h.name}</p>
+        {title(h) ? <>
+          <p className="text-body">{title(h)}</p>
+          <p className="zh text-footnote text-muted">{h.name}</p>
+        </> : <p className="zh text-body">{h.name}</p>}
         <p className="text-footnote text-muted">
-          {[h.brand, h.metro ? fmt(t.stay.metroShort, { min: walkMinutes(h.metro.meters) }) : null, h.cny ? price(h.cny) : null].filter(Boolean).join(" · ")}
+          {[h.metro ? fmt(t.stay.metroShort, { min: walkMinutes(h.metro.meters) }) : null, h.cny ? price(h.cny) : null].filter(Boolean).join(" · ")}
         </p>
       </div>
       <a href={goLink("trip", "hotel_search", { ...link, keyword: h.name }, "stay_pick", tag)} target="_blank" rel="noopener" onClick={() => track("hotel_pick_click", { tag })}

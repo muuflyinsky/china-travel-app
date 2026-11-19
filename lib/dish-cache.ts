@@ -12,7 +12,8 @@ import { rest, supabaseOn } from "./supabase";
 export { supabaseOn };
 
 /** Bump when the prompts change: older entries are then treated as missing and regenerated. */
-export const PROMPT_VERSION = "2026-10-25.1";
+// 2026-11-10.1: drops answers cached before #30, when a skipped dish could be stored with the next dish's answer.
+export const PROMPT_VERSION = "2026-11-10.1";
 
 const MEDIUM_TTL = 7 * 24 * 3600_000;
 

@@ -30,7 +30,8 @@ export function StayWarning({ transit = true, policy = true }: { transit?: boole
   return (
     <div className="space-y-2" role="alert">
       {notes.map((n) => (
-        <p key={n.text} className={`flex gap-2 rounded-control p-3 text-subhead ${n.strong ? "bg-danger-soft font-semibold text-danger" : "bg-warn-soft text-warn"}`}>
+        // Neutral colours: red, green and amber are kept for allergy verdicts (repo CLAUDE.md). Weight and the icon carry the urgency.
+        <p key={n.text} className={`flex gap-2 rounded-control border border-line bg-porcelain p-3 text-subhead text-ink ${n.strong ? "font-semibold" : ""}`}>
           <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />{n.text}
         </p>
       ))}

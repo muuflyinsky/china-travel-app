@@ -8,10 +8,13 @@ import { HotelCard } from "./HotelCard";
 import { RideButtons } from "./RideButtons";
 import { ShowCard } from "./ShowCard";
 import { useCity } from "./useCity";
+import { cityInAddress, loadCities, type City } from "@/lib/cities";
 import { useProfile } from "./useProfile";
 import { useT } from "./useT";
 import { fmt } from "@/lib/i18n";
 import { openApp } from "@/lib/openApp";
+import { AppMissing } from "./AppMissing";
+import type { AppId } from "@/lib/apps";
 import { track } from "@/lib/track";
 import type { Place } from "@/lib/amap";
 
@@ -20,6 +23,7 @@ function HotelRide() {
   const t = useT();
   const [p, set] = useProfile();
   const [copied, setCopied] = useState(false);
+  const [missing, setMissing] = useState<AppId | null>(null);
   const h = p.hotel;
   // Hotels saved before v0.5 have no coordinates: look them up once.
   useEffect(() => {
@@ -32,9 +36,10 @@ function HotelRide() {
       {h.location ? <RideButtons to={{ location: h.location, name: h.name }} address={h.address} /> : (
         <>
           <div className="grid grid-cols-2 gap-2">
-            <button onClick={() => openApp("amap")} className="flex min-h-control items-center justify-center gap-2 rounded-control border border-line bg-card text-subhead font-semibold"><AppIcon id="amap" size={24} />Amap</button>
-            <button onClick={() => openApp("didi")} className="flex min-h-control items-center justify-center gap-2 rounded-control border border-line bg-card text-subhead font-semibold"><AppIcon id="didi" size={24} />{t.today.openDidi}</button>
+            <button onClick={() => { setMissing(null); openApp("amap", undefined, setMissing); }} className="flex min-h-control items-center justify-center gap-2 rounded-control border border-line bg-card text-subhead font-semibold"><AppIcon id="amap" size={24} />Amap</button>
+            <button onClick={() => { setMissing(null); openApp("didi", undefined, setMissing); }} className="flex min-h-control items-center justify-center gap-2 rounded-control border border-line bg-card text-subhead font-semibold"><AppIcon id="didi" size={24} />{t.today.openDidi}</button>
           </div>
+          <AppMissing app={missing} />
           <p className="px-1 text-footnote text-muted">{t.today.didiHint}</p>
         </>
       )}
@@ -56,13 +61,26 @@ function HotelRide() {
  */
 function Destination() {
   const t = useT();
-  const { city } = useCity();
+  const { city: current, detected } = useCity();
+  const [p] = useProfile();
+  // Without a location fix or a pick today, the saved hotel says where the traveller is better than a
+  // trip city or the Shanghai default (a hotel in Xi'an showed "Somewhere else in Shanghai").
+  const [hotelCity, setHotelCity] = useState<City | null>(null);
+  const address = p.hotel?.address ?? "";
+  useEffect(() => {
+    let on = true;
+    if (!address) { setHotelCity(null); return; }
+    loadCities().then((all) => { if (on) setHotelCity(cityInAddress(all, address) ?? null); });
+    return () => { on = false; };
+  }, [address]);
+  const city = detected ? current : hotelCity ?? current;
   const [q, setQ] = useState("");
   const [busy, setBusy] = useState(false);
   const [results, setResults] = useState<Place[] | null>(null);
   const [notice, setNotice] = useState<string>();
   const [picked, setPicked] = useState<Place | null>(null);
   const [card, setCard] = useState(false);
+  const [elsewhere, setElsewhere] = useState(false); // results from outside the current city
   const input = useRef<HTMLInputElement>(null);
 
   async function search(e: React.FormEvent) {
@@ -70,12 +88,17 @@ function Destination() {
     const k = q.trim();
     if (!k) return;
     input.current?.blur(); // close the keyboard so the results are visible
-    setBusy(true); setNotice(undefined); setPicked(null);
-    const r = await fetch(`/api/places?${new URLSearchParams({ q: k, city: city.a })}`).catch(() => null);
-    const d = r?.ok ? await r.json().catch(() => null) : null;
+    setBusy(true); setNotice(undefined); setPicked(null); setElsewhere(false);
+    const find = async (qs: Record<string, string>) => {
+      const r = await fetch(`/api/places?${new URLSearchParams(qs)}`).catch(() => null);
+      return r?.ok ? ((await r.json().catch(() => null)) as { places: Place[] } | null) : null;
+    };
+    // The current city first; nothing there (the city may be wrong, or the trip moves on): all of China.
+    let d = await find({ q: k, city: city.a });
+    if (d && !d.places.length) { const all = await find({ q: k }); if (all?.places.length) { d = all; setElsewhere(true); } }
     setBusy(false);
     if (!d) { setResults(null); setNotice(t.go.searchDown); return; }
-    const list = (d.places as Place[]).slice(0, 6);
+    const list = d.places.slice(0, 6);
     setResults(list);
     if (!list.length) setNotice(fmt(t.go.nothing, { q: k }));
   }
@@ -93,7 +116,7 @@ function Destination() {
           <Search className="h-5 w-5 shrink-0 text-muted" aria-hidden />
           <input ref={input} type="search" enterKeyHint="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t.today.driverElse} aria-label={t.today.driverElse}
             className="h-full min-w-0 flex-1 bg-transparent text-body outline-none placeholder:text-muted [&::-webkit-search-cancel-button]:hidden" />
-          {q && <button type="button" onClick={() => { setQ(""); setResults(null); setNotice(undefined); setPicked(null); }} aria-label={t.go.clear} className="grid h-11 w-8 shrink-0 place-items-center text-muted"><X className="h-4 w-4" aria-hidden /></button>}
+          {q && <button type="button" onClick={() => { setQ(""); setResults(null); setNotice(undefined); setPicked(null); setElsewhere(false); }} aria-label={t.go.clear} className="grid h-11 w-8 shrink-0 place-items-center text-muted"><X className="h-4 w-4" aria-hidden /></button>}
         </label>
         <Button type="submit" className="shrink-0 px-5">{t.today.driverFind}</Button>
       </form>
@@ -101,6 +124,7 @@ function Destination() {
       {notice && <Note tone="warn">{notice}</Note>}
       {results && results.length > 0 && !busy && (
         <>
+          {elsewhere && <Note tone="warn">{fmt(t.today.driverElsewhere, { city: city.e })}</Note>}
           <p className="px-1 text-footnote text-muted">{t.today.driverPick}</p>
           <Group>
             {results.map((x) => (

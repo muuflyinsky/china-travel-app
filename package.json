@@ -8,14 +8,16 @@
     "start": "next start",
     "typecheck": "next typegen && tsc --noEmit",
     "check:allergens": "node scripts/check-allergens.mjs",
-    "verify": "npm run typecheck && npm run check:allergens"
+    "check:must-see": "node scripts/check-must-see.mjs",
+    "check:dish-names": "node scripts/check-dish-names.mjs",
+    "verify": "npm run typecheck && npm run check:allergens && npm run check:must-see && npm run check:dish-names"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "1.1.0",
     "@vercel/analytics": "^1.6.1",
     "konsta": "^5.5.0",
     "lucide-react": "^1.61.0",
-    "next": "16.4.2",
+    "next": "16.4.6",
     "pinyin-pro": "^3.29.5",
     "react": "19.3.1",
     "react-dom": "19.3.1",

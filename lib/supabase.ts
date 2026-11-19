@@ -22,7 +22,9 @@ export async function rest(path: string, init: RequestInit = {}) {
     cache: "no-store",
   });
   if (!res.ok) throw new Error(`supabase ${res.status}: ${(await res.text()).slice(0, 200)}`);
-  return res.status === 204 ? null : res.json();
+  // A write with return=minimal succeeds with an empty body (204, or 201 on an upsert): nothing to parse.
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
 }
 
 /**

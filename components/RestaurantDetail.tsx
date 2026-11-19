@@ -19,6 +19,7 @@ import { orderCard } from "@/lib/order-card";
 import { track } from "@/lib/track";
 import type { ListedRestaurant } from "@/lib/restaurants";
 import type { ListDish, MenuEvent } from "@/lib/dishes";
+import { hasChinese } from "@/lib/dish-name";
 
 /**
  * Signature dishes through the menu pipeline (/api/menu with typed names): dish knowledge base
@@ -109,7 +110,7 @@ export function RestaurantDetail({ r, aiOn = true, children }: { r: ListedRestau
   const restrictions = { allergens: p.allergens, diets: p.diets, severe: p.severe.filter((a) => p.allergens.includes(a)) };
   const restricted = restrictions.allergens.length + restrictions.diets.length > 0;
   const hours = formatHours(r.opentime, p.lang, { daily: t.awards.daily, closed: t.awards.closed });
-  const ordered = (dishes ?? []).filter((d): d is ListDish => Boolean(d && order[d.zh]));
+  const ordered = (dishes ?? []).filter((d): d is ListDish => Boolean(d && order[d.zh] && hasChinese(d.zh)));
   const editions = [...new Set(r.awards.map((a) => `${a.list === "michelin" ? "MICHELIN Guide" : a.list === "black_pearl" ? "Black Pearl" : "Dianping Must-Eat"} ${a.edition}`))];
 
   return (

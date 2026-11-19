@@ -1,14 +1,13 @@
 "use client";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Preloader } from "konsta/react";
 import { MapPin, Minus, Plus, ExternalLink, Check, TrainFront, Sparkles, BedDouble, CalendarDays, Info } from "lucide-react";
 import { Screen, DemoNote } from "@/components/Shell";
 import { Section, Group, Field, Note, Seg, Button, Disclosure, EmptyState } from "@/components/ui";
 import { EditSheet } from "@/components/EditSheet";
 import { SourceLine } from "@/components/SourceLine";
 import { CityPicker } from "@/components/CityPicker";
-import { FeaturedHotel, HotelRow, useHotelPicks } from "@/components/HotelPicks";
+import { FeaturedHotel, HotelRow, HotelSkeleton, useHotelPicks } from "@/components/HotelPicks";
 import { useGuide } from "@/components/CityGuide";
 import { pick } from "@/lib/city-guide-types";
 import { useCity } from "@/components/useCity";
@@ -186,7 +185,7 @@ function Stay() {
           <Seg value={tier} onChange={setTier} label={t.stay.priceRange} options={TIER_IDS.map((id) => ({ value: id, label: t.stay.tiers[id] }))} />
           <p className="px-1 text-footnote text-muted tabular-nums">{fmt(t.stay.perNight, { price: range })}</p>
           <DemoNote show={data?.demo} what={t.common.mapKey} />
-          {!data && <div className="flex justify-center py-8"><Preloader /></div>}
+          {!data && <HotelSkeleton />}
           {data && shownTier !== tier && <Note>{fmt(t.stay.tierFallback, { tier: t.stay.tiers[tier], other: t.stay.tiers[shownTier] })}</Note>}
           {top && <FeaturedHotel h={top} label={fmt(t.stay.pick, { tier: t.stay.tiers[shownTier] })} link={link} tag={`${tagBase}-1`} />}
           {rest.length > 0 && <Group>{rest.map((h, i) => <HotelRow key={h.id} h={h} link={link} tag={`${tagBase}-${i + 2}`} />)}</Group>}

@@ -6,6 +6,7 @@ import * as mock from "./demo";
 import { cacheRead, cacheWrite } from "./cache";
 import { HOT_CITIES } from "./hot-cities";
 import { logRow } from "./supabase";
+import { CLOSED } from "./restaurant-awards";
 import { TIER_IDS, tierBounds, tierOf, type CityPicks, type HotelPick, type TierId } from "./hotel-tiers";
 
 export { tierBounds };
@@ -74,10 +75,11 @@ export function rank(a: HotelPick, b: HotelPick) {
 // Not a hotel room a traveller books here: serviced apartments, and duplicate POIs for a hotel's
 // lobby, entrance or car park.
 const NOT_A_HOTEL = /公寓|大堂|入口|停车场|会所|写字楼/;
-const RULES = "r4"; // r4: station names ending in 口 kept, pinyin as one word
+const RULES = "r5"; // r5: closed hotels dropped, district in pinyin
 
 export function candidate(p: Place, cityShort: string, bounds: [number, number, number]): HotelPick | null {
-  if (NOT_A_HOTEL.test(p.name)) return null;
+  // "全季酒店(广东路店)(暂停营业)": Amap keeps closed hotels, marked in the name.
+  if (NOT_A_HOTEL.test(p.name) || CLOSED.test(p.name)) return null;
   const b = brandOf(p.name);
   const stars = starsOf(p.type);
   const majorCity = cityShort in TRIP_CITY_ID;
@@ -91,6 +93,7 @@ export function candidate(p: Place, cityShort: string, bounds: [number, number, 
     id: p.id, name: p.name, pinyin: p.pinyin, address: p.address, district: p.district, location: p.location,
     rating: p.rating ? Number(p.rating) : undefined, cny, tier, stars,
     chain: b?.kind ?? null, brand: b?.brand, metro: null,
+    area: p.district ? stationPinyin(p.district.replace(/(新区|区|县|市)$/, "")) : undefined,
   };
 }
 

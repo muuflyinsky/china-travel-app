@@ -6,3 +6,6 @@ node_modules
 data/
 next-env.d.ts
 *.tsbuildinfo
+
+# Dish prompt eval runs: only the ones a PR needs are added, with git add -f
+eval/allergens/runs/

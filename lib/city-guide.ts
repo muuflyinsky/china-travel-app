@@ -1,6 +1,6 @@
 import { mkdir, appendFile } from "node:fs/promises";
 import { searchPlaces, py, type Place } from "./amap";
-import { analyzeMenu, currentModel, writeCityGuide } from "./llm";
+import { analyzeMenu, currentModel, translateLines, writeCityGuide } from "./llm";
 import { aiProvider, config, demo } from "./config";
 import { Unavailable } from "./errors";
 import { RESERVATION_SOURCE, reservationFor } from "./reservations";
@@ -8,27 +8,29 @@ import * as mock from "./demo";
 import { cacheList, cacheRead, cacheWrite } from "./cache";
 import { HOT_CITIES } from "./hot-cities";
 import { logRow } from "./supabase";
-import type { CityGuide, GuideArea, GuideDish, GuideSight } from "./city-guide-types";
+import { listSig, listSigs, locate, mergePicks, mustSeeFor, type MustSee } from "./must-see";
+import type { CityGuide, GuideArea, GuideDish, GuideSight, L10n } from "./city-guide-types";
 
 // Automatic city guides (SPEC v0.4 · Explore). Facts come from data, words from the model:
-// - Sights: Amap scenic-spot and museum POIs, ranked by national status and rating.
+// - Sights: the city's reviewed must-see list first (lib/must-see.ts; Amap only locates them),
+//   then Amap scenic-spot and museum POIs, ranked by national status and rating, fill up to 5.
 // - Text: the model writes intros / best time / visit length from those fields only (lib/llm.ts).
 // - Dishes: the model names 5 local dishes; allergens and spice come from the same pipeline as
 //   menu reading; typical spend comes from Amap restaurants that serve the dish.
 // - Reservations: matched to the hand-imported, CC BY data in lib/reservations.ts.
-// Nobody curates this. Low-confidence items and 👎 feedback are logged for a passive review.
+// Apart from the must-see lists, nobody curates this. Low-confidence items and 👎 feedback are logged for a passive review.
 
-const NOISE = /停车|售票|入口|出口|游客中心|服务中心|码头|检票|厕所|管理处|派出所/;
+const NOISE = /停车|售票|入口|出口|游客中心|服务中心|码头|检票|厕所|管理处|派出所|国客中心|客运中心|游客集散/;
 const base = (name: string) => name.replace(/[（(].*$/, "").replace(/-.*$/, "");
 
-/** Top 5 sights: national-level scenic spots and well-rated museums first. */
-export function rankSights(places: Place[]) {
+/** Top `n` sights: national-level scenic spots and well-rated museums first. */
+export function rankSights(places: Place[], n = 5) {
   const seen = new Set<string>();
   return places
     .filter((p) => !NOISE.test(p.name) && p.rating && !seen.has(base(p.name)) && seen.add(base(p.name)))
     .map((p, i) => ({ p, score: Number(p.rating) + (p.type.includes("国家级") ? 0.5 : 0) + (p.type.includes("博物馆") ? 0.1 : 0) - i * 0.01 }))
     .sort((a, b) => b.score - a.score)
-    .slice(0, 5)
+    .slice(0, n)
     .map(({ p }) => p);
 }
 
@@ -46,50 +48,103 @@ async function spendFor(dish: string, adcode: string): Promise<[number, number] 
  * reservation rules. Fast (three map calls), so the page never waits for the model.
  */
 export async function basicGuide(adcode: string, cityZh: string, cityEn: string): Promise<CityGuide & { partial: true }> {
-  const top = await topSights(adcode);
+  const top = await topSights(adcode, { strict: false });
   return {
     city: cityZh, cityEn, adcode, generatedAt: new Date().toISOString(), model: "", partial: true,
-    sources: ["Amap (高德) POI data", `${RESERVATION_SOURCE.name}, ${RESERVATION_SOURCE.license}`],
-    sights: top.map((p) => ({
-      // Without the model there is no English name; the reservation data has one for the big sights.
-      id: p.id, zh: p.name, en: reservationFor(adcode, p.name)?.en ?? p.pinyin, location: p.location, address: p.address,
-      rating: p.rating ? Number(p.rating) : undefined, national: p.type.includes("国家级"), photo: p.photo,
-      intro: { en: "" }, bestTime: { en: "" }, hours: 0, confidence: "low",
-      reservation: reservationFor(adcode, p.name)?.id,
-    })),
-    dishes: [], areas: [],
+    sources: sourcesFor(top),
+    sights: top.picks.map((x) => sightOf(adcode, x, false)),
+    dishes: [], areas: [], ...mustSeeMeta(top),
   };
 }
 
-async function topSights(adcode: string) {
-  const pages = await Promise.all([
-    searchPlaces({ keywords: "景点", types: "110000", city: adcode, page: 1, purpose: "guide" }),
-    searchPlaces({ keywords: "景点", types: "110000", city: adcode, page: 2, purpose: "guide" }).catch(() => []),
-    searchPlaces({ keywords: "博物馆", types: "140100", city: adcode, page: 1, purpose: "guide" }).catch(() => []),
+/** One pick: a listed sight (located by Amap, or `p: null` if Amap didn't find it) or an automatic one. */
+type SightPick = { p: Place | null; e?: MustSee };
+type Top = { picks: SightPick[]; list: MustSee[]; unlocated: string[] };
+
+/**
+ * The picks: the city's reviewed must-see list in order (all of it, up to 6), each located by
+ * its Chinese full name, then Amap's automatic picks up to 5 in all, without repeats. A city
+ * without a list gets exactly the automatic top 5, as before.
+ */
+async function topSights(adcode: string, { strict = true } = {}): Promise<Top> {
+  const [pages, list] = await Promise.all([
+    Promise.all([
+      searchPlaces({ keywords: "景点", types: "110000", city: adcode, page: 1, purpose: "guide" }),
+      searchPlaces({ keywords: "景点", types: "110000", city: adcode, page: 2, purpose: "guide" }).catch(() => []),
+      searchPlaces({ keywords: "博物馆", types: "140100", city: adcode, page: 1, purpose: "guide" }).catch(() => []),
+    ]),
+    // strict (guides that get stored): fail rather than store a guide without the city's list.
+    // The map-only guide is never stored, so it just goes without the list while Supabase is down.
+    strict ? mustSeeFor(adcode) : mustSeeFor(adcode).catch(() => []),
   ]);
-  return rankSights(pages.flat());
+  if (!list.length) return { picks: rankSights(pages.flat()).map((p) => ({ p })), list, unlocated: [] };
+  const located = [];
+  for (const e of list) {
+    // One at a time: the cron throttles Amap calls, and a list is at most 6.
+    const found = await searchPlaces({ keywords: e.zh.replace(/[（(].*?[)）]/g, " ").trim(), city: adcode, pageSize: 10, purpose: "guide" }).catch(() => []);
+    located.push({ e, poi: locate(e, found) });
+  }
+  const { fill } = mergePicks(located, rankSights(pages.flat(), 20));
+  return {
+    picks: [...located.map(({ e, poi }) => ({ p: poi, e })), ...fill.map((p) => ({ p }))],
+    list,
+    unlocated: located.filter((x) => !x.poi).map((x) => x.e.zh),
+  };
+}
+
+const sourcesFor = (top: Top) => [
+  ...(top.list.length ? ["HaodeGo must-see list, compiled from public travel guides (sources per sight in Supabase must_see)"] : []),
+  "Amap (高德) POI data", `${RESERVATION_SOURCE.name}, ${RESERVATION_SOURCE.license}`,
+];
+
+const mustSeeMeta = (top: Top): Pick<CityGuide, "mustSee"> => top.list.length
+  ? { mustSee: { sig: listSig(top.list), reviewedOn: top.list.map((e) => e.reviewedOn ?? "").sort().at(-1) ?? "", unlocated: top.unlocated } }
+  : {};
+
+type Written = NonNullable<Awaited<ReturnType<typeof writeCityGuide>>>["sights"][number];
+
+/**
+ * A pick as a guide sight. Listed sights keep the list's reviewed names, "why go" line and time
+ * from the centre; Amap gives location, address, rating and photo when it found the place.
+ * `w` is the model's text for it (absent in the map-only guide).
+ */
+function sightOf(adcode: string, { p, e }: SightPick, full: boolean, w?: Written, why?: L10n): GuideSight {
+  const zh = e?.zh ?? p!.name;
+  const resv = reservationFor(adcode, zh) ?? (p ? reservationFor(adcode, p.name) : undefined);
+  return {
+    id: p?.id ?? `must-see-${adcode}-${e!.ord}`, zh,
+    // Without the model there is no English name for automatic picks; the reservation data has one for the big sights.
+    en: e?.en ?? (full ? w?.en ?? p!.pinyin : resv?.en ?? p!.pinyin),
+    location: p?.location ?? "", address: p?.address ?? "",
+    rating: p?.rating ? Number(p.rating) : undefined, national: Boolean(p?.type.includes("国家级")), photo: p?.photo,
+    intro: w?.intro ?? { en: "" }, bestTime: w?.best_time ?? { en: "" },
+    hours: full ? Math.min(8, Math.max(0.5, Math.round((w?.hours ?? 2) * 2) / 2)) : 0,
+    confidence: w?.confidence === "high" ? "high" : "low",
+    reservation: resv?.id,
+    ...(e ? { why: why ?? { en: e.why } } : {}),
+    ...(e?.outside && e.centreH ? { centreH: e.centreH } : {}),
+  };
 }
 
 /** Full guide: Amap facts plus the model's text, dishes and areas. Falls back to the basic guide if the model fails. */
 export async function generateGuide(adcode: string, cityZh: string, cityEn: string): Promise<CityGuide> {
   if (!aiProvider) return basicGuide(adcode, cityZh, cityEn);
   const top = await topSights(adcode);
-  const text = await writeCityGuide({
-    cityZh, cityEn,
-    sights: top.map((p) => ({ zh: p.name, type: p.type, address: p.address, rating: p.rating ? Number(p.rating) : undefined })),
-  }).catch((e) => { console.error("[city-guide] model failed, keeping map data only:", (e as Error).message); return null; });
+  const [text, whys] = await Promise.all([
+    writeCityGuide({
+      cityZh, cityEn,
+      sights: top.picks.map(({ p, e }) => ({ zh: e?.zh ?? p!.name, type: p?.type ?? "", address: p?.address ?? "", rating: p?.rating ? Number(p.rating) : undefined })),
+    }).catch((e) => { console.error("[city-guide] model failed, keeping map data only:", (e as Error).message); return null; }),
+    // The reviewed English lines in the other five languages (not reviewed again: a short intro, not safety information).
+    top.list.length ? translateLines(top.list.map((e) => e.why)).catch((e) => { console.error("[city-guide] why lines not translated:", (e as Error).message); return null; }) : null,
+  ]);
   if (!text) return basicGuide(adcode, cityZh, cityEn);
 
-  const sights: GuideSight[] = top.map((p) => {
-    const w = text.sights.find((x) => x.zh === p.name);
-    return {
-      id: p.id, zh: p.name, en: w?.en ?? p.pinyin, location: p.location, address: p.address,
-      rating: p.rating ? Number(p.rating) : undefined, national: p.type.includes("国家级"), photo: p.photo,
-      intro: w?.intro ?? { en: "" }, bestTime: w?.best_time ?? { en: "" },
-      hours: Math.min(8, Math.max(0.5, Math.round((w?.hours ?? 2) * 2) / 2)),
-      confidence: w?.confidence === "high" ? "high" : "low",
-      reservation: reservationFor(adcode, p.name)?.id,
-    };
+  const sights: GuideSight[] = top.picks.map((x) => {
+    const zh = x.e?.zh ?? x.p!.name;
+    // The model may change brackets (（） → ()): fall back to the name without them.
+    const w = text.sights.find((w) => w.zh === zh) ?? text.sights.find((w) => w.zh.replace(/[（(].*$/, "") === zh.replace(/[（(].*$/, ""));
+    return sightOf(adcode, x, true, w, x.e && whys ? whys[top.list.indexOf(x.e)] : undefined);
   });
 
   // Allergens and spice via the menu pipeline, so they match what Eat shows for the same dish.
@@ -116,8 +171,8 @@ export async function generateGuide(adcode: string, cityZh: string, cityEn: stri
 
   return {
     city: cityZh, cityEn, adcode, generatedAt: new Date().toISOString(), model: config.ai.key ? currentModel("text") : config.model, areas,
-    sources: ["Amap (高德) POI data", `${RESERVATION_SOURCE.name}, ${RESERVATION_SOURCE.license}`],
-    sights, dishes,
+    sources: sourcesFor(top),
+    sights, dishes, ...mustSeeMeta(top),
   };
 }
 
@@ -148,7 +203,7 @@ export async function cityGuide(adcode: string, cityZh: string, cityEn: string, 
       const g = await generateGuide(adcode, cityZh, cityEn);
       if (!(g as { partial?: boolean }).partial) await save(g);
       await review(g);
-      await logRow("events", { e: "guide_generated", p: { city: adcode, ok: true, ms: Date.now() - t0, partial: Boolean((g as { partial?: boolean }).partial) }, sid: null });
+      await logRow("events", { e: "guide_generated", p: { city: adcode, ok: true, ms: Date.now() - t0, partial: Boolean((g as { partial?: boolean }).partial), ...(g.mustSee?.unlocated.length ? { unlocated: g.mustSee.unlocated } : {}) }, sid: null });
       return { guide: g };
     } catch (e) {
       await logRow("events", { e: "guide_generated", p: { city: adcode, ok: false, ms: Date.now() - t0, error: String((e as Error).message ?? e).slice(0, 40) }, sid: null });
@@ -181,24 +236,32 @@ export async function review(g: CityGuide | null, extra?: Record<string, unknown
 }
 
 /**
- * The daily job (app/api/cron/city-guides): hot cities with no guide first, then the oldest,
- * skipping any refreshed within `maxAgeDays`. Generates one city at a time and stops starting
- * new ones once `budgetMs` has passed, so the run ends inside the function's time limit.
+ * The daily job (app/api/cron/city-guides): cities whose must-see list changed since their guide
+ * was made first, then hot cities with no guide, then the oldest, skipping any refreshed within
+ * `maxAgeDays`. Generates one city at a time and stops starting new ones once `budgetMs` has
+ * passed, so the run ends inside the function's time limit. Listed sights Amap couldn't find
+ * are reported per city (`unlocated`).
  */
 export async function refreshStaleGuides({ budgetMs, maxAgeDays = 30 }: { budgetMs: number; maxAgeDays?: number }) {
   const t0 = Date.now();
-  const stored = new Map((await cacheList("city_guide")).map((r) => [r.key, Date.parse(r.generatedAt)]));
+  const rows = await cacheList("city_guide", "value->mustSee->>sig");
+  const stored = new Map(rows.map((r) => [r.key, Date.parse(r.generatedAt)]));
+  const storedSig = new Map(rows.map((r) => [r.key, r.extra ?? ""]));
+  const sigs = await listSigs(HOT_CITIES.map((c) => c.a));
   const due = HOT_CITIES
-    .map((c) => ({ c, at: stored.get(c.a) ?? 0 }))
-    .filter(({ at }) => Date.now() - at > maxAgeDays * 864e5)
-    .sort((a, b) => a.at - b.at);
-  const done: { city: string; ok: boolean; s: number; error?: string }[] = [];
-  for (const { c } of due) {
+    .map((c) => ({ c, at: stored.get(c.a) ?? 0, changed: Boolean(sigs) && stored.has(c.a) && (storedSig.get(c.a) ?? "") !== (sigs!.get(c.a) ?? "") }))
+    .filter(({ at, changed }) => changed || Date.now() - at > maxAgeDays * 864e5)
+    .sort((a, b) => Number(b.changed) - Number(a.changed) || a.at - b.at);
+  const done: { city: string; ok: boolean; s: number; error?: string; listChanged?: boolean; unlocated?: string[] }[] = [];
+  for (const { c, changed } of due) {
     if (Date.now() - t0 > budgetMs) break;
     const t = Date.now();
     try {
       const { guide } = await cityGuide(c.a, c.s, c.e, true);
-      done.push({ city: c.e, ok: !(guide as { partial?: boolean }).partial, s: Math.round((Date.now() - t) / 1000) });
+      done.push({
+        city: c.e, ok: !(guide as { partial?: boolean }).partial, s: Math.round((Date.now() - t) / 1000),
+        ...(changed ? { listChanged: true } : {}), ...(guide.mustSee?.unlocated.length ? { unlocated: guide.mustSee.unlocated } : {}),
+      });
     } catch (e) {
       done.push({ city: c.e, ok: false, s: Math.round((Date.now() - t) / 1000), error: String((e as Error).message ?? e).slice(0, 80) });
     }

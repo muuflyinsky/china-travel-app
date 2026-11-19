@@ -15,6 +15,10 @@ export type GuideSight = {
   /** Low = the model was unsure; the UI hides the intro and the item is queued for review. */
   confidence: "high" | "low";
   reservation?: string; // id in lib/reservations.ts
+  /** On the city's reviewed must-see list (lib/must-see.ts): its reviewed "why go" line, translated. */
+  why?: L10n;
+  /** Reviewed travel time from the city centre in hours, for sights outside it. Never computed. */
+  centreH?: number;
 };
 
 export type GuideDish = {
@@ -40,4 +44,10 @@ export type CityGuide = {
   sources: string[];
   sights: GuideSight[]; dishes: GuideDish[];
   areas?: GuideArea[];
+  /**
+   * Set when the city has a reviewed must-see list: its signature (the cron regenerates the city
+   * when the list changes), the latest review date, and listed sights Amap couldn't find (shown
+   * without a route).
+   */
+  mustSee?: { sig: string; reviewedOn: string; unlocated: string[] };
 };

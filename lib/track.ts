@@ -5,7 +5,7 @@
 export const EVENTS = [
   "menu_scan", "order_card_shown", "staff_reply", "staff_reply_dish", "taxi_card_shown", "hotel_card_shown",
   "hotel_pick_click", "resv_alarm_added", "app_open", "menu_first_dish", "menu_done", "dish_flagged", "restaurant_open",
-  "dish_detail", "translate", "hotel_read",
+  "dish_detail", "translate", "hotel_read", "airport_open", "airport_card_out", "airport_didi",
 ] as const;
 export type EventName = (typeof EVENTS)[number];
 

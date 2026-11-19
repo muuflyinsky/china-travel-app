@@ -10,7 +10,7 @@ import { HotelCard } from "@/components/HotelCard";
 import { allergyLinesZh } from "@/lib/allergens";
 import { track } from "@/lib/track";
 import { apiHeaders } from "@/lib/device";
-import { quotaHit } from "@/lib/passes";
+import { inApp, quotaHit } from "@/lib/passes";
 import { useProfile } from "@/components/useProfile";
 import { useT } from "@/components/useT";
 import { ShowCard } from "@/components/ShowCard";
@@ -56,6 +56,10 @@ export default function TalkPage() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const recRef = useRef<SpeechRecognitionLike | null>(null);
   useEffect(() => () => { recRef.current?.stop(); speechSynthesis?.cancel(); }, []);
+  // The iOS app's web view has no speech recognition, so the mic would only show an error there.
+  // Hidden in the app until native speech input (1.1); the website keeps it. Set after mount: the UA isn't known on the server.
+  const [micOk, setMicOk] = useState(false);
+  useEffect(() => setMicOk(!inApp()), []);
   const hasRestrictions = profile.allergens.length + profile.diets.length > 0;
   const me = profile.lang;
   const from = toZh ? me : "zh", to = toZh ? "zh" : me;
@@ -151,11 +155,13 @@ export default function TalkPage() {
             )}
           </div>
           <div className="flex items-center gap-2 px-4 pb-4">
-            <button onClick={listen} aria-pressed={listening} aria-label={listening ? t.talk.stopListening : t.talk.speak}
-              className={`flex h-control shrink-0 items-center gap-2 rounded-control px-4 text-subhead font-semibold ${listening ? "bg-danger text-white" : "bg-cobalt-soft text-cobalt"}`}>
-              {listening ? <Square className="h-4 w-4 fill-current" aria-hidden /> : <Mic className="h-5 w-5" aria-hidden />}
-              <span>{listening ? t.talk.stop : t.talk.speak}</span>
-            </button>
+            {micOk && (
+              <button onClick={listen} aria-pressed={listening} aria-label={listening ? t.talk.stopListening : t.talk.speak}
+                className={`flex h-control shrink-0 items-center gap-2 rounded-control px-4 text-subhead font-semibold ${listening ? "bg-danger text-white" : "bg-cobalt-soft text-cobalt"}`}>
+                {listening ? <Square className="h-4 w-4 fill-current" aria-hidden /> : <Mic className="h-5 w-5" aria-hidden />}
+                <span>{listening ? t.talk.stop : t.talk.speak}</span>
+              </button>
+            )}
             <button onClick={() => go()} disabled={loading || listening} className="flex h-control min-w-0 flex-1 items-center justify-center gap-2 rounded-control bg-cobalt px-3 text-headline text-white disabled:opacity-60 dark:text-porcelain">
               {loading ? <Preloader className="h-5! w-5!" /> : <span className="truncate">{t.talk.translate}</span>}
             </button>

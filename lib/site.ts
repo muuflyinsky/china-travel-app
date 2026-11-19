@@ -9,9 +9,9 @@
  *  www origin (browser and iOS WebView alike) and would be lost. */
 export const SITE_URL = "https://www.haodego.com";
 
-/** App Store listing (App Store Connect app 6829347376). Off until 1.0 is approved and live:
- *  showing a badge for an app you can't download would be untrue. */
-export const APP_STORE_LIVE = false;
+/** App Store listing (App Store Connect app 6829347376). Live since 2026-11-19 (1.0 approved);
+ *  outside the EU and mainland China, so the store page may say "not available" there. */
+export const APP_STORE_LIVE = true;
 export const APP_STORE_ID = "6829347376";
 export const APP_STORE_URL = `https://apps.apple.com/app/id${APP_STORE_ID}`;
 

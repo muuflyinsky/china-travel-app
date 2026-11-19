@@ -20,12 +20,15 @@ export async function cacheRead<T>(ns: string, key: string): Promise<T | null> {
   }
 }
 
-/** Keys stored in a namespace with when each was generated (Supabase only; [] otherwise). */
-export async function cacheList(ns: string): Promise<{ key: string; generatedAt: string }[]> {
+/**
+ * Keys stored in a namespace with when each was generated (Supabase only; [] otherwise).
+ * `extra`: one JSON path into the value to return as text too, e.g. "value->mustSee->>sig".
+ */
+export async function cacheList(ns: string, extra?: string): Promise<{ key: string; generatedAt: string; extra?: string | null }[]> {
   if (!supabaseOn) return [];
   try {
-    const rows = (await rest(`app_cache?select=key,generated_at&ns=eq.${encodeURIComponent(ns)}`)) as { key: string; generated_at: string }[];
-    return rows.map((r) => ({ key: r.key, generatedAt: r.generated_at }));
+    const rows = (await rest(`app_cache?select=key,generated_at${extra ? `,extra:${extra}` : ""}&ns=eq.${encodeURIComponent(ns)}`)) as { key: string; generated_at: string; extra?: string | null }[];
+    return rows.map((r) => ({ key: r.key, generatedAt: r.generated_at, ...(extra ? { extra: r.extra } : {}) }));
   } catch (e) {
     console.error(`[cache] list ${ns}:`, (e as Error).message);
     return [];

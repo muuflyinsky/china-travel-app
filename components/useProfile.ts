@@ -31,13 +31,15 @@ export type Profile = {
   rideApp: "amap" | "didi";
   /** Light or dark look; "system" follows the phone. Applied before first paint (app/layout.tsx). */
   theme: "system" | "light" | "dark";
+  /** Which airport they land at, in a city with two (PEK/PKX, PVG/SHA); "both" = show both, "" = not asked. */
+  arrivalAirport: string;
 };
 
 const DEFAULT: Profile = {
   lang: "en", allergens: [], diets: [], homeCurrency: "USD", name: "",
   locatedInChina: false, arrival: "", entryDate: "", entryType: "visa_free_30", visaDays: 30,
   departure: "", nationality: "", onwardThird: null, guests: 1, hotel: null, allergiesAsked: false,
-  severe: [], cities: [], rideApp: "amap", theme: "system",
+  severe: [], cities: [], rideApp: "amap", theme: "system", arrivalAirport: "",
 };
 const KEY = "ctg.profile";
 const EVENT = "ctg-profile";
