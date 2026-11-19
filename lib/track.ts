@@ -1,11 +1,13 @@
 // Anonymous product events (SPEC v0.5 P2). No personal data: an event name, a few small
 // properties (card type, tier, position…) and a random id that changes every day, so we can count
 // how often one phone uses a feature in a day (to set free daily limits) but never follow it across
-// days. Each event also carries the app language. Nothing about allergies, dates or locations is sent.
+// days. Each event also carries the app language and the platform (ios = the iPhone app, web = a
+// browser). Nothing about allergies, dates or locations is sent.
 export const EVENTS = [
   "menu_scan", "order_card_shown", "staff_reply", "staff_reply_dish", "taxi_card_shown", "hotel_card_shown",
   "hotel_pick_click", "resv_alarm_added", "app_open", "menu_first_dish", "menu_done", "dish_flagged", "restaurant_open",
   "dish_detail", "translate", "hotel_read", "airport_open", "airport_card_out", "airport_didi",
+  "session_start",
 ] as const;
 export type EventName = (typeof EVENTS)[number];
 
@@ -26,12 +28,28 @@ function lang() {
   try { return String(JSON.parse(localStorage.getItem("ctg.profile") ?? "{}").lang ?? "").slice(0, 5); } catch { return ""; }
 }
 
+/** Where the event came from: the iOS app (its WebView adds ChinaTravelBuddy-iOS to the user agent) or a browser. */
+const platform = () => (/ChinaTravelBuddy-iOS/.test(navigator.userAgent) ? "ios" : "web");
+
+/**
+ * One `session_start` per visit: the first page load in a browser tab, or the app being opened
+ * (iOS keeps the WebView's sessionStorage while the app stays in memory). Same daily id as every
+ * event, so it counts visits per day without following anyone across days.
+ */
+export function trackSession() {
+  try {
+    if (sessionStorage.getItem("ctg.session")) return;
+    sessionStorage.setItem("ctg.session", "1");
+  } catch { return; }
+  track("session_start");
+}
+
 export function track(e: EventName, p: Record<string, string | number | boolean> = {}) {
   if (typeof window === "undefined") return;
   const sid = dayId();
-  // First, so the server's 8-property cap never drops it.
+  // First, so the server's 8-property cap never drops them.
   const l = lang() || navigator.language.split("-")[0];
-  const body = JSON.stringify({ e, p: { lang: l, ...p }, sid });
+  const body = JSON.stringify({ e, p: { lang: l, platform: platform(), ...p }, sid });
   try {
     if (!navigator.sendBeacon?.("/api/t", new Blob([body], { type: "application/json" }))) {
       fetch("/api/t", { method: "POST", body, keepalive: true, headers: { "content-type": "application/json" } }).catch(() => {});

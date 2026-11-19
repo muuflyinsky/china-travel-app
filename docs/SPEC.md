@@ -58,6 +58,7 @@
 
 **P2 测量**
 - 匿名事件（`lib/track.ts` → `/api/t` → `data/events.jsonl`，Vercel 上写入日志）：`menu_scan`、`order_card_shown`、`staff_reply`、`taxi_card_shown`、`hotel_card_shown`、`hotel_pick_click`（带档位、区域、位置标签）、`resv_alarm_added`、`airport_open`（机场页打开，带机场方向）、`airport_card_out`、`airport_didi`（带机场代码）。每个事件的属性里都带 `lang`（用户在设置里选的语言，没设时取浏览器语言；2026-11-03 起），用来看用户语言分布，不带别的个人信息。按语言统计：`select p->>'lang' as lang, count(distinct sid) as phone_days from events where ts > now() - interval '28 days' group by 1 order by 2 desc;`
+  - 2026-11-20 起：每个事件都带 `platform`（`ios` = iPhone App，`web` = 浏览器）；新增 `session_start`，每次打开 App 或网页版记一次（`sessionStorage` 标记，官网 /welcome、/guide 不记），沿用每日变化的匿名 id，不跨天追踪。
 - 只记事件名、少量基本属性和随机会话编号；不记过敏、日期、位置。服务器会丢掉未知事件和非基本类型的属性。
 
 ## 1. 产品概述
