@@ -99,3 +99,18 @@ Events before 2026-11-01 have a per-tab id, not a daily one; leave them out.
    subscriptions and 3 consumable tips with the ids above (prices as in the table; tips $1.99 / $4.99 / $9.99).
 3. Submit an app version built from this code, with the in-app purchases attached to it.
 4. When it's live: set `PASS_SECRET` (a long random string) and `QUOTA=on` in Vercel (Production) and redeploy.
+   Migration 0010 (menu photo meals, D8) must be applied before `QUOTA=on`.
+
+## Launch period (DECISIONS D21, 2026-11-20)
+
+1.1 ships with passes on sale, but everything stays free for a launch period first.
+- `PROMO_ENDS=YYYY-MM-DD` in Vercel (Production): the last free day, Beijing time, inclusive. Set it together
+  with `QUOTA=on` and redeploy (the date reaches the app through the root layout at build time).
+- While it runs, `lib/quota.ts` counts nothing and never answers 402, so the pass sheet never opens by itself.
+  From the next day (00:00 Beijing) the free limits apply on their own; nothing to switch.
+- Passes and tips can still be bought and restored (Settings → Support and purchases → Trip pass / Leave a tip),
+  so App Review can test them. The pass sheet says that a pass starts when it's bought, so nobody needs one yet.
+- What travellers see: a note on Today, hidden for good with ×, shown again only if the date changes
+  (`components/PromoNote.tsx`); "Free until {date}" on the Settings pass row. No countdown, no "was" price.
+- The date must be real and kept (consumer law, D21): don't extend it again and again. To end it early, change
+  `PROMO_ENDS` and redeploy; removing it ends the launch period at once.

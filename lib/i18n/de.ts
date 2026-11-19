@@ -903,6 +903,14 @@ export const de: Dict = {
     trainSoon: "Tickets gibt es ab {date}, 15 Tage vorher. Am besten an dem Tag buchen: Beliebte Züge sind schnell ausgebucht.",
     names: { newYear: "Neujahr", spring: "Frühlingsfest", qingming: "Qingming", labour: "Tag der Arbeit", dragon: "Drachenbootfest", midAutumn: "Mondfest", national: "Nationalfeiertag" },
   },
+  /** Launch period (DECISIONS D21): components/PromoNote.tsx, Settings, the pass sheet. */
+  promo: {
+    app: "Kostenlos während unserer Startphase bis zum {date}. Danach: ein kostenloses Tageskontingent und ein optionaler Reisepass.",
+    web: "Kostenlos während unserer Startphase bis zum {date}. Danach: ein kostenloses Tageskontingent.",
+    settings: "Kostenlos bis zum {date}",
+    sheet: "Während unserer Startphase bis zum {date} ist alles kostenlos. Ein Reisepass beginnt beim Kauf, du brauchst ihn also erst danach.",
+    hide: "Ausblenden",
+  },
   pass: {
     out: { menu_photo: "Die 2 kostenlosen Speisekarten für heute sind aufgebraucht (je bis zu 4 Fotos)", menu_text: "Die kostenlosen Gerichtsabfragen für heute sind aufgebraucht", translate: "Die kostenlosen Übersetzungen für heute sind aufgebraucht", hotel: "Deine kostenlosen Buchungs-Screenshots sind aufgebraucht", none: "Reisepass" },
     body: "Mit einem Reisepass hast du unbegrenzt Speisekarten-Fotos, Gerichtsabfragen und Übersetzungen. Allergie-Check und Allergiekarte sind immer kostenlos.",

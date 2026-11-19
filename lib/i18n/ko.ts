@@ -903,6 +903,14 @@ export const ko: Dict = {
     trainSoon: "표는 {date}에 판매 시작(15일 전). 인기 열차는 금방 매진되니 그날 예약하세요.",
     names: { newYear: "신정", spring: "춘절", qingming: "청명절", labour: "노동절", dragon: "단오절", midAutumn: "중추절", national: "국경절" },
   },
+  /** Launch period (DECISIONS D21): components/PromoNote.tsx, Settings, the pass sheet. */
+  promo: {
+    app: "출시 기념 기간인 {date}까지 무료예요. 그 후에는 매일 무료 사용량과 선택형 여행 패스를 쓸 수 있어요.",
+    web: "출시 기념 기간인 {date}까지 무료예요. 그 후에는 매일 무료 사용량을 쓸 수 있어요.",
+    settings: "{date}까지 무료",
+    sheet: "출시 기념 기간인 {date}까지는 모두 무료예요. 여행 패스는 구매한 순간부터 시작되니, 그 이후에만 필요해요.",
+    hide: "숨기기",
+  },
   pass: {
     out: { menu_photo: "오늘 무료 메뉴 2회를 모두 사용했어요 (회당 사진 최대 4장)", menu_text: "오늘 무료 요리 검색을 모두 사용했어요", translate: "오늘 무료 번역을 모두 사용했어요", hotel: "무료 예약 스크린샷 읽기를 모두 사용했어요", none: "여행 패스" },
     body: "여행 패스로 메뉴 촬영, 요리 검색, 번역을 무제한으로 쓸 수 있어요. 알레르기 확인과 알레르기 카드는 언제나 무료예요.",

@@ -5,8 +5,10 @@ import { NextResponse } from "next/server";
 import { FREE, type QuotaKind } from "./products";
 import { passValid } from "./passes-server";
 import { rest, supabaseOn } from "./supabase";
+import { promoActive, promoEnds } from "./promo";
 
-const on = () => process.env.QUOTA === "on";
+// During the launch period (PROMO_ENDS, lib/promo.ts) nothing is counted; the limits start by themselves after it.
+const on = () => process.env.QUOTA === "on" && !promoActive(promoEnds());
 
 /** The random id the app or website made for itself (lib/device.ts), or the IP without one. */
 export function deviceOf(req: Request) {

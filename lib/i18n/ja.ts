@@ -903,6 +903,14 @@ export const ja: Dict = {
     trainSoon: "切符は{date}に発売（15日前）。人気の列車はすぐ売り切れるので、その日に予約しましょう。",
     names: { newYear: "元日", spring: "春節", qingming: "清明節", labour: "労働節", dragon: "端午節", midAutumn: "中秋節", national: "国慶節" },
   },
+  /** Launch period (DECISIONS D21): components/PromoNote.tsx, Settings, the pass sheet. */
+  promo: {
+    app: "リリース記念期間として{date}まで無料です。その後は毎日の無料枠と、必要に応じてトラベルパスをご利用いただけます。",
+    web: "リリース記念期間として{date}まで無料です。その後は毎日の無料枠をご利用いただけます。",
+    settings: "{date}まで無料",
+    sheet: "リリース記念期間の{date}まではすべて無料です。トラベルパスは購入した時点から始まるので、必要になるのはその後です。",
+    hide: "非表示",
+  },
   pass: {
     out: { menu_photo: "今日の無料メニュー2回分を使い切りました（1回につき写真4枚まで）", menu_text: "今日の無料料理検索を使い切りました", translate: "今日の無料翻訳を使い切りました", hotel: "無料の予約スクリーンショット読み取りを使い切りました", none: "トラベルパス" },
     body: "トラベルパスでメニュー撮影・料理検索・翻訳が無制限になります。アレルギーチェックとアレルギーカードはいつでも無料です。",

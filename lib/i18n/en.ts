@@ -906,6 +906,14 @@ export const en = {
     trainSoon: "Tickets go on sale {date}, 15 days ahead. Book that day: popular trains sell out fast.",
     names: { newYear: "New Year", spring: "Spring Festival", qingming: "Qingming", labour: "Labour Day", dragon: "Dragon Boat Festival", midAutumn: "Mid-Autumn Festival", national: "National Day" },
   },
+  /** Launch period (DECISIONS D21): components/PromoNote.tsx, Settings, the pass sheet. */
+  promo: {
+    app: "Free during our launch period until {date}. After that: a free daily allowance and an optional trip pass.",
+    web: "Free during our launch period until {date}. After that: a free daily allowance.",
+    settings: "Free until {date}",
+    sheet: "Everything is free during our launch period until {date}. A trip pass starts when you buy it, so you only need one after that.",
+    hide: "Hide",
+  },
   pass: {
     out: { menu_photo: "That’s today’s 2 free menus (up to 4 photos each)", menu_text: "That’s today’s free dish lookups", translate: "That’s today’s free translations", hotel: "That’s your free booking screenshots", none: "Trip pass" },
     body: "A trip pass gives you unlimited menu photos, dish lookups and translation. Your allergy check and allergy card are always free.",
