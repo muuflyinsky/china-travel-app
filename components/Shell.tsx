@@ -19,7 +19,11 @@ const TABS = [
   { href: "/talk", key: "talk", Icon: Languages },
 ] as const;
 
+/** Website pages (lib/site.ts): full-width, no tab bar or app column. The iOS app never links to them. */
+const isSitePath = (path: string | null) => !!path && /^\/(welcome|guide)(\/|$)/.test(path);
+
 export function AppShell({ children }: { children: React.ReactNode }) {
+  const path = usePathname();
   const [dark, setDark] = useState(false);
   const [profile] = useProfile();
   // <html lang> follows the UI language, so screen readers, hyphenation and CJK fonts are right.
@@ -35,6 +39,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     mq.addEventListener("change", apply);
     return () => mq.removeEventListener("change", apply);
   }, [profile.theme]);
+  if (isSitePath(path)) return <>{children}</>;
   // One centred column on every screen size, so navbar, content and tab bar always line up.
   return (
     <App theme="ios" dark={dark} safeAreas className="app-column">
