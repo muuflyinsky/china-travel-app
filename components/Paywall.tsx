@@ -10,6 +10,7 @@ import { fmt } from "@/lib/i18n";
 import { allergyLinesZh } from "@/lib/allergens";
 import { PASSES, type QuotaKind } from "@/lib/products";
 import { buy, hasPasses, products, refreshPass, restore, savedPass, type StoreProduct } from "@/lib/passes";
+import { holdReview } from "@/lib/review";
 
 /**
  * Trip pass sheet, opened by showPaywall() when today's free uses run out (or from Settings).
@@ -28,6 +29,7 @@ export function Paywall() {
   const canBuy = hasPasses();
 
   useEffect(() => { refreshPass().then(() => setPass(savedPass())); }, []);
+  useEffect(() => (kind !== null ? holdReview() : undefined), [kind]);
   useEffect(() => {
     const open = (e: Event) => { setKind((e as CustomEvent<QuotaKind | "none">).detail); setNote(null); setPass(savedPass()); };
     window.addEventListener("ctg:paywall", open);
@@ -45,6 +47,7 @@ export function Paywall() {
     const r = await buy(id);
     setBusy(null);
     if (r.status === "purchased" && r.pass) { setPass(r.pass); setNote({ tone: "info", text: fmt(t.pass.thanks, { date: until(r.pass.ends) }) }); }
+    else if (r.status === "unlinked") setNote({ tone: "warn", text: t.pass.unlinked });
     else if (r.status === "pending") setNote({ tone: "info", text: t.pass.pending });
     else if (r.status !== "cancelled") setNote({ tone: "warn", text: t.pass.failed });
   }
@@ -53,7 +56,8 @@ export function Paywall() {
     setBusy("restore"); setNote(null);
     const p = await restore();
     setBusy(null);
-    if (p) { setPass(p); setNote({ tone: "info", text: fmt(t.pass.thanks, { date: until(p.ends) }) }); }
+    if (p === "unreachable") setNote({ tone: "warn", text: t.pass.unreachable });
+    else if (p) { setPass(p); setNote({ tone: "info", text: fmt(t.pass.thanks, { date: until(p.ends) }) }); }
     else setNote({ tone: "warn", text: t.pass.restoreNone });
   }
 

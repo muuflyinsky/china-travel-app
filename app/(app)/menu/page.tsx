@@ -25,6 +25,7 @@ import { verdict, withDetailAllergens, type Verdict, type VerdictKind } from "@/
 import { hasChinese } from "@/lib/dish-name";
 import { VerdictTag, reasonText, verdictLabel } from "@/components/VerdictTag";
 import { orderCard, staffReplies, allergyExplain as allergyExplainText } from "@/lib/order-card";
+import { noteWin } from "@/lib/review";
 import { MEAL_TTL, clearMeal, isSaved, loadMeal, loadSaved, mergeDish, pageId, refreshSaved, saveMeal, thumbnail, toggleSaved, SAVED_EVENT, type Line, type MealPage, type SavedDish } from "@/lib/meal";
 
 /** Photos picked from the library at once: one meal's worth (DECISIONS D8: 4 photos per free use). */
@@ -501,6 +502,7 @@ export default function MenuPage() {
       }
       patchPage(id, m);
       track("menu_done", { ms: Math.round(performance.now() - t0), dishes: m.dishes.filter(Boolean).length, missing: m.missing });
+      if (!m.demo && m.dishes.some(Boolean)) noteWin();
       return true;
     } catch (e) {
       // A page that already showed dishes stays; one that never got any goes.

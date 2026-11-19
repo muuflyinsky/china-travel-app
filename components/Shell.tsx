@@ -9,6 +9,8 @@ import { useProfile } from "./useProfile";
 import { Paywall } from "./Paywall";
 import { fmt, UI_DICTS } from "@/lib/i18n";
 import { trackSession } from "@/lib/track";
+import { maybeAskForReview } from "@/lib/review";
+import { syncOfflineHotel } from "@/lib/offline-hotel";
 
 // Five top-level sections (iOS HIG: 2–5 tabs, always visible). Settings and Emergency are pushed
 // screens with a back button; Pay, Mobile data and Before you go live inside Today.
@@ -26,7 +28,7 @@ const isSitePath = (path: string | null) => !!path && /^\/(welcome|guide)(\/|$)/
 export function AppShell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const [dark, setDark] = useState(false);
-  const [profile] = useProfile();
+  const [profile, , loaded] = useProfile();
   // One anonymous session_start per visit to the app (not the website pages, which have their own
   // cookieless page counts).
   useEffect(() => { if (!isSitePath(path)) trackSession(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -43,6 +45,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     mq.addEventListener("change", apply);
     return () => mq.removeEventListener("change", apply);
   }, [profile.theme]);
+  // The offline page shows the saved hotel as a taxi card (app 1.1; lib/offline-hotel.ts).
+  useEffect(() => { if (loaded) syncOfflineHotel(profile.hotel, profile.lang); }, [loaded, profile.hotel, profile.lang]);
+  // Rating prompt: only on Today, the calm screen between tasks (lib/review.ts decides the rest).
+  useEffect(() => (path === "/" ? maybeAskForReview() : undefined), [path]);
   if (isSitePath(path)) return <>{children}</>;
   // One centred column on every screen size, so navbar, content and tab bar always line up.
   return (

@@ -917,6 +917,8 @@ export const ko: Dict = {
     active: "{date}까지 무제한",
     thanks: "감사합니다! {date}까지 무제한이에요.",
     failed: "구매가 완료되지 않았어요. 요금은 청구되지 않았어요.",
+    unlinked: "구매는 완료됐지만 아직 패스를 켜지 못했어요. 온라인이 되면 구매 복원을 눌러 주세요. 다시 청구되지 않아요.",
+    unreachable: "HaodeGo에 연결하지 못했어요. 온라인이 되면 구매 복원을 다시 눌러 주세요.",
     pending: "승인을 기다리는 중이에요.",
     getApp: "무제한으로 쓰려면 iPhone 앱 HaodeGo의 여행 패스가 필요해요.",
     loading: "가격 불러오는 중…",

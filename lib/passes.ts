@@ -34,39 +34,62 @@ export const passToken = () => savedPass()?.token ?? null;
 
 export const products = (ids: readonly string[]) => call<{ products: StoreProduct[] }>("products", { ids: [...ids] }).then((r) => r.products);
 
-/** Sends the phone's pass transactions to the server; keeps the token if one is active. */
+/** Our server couldn't be reached or failed (offline, 5xx): says nothing about the purchase itself. */
+class Unreachable extends Error {}
+
+/**
+ * Sends the phone's pass transactions to the server; keeps the token if one is active.
+ * null = the server answered and no pass is running; throws Unreachable when it didn't answer.
+ */
 async function exchange(transactions: string[]): Promise<Saved | null> {
   if (!transactions.length) return null;
   const { apiHeaders } = await import("./device");
-  const r = await fetch("/api/pass", { method: "POST", headers: { "content-type": "application/json", ...apiHeaders() }, body: JSON.stringify({ transactions }) });
-  if (!r.ok) return null;
-  const s = (await r.json()) as Saved;
+  let r: Response;
+  try {
+    r = await fetch("/api/pass", { method: "POST", headers: { "content-type": "application/json", ...apiHeaders() }, body: JSON.stringify({ transactions }) });
+  } catch { throw new Unreachable(); }
+  if (r.status === 404) return null;
+  if (!r.ok) throw new Unreachable();
+  const s = (await r.json().catch(() => null)) as Saved | null;
+  if (!s?.token) throw new Unreachable();
   try { localStorage.setItem("ctg.pass", JSON.stringify(s)); } catch {}
   return s;
 }
 
-export type BuyResult = { status: "purchased"; pass: Saved | null } | { status: "cancelled" | "pending" | "failed" };
+/**
+ * "unlinked": Apple took the payment but our server didn't switch the pass on (no connection,
+ * server error). The pass is safe on the Apple ID; Restore purchases switches it on later.
+ * Never reported as "failed", which tells the traveller they weren't charged.
+ */
+export type BuyResult = { status: "purchased"; pass: Saved | null } | { status: "unlinked" | "cancelled" | "pending" | "failed" };
 
 export async function buy(id: string): Promise<BuyResult> {
+  let r: { status: "purchased" | "cancelled" | "pending"; jws?: string };
+  try { r = await call<typeof r>("buy", { id }); } catch { return { status: "failed" }; }
+  if (r.status !== "purchased") return { status: r.status };
+  if (!PASSES.some((p) => p.id === id)) return { status: "purchased", pass: null }; // a tip
+  if (!r.jws) return { status: "unlinked" };
   try {
-    const r = await call<{ status: "purchased" | "cancelled" | "pending"; jws?: string }>("buy", { id });
-    if (r.status !== "purchased") return { status: r.status };
-    const isPass = PASSES.some((p) => p.id === id);
-    return { status: "purchased", pass: isPass && r.jws ? await exchange([r.jws]) : null };
-  } catch { return { status: "failed" }; }
+    const pass = await exchange([r.jws]);
+    return pass ? { status: "purchased", pass } : { status: "unlinked" };
+  } catch { return { status: "unlinked" }; }
 }
 
-/** Restore Purchases: asks the App Store, then exchanges any pass still running. */
-export async function restore(): Promise<Saved | null> {
-  const r = await call<{ transactions: string[] }>("restore").catch(() => ({ transactions: [] as string[] }));
-  return exchange(r.transactions);
+/** Restore Purchases: asks the App Store, then exchanges any pass still running. "unreachable" = our server didn't answer. */
+export async function restore(): Promise<Saved | null | "unreachable"> {
+  // Syncing with the App Store fails offline or when Apple ID sign-in is cancelled; the passes
+  // already on this phone (Transaction.all) can still be switched on, or reported as unreachable.
+  const r = await call<{ transactions: string[] }>("restore")
+    .catch(() => call<{ transactions: string[] }>("entitlements"))
+    .catch(() => ({ transactions: [] as string[] }));
+  try { return await exchange(r.transactions); } catch { return "unreachable"; }
 }
 
 /** On launch: picks up a pass bought on another device or before reinstalling, without prompting. */
 export async function refreshPass() {
   if (!hasPasses() || savedPass()) return;
   const r = await call<{ transactions: string[] }>("entitlements").catch(() => ({ transactions: [] as string[] }));
-  await exchange(r.transactions);
+  await exchange(r.transactions).catch(() => null);
 }
 
 /** Opens the trip pass sheet (components/Paywall.tsx). */
