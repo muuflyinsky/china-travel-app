@@ -1,11 +1,10 @@
 import { searchPlaces, type Place } from "./amap";
 import { stationName, stationPinyin } from "./metro";
 import { demo } from "./config";
+import { Unavailable } from "./errors";
 import { TRIP_CITY_ID } from "./affiliate";
 import * as mock from "./demo";
 import { cacheRead, cacheWrite } from "./cache";
-import { HOT_CITIES } from "./hot-cities";
-import { logRow } from "./supabase";
 import { CLOSED } from "./restaurant-awards";
 import { TIER_IDS, tierBounds, tierOf, type CityPicks, type HotelPick, type TierId } from "./hotel-tiers";
 
@@ -97,8 +96,12 @@ export function candidate(p: Place, cityShort: string, bounds: [number, number, 
   };
 }
 
+/** A failed search counts as no results, except when the map is unavailable for the day (budget
+ *  reached, lib/amap.ts): then the Stay page says picks are unavailable instead of "no hotels". */
+const noResults = (e: unknown): Place[] => { if (e instanceof Unavailable) throw e; return []; };
+
 async function nearestMetro(location: string) {
-  const [s] = await searchPlaces({ around: location, types: "150500", radius: 1500, pageSize: 1, purpose: "hotels" }).catch(() => []);
+  const [s] = await searchPlaces({ around: location, types: "150500", radius: 1500, pageSize: 1, purpose: "hotels" }).catch(noResults);
   if (!s?.distance) return null;
   // The nearest point is often an exit ("广济街地铁站D1口"): name the station.
   const name = stationName(s.name);
@@ -128,7 +131,7 @@ export async function cityPicks(adcode: string, cityShort: string, around?: stri
   // Economy chains (汉庭, 如家) too: without them the economy tier can be empty in Shanghai.
   const queries = [["酒店", 1], ["酒店", 2], ["万豪", 1], ["希尔顿", 1], ["洲际", 1], ["凯悦", 1], ["全季", 1], ["亚朵", 1], ["汉庭", 1], ["如家", 1]] as const;
   const pages = await Promise.all(queries.map(([keywords, page]) =>
-    searchPlaces(around ? { keywords, types: "100100", around, radius: 2500, page, purpose: "hotels" } : { keywords, types: "100100", city: adcode, page, purpose: "hotels" }).catch(() => [])));
+    searchPlaces(around ? { keywords, types: "100100", around, radius: 2500, page, purpose: "hotels" } : { keywords, types: "100100", city: adcode, page, purpose: "hotels" }).catch(noResults)));
   const seen = new Set<string>();
   const pool = pages.flat().filter((p) => !seen.has(p.id) && seen.add(p.id))
     .map((p) => candidate(p, cityShort, bounds)).filter((h): h is HotelPick => h !== null);
@@ -145,32 +148,4 @@ export async function cityPicks(adcode: string, cityShort: string, around?: stri
   // An empty result isn't stored: it would hide a fix (or a better Amap day) for a week.
   if (TIER_IDS.some((id) => tiers[id].length)) await cacheWrite("hotel_picks", `${RULES}:${key}`, picks);
   return picks;
-}
-
-// Beijing, Shanghai and Guangzhou every day, plus two more hot cities in turn.
-const ALWAYS = ["110000", "310000", "440100"];
-
-/**
- * Daily check (cron): builds or reads each city's picks and logs every empty tier as a
- * `hotel_gap` event, so an empty Stay page shows up in the data instead of in a review.
- */
-export async function checkHotelPicks({ today = new Date(), deadline = Infinity }: { today?: Date; deadline?: number } = {}) {
-  const rest = HOT_CITIES.filter((c) => !ALWAYS.includes(c.a));
-  const day = Math.floor(today.getTime() / 864e5);
-  const cities = [...ALWAYS.map((a) => HOT_CITIES.find((c) => c.a === a)).filter((c): c is (typeof HOT_CITIES)[number] => Boolean(c)),
-    ...[0, 1].map((i) => rest[(day * 2 + i) % rest.length]).filter(Boolean)];
-  const gaps: { city: string; tiers: TierId[] }[] = [];
-  const checked: string[] = [];
-  // A cold city is ~34 Amap calls (about 15 s at the cron's pace): stop well before the deadline.
-  for (const c of cities) {
-    if (Date.now() > deadline - 20_000) break;
-    checked.push(c.e);
-    const picks = await cityPicks(c.a, c.s);
-    const empty = TIER_IDS.filter((id) => !picks.tiers[id].length);
-    if (empty.length) {
-      gaps.push({ city: c.e, tiers: empty });
-      await logRow("events", { e: "hotel_gap", p: { city: c.a, tiers: empty.join(",") }, sid: null });
-    }
-  }
-  return { checked, gaps };
 }

@@ -27,6 +27,20 @@ export async function rest(path: string, init: RequestInit = {}) {
   return text ? JSON.parse(text) : null;
 }
 
+/** Number of rows matching a PostgREST filter (e.g. "e=eq.amap_call&ts=gte.…"), without reading them. */
+export async function countRows(table: string, filter: string): Promise<number> {
+  const key = sb.key || sb.anon;
+  const res = await fetch(`${sb.url}/rest/v1/${table}?select=id&${filter}`, {
+    method: "HEAD",
+    headers: { apikey: key, prefer: "count=exact" },
+    signal: AbortSignal.timeout(3000),
+    cache: "no-store",
+  });
+  const total = Number(res.headers.get("content-range")?.split("/")[1]);
+  if (!res.ok || !Number.isFinite(total)) throw new Error(`supabase count ${res.status}`);
+  return total;
+}
+
 /**
  * Appends one row to a log table, or — without Supabase, or if the insert fails — to
  * data/<file>.jsonl (local dev) or the server log (read-only hosts such as Vercel).

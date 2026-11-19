@@ -3,7 +3,7 @@ import { config, demo } from "./config";
 import * as mock from "./demo";
 import { after } from "next/server";
 import { Unavailable } from "./errors";
-import { logRow } from "./supabase";
+import { countRows, logRow, supabaseOn } from "./supabase";
 
 // Amap (高德) Web Service API. Docs: https://lbs.amap.com/api/webservice/summary
 // AMAP_BASE_URL is for tests against a local mock; production uses the default.
@@ -41,7 +41,9 @@ export type AmapPurpose = "search" | "category" | "nearby" | "guide" | "restaura
  * too, so this is an upper bound on what Amap bills.
  */
 function count(api: string, purpose: AmapPurpose, ok: boolean) {
-  const row = { e: "amap_call", p: { api, purpose, ok }, sid: null };
+  used.local++;
+  // env tells production from preview deploys and local runs, which may share the key and quota.
+  const row = { e: "amap_call", p: { api, purpose, ok, env: process.env.VERCEL_ENV ?? "local" }, sid: null };
   try { after(() => logRow("events", row)); } catch { void logRow("events", row); }
 }
 
@@ -61,12 +63,40 @@ export class AmapBlocked extends Error {
   constructor(path: string) { super(`Amap ${path}: blocked (HTML instead of JSON)`); }
 }
 
+// ---- Daily budget ------------------------------------------------------------------------
+// The key's quota is small (personal account, about 5,000 searches a month; workspace inbox/
+// 2026-11-19-dev-高德调用量.md). Past AMAP_DAILY_BUDGET calls in a Beijing day, or once Amap
+// says the quota is used up, every call fails as Unavailable("map") until the next day, and pages
+// fall back (Stay: Trip.com; Explore and routes: a short note). Nothing from Amap is stored.
+const BUDGET = Number(process.env.AMAP_DAILY_BUDGET) || 150;
+// Amap's "daily / monthly quota used up" answers.
+const QUOTA_CODES = new Set(["10003", "10044", "10045"]);
+const beijingDay = () => new Date(Date.now() + 8 * 3600_000).toISOString().slice(0, 10);
+/** Today's count from Supabase (all instances), refreshed at most once a minute, plus calls since. */
+const used = { day: "", base: 0, local: 0, at: 0, out: "" };
+async function overBudget() {
+  const day = beijingDay();
+  if (used.out === day) return true;
+  if (used.day !== day) Object.assign(used, { day, base: 0, local: 0, at: 0 });
+  if (supabaseOn && Date.now() - used.at > 60_000) {
+    used.at = Date.now();
+    const since = new Date(Date.parse(`${day}T00:00:00+08:00`)).toISOString();
+    const n = await countRows("events", `e=eq.amap_call&ts=gte.${since}`).catch(() => null);
+    if (n !== null) { used.base = n; used.local = 0; }
+  }
+  if (used.base + used.local < BUDGET) return false;
+  if (used.out !== day) console.warn(`[amap] daily budget of ${BUDGET} calls reached; map features fall back until tomorrow`);
+  used.out = day;
+  return true;
+}
+
 // Amap's "too many requests" answers (QPS limits): wait and try again, 3 times at most.
 const QPS_CODES = new Set(["10019", "10020", "10021", "10022", "10029"]);
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 async function amap<T>(path: string, params: Record<string, string | undefined>, purpose: AmapPurpose): Promise<T> {
   if (!config.amapKey) throw new Unavailable("map");
+  if (await overBudget()) throw new Unavailable("map");
   const qs = new URLSearchParams({ key: config.amapKey });
   for (const [k, v] of Object.entries(params)) if (v) qs.set(k, v);
   for (let attempt = 0; ; attempt++) {
@@ -81,6 +111,11 @@ async function amap<T>(path: string, params: Record<string, string | undefined>,
     count(path, purpose, data.status === "1");
     if (data.status === "1") return data as T;
     if (QPS_CODES.has(String(data.infocode)) && attempt < 3) { await sleep(1000 * 2 ** attempt); continue; }
+    if (QUOTA_CODES.has(String(data.infocode))) {
+      used.out = beijingDay();
+      console.warn(`[amap] quota used up (${data.infocode}); map features fall back until tomorrow`);
+      throw new Unavailable("map");
+    }
     throw new Error(`Amap ${path}: ${data.info ?? "error"} (${data.infocode ?? ""})`);
   }
 }
@@ -188,8 +223,10 @@ async function v5OrV3<T>(v5: () => Promise<T>, v3: () => Promise<T>) {
   if (Date.now() < v5BlockedUntil) return v3();
   try { return await v5(); } catch (e) {
     if (!(e instanceof AmapBlocked)) throw e;
-    console.warn("[amap] v5 blocked, using v3 for 10 min");
-    v5BlockedUntil = Date.now() + 10 * 60_000;
+    // Blocked from Vercel almost every time since 2026-11-03: try v5 again only after 6 hours,
+    // instead of spending an extra request on most searches.
+    console.warn("[amap] v5 blocked, using v3 for 6 h");
+    v5BlockedUntil = Date.now() + 6 * 3600_000;
     return v3();
   }
 }

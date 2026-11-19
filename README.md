@@ -19,7 +19,7 @@ Every feature works without keys, using sample data (marked with a “Demo data�
 | Key | Unlocks | Where to get it |
 |---|---|---|
 | `ANTHROPIC_API_KEY` | Menu photo recognition, dish knowledge, translation | console.anthropic.com |
-| `AMAP_KEY` | POI search, transit / walk / drive routes, hotels, weather | console.amap.com → 应用管理 → **Web服务** Key |
+| `AMAP_KEY` | POI search, transit / walk / drive routes, hotels, weather | console.amap.com → 应用管理 → **Web服务** Key. For local runs leave it empty (sample data) or create a second key: the production key's quota is small and shared. `AMAP_DAILY_BUDGET` (default 150) caps calls per Beijing day. |
 | `TRIP_ALLIANCE_ID`, `TRIP_SID` | Commission on Trip.com bookings | Trip.com Affiliate program |
 | `TRIP_SUB3` | Placement id from your Trip.com link (`trip_sub3=`) | Trip.com Affiliate dashboard |
 | `FLIGGY_PID` | Commission on Fliggy | 淘宝联盟 pub.alimama.com |
