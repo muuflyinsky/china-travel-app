@@ -47,9 +47,12 @@ export function trackSession() {
 export function track(e: EventName, p: Record<string, string | number | boolean> = {}) {
   if (typeof window === "undefined") return;
   const sid = dayId();
-  // First, so the server's 8-property cap never drops them.
+  // lang and platform first, so the server's 8-property cap never drops them; platform is set
+  // again after the event's own properties, so no caller can override it.
   const l = lang() || navigator.language.split("-")[0];
-  const body = JSON.stringify({ e, p: { lang: l, platform: platform(), ...p }, sid });
+  const props: Record<string, string | number | boolean> = { lang: l, platform: "", ...p };
+  props.platform = platform();
+  const body = JSON.stringify({ e, p: props, sid });
   try {
     if (!navigator.sendBeacon?.("/api/t", new Blob([body], { type: "application/json" }))) {
       fetch("/api/t", { method: "POST", body, keepalive: true, headers: { "content-type": "application/json" } }).catch(() => {});
