@@ -70,7 +70,7 @@ export default function SettingsPage() {
     return () => { live = false; };
   }, [sheet]);
   const [moreAllergens, setMoreAllergens] = useState(false);
-  // Deep links such as /settings#dates open the matching editor.
+  // Deep links such as /app/settings#dates open the matching editor.
   useEffect(() => {
     const h = location.hash.slice(1) as Sheet;
     if (SHEETS.includes(h)) setSheet(h);

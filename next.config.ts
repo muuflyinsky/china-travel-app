@@ -20,7 +20,9 @@ const nextConfig: NextConfig = {
       { source: "/welcome", destination: "/", permanent: true },
       // Screens merged long ago (SPEC v0.4), kept for old links.
       { source: "/go", destination: "/app/explore", permanent: true },
-      { source: "/:old(essentials|prepare|pay|esim)", destination: "/app", permanent: true },
+      { source: "/pay", destination: "/app#pay", permanent: true },
+      { source: "/esim", destination: "/app#data", permanent: true },
+      { source: "/:old(essentials|prepare)", destination: "/app", permanent: true },
     ];
   },
 };

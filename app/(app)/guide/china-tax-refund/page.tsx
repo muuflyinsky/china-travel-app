@@ -1,4 +1,4 @@
-// Departure tax refund, from the same hand-checked data and wording as the app's /tax-refund screen
+// Departure tax refund, from the same hand-checked data and wording as the app's /app/tax-refund screen
 // (lib/tax-refund.ts, lib/i18n/en.ts `tax`). Only what an official source states is shown.
 import type { Metadata } from "next";
 import { GuidePage, G } from "@/components/site/GuidePage";

@@ -85,10 +85,10 @@
 ```
 Today（首页）  Eat（菜单）  Explore（探索，原 Go）  Stay（住宿）  Talk（翻译 + 所有给人看的卡）
    │
-   ├─ ⚙ Settings（设置）          /settings   —— 每个主页面右上角齿轮进入
-   └─ Emergency（紧急求助）       /sos        —— Today 底部和 Talk 都有入口
+   ├─ ⚙ Settings（设置）          /app/settings   —— 每个主页面右上角齿轮进入
+   └─ Emergency（紧急求助）       /app/sos    —— Today 底部和 Talk 都有入口
 ```
-v0.4 把 Pay、Mobile data、Before you go 三个独立页面并入 Today。旧地址仍可打开并重定向：`/pay` → `/#pay`，`/esim` → `/#data`，`/prepare`、`/essentials` → `/`，`/go` → `/explore`。
+v0.4 把 Pay、Mobile data、Before you go 三个独立页面并入 Today。旧地址仍可打开并重定向（iOS 1.1 起 App 在 `/app`，见 §5.1）：`/pay` → `/app#pay`，`/esim` → `/app#data`，`/prepare`、`/essentials` → `/app`，`/go` → `/app/explore`。
 
 ### 2.1 Today 按出行阶段变化（`lib/phase.ts`）
 阶段由日期和定位**自动判断**，没有手动的 Planning / In China 开关：

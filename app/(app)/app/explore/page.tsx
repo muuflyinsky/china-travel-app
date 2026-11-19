@@ -124,7 +124,7 @@ function Explore() {
     return () => io.disconnect();
   }, [more, query, busy]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Deep link from Today, e.g. /explore?q=机场 on the last days of the trip.
+  // Deep link from Today, e.g. /app/explore?q=机场 on the last days of the trip.
   useEffect(() => {
     const preset = params.get("q");
     if (preset) { setQ(preset); search(preset); }
