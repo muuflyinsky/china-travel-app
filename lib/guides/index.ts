@@ -74,8 +74,15 @@ export function cityGuide(city: CityId, topic: TopicId, drafts = SHOW_DRAFTS): C
 /** A page exists when it has at least one fact to show on this build. */
 export const hasGuide = (city: CityId, topic: TopicId, drafts = SHOW_DRAFTS) => cityGuide(city, topic, drafts).sections.length > 0;
 export const cityTopics = (city: CityId, drafts = SHOW_DRAFTS) => TOPICS.filter((t) => hasGuide(city, t, drafts));
-/** Worth indexing: checked facts only, and at least one of them about this city. */
-export const indexable = (city: CityId, topic: TopicId) => cityGuide(city, topic, false).cityFacts > 0;
+/**
+ * Search engines may index the guides only once GUIDES_INDEXABLE=1 is set (Vercel env, then redeploy).
+ * Off by default (Veer, 2026-11-20): the facts were checked against their sources by an AI session,
+ * not yet spot-checked by a person, and the translations aren't reviewed. While off, every guide
+ * page is noindex and the sitemap lists none; the pages still open.
+ */
+export const GUIDES_INDEXABLE = process.env.GUIDES_INDEXABLE === "1";
+/** Worth indexing: the switch is on, checked facts only, and at least one of them about this city. */
+export const indexable = (city: CityId, topic: TopicId) => GUIDES_INDEXABLE && cityGuide(city, topic, false).cityFacts > 0;
 const indexableTopics = (city: CityId) => TOPICS.filter((t) => indexable(city, t));
 
 /** Every indexable guide URL (verified facts only, whatever the build), for the sitemap. */

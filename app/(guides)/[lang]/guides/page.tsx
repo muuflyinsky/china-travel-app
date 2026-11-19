@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CITY_IDS, LANGS, cityName, cityTopics, guidePath, isLang } from "@/lib/guides";
+import { CITY_IDS, LANGS, cityName, cityTopics, guidePath, isLang, GUIDES_INDEXABLE } from "@/lib/guides";
 import { guideMeta } from "@/lib/guides/meta";
 import { GuideFooter, GuideHeader, topicKey } from "@/components/guides/Chrome";
 import { fmt, getDict } from "@/lib/i18n";
@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: P) {
   const { lang } = await params;
   if (!isLang(lang)) return {};
   const t = getDict(lang).guides;
-  const live = CITY_IDS.some((c) => cityTopics(c, false).length > 0);
+  const live = GUIDES_INDEXABLE && CITY_IDS.some((c) => cityTopics(c, false).length > 0);
   return guideMeta(lang, t.hubTitle, t.hubIntro, { noindex: !live });
 }
 

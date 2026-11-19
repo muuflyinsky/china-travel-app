@@ -357,6 +357,7 @@ iOS 分组列表，每行 = 图标（lucide 线性图标 + 浅色底块，不用
 - **路由结构**：App 页面在 `app/(app)/`（网址不变），攻略页在 `app/(guides)/[lang]/`，两个独立的根布局，所以攻略页有正确的 `<html lang>`、不带 App 外壳；未匹配的网址走 `app/global-not-found.tsx`。
 - **攻略页** `/{en|es|fr|de|ja|ko}/guides/{city}/{payment|transport|mobile-data|hotel-check-in}`，另有 `/{lang}/guides` 和 `/{lang}/guides/{city}`。静态生成，含 hreflang（x-default=英文）、Article + BreadcrumbList JSON-LD、出处列表和核对日期；页底引导打开 App。
 - **内容规则**：只用官方和主流媒体来源，每条事实至少一个出处（`lib/guides/content/*.ts`）；城市没有出处的，只显示全国规则，不猜。事实设了 `checked` 日期（有人读过所引页面、确认写的是这句话）才上正式站；未核对的只在预览和本地构建显示（虚线框、“unverified”、noindex），sitemap 只收已核对的页面；某城某主题没有已核对的城市专属事实时（只剩全国规则），该页可访问但 noindex、不进 sitemap。2026-11-11 首批：123 条中 91 条已核对并译成 6 种语言；西安因陕西政府网站无法访问，暂只有全国规则。英文为准，其他语言是翻译，缺翻译时该条显示英文。
+- **收录开关**（Veer 2026-11-20）：`GUIDES_INDEXABLE` 未设为 `1` 时，所有指南页 noindex、sitemap 不收，页面照常能打开。原因：已核对的 91 条是 AI 会话对照来源原文核的，还没有人工抽查，翻译也没经母语者审。人工抽查后在 Vercel 设 `GUIDES_INDEXABLE=1` 并重新部署，北京、上海即按上面的规则收录。
 - 试点城市：北京、上海、西安。Veer 审过后按每批约 10 城扩到 46 城。App 将来移到 `/app`、根目录做主页是另一个计划，未开始。
 
 ---
