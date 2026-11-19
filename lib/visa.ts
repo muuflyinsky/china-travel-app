@@ -7,15 +7,22 @@
 // - Update VERIFIED_ON whenever you check, even if nothing changed. Users see this date.
 // - The Before-you-go page and the stay countdown both read from this file.
 //
-// Status of this table: compiled on 2026-10-23 from the policy summary in the design review
-// (NIA notices, gov.cn, Shanghai government, China Briefing). Country membership has NOT yet been
-// checked line by line against the official NIA lists — do that before launch.
+// Status of this table: checked country by country against the official lists on 2026-11-19
+// (product window, workspace inbox/2026-11-19-product-免签核对.md). Sources:
+// - Unilateral (50 countries): NIA https://www.nia.gov.cn/n741440/n741577/c1731154/content.html (2026-02-17)
+// - Russia to 2027-12-31: MFA press conference 2026-05-20
+//   https://www.mfa.gov.cn/fyrbt_673021/jzhsl_673025/202605/t20260520_11914508.shtml
+// - Mutual: MFA consular list https://cs.mfa.gov.cn/lh/lhqz_149493/list/202607/t20260713_11981384.html
+//   and NIA https://en.nia.gov.cn/n147418/n147463/c181470/content.html (2025-04-14)
+// - 240-hour transit (57): NIA https://en.nia.gov.cn/n147418/n147463/c183412/content.html (2026-08-20)
 
-export const VERIFIED_ON = "2026-10-23";
+export const VERIFIED_ON = "2026-11-19";
 export const SOURCE = { name: "National Immigration Administration", url: "https://en.nia.gov.cn" };
 
 /** Unilateral visa-free entry: 30 days, business / tourism / family / exchange / transit. */
 export const UNILATERAL_UNTIL = "2026-12-31";
+/** Countries whose unilateral entry ends on a different date than UNILATERAL_UNTIL. */
+const UNILATERAL_UNTIL_BY_COUNTRY: Record<string, string> = { RU: "2027-12-31" };
 const UNILATERAL = [
   "FR", "DE", "IT", "ES", "NL", "CH", "IE", "HU", "AT", "BE", "LU", "PL", "PT", "GR", "CY", "SI", "SK",
   "NO", "FI", "DK", "IS", "AD", "MC", "LI", "BG", "RO", "HR", "ME", "MK", "MT", "EE", "LV", "SE", "RU",
@@ -24,11 +31,24 @@ const UNILATERAL = [
 /** Unilateral entries with no announced end date. */
 const UNILATERAL_OPEN_ENDED = ["BN"];
 
-/** Mutual visa exemption agreements: 30 days per entry, at most 90 days in any 180. */
-const MUTUAL = [
-  "SG", "TH", "MY", "AE", "QA", "RS", "BY", "GE", "KZ", "UZ", "MV", "MU", "SC", "BB", "BS", "GD", "FJ",
-  "SM", "EC", "SR", "DM", "AG", "TO", "AL", "BA", "AM", "AZ", "SB",
-];
+/**
+ * Mutual visa exemption agreements, each with its own stay rule (official list, 2026-11-19):
+ * `days` per visit, and `cap` = an extra limit on the total ("180": at most 90 days in any 180,
+ * "year": at most 90 days a year).
+ */
+type Mutual = { days: number; cap?: "180" | "year" };
+const MUTUAL: Record<string, Mutual> = {
+  // 30 days per visit, nothing more in the agreement.
+  ...Object.fromEntries(["SG", "AE", "QA", "RS", "MV", "EC", "SC", "BS", "DM", "SR", "BB", "FJ", "GD", "TO"].map((c) => [c, { days: 30 }])),
+  // 30 days per visit, at most 90 days in any 180. MY, UZ and AZ: the NIA table predates these
+  // agreements, so this rests on Xinhua / China Daily reports only — check again when NIA updates.
+  ...Object.fromEntries(["TH", "KZ", "GE", "WS", "SB", "AG", "MY", "UZ", "AZ"].map((c) => [c, { days: 30, cap: "180" as const }])),
+  // At most 90 days in any 180, no limit per visit.
+  ...Object.fromEntries(["AL", "BA", "AM"].map((c) => [c, { days: 90, cap: "180" as const }])),
+  BY: { days: 30, cap: "year" }, // 30 days per visit, at most 90 days a year
+  MU: { days: 60 }, // 60 days (2017 amendment)
+  SM: { days: 90 }, // "up to 3 months": counted as 90 days, the safe side of three calendar months
+};
 
 /** 240-hour visa-free transit (to a third country, designated ports and provinces only). 57 countries. */
 const TRANSIT_240 = [
@@ -40,16 +60,16 @@ const TRANSIT_240 = [
 
 export type VisaRule =
   | { kind: "unilateral"; days: 30; until: string | null }
-  | { kind: "mutual"; days: 30 }
+  | { kind: "mutual"; days: number; cap?: "180" | "year" }
   | { kind: "transit240"; days: 10 }
   | { kind: "visa" };
 
 /** Best route for a nationality. `onwardThirdCountry` matters only for transit-only countries. */
 export function visaRule(country: string, onwardThirdCountry: boolean | null): VisaRule & { transitOnly: boolean } {
   const c = country.toUpperCase();
-  if (UNILATERAL.includes(c)) return { kind: "unilateral", days: 30, until: UNILATERAL_UNTIL, transitOnly: false };
+  if (UNILATERAL.includes(c)) return { kind: "unilateral", days: 30, until: UNILATERAL_UNTIL_BY_COUNTRY[c] ?? UNILATERAL_UNTIL, transitOnly: false };
   if (UNILATERAL_OPEN_ENDED.includes(c)) return { kind: "unilateral", days: 30, until: null, transitOnly: false };
-  if (MUTUAL.includes(c)) return { kind: "mutual", days: 30, transitOnly: false };
+  if (MUTUAL[c]) return { kind: "mutual", ...MUTUAL[c], transitOnly: false };
   if (TRANSIT_240.includes(c)) {
     return onwardThirdCountry === false ? { kind: "visa", transitOnly: true } : { kind: "transit240", days: 10, transitOnly: true };
   }
@@ -61,7 +81,12 @@ export function entryTypeFor(rule: VisaRule): "visa_free_30" | "transit_240" | "
   return rule.kind === "transit240" ? "transit_240" : rule.kind === "visa" ? "visa" : "visa_free_30";
 }
 
-export const COUNTS = { unilateral: UNILATERAL.length + UNILATERAL_OPEN_ENDED.length, mutual: MUTUAL.length, transit240: TRANSIT_240.length };
+/** Days a visa-free entry allows for this passport (30 unless a mutual agreement says otherwise). */
+export function visaFreeDays(country?: string | null) {
+  return (country && MUTUAL[country.toUpperCase()]?.days) || 30;
+}
+
+export const COUNTS = { unilateral: UNILATERAL.length + UNILATERAL_OPEN_ENDED.length, mutual: Object.keys(MUTUAL).length, transit240: TRANSIT_240.length };
 
 // ---- nationality guess -------------------------------------------------------------------
 
