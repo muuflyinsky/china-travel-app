@@ -567,12 +567,12 @@ export const payment: TopicContent = {
         {
           "applies": "beijing",
           "text": {
-            "en": "BEIJING PASS, a prepaid card launched in July 2024, is sold at both Beijing airports, subway and railway stations for 20 yuan (bring your passport) and is used mainly on public transport.",
-            "es": "BEIJING PASS, una tarjeta prepago lanzada en julio de 2024, se vende en los dos aeropuertos de Pekín y en estaciones de metro y de tren por 20 yuanes (lleva tu pasaporte) y se usa sobre todo en el transporte público.",
-            "fr": "BEIJING PASS, une carte prépayée lancée en juillet 2024, est vendue dans les deux aéroports de Pékin et dans les stations de métro et gares ferroviaires pour 20 yuans (munissez-vous de votre passeport) ; elle sert surtout dans les transports en commun.",
-            "de": "BEIJING PASS, eine im Juli 2024 eingeführte Prepaid-Karte, wird an beiden Pekinger Flughäfen sowie an U-Bahn- und Bahnhöfen für 20 Yuan verkauft (Reisepass mitbringen) und vor allem im öffentlichen Nahverkehr genutzt.",
-            "ja": "2024年7月に発売されたプリペイドカード「BEIJING PASS」は、北京の両空港、地下鉄駅、鉄道駅で20元で販売されており（パスポートが必要です）、主に公共交通機関で使われます。",
-            "ko": "2024년 7월 출시된 선불카드 BEIJING PASS는 베이징의 두 공항과 지하철역, 기차역에서 20위안에 판매되며(여권 지참), 주로 대중교통에 사용됩니다."
+            "en": "BEIJING PASS, a prepaid card launched in July 2024, is sold at both Beijing airports, subway and railway stations for 20 yuan (as of October 2024; bring your passport) and is used mainly on public transport.",
+            "es": "BEIJING PASS, una tarjeta prepago lanzada en julio de 2024, se vende en los dos aeropuertos de Pekín y en estaciones de metro y de tren por 20 yuanes (a octubre de 2024; lleva tu pasaporte) y se usa sobre todo en el transporte público.",
+            "fr": "BEIJING PASS, une carte prépayée lancée en juillet 2024, est vendue dans les deux aéroports de Pékin et dans les stations de métro et gares ferroviaires pour 20 yuans (en octobre 2024 ; munissez-vous de votre passeport) ; elle sert surtout dans les transports en commun.",
+            "de": "BEIJING PASS, eine im Juli 2024 eingeführte Prepaid-Karte, wird an beiden Pekinger Flughäfen sowie an U-Bahn- und Bahnhöfen für 20 Yuan verkauft (Stand: Oktober 2024; Reisepass mitbringen) und vor allem im öffentlichen Nahverkehr genutzt.",
+            "ja": "2024年7月に発売されたプリペイドカード「BEIJING PASS」は、北京の両空港、地下鉄駅、鉄道駅で20元で販売されており（2024年10月現在。パスポートが必要です）、主に公共交通機関で使われます。",
+            "ko": "2024년 7월 출시된 선불카드 BEIJING PASS는 베이징의 두 공항과 지하철역, 기차역에서 20위안에 판매되며(2024년 10월 기준, 여권 지참), 주로 대중교통에 사용됩니다."
           },
           "src": [
             "s20"

@@ -500,12 +500,12 @@ export const hotelCheckIn: TopicContent = {
         {
           "applies": "shanghai",
           "text": {
-            "en": "In Shanghai you can register online through the Self-help Declaration System for Overseas Personnel's Accommodation Registration, or in the Suishenban (随申办) app: switch to 'International', then Other services, Accommodation registration.",
-            "es": "En Shanghái puedes registrarte en línea a través del Self-help Declaration System for Overseas Personnel's Accommodation Registration (sistema de autodeclaración del registro de alojamiento de extranjeros), o en la app Suishenban (随申办): cambia a «International» y luego ve a Other services y Accommodation registration.",
-            "fr": "À Shanghai, vous pouvez vous déclarer en ligne via le Self-help Declaration System for Overseas Personnel's Accommodation Registration (système d'auto-déclaration de l'hébergement des personnes étrangères), ou dans l'application Suishenban (随申办) : passez en mode « International », puis Autres services, Déclaration d'hébergement.",
-            "de": "In Shanghai können Sie sich online über das Self-help Declaration System for Overseas Personnel's Accommodation Registration oder in der App Suishenban (随申办) anmelden: Wechseln Sie zu „International“, dann Other services, Accommodation registration.",
-            "ja": "上海では、「境外人員住宿登記自助申報システム」（Self-help Declaration System for Overseas Personnel's Accommodation Registration）または随申办（Suishenban）アプリでオンライン登録できます。アプリでは「International」に切り替え、「Other services」から「Accommodation registration」へ進みます。",
-            "ko": "상하이에서는 '해외 인원 숙박 등록 셀프 신고 시스템(Self-help Declaration System for Overseas Personnel's Accommodation Registration)'이나 随申办(쑤이선반) 앱에서 온라인으로 등록할 수 있습니다. 'International'로 전환한 뒤 기타 서비스(Other services), 숙박 등록(Accommodation registration)을 선택하십시오."
+            "en": "In Shanghai you can register online through the Self-help Declaration System for Overseas Personnel's Accommodation Registration, or in the Suishenban (随申办) app: switch to 'International', then Other services, Accommodation registration (as of December 2023).",
+            "es": "En Shanghái puedes registrarte en línea a través del Self-help Declaration System for Overseas Personnel's Accommodation Registration (sistema de autodeclaración del registro de alojamiento de extranjeros), o en la app Suishenban (随申办): cambia a «International» y luego ve a Other services y Accommodation registration (a diciembre de 2023).",
+            "fr": "À Shanghai, vous pouvez vous déclarer en ligne via le Self-help Declaration System for Overseas Personnel's Accommodation Registration (système d'auto-déclaration de l'hébergement des personnes étrangères), ou dans l'application Suishenban (随申办) : passez en mode « International », puis Autres services, Déclaration d'hébergement (en décembre 2023).",
+            "de": "In Shanghai können Sie sich online über das Self-help Declaration System for Overseas Personnel's Accommodation Registration oder in der App Suishenban (随申办) anmelden: Wechseln Sie zu „International“, dann Other services, Accommodation registration (Stand: Dezember 2023).",
+            "ja": "上海では、「境外人員住宿登記自助申報システム」（Self-help Declaration System for Overseas Personnel's Accommodation Registration）または随申办（Suishenban）アプリでオンライン登録できます。アプリでは「International」に切り替え、「Other services」から「Accommodation registration」へ進みます（2023年12月現在）。",
+            "ko": "상하이에서는 '해외 인원 숙박 등록 셀프 신고 시스템(Self-help Declaration System for Overseas Personnel's Accommodation Registration)'이나 随申办(쑤이선반) 앱에서 온라인으로 등록할 수 있습니다. 'International'로 전환한 뒤 기타 서비스(Other services), 숙박 등록(Accommodation registration)을 선택하십시오(2023년 12월 기준)."
           },
           "src": [
             "s4",
