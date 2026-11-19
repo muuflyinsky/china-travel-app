@@ -11,8 +11,8 @@ import { useT } from "@/components/useT";
 import { useCity } from "@/components/useCity";
 import { useProfile } from "@/components/useProfile";
 import { fmt, type Dict } from "@/lib/i18n";
-import { openApp } from "@/lib/openApp";
 import { track } from "@/lib/track";
+import { DidiButton } from "@/components/AppMissing";
 import {
   AIRPORT_CITIES, VERIFIED_ON, airportsIn, toAirportLines, type ArrivalAirport, type Metro, type Name,
 } from "@/lib/airports";
@@ -98,7 +98,7 @@ function WaysIn({ a, x, heading }: { a: ArrivalAirport; x: X; heading: boolean }
         {a.ride?.note && <Line icon={MapPin}>{x.notes[a.ride.note]}</Line>}
         {!a.ride && <p className="text-subhead text-muted">{x.rideSigns}</p>}
         <p className="text-subhead">{x.rideHow}</p>
-        <Button variant="soft" onClick={() => { openApp("didi"); track("airport_didi", { code: a.code }); }} className="w-full text-subhead!">{x.openDidi}</Button>
+        <DidiButton label={x.openDidi} driverHref="/driver" onOpen={() => track("airport_didi", { code: a.code })} />
       </Way>
       {a.online && <Note>{x.notes[a.online]}</Note>}
       {a.money && <Note>{x.notes[a.money]}</Note>}
@@ -164,7 +164,7 @@ function WayOut({ a, x, heading }: { a: ArrivalAirport; x: X; heading: boolean }
       </Way>
       <Way icon={Car} title={x.ride}>
         <p className="text-subhead">{x.rideOut} <span className="zh font-semibold" lang="zh-CN">{a.name.zh}{term ? ` ${term}` : ""}</span></p>
-        <Button variant="soft" onClick={() => { openApp("didi"); track("airport_didi", { code: a.code, out: 1 }); }} className="w-full text-subhead!">{x.openDidi}</Button>
+        <DidiButton label={x.openDidi} driverHref="/driver" onOpen={() => track("airport_didi", { code: a.code, out: 1 })} />
       </Way>
       {card && <ShowCard kind="airport" lines={toAirportLines(a, term)} sub={`${a.name.en}${term ? ` ${term}` : ""} · ${x.intlDepartures}`} onClose={() => setCard(false)} />}
     </>

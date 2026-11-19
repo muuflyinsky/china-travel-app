@@ -4,7 +4,7 @@ import { useProfile } from "./useProfile";
 import { useT } from "./useT";
 import { fmt } from "@/lib/i18n";
 import { stayWindow } from "@/lib/stay";
-import { UNILATERAL_UNTIL, visaRule } from "@/lib/visa";
+import { visaRule } from "@/lib/visa";
 
 /**
  * Legal warnings about the planned stay (SPEC v0.5 · P0-6), shown wherever dates appear:
@@ -23,8 +23,8 @@ export function StayWarning({ transit = true, policy = true }: { transit?: boole
     notes.push({ strong: true, text: fmt(p.entryType === "visa" ? t.stay.overstayVisa : t.stay.overstayFree, { planned: d(w.planned), legal: d(w.legal) }) });
   }
   if (transit && p.entryType === "transit_240") notes.push({ text: t.stay.transitRules });
-  if (policy && rule?.kind === "unilateral" && rule.until && p.arrival && p.arrival > UNILATERAL_UNTIL) {
-    notes.push({ text: fmt(t.visa.expiry, { date: d(UNILATERAL_UNTIL) }) });
+  if (policy && rule?.kind === "unilateral" && rule.until && p.arrival && p.arrival > rule.until) {
+    notes.push({ text: fmt(t.visa.expiry, { date: d(rule.until) }) });
   }
   if (!notes.length) return null;
   return (

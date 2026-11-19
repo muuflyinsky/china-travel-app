@@ -1,0 +1,69 @@
+// Header and footer for the website pages (/welcome, /guide/*). Server-rendered, no app chrome.
+// Website pages are always light (globals.css :root.dark:has(.site)), so no dark: variants here.
+// Links into the app (/, /privacy, /support) are plain <a>: a full page load, so the website-only
+// analytics script is never carried over into app pages.
+import Link from "next/link";
+import { Analytics } from "@vercel/analytics/next";
+import { APP_STORE_LIVE, APP_STORE_URL } from "@/lib/site";
+
+export function SiteFrame({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="site min-h-full bg-porcelain text-ink">
+      <header className="sticky top-0 z-30 border-b border-line bg-card/85 backdrop-blur-md">
+        <div className="mx-auto flex min-h-14 max-w-5xl items-center gap-3 px-gutter">
+          <Link href="/welcome" className="flex min-h-touch items-center gap-2 text-headline">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/icon.svg" alt="" width={28} height={28} className="rounded-[7px]" />
+            HaodeGo
+          </Link>
+          <nav className="ml-auto flex items-center gap-1">
+            <Link href="/guide" className="flex min-h-touch items-center px-3 text-subhead font-semibold text-cobalt">Guides</Link>
+            <a href="/" className="flex min-h-touch items-center rounded-control bg-cobalt px-4 text-subhead font-semibold text-white">Open HaodeGo</a>
+          </nav>
+        </div>
+      </header>
+      <main>{children}</main>
+      <footer className="mt-section border-t border-line">
+        <div className="mx-auto grid max-w-5xl gap-stack px-gutter py-8 text-subhead text-muted sm:grid-cols-[1fr_auto]">
+          <div className="space-y-2">
+            <p className="font-semibold text-ink">HaodeGo · China Travel Buddy</p>
+            <p>Everything you need for a trip to mainland China, in one app, in your language. Free to start, no account.</p>
+            <p className="text-footnote">Map data and place photos from Amap. Hotel, train, ticket and eSIM links are affiliate links: we may earn a commission, at no extra cost to you.</p>
+          </div>
+          <ul className="flex flex-wrap gap-x-4 gap-y-1 sm:flex-col">
+            <li><a href="/" className="font-semibold text-cobalt">Open HaodeGo</a></li>
+            {APP_STORE_LIVE && <li><a href={APP_STORE_URL} className="font-semibold text-cobalt">App Store</a></li>}
+            <li><Link href="/guide" className="text-cobalt">Guides</Link></li>
+            <li><a href="/support" className="text-cobalt">Help & support</a></li>
+            <li><a href="/privacy" className="text-cobalt">Privacy</a></li>
+          </ul>
+        </div>
+        <p className="mx-auto max-w-5xl px-gutter pb-8 text-footnote text-muted">© 2026 HaodeGo</p>
+      </footer>
+      <Analytics />
+    </div>
+  );
+}
+
+/** Narrow column for long-form guide text. */
+export function Prose({ children }: { children: React.ReactNode }) {
+  return <div className="mx-auto max-w-2xl px-gutter">{children}</div>;
+}
+
+/** The one call to action: open the web app (and, once 1.0 is live, the App Store). */
+export function OpenAppCta({ where }: { where: string }) {
+  return (
+    <div className="flex flex-wrap items-center gap-stack">
+      <a href="/" data-cta={where} className="inline-flex min-h-control items-center justify-center rounded-control bg-cobalt px-6 text-headline text-white shadow-bar transition-transform hover:-translate-y-0.5">
+        Open HaodeGo
+      </a>
+      {APP_STORE_LIVE ? (
+        <a href={APP_STORE_URL} data-cta={`${where}-appstore`} className="inline-flex min-h-control items-center justify-center rounded-control border border-line bg-card px-5 text-headline">
+          Get the iPhone app
+        </a>
+      ) : (
+        <span className="text-subhead text-muted">Free to start · no account · works in your browser</span>
+      )}
+    </div>
+  );
+}
