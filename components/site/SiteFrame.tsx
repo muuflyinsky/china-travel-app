@@ -1,4 +1,4 @@
-// Header and footer for the website pages (/welcome, /guide/*). Server-rendered, no app chrome.
+// Header and footer for the website pages (/ and /guide/*). Server-rendered, no app chrome.
 // Website pages are always light (globals.css :root.dark:has(.site)), so no dark: variants here.
 // Links into the app (/, /privacy, /support) are plain <a>: a full page load, so the website-only
 // analytics script is never carried over into app pages.
@@ -11,14 +11,14 @@ export function SiteFrame({ children }: { children: React.ReactNode }) {
     <div className="site min-h-full bg-porcelain text-ink">
       <header className="sticky top-0 z-30 border-b border-line bg-card/85 backdrop-blur-md">
         <div className="mx-auto flex min-h-14 max-w-5xl items-center gap-3 px-gutter">
-          <Link href="/welcome" className="flex min-h-touch items-center gap-2 text-headline">
+          <Link href="/" className="flex min-h-touch items-center gap-2 text-headline">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/icon.svg" alt="" width={28} height={28} className="rounded-[7px]" />
             HaodeGo
           </Link>
           <nav className="ml-auto flex items-center gap-1">
             <Link href="/guide" className="flex min-h-touch items-center px-3 text-subhead font-semibold text-cobalt">Guides</Link>
-            <a href="/" className="flex min-h-touch items-center rounded-control bg-cobalt px-4 text-subhead font-semibold text-white">Open HaodeGo</a>
+            <a href="/app" className="flex min-h-touch items-center rounded-control bg-cobalt px-4 text-subhead font-semibold text-white">Open HaodeGo</a>
           </nav>
         </div>
       </header>
@@ -31,7 +31,7 @@ export function SiteFrame({ children }: { children: React.ReactNode }) {
             <p className="text-footnote">Map data and place photos from Amap. Hotel, train, ticket and eSIM links are affiliate links: we may earn a commission, at no extra cost to you.</p>
           </div>
           <ul className="flex flex-wrap gap-x-4 gap-y-1 sm:flex-col">
-            <li><a href="/" className="font-semibold text-cobalt">Open HaodeGo</a></li>
+            <li><a href="/app" className="font-semibold text-cobalt">Open HaodeGo</a></li>
             {APP_STORE_LIVE && <li><a href={APP_STORE_URL} className="font-semibold text-cobalt">App Store</a></li>}
             <li><Link href="/guide" className="text-cobalt">Guides</Link></li>
             <li><a href="/support" className="text-cobalt">Help & support</a></li>
@@ -54,7 +54,7 @@ export function Prose({ children }: { children: React.ReactNode }) {
 export function OpenAppCta({ where }: { where: string }) {
   return (
     <div className="flex flex-wrap items-center gap-stack">
-      <a href="/" data-cta={where} className="inline-flex min-h-control items-center justify-center rounded-control bg-cobalt px-6 text-headline text-white shadow-bar transition-transform hover:-translate-y-0.5">
+      <a href="/app" data-cta={where} className="inline-flex min-h-control items-center justify-center rounded-control bg-cobalt px-6 text-headline text-white shadow-bar transition-transform hover:-translate-y-0.5">
         Open HaodeGo
       </a>
       {APP_STORE_LIVE ? (

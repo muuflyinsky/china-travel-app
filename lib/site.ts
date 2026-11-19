@@ -1,8 +1,8 @@
-// The website around the app: /welcome (what HaodeGo is) and /guide/* (answers travellers search for).
+// The website around the app: / (what HaodeGo is; /welcome until iOS 1.1, now redirects) and /guide/* (answers travellers search for).
 // These pages are server-rendered so search engines can read them; the app's own pages are not
 // (they build everything from localStorage in the browser). The iOS app never links here.
 // Copy is English only for now (workspace inbox/2026-11-04-website-官网方案.md); other languages get
-// their own URLs (/de/welcome …) when they are written, never a half-translated page.
+// their own URLs (/de …) when they are written, never a half-translated page.
 
 /** Canonical origin: www, because Vercel serves the site there (haodego.com 308-redirects to it).
  *  Don't swap the redirect: travellers' trips, allergies and settings live in localStorage on the
@@ -42,7 +42,7 @@ export const GUIDES: GuideLink[] = [
 
 /** Every URL the sitemap lists, with the date its content was last checked. */
 export const SITE_PAGES: { path: string; updated: string }[] = [
-  { path: "/welcome", updated: "2026-11-04" },
+  { path: "/", updated: "2026-11-04" },
   { path: "/guide", updated: "2026-11-04" },
   ...GUIDES.map((g) => ({ path: g.href, updated: "2026-11-04" })),
 ];

@@ -26,7 +26,7 @@
   /* Type scale (SPEC v0.4). Components use only these: text-display-zh … text-footnote.
      Never write a pixel font size in a component. Weights: 400 / 600 / 700 (700 = large title
      and the Chinese display cards only). */
-  /* Website pages only (/welcome): the hero headline on wide screens. */
+  /* Website pages only (/): the hero headline on wide screens. */
   --text-hero: 44px;
   --text-hero--line-height: 52px;
   --text-hero--font-weight: 700;
@@ -125,7 +125,7 @@
 }
 
 html, body { background: var(--porcelain); color: var(--ink); }
-/* Website pages (/welcome, /guide/*) are full width: no tinted desktop backdrop around an app column. */
+/* Website pages (/, /guide/*) are full width: no tinted desktop backdrop around an app column. */
 body:has(.site) { background: var(--porcelain); }
 body { -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; }
 ::selection { background: color-mix(in srgb, var(--cobalt) 25%, transparent); }
@@ -193,7 +193,7 @@ html:not(.in-app) .app-only { display: none !important; }
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
 
-/* ---- Website pages (/welcome, /guide/*): always light, with CSS-only motion ----------------- */
+/* ---- Website pages (/, /guide/*): always light, with CSS-only motion ----------------- */
 /* The app follows the phone's theme; the website keeps one look (Veer, 2026-11-05). */
 :root.dark:has(.site) {
   --porcelain: #f7f8fb; --card: #ffffff; --ink: #1a1f2e; --muted: #5b6273; --line: #e3e6ee;

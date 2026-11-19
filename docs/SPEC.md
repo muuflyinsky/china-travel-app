@@ -58,7 +58,7 @@
 
 **P2 测量**
 - 匿名事件（`lib/track.ts` → `/api/t` → `data/events.jsonl`，Vercel 上写入日志）：`menu_scan`、`order_card_shown`、`staff_reply`、`taxi_card_shown`、`hotel_card_shown`、`hotel_pick_click`（带档位、区域、位置标签）、`resv_alarm_added`、`airport_open`（机场页打开，带机场方向）、`airport_card_out`、`airport_didi`（带机场代码）。每个事件的属性里都带 `lang`（用户在设置里选的语言，没设时取浏览器语言；2026-11-03 起），用来看用户语言分布，不带别的个人信息。按语言统计：`select p->>'lang' as lang, count(distinct sid) as phone_days from events where ts > now() - interval '28 days' group by 1 order by 2 desc;`
-  - 2026-11-20 起：每个事件都带 `platform`（`ios` = iPhone App，`web` = 浏览器）；新增 `session_start`，每次打开 App 或网页版记一次（`sessionStorage` 标记，官网 /welcome、/guide 不记），沿用每日变化的匿名 id，不跨天追踪。
+  - 2026-11-20 起：每个事件都带 `platform`（`ios` = iPhone App，`web` = 浏览器）；新增 `session_start`，每次打开 App 或网页版记一次（`sessionStorage` 标记，官网首页 /、/guide 不记），沿用每日变化的匿名 id，不跨天追踪。
 - 只记事件名、少量基本属性和随机会话编号；不记过敏、日期、位置。服务器会丢掉未知事件和非基本类型的属性。
 
 ## 1. 产品概述
@@ -359,7 +359,12 @@ iOS 分组列表，每行 = 图标（lucide 线性图标 + 浅色底块，不用
 
 ### 5.1 SEO 与城市攻略页（2026-11-05）
 - **主域名** `https://www.haodego.com`（`lib/seo.ts`）：`metadataBase`、canonical、og:url 都用 www；`app/robots.ts`、`app/sitemap.ts`；每个公开页有自己的标题和描述（各路由的 `layout.tsx`）；设置页 noindex。
-- **路由结构**：App 页面在 `app/(app)/`（网址不变），攻略页在 `app/(guides)/[lang]/`，两个独立的根布局，所以攻略页有正确的 `<html lang>`、不带 App 外壳；未匹配的网址走 `app/global-not-found.tsx`。
+- **路由结构**：App 页面在 `app/(app)/`，攻略页在 `app/(guides)/[lang]/`，两个独立的根布局，所以攻略页有正确的 `<html lang>`、不带 App 外壳；未匹配的网址走 `app/global-not-found.tsx`。
+- **官网在 `/`，App 在 `/app`**（iOS 1.1 起，Veer 11-19）：官网首页（原 `/welcome`）是 `app/(app)/page.tsx`；App 各屏在 `app/(app)/app/*`（`/app` Today、`/app/menu`、`/app/explore`、`/app/stay`、`/app/talk`、`/app/settings`、`/app/driver`、`/app/sos`、`/app/airport`、`/app/tax-refund`、`/app/pay-codes`）。`/privacy`、`/support`、`/guide/*` 不变（App Store Connect 里填的是这两个网址）。
+  - 旧网址永久跳转（308，`next.config.ts`）：`/menu` 等 → `/app/menu` 等（带上参数）；`/welcome` → `/`；`/go` → `/app/explore`；`/essentials`、`/prepare`、`/pay`、`/esim` → `/app`。
+  - `/` 自动进 App：iOS 外壳（User-Agent 带 `ChinaTravelBuddy-iOS`，含已上架的 1.0）在服务器端 307 到 `/app`；1.1 之前加到主屏幕的快捷方式（打开的是 `/`）由根布局的内联脚本检测独立窗口（`navigator.standalone` / `display-mode: standalone`）后跳 `/app`。
+  - PWA manifest：`start_url` `/app`，`id` 固定为 `/`（已安装的不算新 App），`scope` 保持 `/`（设置页链到 `/privacy`、`/support`，scope 改成 `/app` 会弹出浏览器栏）。
+  - 同一个源（www），localStorage 不受影响（D11）。sitemap 列 `/`（优先级 1）、`/app/*`、`/guide/*`、攻略页；robots 禁 `/api/`、`/app/settings`。
 - **攻略页** `/{en|es|fr|de|ja|ko}/guides/{city}/{payment|transport|mobile-data|hotel-check-in}`，另有 `/{lang}/guides` 和 `/{lang}/guides/{city}`。静态生成，含 hreflang（x-default=英文）、Article + BreadcrumbList JSON-LD、出处列表和核对日期；页底引导打开 App。
 - **内容规则**：只用官方和主流媒体来源，每条事实至少一个出处（`lib/guides/content/*.ts`）；城市没有出处的，只显示全国规则，不猜。事实设了 `checked` 日期（有人读过所引页面、确认写的是这句话）才上正式站；未核对的只在预览和本地构建显示（虚线框、“unverified”、noindex），sitemap 只收已核对的页面；某城某主题没有已核对的城市专属事实时（只剩全国规则），该页可访问但 noindex、不进 sitemap。2026-11-11 首批：123 条中 91 条已核对并译成 6 种语言；西安因陕西政府网站无法访问，暂只有全国规则。英文为准，其他语言是翻译，缺翻译时该条显示英文。
 - **收录开关**（Veer 2026-11-20）：`GUIDES_INDEXABLE` 未设为 `1` 时，所有指南页 noindex、sitemap 不收，页面照常能打开。原因：已核对的 91 条是 AI 会话对照来源原文核的，还没有人工抽查，翻译也没经母语者审。人工抽查后在 Vercel 设 `GUIDES_INDEXABLE=1` 并重新部署，北京、上海即按上面的规则收录。

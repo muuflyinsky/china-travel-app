@@ -5,7 +5,7 @@ import type { TopicContent } from "../types";
 // `note` says why. Gaps the research couldn't source: see the workspace inbox note.
 export const payment: TopicContent = {
   "checked": "2026-11-11",
-  "appPath": "/#pay",
+  "appPath": "/app/pay-codes",
   "sources": {
     "s1": {
       "title": "China to raise single mobile transaction limit to 5,000 USD for overseas travelers",

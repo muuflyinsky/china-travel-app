@@ -12,7 +12,7 @@ export function GuidePage({ title, intro, checked, appHelps, sources, path, chil
     <SiteFrame>
       <Prose>
         <nav aria-label="Breadcrumb" className="pt-6 text-footnote text-muted">
-          <Link href="/welcome" className="text-cobalt">HaodeGo</Link> › <Link href="/guide" className="text-cobalt">Guides</Link>
+          <Link href="/" className="text-cobalt">HaodeGo</Link> › <Link href="/guide" className="text-cobalt">Guides</Link>
         </nav>
         <article>
           <h1 className="mt-3 text-large-title text-balance">{title}</h1>

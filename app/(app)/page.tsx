@@ -1,593 +1,197 @@
-"use client";
+// What HaodeGo is, for people who find it on the web. Server-rendered so search engines can read it.
+// Positioning (Veer, 2026-11-04): one calm place for the whole trip, not any single feature.
+// Redesign (Veer, 2026-11-05): less text, more motion and imagery, light mode only; no new logo or
+// illustrations, so the visuals are the app's real screens and its large Chinese show-cards.
+// Every claim is something the app does today (docs/SPEC.md); no ratings, reviews or counts.
+// Motion lives in globals.css (.site-*), CSS only, and stops under prefers-reduced-motion.
+import type { Metadata } from "next";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import {
-  Camera, Siren, Check, CalendarClock, CalendarPlus, Plane, Smartphone, Wallet, Ticket, Lightbulb, BedDouble, CarTaxiFront,
-  Sun, CloudSun, Cloud, CloudRain, CloudLightning, Snowflake, CloudFog, ChevronRight, ChevronDown, LogIn, Receipt, PlaneTakeoff, PlaneLanding, ListChecks, QrCode, Calculator, ShieldCheck, ClipboardList } from "lucide-react";
-import { Screen, DemoNote } from "@/components/Shell";
-import { Section, Card, Group, Row, Button, IconTile, Note } from "@/components/ui";
-import { useInApp } from "@/components/useInApp";
-import { TripAlerts } from "@/components/TripAlerts";
-import { VisaCheck } from "@/components/VisaCheck";
-import { useHotelPicks, usePrice } from "@/components/HotelPicks";
-import { PayButtons, PAY_LINKS, WechatGuide } from "@/components/PayButtons";
-import { AppIcon } from "@/components/AppIcon";
-import { APPS, type AppId } from "@/lib/apps";
-import { openApp } from "@/lib/openApp";
-import { DriverPanel } from "@/components/DriverPanel";
-import { track } from "@/lib/track";
-import { PriceCheck } from "@/components/PriceCheck";
-import { PaySetup } from "@/components/prep/PaySetup";
-import { EsimPicker } from "@/components/prep/EsimPicker";
-import { AppList, AppSetupNote } from "@/components/prep/AppList";
-import { TrainBooking } from "@/components/prep/TrainBooking";
-import { GoodToKnow } from "@/components/prep/GoodToKnow";
-import { useProfile } from "@/components/useProfile";
-import { useCity } from "@/components/useCity";
-import { useT } from "@/components/useT";
-import { CityPicker } from "@/components/CityPicker";
-import { EditSheet } from "@/components/EditSheet";
-import { ReservationSheet } from "@/components/ReservationSheet";
-import { useRouter } from "next/navigation";
-import { stayWindow, stayReminderIcs, todayIso, daysBetween } from "@/lib/stay";
-import { StayWarning } from "@/components/StayWarning";
-import { tripPhase } from "@/lib/phase";
-import { upcomingReminders, type Reminder } from "@/lib/reminders";
-import { RESERVATIONS, type Reservation } from "@/lib/reservations";
-import { fmt } from "@/lib/i18n";
-import { currentPosition, locationAllowed } from "@/lib/location";
+import { CalendarCheck, PlaneLanding, Compass, PlaneTakeoff, UserX, Smartphone, BadgeX } from "lucide-react";
+import { SiteFrame, OpenAppCta } from "@/components/site/SiteFrame";
+import { GUIDES, SITE_URL } from "@/lib/site";
 
-type Weather = { casts: { date: string; dayweather: string; daytemp: string; nighttemp: string }[] };
+const title = "HaodeGo: the China travel app for visa, payments, menus and getting around";
+const description =
+  "Everything you need for a trip to mainland China in one app: visa-free check, Alipay and WeChat Pay setup, menus in your language, taxi cards, metro routes and translation. Free to start, no account.";
 
-function WeatherIcon({ zh }: { zh: string }) {
-  const cls = "h-5 w-5 text-muted";
-  if (zh.includes("雷")) return <CloudLightning className={cls} aria-hidden />;
-  if (zh.includes("雨")) return <CloudRain className={cls} aria-hidden />;
-  if (zh.includes("雪")) return <Snowflake className={cls} aria-hidden />;
-  if (zh.includes("雾") || zh.includes("霾")) return <CloudFog className={cls} aria-hidden />;
-  if (zh.includes("阴")) return <Cloud className={cls} aria-hidden />;
-  if (zh.includes("多云")) return <CloudSun className={cls} aria-hidden />;
-  return <Sun className={cls} aria-hidden />;
-}
+export const metadata: Metadata = {
+  title: { absolute: title }, // already starts with the brand: no "· HaodeGo" from the root template
+  description,
+  alternates: { canonical: "/" },
+  // A file-based image would sit in the (app) group and apply to every app page, so it's named here.
+  openGraph: { title, description, url: "/", siteName: "HaodeGo", type: "website",
+    images: [{ url: "/site/og-welcome.png", alt: "HaodeGo: everything you need in China, in one app" }] },
+  twitter: { card: "summary_large_image", title, description },
+};
 
-/** China's National Immigration Administration, mobile form (checked 2026-11-04: "入境卡填报"). */
-const ARRIVAL_CARD_URL = "https://s.nia.gov.cn/ArrivalCardFillingPhone/";
+/** Real App Store screens, shown one after another in the hero phone. */
+const SCREENS = [
+  { src: "/site/04-explore.webp", alt: "Explore: top picks in Shanghai with a taxi card and route for each" },
+  { src: "/site/05-route.webp", alt: "Route: bus and metro options with fares, stop names in pinyin and Chinese" },
+  { src: "/site/01-menu-results.webp", alt: "Eat: a Chinese menu read into English, each dish checked for the traveller’s allergies" },
+  { src: "/site/03-order-card.webp", alt: "Order card in large Chinese for the waiter" },
+  { src: "/site/06-talk.webp", alt: "Talk: English translated into Chinese with pinyin" },
+];
 
-const fmtDay = (iso: string, lang: string, month: "short" | "long" = "short") =>
-  new Date(`${iso}T00:00:00Z`).toLocaleDateString(lang, { timeZone: "UTC", day: "numeric", month });
+const CHIPS = [
+  { label: "Taxi card in Chinese", pos: "left-0 top-[14%]" },
+  { label: "Menus in your language", pos: "right-0 top-[34%]" },
+  { label: "Routes with fares", pos: "left-[2%] top-[58%]" },
+  { label: "Alipay in one tap", pos: "right-[4%] top-[78%]" },
+];
 
-/** How a sight's tickets are released, in one short line. */
-function releaseRule(t: ReturnType<typeof useT>, r: Reservation) {
-  return !r.release ? t.resv.noRelease
-    : r.release.time ? fmt(t.resv.opensRule, { time: r.release.time, n: r.release.days })
-    : fmt(t.resv.opensDays, { n: r.release.days });
-}
+const STEPS = [
+  { Icon: CalendarCheck, when: "Before you go", line: "Visa check, payments, data and apps." },
+  { Icon: PlaneLanding, when: "The day you land", line: "Your hotel address, ready for the driver." },
+  { Icon: Compass, when: "Every day", line: "Menus, routes, taxis, paying and talking." },
+  { Icon: PlaneTakeoff, when: "Leaving", line: "Airport on time, tax refund back." },
+];
 
-/**
- * Ticket alarms: releases the traveller set an alarm for (next 48 h), then sights in their trip
- * cities that need a reservation and have no alarm yet.
- */
-function Alarms({ suggest }: { suggest: boolean }) {
-  const t = useT();
-  const [p] = useProfile();
-  const [list, setList] = useState<Reminder[]>([]);
-  const [open, setOpen] = useState<Reservation | null>(null);
-  useEffect(() => setList(upcomingReminders()), [open]);
-  const cities = p.cities.map((c) => c.a);
-  const ideas = suggest ? RESERVATIONS.filter((r) => cities.includes(r.city) && !list.some((x) => x.id === r.id)) : [];
-  if (!list.length && !ideas.length) return null;
-  return (
-    <Section title={t.resv.reminders}>
-      <Group>
-        {list.map((r) => {
-          const s = RESERVATIONS.find((x) => x.id === r.id);
-          const when = new Date(r.at).toLocaleString(p.lang, { weekday: "short", hour: "2-digit", minute: "2-digit" });
-          return s && (
-            <Row key={r.id + r.visit} href={s.url ?? s.guide} external icon={<IconTile><CalendarClock className="h-5 w-5" aria-hidden /></IconTile>}
-              title={s.en} sub={fmt(t.resv.reminderLine, { date: fmtDay(r.visit, p.lang, "long"), when })} />
-          );
-        })}
-        {ideas.map((r) => (
-          <Row key={r.id} onClick={() => setOpen(r)} icon={<IconTile><Ticket className="h-5 w-5" aria-hidden /></IconTile>}
-            title={r.en} sub={releaseRule(t, r)} after={<span className="text-subhead font-semibold text-cobalt">{t.resv.alarm}</span>} chevron={false} />
-        ))}
-      </Group>
-      {open && <ReservationSheet r={open} open onClose={() => setOpen(null)} />}
-    </Section>
-  );
-}
+const TRUST = [
+  { Icon: UserX, text: "No account" },
+  { Icon: Smartphone, text: "Your trip stays on your phone" },
+  { Icon: BadgeX, text: "No ads" },
+];
 
-// ---- before the trip ---------------------------------------------------------------------
+const FAQ = [
+  { q: "Is HaodeGo free?", a: "You can start for free: open haodego.com/app in your phone’s browser, with no account to create. The allergy check, allergy card and emergency help are always free." },
+  { q: "Is there an iPhone app?", a: "Yes, HaodeGo is on the App Store. Where it isn’t offered yet (the EU and mainland China), open haodego.com/app in Safari and add it to your Home Screen." },
+  { q: "Does it work without internet?", a: "No. Reading menus, maps and translation need a connection, so set up a travel eSIM or a local SIM card first." },
+  { q: "Can I rely on the allergy check?", a: "Use it as a guide, not a guarantee. Ingredients are inferred from common recipes, and a severe allergy never gets a green answer. Always show your allergy card and confirm with staff." },
+];
 
-/** One row per destination city with its comfort-tier pick: the highest-earning spot in the app. */
-function CityHotelRow({ c }: { c: { a: string; e: string; s: string } }) {
-  const t = useT();
-  const price = usePrice();
-  const { data } = useHotelPicks(c.a, c.s);
-  const pick = data?.tiers.comfort[0] ?? data?.tiers.economy[0];
-  return (
-    <Row href={`/stay?${new URLSearchParams({ city: c.a, name: c.s, en: c.e })}`}
-      icon={<IconTile><BedDouble className="h-5 w-5" aria-hidden /></IconTile>}
-      title={fmt(t.today.hotelsFor, { city: c.e })}
-      sub={pick ? <><span className="zh">{pick.name}</span>{pick.cny ? <> · {price(pick.cny)}</> : null}</> : t.prepare.hotelsBody} />
-  );
-}
-
-function CityHotels() {
-  const t = useT();
-  const [p] = useProfile();
-  return (
-    <Group>
-      {p.cities.map((c) => <CityHotelRow key={c.a} c={c} />)}
-      {p.cities.length === 0 && <Row href="/settings#cities" icon={<IconTile><BedDouble className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.addCities} sub={t.today.addCitiesSub} />}
-    </Group>
-  );
-}
-
-/** What used to be the Pay, Mobile data and Before-you-go pages, as one expandable checklist. */
-const PREP = [
-  { key: "pay", Icon: Wallet, Body: PaySetup },
-  { key: "data", Icon: Smartphone, Body: EsimPicker },
-  { key: "book", Icon: Ticket, Body: TrainBooking },
-  { key: "good", Icon: Lightbulb, Body: GoodToKnow },
-  { key: "airport", Icon: PlaneLanding, Body: AirportPrep },
-] as const;
-
-/** In the iOS app the list is things to get done, not apps to install (App Review 3.2.2(i), D19). */
-const PREP_IN_APP = [
-  PREP[0], PREP[1],
-  { key: "around", Icon: CarTaxiFront, Body: GettingAround },
-  PREP[2], PREP[4], PREP[3],
-] as const;
-
-/** Taxis and maps, in words only: app names without icons or store links. */
-function GettingAround() {
-  const t = useT();
-  return (
-    <div className="space-y-3">
-      <p className="text-subhead">{t.inapp.aroundBody}</p>
-      <Note>{t.inapp.aroundNote}</Note>
-    </div>
-  );
-}
-
-/** Readable before the trip: the arrival-day guide (app/airport). */
-function AirportPrep() {
-  const t = useT();
-  return (
-    <div className="space-y-3">
-      <p className="text-subhead">{t.today.airportPrepBody}</p>
-      <Button variant="soft" href="/airport" className="w-full text-subhead!">{t.today.fromAirportOpen}</Button>
-    </div>
-  );
-}
-
-function Checklist() {
-  const t = useT();
-  const app = useInApp();
-  const items = app ? PREP_IN_APP : PREP;
-  const title = (key: (typeof PREP_IN_APP)[number]["key"]) => (app && key in t.inapp.prep ? t.inapp.prep[key as keyof typeof t.inapp.prep] : t.today.prep[key as keyof typeof t.today.prep]);
-  const [done, setDone] = useState<string[]>([]);
-  const [open, setOpen] = useState<string | null>(null);
-  const [expanded, setExpanded] = useState(false);
-  useEffect(() => {
-    try { setDone(JSON.parse(localStorage.getItem("ctg.prep") ?? "[]")); } catch {}
-    const h = location.hash.slice(1);
-    if (PREP_IN_APP.some((x) => x.key === h)) { setExpanded(true); setOpen(h); setTimeout(() => document.getElementById(h)?.scrollIntoView({ block: "start" }), 50); }
-  }, []);
-  const tick = (k: string) => {
-    const n = done.includes(k) ? done.filter((x) => x !== k) : [...done, k];
-    setDone(n);
-    try { localStorage.setItem("ctg.prep", JSON.stringify(n)); } catch {}
+export default function WelcomePage() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        name: "HaodeGo",
+        alternateName: "HaodeGo: China Travel Buddy",
+        url: SITE_URL,
+        applicationCategory: "TravelApplication",
+        operatingSystem: "Any (web browser)",
+        offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+        description,
+      },
+      {
+        "@type": "FAQPage",
+        mainEntity: FAQ.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+      },
+    ],
   };
-  const count = items.filter((x) => done.includes(x.key)).length;
-  // Before mount `app` is still false: the collapsed row shows both versions and CSS picks one,
-  // so the iOS app never flashes the website's "0 of 5".
-  const both = (f: (list: readonly { key: string }[]) => React.ReactNode) => (
-    <><span className="web-only">{f(PREP)}</span><span className="app-only">{f(PREP_IN_APP)}</span></>
-  );
-  const readyTitle = both((list) => fmt(t.today.getReady, { done: list.filter((x) => done.includes(x.key)).length, total: list.length }));
-  // Collapsed to one row until opened: the prep list matters, but less than visa and hotels.
-  if (!expanded) {
-    return (
-      <Section>
-        <Group>
-          <Row onClick={() => setExpanded(true)} icon={<IconTile><ListChecks className="h-5 w-5" aria-hidden /></IconTile>}
-            title={readyTitle} sub={<><span className="web-only">{t.today.getReadySub}</span><span className="app-only">{t.inapp.getReadySub}</span></>} />
-        </Group>
-      </Section>
-    );
-  }
   return (
-    <Section title={fmt(t.today.getReady, { done: count, total: items.length })}>
-      <ul className="divide-y divide-line overflow-hidden rounded-card border border-line bg-card">
-        {items.map(({ key, Icon, Body }) => {
-          const isOpen = open === key, isDone = done.includes(key);
-          return (
-            <li key={key} id={key} className="scroll-mt-4">
-              <div className="flex min-h-14 items-center gap-3 pl-4">
-                <button onClick={() => tick(key)} aria-pressed={isDone} aria-label={title(key)}
-                  className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border-2 ${isDone ? "border-cobalt bg-cobalt text-white dark:text-porcelain" : "border-line"}`}>
-                  {isDone && <Check className="h-4 w-4" strokeWidth={3} />}
-                </button>
-                <button onClick={() => setOpen(isOpen ? null : key)} aria-expanded={isOpen} className="flex flex-1 items-center gap-3 py-3 pr-4 text-left">
-                  <Icon className="h-5 w-5 shrink-0 text-cobalt" aria-hidden />
-                  <span className={`flex-1 text-body ${isDone ? "text-muted line-through" : ""}`}>{title(key)}</span>
-                  <ChevronDown className={`h-5 w-5 shrink-0 text-muted transition-transform ${isOpen ? "rotate-180" : ""}`} aria-hidden />
-                </button>
-              </div>
-              {isOpen && <div className="px-4 pt-1 pb-4"><Body /></div>}
-            </li>
-          );
-        })}
-      </ul>
-    </Section>
-  );
-}
+    <SiteFrame>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-function BeforeTrip() {
-  const t = useT();
-  const [p] = useProfile();
-  const days = p.arrival ? daysBetween(todayIso(), p.arrival) : null;
-  return (
-    <>
-      <Section>
-        <VisaCheck />
-        {/* Only the official site: fake ones charge a fee for this free form. */}
-        <Group>
-          <Row href={ARRIVAL_CARD_URL} external icon={<IconTile><ClipboardList className="h-5 w-5" aria-hidden /></IconTile>}
-            title={t.prepare.arrivalCardTitle} sub={t.prepare.arrivalCardSub} />
-        </Group>
-        <p className="px-1 text-footnote text-muted">{t.prepare.arrivalCardLater}</p>
-      </Section>
-      <TripAlerts section />
-      <Section title={days === null || days < 0 ? undefined : fmt(t.today.arrivingIn, { n: days })}>
-        {(days === null || days < 0) && (
-          <Group>
-            <Row href="/settings#dates" icon={<IconTile><Plane className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.addArrival} />
-          </Group>
-        )}
-        <CityHotels />
-      </Section>
-      <Alarms suggest />
-      {/* Shown from the start, so travellers know it's here before they shop (Veer, 2026-11-03). */}
-      <Section>
-        <Group>
-          <Row href="/tax-refund" icon={<IconTile><Receipt className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.taxRow} sub={t.today.taxRowSub} />
-        </Group>
-      </Section>
-      {/* Not folded (SPEC v0.5 P1.5): knowing which Chinese app to install is the point. */}
-      <Section title={t.today.appsTitle} className="web-only">
-        <div className="rounded-card border border-line bg-card px-4"><AppList /></div>
-        <AppSetupNote />
-      </Section>
-      <Checklist />
-    </>
-  );
-}
-
-// ---- in China ----------------------------------------------------------------------------
-
-/** After the arrival date: one tap to confirm the entry date instead of typing it. */
-function EntryConfirm() {
-  const t = useT();
-  const [p, set] = useProfile();
-  if (!p.arrival || p.entryDate || p.arrival > todayIso()) return null;
-  return (
-    <Card>
-      <p className="flex items-center gap-2 text-headline"><LogIn className="h-5 w-5 shrink-0 text-cobalt" aria-hidden />{fmt(t.today.entryConfirm, { date: fmtDay(p.arrival, p.lang, "long") })}</p>
-      <div className="mt-3 grid grid-cols-2 gap-2">
-        <Button onClick={() => set({ entryDate: p.arrival })} className="text-subhead!"><Check className="h-5 w-5" aria-hidden />{t.today.entryYes}</Button>
-        <Button variant="soft" href="/settings#entry" className="text-subhead!">{t.today.entryOther}</Button>
-      </div>
-    </Card>
-  );
-}
-
-/** Arrival day: the airport-to-hotel guide, right under the entry-date question. */
-function FromAirport() {
-  const t = useT();
-  const [p] = useProfile();
-  const today = todayIso();
-  if (p.arrival !== today && p.entryDate !== today) return null;
-  return (
-    <Card>
-      <h3 className="flex items-center gap-2 text-headline"><PlaneLanding className="h-5 w-5 shrink-0 text-cobalt" aria-hidden />{t.today.fromAirportTitle}</h3>
-      <p className="mt-1 text-subhead">{t.today.fromAirportBody}</p>
-      <Button href="/airport" className="mt-3 w-full text-subhead!">{t.today.fromAirportOpen}</Button>
-    </Card>
-  );
-}
-
-function StayCard() {
-  const t = useT();
-  const [p] = useProfile();
-  // Counts down to the earlier of the planned departure and the latest legal exit day.
-  const s = stayWindow(p);
-  if (!s?.entered) return null;
-  const download = () => {
-    const blob = new Blob([stayReminderIcs(s.lastDay, t.stay.reminderTitle, t.stay.reminderBody)], { type: "text/calendar" });
-    const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: "leave-china-reminder.ics" });
-    a.click();
-  };
-  const urgent = s.overdue || s.daysLeft <= 3;
-  return (
-    <Card tone={s.overdue ? "danger" : "plain"}>
-      <div className="flex items-start justify-between gap-3">
-        <p className="text-footnote text-muted">{fmt(t.stay.dayOf, { day: Math.max(1, s.dayOfStay), total: s.allowed })}</p>
-        <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-footnote font-semibold whitespace-nowrap tabular-nums ${urgent ? "bg-danger-soft text-danger" : "bg-porcelain text-ink"}`}>
-          {s.overdue ? "!" : s.daysLeft === 0 ? t.stay.lastDay : fmt(t.stay.daysLeft, { n: s.daysLeft })}
-        </span>
-      </div>
-      <p className="text-title">{fmt(t.stay.leaveBy, { date: fmtDay(s.lastDay, p.lang) })}</p>
-      {s.overdue && <p className="mt-2 text-subhead text-danger">{fmt(t.stay.overdue, { n: -s.daysLeft })}</p>}
-      <div className="mt-3"><StayWarning policy={false} /></div>
-      <div className="mt-3 flex gap-2">
-        <Button variant="soft" onClick={download} className="flex-1 text-subhead!"><CalendarPlus className="h-4 w-4" aria-hidden />{t.stay.reminder}</Button>
-        <Button variant="ghost" href="/settings#entry" className="text-subhead!">{t.common.edit}</Button>
-      </div>
-      <p className="mt-2 text-footnote text-muted">{t.stay.checkStamp}</p>
-    </Card>
-  );
-}
-
-function CityLine() {
-  const t = useT();
-  const { city, setCity, detect, detected } = useCity();
-  const [wx, setWx] = useState<Weather | null>(null);
-  useEffect(() => {
-    setWx(null);
-    fetch(`/api/weather?adcode=${city.a}`).then((r) => r.json()).then((d) => d.casts && setWx(d)).catch(() => {});
-  }, [city.a]);
-  // If location access was already granted, find the city without asking.
-  useEffect(() => {
-    if (detected) return;
-    locationAllowed().then((ok) => { if (ok) detect().catch(() => {}); });
-  }, [detected, detect]);
-  const today = wx?.casts?.[0];
-  return (
-    <div className="flex items-center gap-1 px-1 text-subhead text-muted">
-      {t.city.youreIn} <CityPicker compact value={city} onChange={setCity} onLocate={detect} />
-      {today && <span className="ml-auto flex items-center gap-1.5 tabular-nums"><WeatherIcon zh={today.dayweather} />{today.nighttemp}–{today.daytemp}°</span>}
-    </div>
-  );
-}
-
-/** Tier 1 — the primary action in China: scan a menu, with the allergy check it will apply. */
-function MenuHero() {
-  const t = useT();
-  const [p] = useProfile();
-  const checks = [
-    ...p.allergens.map((a) => `${t.allergens[a as keyof typeof t.allergens]}${p.severe.includes(a) ? ` (${t.settings.severeShort})` : ""}`),
-    ...p.diets.map((d) => t.diets[d as keyof typeof t.diets]),
-  ];
-  return (
-    <Link href="/menu" className="block rounded-card bg-cobalt p-card text-white dark:text-porcelain">
-      <span className="flex items-center gap-3">
-        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-control bg-white/20"><Camera className="h-6 w-6" aria-hidden /></span>
-        <span className="min-w-0 flex-1 text-title">{t.today.tileMenu}</span>
-        <ChevronRight className="h-5 w-5 shrink-0 opacity-80" aria-hidden />
-      </span>
-      <span className="mt-3 flex items-start gap-1.5 border-t border-white/20 pt-3 text-footnote opacity-95">
-        <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-        <span className="min-w-0">{checks.length ? <>{t.eat.checkingFor} {checks.join(", ")}</> : t.eat.addRestrictions}</span>
-      </span>
-    </Link>
-  );
-}
-
-/** Tier 2 — a quick action: icon, title, one line of context. */
-function Tile({ icon, title, sub, onClick, href, apps, className = "" }: {
-  icon: React.ReactNode; title: string; sub?: React.ReactNode; onClick?: () => void; href?: string; className?: string;
-  /** Brand icons of the Chinese apps this moment uses — the only colour besides allergy colours. */
-  apps?: AppId[];
-}) {
-  const cls = `flex min-h-[108px] flex-col items-start gap-1.5 rounded-card border border-line bg-card p-3.5 text-left ${className}`;
-  const body = (
-    <>
-      <span className="flex w-full items-center justify-between">
-        <span className="grid h-9 w-9 place-items-center rounded-[10px] bg-cobalt-soft text-cobalt">{icon}</span>
-        {apps && <span className="web-only flex -space-x-1.5">{apps.map((a) => <AppIcon key={a} id={a} size={22} />)}</span>}
-      </span>
-      <span className="text-headline">{title}</span>
-      {sub && <span className="line-clamp-2 text-footnote text-muted">{sub}</span>}
-    </>
-  );
-  return href ? <Link href={href} className={cls}>{body}</Link> : <button onClick={onClick} className={cls}>{body}</button>;
-}
-
-/** Pay, compressed to one row: Alipay's pay code and WeChat Pay one tap each; the converter is an icon. */
-function PayStrip({ onConvert }: { onConvert: () => void }) {
-  const t = useT();
-  const btn = "flex min-h-control min-w-0 items-center gap-2 rounded-control border border-line bg-card px-2.5 text-left text-subhead font-semibold";
-  const [guide, setGuide] = useState(false);
-  return (
-    <div className="grid grid-cols-[1fr_1fr_auto] gap-2" role="group" aria-label={t.today.tilePay}>
-      <button className={btn} onClick={() => openApp("alipay", PAY_LINKS.alipayPay)} aria-label={t.pay.openAlipay}>
-        <AppIcon id="alipay" size={26} /><span className="min-w-0 flex-1 truncate">Alipay</span><QrCode className="h-4 w-4 shrink-0 text-cobalt" aria-hidden />
-      </button>
-      <button className={btn} onClick={() => setGuide(true)} aria-label={t.pay.openWechat}>
-        <AppIcon id="wechat" size={26} /><span className="min-w-0 flex-1 truncate">WeChat</span><QrCode className="h-4 w-4 shrink-0 text-cobalt" aria-hidden />
-      </button>
-      <button onClick={onConvert} aria-label={t.today.priceCheck} className="grid min-h-control w-control place-items-center rounded-control border border-line bg-card text-cobalt">
-        <Calculator className="h-5 w-5" aria-hidden />
-      </button>
-      {guide && <WechatGuide onClose={() => setGuide(false)} />}
-    </div>
-  );
-}
-
-const CHINA_APPS: AppId[] = ["alipay", "wechat", "amap", "didi", "tripcom", "rail12306"];
-
-/** "Your China apps": one tap opens each app, or its store page if it isn't installed. */
-function ChinaApps() {
-  const t = useT();
-  return (
-    <div className="rounded-card border border-line bg-card px-2 pt-3 pb-1">
-      <p className="px-2 text-footnote font-semibold text-muted">{t.today.chinaApps}</p>
-      <div className="mt-1 grid grid-cols-6 gap-0.5">
-        {CHINA_APPS.map((a) => (
-          <button key={a} onClick={() => openApp(a)} className="flex min-h-[68px] min-w-0 flex-col items-center justify-center gap-1 rounded-control">
-            <AppIcon id={a} size={40} />
-            <span className="w-full truncate text-center text-footnote text-muted">{APPS[a].name.replace("Railway ", "")}</span>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/**
- * First screen in China (v0.6), in three tiers: the primary action (scan a menu, in InChina),
- * quick actions (driver · today · a one-row pay strip), then travel essentials (stay countdown,
- * emergency help, the Chinese apps).
- */
-function Moments({ leaving = false }: { leaving?: boolean }) {
-  const t = useT();
-  const router = useRouter();
-  const [p] = useProfile();
-  const { city } = useCity();
-  const [sheet, setSheet] = useState<"driver" | "pay" | "today" | "stay" | null>(null);
-  const [alarms, setAlarms] = useState<Reminder[]>([]);
-  useEffect(() => setAlarms(upcomingReminders()), [sheet]);
-  const next = alarms[0] && RESERVATIONS.find((r) => r.id === alarms[0].id);
-  const nextWhen = alarms[0] && new Date(alarms[0].at).toLocaleTimeString(p.lang, { hour: "2-digit", minute: "2-digit" });
-  const w = stayWindow(p);
-  const s = w?.entered ? w : null;
-
-  return (
-    <>
-      <Section title={t.today.quickActions}>
-        <div className="grid grid-cols-2 gap-stack">
-          <Tile onClick={() => setSheet("driver")} icon={<CarTaxiFront className="h-5 w-5" aria-hidden />} title={t.today.tileDriver} apps={["didi", "amap"]}
-            // How to add a hotel is explained in the sheet, not on the tile.
-            sub={p.hotel && <span className="zh">{p.hotel.name}</span>} />
-          <Tile onClick={() => (alarms.length ? setSheet("today") : router.push("/explore"))} icon={<CalendarClock className="h-5 w-5" aria-hidden />}
-            title={t.today.tileToday} sub={next ? fmt(t.today.tileTodayAlarm, { name: next.en, when: nextWhen! }) : fmt(t.today.tileTodaySub, { city: city.e })} />
-          {/* In the iOS app the pay buttons live on our own Pay page, not on the home screen (D19). */}
-          <Tile className="app-only" href="/pay-codes" icon={<Wallet className="h-5 w-5" aria-hidden />} title={t.inapp.tilePay} sub={t.inapp.tilePaySub} />
-          <Tile className="app-only" onClick={() => setSheet("pay")} icon={<Calculator className="h-5 w-5" aria-hidden />} title={t.today.priceCheck} sub={`¥ → ${p.homeCurrency}`} />
+      {/* Hero: one promise, one button, the app itself moving through the trip */}
+      <section className="relative overflow-hidden">
+        <div aria-hidden className="site-glow pointer-events-none absolute inset-x-0 top-0 h-[560px]" />
+        <div className="relative mx-auto grid max-w-5xl items-center gap-10 px-gutter pt-10 pb-6 md:grid-cols-[1.1fr_1fr] md:pt-20 md:pb-16">
+          <div className="site-rise">
+            <h1 className="text-large-title text-balance md:text-hero">Everything you need in China, in one app.</h1>
+            <p className="mt-4 text-body text-muted text-pretty md:text-title md:font-normal">One calm place for the whole trip. Clear answers, no hunting around.</p>
+            <div className="mt-8"><OpenAppCta where="hero" /></div>
+          </div>
+          <div className="site-rise relative mx-auto h-[500px] w-full max-w-[380px] md:h-[600px]" style={{ animationDelay: "150ms" }}>
+            <div className="site-phone absolute left-1/2 top-0 h-[480px] w-[222px] -translate-x-1/2 overflow-hidden rounded-[36px] border-[7px] border-ink bg-card shadow-float md:h-[574px] md:w-[264px]">
+              {SCREENS.map((s, i) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img key={s.src} src={s.src} alt={s.alt} width={660} height={1434} loading={i === 0 ? "eager" : "lazy"}
+                  fetchPriority={i === 0 ? "high" : undefined}
+                  className="site-screen absolute inset-0 h-full w-full object-cover object-top" style={{ animationDelay: `${i * 3 - 0.6}s` }} />
+              ))}
+            </div>
+            {CHIPS.map((c, i) => (
+              <span key={c.label} className={`site-chip absolute ${c.pos} rounded-full border border-line bg-card px-3 py-2 text-footnote font-semibold shadow-bar md:text-subhead`}
+                style={{ animationDelay: `${i * 0.8}s` }}>
+                {c.label}
+              </span>
+            ))}
+          </div>
         </div>
-        <div className="web-only"><PayStrip onConvert={() => setSheet("pay")} /></div>
-      </Section>
+      </section>
 
-      <Section title={t.today.essentials}>
-        <StayWarning policy={false} />
-        <Group>
-          {s ? (
-            <Row onClick={() => setSheet("stay")} icon={<IconTile><CalendarClock className="h-5 w-5" aria-hidden /></IconTile>}
-              title={fmt(t.stay.leaveBy, { date: fmtDay(s.lastDay, p.lang) })}
-              sub={`${fmt(t.stay.dayOf, { day: Math.max(1, s.dayOfStay), total: s.allowed })} · ${s.overdue ? fmt(t.stay.overdue, { n: -daysBetween(s.legal, todayIso()) }) : fmt(t.stay.daysLeft, { n: s.daysLeft })}`}
-              // Only a red badge when it's urgent; otherwise the count sits in the subtitle.
-              after={s.overdue || s.daysLeft <= 3 ? <span className="shrink-0 rounded-full bg-danger-soft px-2.5 py-0.5 text-footnote font-semibold text-danger tabular-nums">{s.overdue ? "!" : s.daysLeft}</span> : undefined} />
-          ) : (
-            <Row href="/settings#entry" icon={<IconTile><CalendarClock className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.stayTrack} sub={t.today.stayTrackSub} />
-          )}
-          {/* Leaving: the tax refund card is already on the first screen. */}
-          {!leaving && <Row href="/tax-refund" icon={<IconTile><Receipt className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.taxRow} sub={t.today.taxRowSub} />}
-          <Row href="/sos" icon={<IconTile tone="danger"><Siren className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.help} sub={t.today.helpSub} />
-        </Group>
-        <div className="web-only"><ChinaApps /></div>
-      </Section>
+      {/* The signature moment: a card the driver can read */}
+      <section className="mx-auto mt-section max-w-5xl px-gutter md:mt-20">
+        <div className="site-reveal grid items-center gap-8 overflow-hidden rounded-[28px] bg-cobalt p-6 text-white md:grid-cols-2 md:p-12">
+          <div>
+            <h2 className="text-large-title">Show this. They’ll understand.</h2>
+            <p className="mt-3 text-body text-white/80">Large Chinese cards for drivers, waiters and shop staff, with your language underneath.</p>
+          </div>
+          <div className="site-card rounded-card bg-card p-6 text-ink shadow-float">
+            <p lang="zh-CN" className="zh text-title text-muted">师傅您好，请带我去：</p>
+            <p lang="zh-CN" className="zh mt-1 text-display-zh">豫园</p>
+            <p lang="zh-CN" className="zh mt-2 text-headline">地址：上海市黄浦区福佑路168号</p>
+            <p className="mt-4 border-t border-line pt-3 text-subhead text-muted">Hello driver, please take me to: Yu Garden</p>
+          </div>
+        </div>
+      </section>
 
-      <EditSheet open={sheet === "driver"} title={t.today.tileDriver} onClose={() => setSheet(null)}>
-        <DriverPanel />
-      </EditSheet>
-      <EditSheet open={sheet === "pay"} title={t.today.priceCheck} onClose={() => setSheet(null)}>
-        <Card><PriceCheck /></Card>
-        <div className="web-only"><PayButtons /></div>
-      </EditSheet>
-      <EditSheet open={sheet === "today"} title={t.today.tileToday} onClose={() => setSheet(null)}>
-        <Alarms suggest={false} />
-        <Button variant="soft" href="/explore" className="w-full">{fmt(t.today.tileTodaySub, { city: city.e })}</Button>
-      </EditSheet>
-      <EditSheet open={sheet === "stay"} title={t.stay.trip} onClose={() => setSheet(null)}>
-        <StayCard />
-      </EditSheet>
-    </>
-  );
-}
+      {/* The trip in four steps */}
+      <section className="mx-auto mt-section max-w-5xl px-gutter md:mt-20">
+        <h2 className="site-reveal text-large-title text-balance">From planning to flying home</h2>
+        <ol className="mt-8 grid grid-cols-2 gap-stack lg:grid-cols-4">
+          {STEPS.map(({ Icon, when, line }) => (
+            <li key={when} className="site-reveal rounded-card border border-line bg-card p-card">
+              <span className="grid h-12 w-12 place-items-center rounded-control bg-cobalt-soft text-cobalt"><Icon className="h-6 w-6" aria-hidden /></span>
+              <h3 className="mt-4 text-headline">{when}</h3>
+              <p className="mt-1 text-subhead text-muted text-pretty">{line}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
 
-/** In China, including arrival day (EntryConfirm only shows until the entry date is set). */
-function InChina() {
-  return (
-    <>
-      <Section>
-        <CityLine />
-        <EntryConfirm />
-        <FromAirport />
-        <MenuHero />
-        <TripAlerts />
-      </Section>
-      <Moments />
-    </>
-  );
-}
+      {/* Real screens, drifting past */}
+      <section className="mt-section overflow-hidden md:mt-20" aria-label="Screens from the app">
+        <ul className="site-marquee flex w-max gap-stack py-2">
+          {[...SCREENS, ...SCREENS].map((s, i) => (
+            <li key={i} aria-hidden={i >= SCREENS.length || undefined} className="w-[180px] shrink-0 md:w-[220px]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={s.src} alt={i < SCREENS.length ? s.alt : ""} width={660} height={1434} loading="lazy" className="w-full rounded-[22px] border border-line" />
+            </li>
+          ))}
+        </ul>
+      </section>
 
-/** The last days: what's left to do first (airport, tax refund), then the usual in-China screen. */
-function Leaving() {
-  const t = useT();
-  const [p] = useProfile();
-  return (
-    <>
-      <Section>
-        <CityLine />
-        {/* A short stay (transit) can be "leaving" on the day they land. */}
-        <FromAirport />
-        <Card>
-          <h3 className="flex items-center gap-2 text-headline"><PlaneTakeoff className="h-5 w-5 shrink-0 text-cobalt" aria-hidden />{t.today.airportTitle}</h3>
-          <p className="mt-1 text-subhead">{p.departure ? fmt(t.today.airportBody, { date: fmtDay(p.departure, p.lang, "long") }) : t.today.airportBodyNoDate}</p>
-          <Button variant="soft" href="/airport?dir=out" className="mt-3 w-full text-subhead!">{t.today.airportFind}</Button>
-        </Card>
-        <Card>
-          <h3 className="flex items-center gap-2 text-headline"><Receipt className="h-5 w-5 shrink-0 text-cobalt" aria-hidden />{t.today.taxTitle}</h3>
-          <p className="mt-1 text-subhead">{t.today.taxBody}</p>
-          <Button variant="soft" href="/tax-refund" className="mt-3 w-full text-subhead!">{t.today.taxOpen}</Button>
-        </Card>
-        <MenuHero />
-        <TripAlerts />
-      </Section>
-      <Moments leaving />
-    </>
-  );
-}
+      {/* Trust, in one row */}
+      <section className="mx-auto mt-section max-w-5xl px-gutter md:mt-16">
+        <ul className="site-reveal flex flex-wrap justify-center gap-x-8 gap-y-3 text-headline">
+          {TRUST.map(({ Icon, text }) => (
+            <li key={text} className="flex items-center gap-2"><Icon className="h-5 w-5 text-cobalt" aria-hidden />{text}</li>
+          ))}
+        </ul>
+      </section>
 
-export default function Home() {
-  const t = useT();
-  const [profile, set, loaded] = useProfile();
-  const [demo, setDemo] = useState<{ demoAi: boolean; demoMaps: boolean } | null>(null);
-  useEffect(() => { fetch("/api/status").then((r) => r.json()).then(setDemo).catch(() => {}); }, []);
+      {/* FAQ */}
+      <section className="mx-auto mt-section max-w-3xl px-gutter md:mt-20">
+        <h2 className="text-title">Questions</h2>
+        <div className="mt-4 divide-y divide-line rounded-card border border-line bg-card">
+          {FAQ.map((f) => (
+            <details key={f.q} className="group px-4">
+              <summary className="flex min-h-control cursor-pointer list-none items-center justify-between gap-3 py-3 text-headline [&::-webkit-details-marker]:hidden">
+                {f.q}<span aria-hidden className="text-muted transition-transform group-open:rotate-45">+</span>
+              </summary>
+              <p className="pb-4 text-body text-muted text-pretty">{f.a}</p>
+            </details>
+          ))}
+        </div>
+        <p className="mt-4 text-subhead text-muted">
+          More answers in the guides:{" "}
+          {GUIDES.map((g, i) => (
+            <span key={g.href}>{i > 0 && " · "}<Link href={g.href} className="font-semibold text-cobalt">{g.title.split(":")[0]}</Link></span>
+          ))}
+        </p>
+      </section>
 
-  // If location access was already granted and it shows the traveller in China, remember that:
-  // it moves Today to the in-China cards even without dates.
-  useEffect(() => {
-    if (!loaded || profile.locatedInChina) return;
-    (async () => {
-      if (!(await locationAllowed())) return;
-      const { longitude: lng, latitude: lat } = await currentPosition({ maxAgeMs: 600000 });
-      if (lng < 73 || lng > 135 || lat < 18 || lat > 54) return; // rough box first; Amap has the final say
-      const r = await fetch(`/api/regeo?lng=${lng}&lat=${lat}`).catch(() => null);
-      const d = r?.ok ? await r.json() : null;
-      if (typeof d?.adcode === "string" && d.adcode) set({ locatedInChina: true });
-    })().catch(() => {});
-  }, [loaded, profile.locatedInChina, set]);
-
-  const phase = tripPhase(profile);
-  return (
-    <Screen title={t.today.greeting}>
-      <DemoNote show={Boolean(demo?.demoAi || demo?.demoMaps)} what={[demo?.demoAi && t.common.aiKey, demo?.demoMaps && t.common.mapKey].filter(Boolean).join(" + ")} />
-      {loaded && (
-        phase === "before" ? <BeforeTrip />
-        : phase === "leaving" ? <Leaving />
-        : <InChina />
-      )}
-      {loaded && phase === "before" && (
-        <Section>
-          <Group>
-            <Row href="/sos" icon={<IconTile tone="danger"><Siren className="h-5 w-5" aria-hidden /></IconTile>} title={t.today.help} sub={t.today.helpSub} />
-          </Group>
-        </Section>
-      )}
-    </Screen>
+      {/* Closing call to action */}
+      <section className="mx-auto mt-section max-w-5xl px-gutter md:mt-20">
+        <div className="site-reveal rounded-[28px] bg-ink p-8 text-center text-porcelain md:p-14">
+          <h2 className="text-large-title text-balance">Start planning now. It’s in your pocket when you land.</h2>
+          <a href="/app" data-cta="closing" className="mt-8 inline-flex min-h-control items-center justify-center rounded-control bg-card px-8 text-headline text-ink">Open HaodeGo</a>
+          <p className="mt-3 text-subhead opacity-70">Free to start · no account</p>
+        </div>
+      </section>
+    </SiteFrame>
   );
 }

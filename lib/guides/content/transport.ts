@@ -5,7 +5,7 @@ import type { TopicContent } from "../types";
 // `note` says why. Gaps the research couldn't source: see the workspace inbox note.
 export const transport: TopicContent = {
   "checked": "2026-11-11",
-  "appPath": "/driver",
+  "appPath": "/app/driver",
   "sources": {
     "s1": {
       "title": "Beijing Subway Supports Tap-and-Go with 5 Most Used Overseas Cards",

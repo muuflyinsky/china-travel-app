@@ -20,4 +20,4 @@ export function pageMeta(path: string, title: string, description: string, opts:
 }
 
 /** Public app pages, for the sitemap. Settings and the old redirect paths are left out. */
-export const PUBLIC_PAGES = ["/", "/explore", "/menu", "/stay", "/talk", "/driver", "/airport", "/sos", "/tax-refund", "/support", "/privacy"] as const;
+export const PUBLIC_PAGES = ["/app", "/app/explore", "/app/menu", "/app/stay", "/app/talk", "/app/driver", "/app/airport", "/app/sos", "/app/tax-refund", "/support", "/privacy"] as const;

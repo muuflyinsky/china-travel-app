@@ -199,7 +199,7 @@ export function CityGuide({ adcode, cityEn, initialTab = "see", tab: controlled,
         {fmt(t.guide.topTrip, { city: cityEn })}<ExternalLink className="h-3.5 w-3.5" aria-hidden />
       </a>
       {taxCity(adcode) && (
-        <Group><Row href="/tax-refund" icon={<IconTile><Receipt className="h-5 w-5" aria-hidden /></IconTile>} title={fmt(t.guide.taxRow, { city: cityEn })} /></Group>
+        <Group><Row href="/app/tax-refund" icon={<IconTile><Receipt className="h-5 w-5" aria-hidden /></IconTile>} title={fmt(t.guide.taxRow, { city: cityEn })} /></Group>
       )}
       {/* Map data alone is sourced; anything with model-written text says so. */}
       {/* A city with a reviewed must-see list says who chose what (only on the See tab: dishes are still automatic). */}
