@@ -3,9 +3,11 @@
 <!--
   The app's own privacy manifest. Capacitor and Cordova ship their own for the APIs they use.
   Collected data matches the App Privacy label in native/app-store.md (keep the two in step).
-  Required-reason APIs: none in this target. PassesPlugin and ReviewPlugin use StoreKit only;
-  the 90-day rating limit is kept in the web app's localStorage, not UserDefaults. If native code
-  starts using UserDefaults, file timestamps, boot time or disk space, declare it here.
+  Required-reason APIs: UserDefaults (CA92.1, read and written only by this app), used by
+  @capacitor/preferences, which ships no privacy manifest of its own: the offline page's
+  "back to my hotel" card (lib/offline-hotel.ts → native/www/offline.html). PassesPlugin and
+  ReviewPlugin use StoreKit only. If native code starts using file timestamps, boot time or disk
+  space, declare it here too.
 -->
 <plist version="1.0">
 <dict>
@@ -101,6 +103,15 @@
 		</dict>
 	</array>
 	<key>NSPrivacyAccessedAPITypes</key>
-	<array/>
+	<array>
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>CA92.1</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>
