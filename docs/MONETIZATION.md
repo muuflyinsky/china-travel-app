@@ -104,8 +104,9 @@ Events before 2026-11-01 have a per-tab id, not a daily one; leave them out.
 ## Launch period (DECISIONS D21, 2026-11-20)
 
 1.1 ships with passes on sale, but everything stays free for a launch period first.
-- `PROMO_ENDS=YYYY-MM-DD` in Vercel (Production): the last free day, Beijing time, inclusive. Set it together
-  with `QUOTA=on` and redeploy (the date reaches the app through the root layout at build time).
+- `PROMO_ENDS=YYYY-MM-DD` in Vercel (Production): the last free day, Beijing time, inclusive. Set it before or
+  together with `QUOTA=on` (never `QUOTA=on` alone first, or 1.1 users hit the limits before the period starts),
+  then redeploy (the date reaches the app through the root layout at build time). 1.0 builds are never limited.
 - While it runs, `lib/quota.ts` counts nothing and never answers 402, so the pass sheet never opens by itself.
   From the next day (00:00 Beijing) the free limits apply on their own; nothing to switch.
 - Passes and tips can still be bought and restored (Settings → Support and purchases → Trip pass / Leave a tip),

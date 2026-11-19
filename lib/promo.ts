@@ -8,7 +8,10 @@
 /** Last free day from the environment (server only; the app gets it from the root layout). */
 export function promoEnds(): string | null {
   const v = process.env.PROMO_ENDS?.trim() ?? "";
-  return /^\d{4}-\d{2}-\d{2}$/.test(v) && !Number.isNaN(Date.parse(v)) ? v : null;
+  // Round trip, so an impossible day such as 2026-02-31 is refused rather than rolled into March.
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return null;
+  const d = new Date(`${v}T00:00:00Z`);
+  return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === v ? v : null;
 }
 
 const beijingDay = (now: Date) => now.toLocaleDateString("en-CA", { timeZone: "Asia/Shanghai" });

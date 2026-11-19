@@ -905,8 +905,8 @@ export const fr: Dict = {
   },
   /** Launch period (DECISIONS D21): components/PromoNote.tsx, Settings, the pass sheet. */
   promo: {
-    app: "Gratuit pendant notre période de lancement jusqu’au {date}. Ensuite : une utilisation gratuite chaque jour et un pass voyage facultatif.",
-    web: "Gratuit pendant notre période de lancement jusqu’au {date}. Ensuite : une utilisation gratuite chaque jour.",
+    app: "Gratuit pendant notre période de lancement jusqu’au {date}. Ensuite : des utilisations gratuites chaque jour et un pass voyage facultatif.",
+    web: "Gratuit pendant notre période de lancement jusqu’au {date}. Ensuite : des utilisations gratuites chaque jour.",
     settings: "Gratuit jusqu’au {date}",
     sheet: "Tout est gratuit pendant notre période de lancement jusqu’au {date}. Le pass voyage commence quand vous l’achetez : vous n’en avez besoin qu’après cette date.",
     hide: "Masquer",
