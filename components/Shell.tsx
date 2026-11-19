@@ -8,6 +8,7 @@ import { useT } from "./useT";
 import { useProfile } from "./useProfile";
 import { Paywall } from "./Paywall";
 import { fmt, UI_DICTS } from "@/lib/i18n";
+import { trackSession } from "@/lib/track";
 
 // Five top-level sections (iOS HIG: 2–5 tabs, always visible). Settings and Emergency are pushed
 // screens with a back button; Pay, Mobile data and Before you go live inside Today.
@@ -26,6 +27,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const [dark, setDark] = useState(false);
   const [profile] = useProfile();
+  // One anonymous session_start per visit to the app (not the website pages, which have their own
+  // cookieless page counts).
+  useEffect(() => { if (!isSitePath(path)) trackSession(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   // <html lang> follows the UI language, so screen readers, hyphenation and CJK fonts are right.
   useEffect(() => { document.documentElement.lang = profile.lang in UI_DICTS ? profile.lang : "en"; }, [profile.lang]);
   // Dark or light: the traveller's choice in Settings, or the phone's when it's "system".
