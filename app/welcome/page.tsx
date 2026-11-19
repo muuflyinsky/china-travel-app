@@ -15,7 +15,7 @@ const description =
   "Everything you need for a trip to mainland China in one app: visa-free check, Alipay and WeChat Pay setup, menus in your language, taxi cards, metro routes and translation. Free to start, no account.";
 
 export const metadata: Metadata = {
-  title,
+  title: { absolute: title }, // already starts with the brand: no "· HaodeGo" from the root template
   description,
   alternates: { canonical: "/welcome" },
   openGraph: { title, description, url: "/welcome", siteName: "HaodeGo", type: "website" },

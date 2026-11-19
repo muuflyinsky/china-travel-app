@@ -13,7 +13,7 @@ const description =
   "A clear checklist for a first trip to mainland China: visa-free entry, the online arrival card, Alipay and WeChat Pay, mobile data, which apps to install, trains, sights and emergency numbers.";
 
 export const metadata: Metadata = {
-  title: `${title} | HaodeGo`,
+  title,
   description,
   alternates: { canonical: PATH },
   openGraph: { title, description, url: PATH, siteName: "HaodeGo", type: "article", images: [OG_IMAGE] },

@@ -13,7 +13,7 @@ const description =
   "How tourists claim China’s departure tax refund: the ¥200 rule in Tax Free shops, the four steps at the airport, and where the refund counters are at Beijing, Shanghai and Guangzhou airports.";
 
 export const metadata: Metadata = {
-  title: `${title} | HaodeGo`,
+  title,
   description,
   alternates: { canonical: PATH },
   openGraph: { title, description, url: PATH, siteName: "HaodeGo", type: "article", images: [OG_IMAGE] },

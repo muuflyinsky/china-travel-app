@@ -11,7 +11,7 @@ const description =
   "Foreign visitors can fill in China’s arrival card on their phone before landing. Where the official form is, that it’s free, how to avoid paid look-alike sites, and what to do if you didn’t fill it in.";
 
 export const metadata: Metadata = {
-  title: `${title} | HaodeGo`,
+  title,
   description,
   alternates: { canonical: PATH },
   openGraph: { title, description, url: PATH, siteName: "HaodeGo", type: "article", images: [OG_IMAGE] },

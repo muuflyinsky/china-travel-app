@@ -8,7 +8,7 @@ const title = "China travel guides: clear answers before and during your trip";
 const description = "Short, checked guides for travelling in mainland China: what to sort out before you go, the online arrival card, and the departure tax refund.";
 
 export const metadata: Metadata = {
-  title: `${title} | HaodeGo`,
+  title,
   description,
   alternates: { canonical: "/guide" },
   openGraph: { title, description, url: "/guide", siteName: "HaodeGo", type: "website" },
