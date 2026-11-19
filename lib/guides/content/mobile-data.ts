@@ -445,12 +445,12 @@ export const mobileData: TopicContent = {
         {
           "applies": "beijing",
           "text": {
-            "en": "China Unicom Beijing sells visitor SIM plans for 7, 10, 15 or 30 days, priced below international roaming (as of March 2025). Bring your passport and visa.",
-            "es": "China Unicom Beijing vende planes SIM para visitantes de 7, 10, 15 o 30 días, más baratos que el roaming internacional (a marzo de 2025). Lleva tu pasaporte y tu visado.",
-            "fr": "China Unicom Pékin vend des forfaits SIM pour visiteurs de 7, 10, 15 ou 30 jours, moins chers que l'itinérance internationale (en mars 2025). Munissez-vous de votre passeport et de votre visa.",
-            "de": "China Unicom Beijing verkauft SIM-Tarife für Besucher für 7, 10, 15 oder 30 Tage, günstiger als internationales Roaming (Stand: März 2025). Bringen Sie Reisepass und Visum mit.",
-            "ja": "中国聯通北京は、7日・10日・15日・30日の旅行者向けSIMプランを国際ローミングより安い料金で販売しています（2025年3月現在）。パスポートとビザをお持ちください。",
-            "ko": "차이나유니콤 베이징은 7일, 10일, 15일, 30일 방문객용 SIM 요금제를 국제 로밍보다 저렴하게 판매합니다(2025년 3월 기준). 여권과 비자를 지참하십시오."
+            "en": "China Unicom Beijing sells visitor SIM plans for 7, 10, 15 or 30 days, priced below international roaming (as of March 2025). Bring your passport (and your visa, if you entered on one).",
+            "es": "China Unicom Beijing vende planes SIM para visitantes de 7, 10, 15 o 30 días, más baratos que el roaming internacional (a marzo de 2025). Lleva tu pasaporte (y tu visado, si entraste con uno).",
+            "fr": "China Unicom Pékin vend des forfaits SIM pour visiteurs de 7, 10, 15 ou 30 jours, moins chers que l'itinérance internationale (en mars 2025). Munissez-vous de votre passeport (et de votre visa si vous êtes entré avec un visa).",
+            "de": "China Unicom Beijing verkauft SIM-Tarife für Besucher für 7, 10, 15 oder 30 Tage, günstiger als internationales Roaming (Stand: März 2025). Bringen Sie Ihren Reisepass mit (und Ihr Visum, falls Sie mit Visum eingereist sind).",
+            "ja": "中国聯通北京は、7日・10日・15日・30日の旅行者向けSIMプランを国際ローミングより安い料金で販売しています（2025年3月現在）。パスポート（ビザで入国した場合はビザも）をお持ちください。",
+            "ko": "차이나유니콤 베이징은 7일, 10일, 15일, 30일 방문객용 SIM 요금제를 국제 로밍보다 저렴하게 판매합니다(2025년 3월 기준). 여권(비자로 입국했다면 비자도)을 지참하십시오."
           },
           "src": [
             "s8"

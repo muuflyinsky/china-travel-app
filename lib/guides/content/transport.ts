@@ -244,8 +244,7 @@ export const transport: TopicContent = {
             "ko": "다싱 공항 익스프레스는 차오차오역에서 다싱 공항까지 약 19분 걸립니다."
           },
           "src": [
-            "s7",
-            "s9"
+            "s7"
           ],
           "checked": "2026-11-11"
         },
