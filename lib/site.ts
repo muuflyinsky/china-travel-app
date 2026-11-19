@@ -15,9 +15,10 @@ export const APP_STORE_LIVE = true;
 export const APP_STORE_ID = "6829347376";
 export const APP_STORE_URL = `https://apps.apple.com/app/id${APP_STORE_ID}`;
 
-/** Share image for the guides (app/guide/opengraph-image.png); articles that set their own
- *  openGraph must list it again, or the file-based image is dropped. */
-export const OG_IMAGE = "/guide/opengraph-image.png";
+/** Share image for the guide articles, from public/ (a copy of app/(app)/guide/opengraph-image.png):
+ *  inside a route group Next adds a hash to the file-based image's URL, so it can't be named here.
+ *  Articles that set their own openGraph must list it, or the file-based image is dropped. */
+export const OG_IMAGE = "/site/og-guide.png";
 
 export type GuideLink = { href: string; title: string; blurb: string };
 

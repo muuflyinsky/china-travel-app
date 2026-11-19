@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import "./globals.css";
+import "../globals.css";
 import { AppShell } from "@/components/Shell";
 import { SITE } from "@/lib/seo";
 
