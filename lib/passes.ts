@@ -77,7 +77,11 @@ export async function buy(id: string): Promise<BuyResult> {
 
 /** Restore Purchases: asks the App Store, then exchanges any pass still running. "unreachable" = our server didn't answer. */
 export async function restore(): Promise<Saved | null | "unreachable"> {
-  const r = await call<{ transactions: string[] }>("restore").catch(() => ({ transactions: [] as string[] }));
+  // Syncing with the App Store fails offline or when Apple ID sign-in is cancelled; the passes
+  // already on this phone (Transaction.all) can still be switched on, or reported as unreachable.
+  const r = await call<{ transactions: string[] }>("restore")
+    .catch(() => call<{ transactions: string[] }>("entitlements"))
+    .catch(() => ({ transactions: [] as string[] }));
   try { return await exchange(r.transactions); } catch { return "unreachable"; }
 }
 
