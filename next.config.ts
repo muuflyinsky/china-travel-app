@@ -15,7 +15,8 @@ const nextConfig: NextConfig = {
       // Home-screen shortcuts made before 1.1 are sent on in app/(app)/layout.tsx (only the browser knows).
       { source: "/", has: [{ type: "header", key: "user-agent", value: ".*ChinaTravelBuddy-iOS.*" }], destination: "/app", permanent: false },
       // Old links, bookmarks and search results: same screen at its new address (query strings carry over).
-      ...MOVED.map((p) => ({ source: `/${p}/:rest*`, destination: `/app/${p}/:rest*`, permanent: true })),
+      // One hop each: ":rest+" leaves the bare path to the second rule (":rest*" sent /menu to /app/menu/).
+      ...MOVED.map((p) => ({ source: `/${p}/:rest+`, destination: `/app/${p}/:rest+`, permanent: true })),
       ...MOVED.map((p) => ({ source: `/${p}`, destination: `/app/${p}`, permanent: true })),
       { source: "/welcome", destination: "/", permanent: true },
       // Screens merged long ago (SPEC v0.4), kept for old links.
