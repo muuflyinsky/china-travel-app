@@ -20,6 +20,9 @@ const config: CapacitorConfig = {
     url,
     cleartext: url.startsWith("http://"),
     errorPath: "offline.html",
+    // The app lives at /app, the website at / (iOS 1.1). 1.0 builds load / and are redirected by
+    // their user agent (next.config.ts); this skips that hop.
+    appStartPath: "/app",
     // Both hosts stay inside the app (Vercel may redirect one to the other); anything else,
     // such as partner booking sites, opens in Safari.
     allowNavigation: ["haodego.com", "www.haodego.com"],
