@@ -25,7 +25,6 @@ import { promoDate } from "@/lib/promo";
 import { hasPasses, products, savedPass, showPaywall } from "@/lib/passes";
 import { PASSES } from "@/lib/products";
 
-/** The App Store version (MARKETING_VERSION in ios/App). Update it with each native release. */
 /** The app build's version: 1.1 added the Review plugin (ios/App/App/ReviewPlugin.swift). */
 const appVersion = () => ((window as unknown as { Capacitor?: { PluginHeaders?: { name: string }[] } }).Capacitor?.PluginHeaders?.some((h) => h.name === "Review") ? "1.1" : "1.0");
 
