@@ -5,7 +5,7 @@ import type { TopicContent } from "../types";
 // `note` says why. Gaps the research couldn't source: see the workspace inbox note.
 export const mobileData: TopicContent = {
   "checked": "2026-11-11",
-  "appPath": "/#data",
+  "appPath": "/app#data",
   "sources": {
     "s1": {
       "title": "外籍来华人员办理电话卡业务指南 (Guide for foreign nationals applying for phone cards)",

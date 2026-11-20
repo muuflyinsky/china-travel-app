@@ -15,15 +15,16 @@ import { syncOfflineHotel } from "@/lib/offline-hotel";
 // Five top-level sections (iOS HIG: 2–5 tabs, always visible). Settings and Emergency are pushed
 // screens with a back button; Pay, Mobile data and Before you go live inside Today.
 const TABS = [
-  { href: "/", key: "today", Icon: House },
-  { href: "/menu", key: "eat", Icon: UtensilsCrossed },
-  { href: "/explore", key: "go", Icon: Compass },
-  { href: "/stay", key: "stay", Icon: BedDouble },
-  { href: "/talk", key: "talk", Icon: Languages },
+  { href: "/app", key: "today", Icon: House },
+  { href: "/app/menu", key: "eat", Icon: UtensilsCrossed },
+  { href: "/app/explore", key: "go", Icon: Compass },
+  { href: "/app/stay", key: "stay", Icon: BedDouble },
+  { href: "/app/talk", key: "talk", Icon: Languages },
 ] as const;
 
-/** Website pages (lib/site.ts): full-width, no tab bar or app column. The iOS app never links to them. */
-const isSitePath = (path: string | null) => !!path && /^\/(welcome|guide)(\/|$)/.test(path);
+/** Website pages (lib/site.ts): the home page "/" and /guide/*. Full-width, no tab bar or app column.
+ *  The app lives under /app (iOS 1.1); the iOS app never links to the website pages. */
+const isSitePath = (path: string | null) => !!path && (path === "/" || /^\/guide(\/|$)/.test(path));
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
@@ -48,7 +49,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // The offline page shows the saved hotel as a taxi card (app 1.1; lib/offline-hotel.ts).
   useEffect(() => { if (loaded) syncOfflineHotel(profile.hotel, profile.lang); }, [loaded, profile.hotel, profile.lang]);
   // Rating prompt: only on Today, the calm screen between tasks (lib/review.ts decides the rest).
-  useEffect(() => (path === "/" ? maybeAskForReview() : undefined), [path]);
+  useEffect(() => (path === "/app" ? maybeAskForReview() : undefined), [path]);
   if (isSitePath(path)) return <>{children}</>;
   // One centred column on every screen size, so navbar, content and tab bar always line up.
   return (
@@ -62,7 +63,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 export function SettingsButton() {
   const t = useT();
   return (
-    <NextLink href="/settings" aria-label={t.common.settings} className="grid h-touch w-touch shrink-0 place-items-center rounded-full border border-line bg-card text-cobalt">
+    <NextLink href="/app/settings" aria-label={t.common.settings} className="grid h-touch w-touch shrink-0 place-items-center rounded-full border border-line bg-card text-cobalt">
       <Settings className="h-5 w-5" />
     </NextLink>
   );
@@ -85,7 +86,7 @@ export function Screen({ title, right, children, back }: { title: string; right?
           centerTitle
           title={title}
           left={
-            <button onClick={() => (history.length > 1 ? router.back() : router.push("/"))} className="flex min-h-11 items-center pr-2 text-body text-cobalt">
+            <button onClick={() => (history.length > 1 ? router.back() : router.push("/app"))} className="flex min-h-11 items-center pr-2 text-body text-cobalt">
               <ChevronLeft className="h-6 w-6" aria-hidden />{t.common.back}
             </button>
           }
@@ -109,7 +110,7 @@ export function Screen({ title, right, children, back }: { title: string; right?
         innerClassName="gap-0! bg-card/95! backdrop-blur-xl rounded-full border border-line shadow-bar"
       >
         {TABS.map(({ href, key, Icon }) => {
-          const active = href === "/" ? path === "/" : path.startsWith(href);
+          const active = href === "/app" ? path === "/app" : path.startsWith(href);
           return (
             <TabbarLink
               key={href}

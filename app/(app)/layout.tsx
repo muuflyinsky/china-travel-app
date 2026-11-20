@@ -36,6 +36,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className="h-full" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: 'if(/ChinaTravelBuddy-iOS/.test(navigator.userAgent))document.documentElement.classList.add("in-app")' }} />
+        {/* "/" is the website; the iOS app and home-screen shortcuts made before iOS 1.1 (start_url "/")
+            go straight to the app at /app. next.config.ts redirects the iOS app on the server first. */}
+        <script dangerouslySetInnerHTML={{ __html: 'if(location.pathname==="/"&&(/ChinaTravelBuddy-iOS/.test(navigator.userAgent)||navigator.standalone||matchMedia("(display-mode: standalone)").matches))location.replace("/app"+location.search)' }} />
         {/* Dark before first paint (the saved choice, else the phone's), so the app never flashes white. */}
         <script dangerouslySetInnerHTML={{ __html: 'try{var t=(JSON.parse(localStorage.getItem("ctg.profile")||"{}").theme)||"system";if(t==="dark"||(t!=="light"&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark")}catch(e){}' }} />
       </head>

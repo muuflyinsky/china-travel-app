@@ -11,7 +11,7 @@ export default function GlobalNotFound() {
         <main className="max-w-sm text-center">
           <h1 className="text-title">Page not found</h1>
           <p className="mt-2 text-body text-muted">This page doesn’t exist or has moved.</p>
-          <a href="/" className="mt-section inline-flex min-h-control items-center rounded-control bg-cobalt px-5 text-subhead font-semibold text-white">Open HaodeGo</a>
+          <a href="/app" className="mt-section inline-flex min-h-control items-center rounded-control bg-cobalt px-5 text-subhead font-semibold text-white">Open HaodeGo</a>
         </main>
       </body>
     </html>

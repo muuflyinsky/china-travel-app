@@ -1,7 +1,8 @@
 {
+  "id": "/",
   "name": "HaodeGo: China Travel Buddy",
   "short_name": "HaodeGo",
-  "start_url": "/",
+  "start_url": "/app",
   "display": "standalone",
   "background_color": "#f7f8fb",
   "theme_color": "#2b4acb",
@@ -18,5 +19,6 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "scope": "/"
 }

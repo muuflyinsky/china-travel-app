@@ -5,7 +5,7 @@ import type { TopicContent } from "../types";
 // `note` says why. Gaps the research couldn't source: see the workspace inbox note.
 export const hotelCheckIn: TopicContent = {
   "checked": "2026-11-11",
-  "appPath": "/stay",
+  "appPath": "/app/stay",
   "sources": {
     "s1": {
       "title": "Regulations on filing accommodation registration for foreigners (NIA English page, Exit and Entry Administration Law art. 39 / art. 76)",

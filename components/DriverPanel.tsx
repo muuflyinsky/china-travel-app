@@ -156,7 +156,7 @@ function Destination() {
 }
 
 /**
- * Everything for a taxi in one place (Today's "Show the driver" sheet and the /driver page):
+ * Everything for a taxi in one place (Today's "Show the driver" sheet and the /app/driver page):
  * back to the hotel, ride apps, and any other destination searched here and shown in Chinese.
  */
 export function DriverPanel() {
