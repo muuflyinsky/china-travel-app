@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "../globals.css";
 import { AppShell } from "@/components/Shell";
+import { promoEnds } from "@/lib/promo";
 import { SITE } from "@/lib/seo";
 
 const title = "HaodeGo: China Travel Buddy";
@@ -43,7 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: 'try{var t=(JSON.parse(localStorage.getItem("ctg.profile")||"{}").theme)||"system";if(t==="dark"||(t!=="light"&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark")}catch(e){}' }} />
       </head>
       <body className="h-full">
-        <AppShell>{children}</AppShell>
+        <AppShell promoEnds={promoEnds()}>{children}</AppShell>
       </body>
     </html>
   );

@@ -11,6 +11,8 @@ import { allergyLinesZh } from "@/lib/allergens";
 import { PASSES, type QuotaKind } from "@/lib/products";
 import { buy, hasPasses, products, refreshPass, restore, savedPass, type StoreProduct } from "@/lib/passes";
 import { holdReview } from "@/lib/review";
+import { promoActive, promoDate } from "@/lib/promo";
+import { usePromo } from "./usePromo";
 
 /**
  * Trip pass sheet, opened by showPaywall() when today's free uses run out (or from Settings).
@@ -27,6 +29,7 @@ export function Paywall() {
   const [card, setCard] = useState(false);
   const [pass, setPass] = useState(savedPass);
   const canBuy = hasPasses();
+  const promo = usePromo();
 
   useEffect(() => { refreshPass().then(() => setPass(savedPass())); }, []);
   useEffect(() => (kind !== null ? holdReview() : undefined), [kind]);
@@ -72,6 +75,9 @@ export function Paywall() {
           <Note>{fmt(t.pass.active, { date: until(pass.ends) })}</Note>
         ) : (
           <>
+            {/* Launch period (D21): passes stay on sale, but say plainly that nobody needs one yet. */}
+            {/* Only when opened from Settings: a 402 means the server already counts, so the period is over. */}
+            {promo && kind === "none" && promoActive(promo) && <Note>{fmt(t.promo.sheet, { date: promoDate(promo, profile.lang) })}</Note>}
             <p className="px-1 text-body">{t.pass.body}</p>
             {kind && kind !== "none" && kind !== "hotel" && <p className="px-1 text-subhead text-muted">{t.pass.resets}</p>}
           </>

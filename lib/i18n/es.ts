@@ -903,6 +903,14 @@ export const es: Dict = {
     trainSoon: "Los billetes salen a la venta el {date}, 15 días antes. Reserva ese día: los trenes populares se agotan rápido.",
     names: { newYear: "Año Nuevo", spring: "Año Nuevo chino", qingming: "Qingming", labour: "Día del Trabajo", dragon: "Festival del Bote del Dragón", midAutumn: "Festival del Medio Otoño", national: "Día Nacional" },
   },
+  /** Launch period (DECISIONS D21): components/PromoNote.tsx, Settings, the pass sheet. */
+  promo: {
+    app: "Gratis durante nuestro periodo de lanzamiento hasta el {date}. Después: usos gratis cada día y un pase de viaje opcional.",
+    web: "Gratis durante nuestro periodo de lanzamiento hasta el {date}. Después: usos gratis cada día.",
+    settings: "Gratis hasta el {date}",
+    sheet: "Todo es gratis durante nuestro periodo de lanzamiento hasta el {date}. El pase de viaje empieza cuando lo compras, así que solo lo necesitas a partir de entonces.",
+    hide: "Ocultar",
+  },
   pass: {
     out: { menu_photo: "Ya usaste las 2 cartas gratis de hoy (hasta 4 fotos cada una)", menu_text: "Ya usaste las búsquedas de platos gratis de hoy", translate: "Ya usaste las traducciones gratis de hoy", hotel: "Ya usaste tus capturas de reserva gratis", none: "Pase de viaje" },
     body: "Un pase de viaje te da fotos de carta, búsquedas de platos y traducciones ilimitadas. La comprobación de alergias y la tarjeta de alergias son siempre gratis.",

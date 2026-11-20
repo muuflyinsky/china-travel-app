@@ -20,11 +20,13 @@ import pkg from "@/package.json";
 import Link from "next/link";
 import { privacyText, supportText } from "@/lib/legal";
 import { TipJar } from "@/components/TipJar";
+import { usePromo } from "@/components/usePromo";
+import { promoDate } from "@/lib/promo";
 import { hasPasses, products, savedPass, showPaywall } from "@/lib/passes";
 import { PASSES } from "@/lib/products";
 
-/** The App Store version (MARKETING_VERSION in ios/App). Update it with each native release. */
-const APP_VERSION = "1.0";
+/** The app build's version: 1.1 added the Review plugin (ios/App/App/ReviewPlugin.swift). */
+const appVersion = () => ((window as unknown as { Capacitor?: { PluginHeaders?: { name: string }[] } }).Capacitor?.PluginHeaders?.some((h) => h.name === "Review") ? "1.1" : "1.0");
 
 const CURRENCIES = ["USD", "EUR", "GBP", "JPY", "KRW", "AUD", "CAD", "SGD", "HKD", "CHF", "THB", "MYR", "NZD", "SEK", "INR", "BRL", "MXN", "RUB", "TRY", "IDR", "VND", "PHP"];
 const toggle = (list: string[], id: string) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
@@ -70,6 +72,9 @@ export default function SettingsPage() {
     return () => { live = false; };
   }, [sheet]);
   const [moreAllergens, setMoreAllergens] = useState(false);
+  const promo = usePromo();
+  const [version, setVersion] = useState("1.0");
+  useEffect(() => setVersion(appVersion()), []);
   // Deep links such as /app/settings#dates open the matching editor.
   useEffect(() => {
     const h = location.hash.slice(1) as Sheet;
@@ -126,15 +131,15 @@ export default function SettingsPage() {
         </Group>
       </Section>
 
-      {/* Nothing is for sale in the app until 1.1 opens in-app purchases, so it says "Support" there. */}
-      <Section title={<><span className="web-only">{t.settings.about}</span><span className="app-only">{t.inapp.support}</span></>}>
+      {/* "Support" in the app until the App Store has passes to sell (1.1), then "Support and purchases". */}
+      <Section title={<><span className="web-only">{t.settings.about}</span><span className="app-only">{store ? t.settings.about : t.inapp.support}</span></>}>
         <Group>
-          {store && <Row onClick={() => showPaywall()} icon={<Ico I={Ticket} />} title={t.pass.settingsRow} after={<Value>{store.ends ? fmt(t.pass.active, { date: new Date(store.ends).toLocaleDateString(p.lang, { day: "numeric", month: "short" }) }) : t.pass.settingsNone}</Value>} />}
+          {store && <Row onClick={() => showPaywall()} icon={<Ico I={Ticket} />} title={t.pass.settingsRow} after={<Value>{store.ends ? fmt(t.pass.active, { date: new Date(store.ends).toLocaleDateString(p.lang, { day: "numeric", month: "short" }) }) : promo ? fmt(t.promo.settings, { date: promoDate(promo, p.lang) }) : t.pass.settingsNone}</Value>} />}
           {store && <Row onClick={() => setSheet("tips")} icon={<Ico I={HandHeart} />} title={t.pass.tipsRow} />}
           <Row href="/support" icon={<Ico I={LifeBuoy} />} title={supportText(p.lang).title} />
           <Row onClick={() => setSheet("privacy")} icon={<Ico I={Lock} />} title={t.settings.privacyTitle} />
           <Row onClick={() => setSheet("earn")} icon={<Ico I={Coins} />} title={t.settings.howWeEarn} />
-          <Row icon={<Ico I={Info} />} title={t.settings.version} after={<Value><span className="web-only">{pkg.version}</span><span className="app-only">{APP_VERSION}</span></Value>} chevron={false} />
+          <Row icon={<Ico I={Info} />} title={t.settings.version} after={<Value><span className="web-only">{pkg.version}</span><span className="app-only">{version}</span></Value>} chevron={false} />
         </Group>
       </Section>
 
