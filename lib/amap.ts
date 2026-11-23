@@ -94,7 +94,7 @@ async function overBudget() {
 const QPS_CODES = new Set(["10019", "10020", "10021", "10022", "10029"]);
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-async function amap<T>(path: string, params: Record<string, string | undefined>, purpose: AmapPurpose): Promise<T> {
+async function amap<T>(path: string, params: Record<string, string | undefined>, purpose: AmapPurpose, fresh = false): Promise<T> {
   if (!config.amapKey) throw new Unavailable("map");
   if (await overBudget()) throw new Unavailable("map");
   const qs = new URLSearchParams({ key: config.amapKey });
@@ -102,7 +102,7 @@ async function amap<T>(path: string, params: Record<string, string | undefined>,
   for (let attempt = 0; ; attempt++) {
     await slot();
     // A QPS refusal comes back as HTTP 200, so retries skip Next's 5-minute fetch cache.
-    const res = await fetch(`${BASE}${path}?${qs}`, attempt ? { cache: "no-store" } : { next: { revalidate: 300 } });
+    const res = await fetch(`${BASE}${path}?${qs}`, attempt || fresh ? { cache: "no-store" } : { next: { revalidate: 300 } });
     const text = await res.text();
     // Amap's firewall sometimes answers a server with an HTML "verify you're human" page instead
     // of JSON (seen on /v5/place/* from Vercel, 2026-11-03). Callers can fall back to v3.
@@ -284,12 +284,20 @@ export async function reverseGeocode(location: string) {
   };
 }
 
+type Forecast = { forecasts: { city: string; reporttime?: string; casts: { date: string; dayweather: string; daytemp: string; nighttemp: string }[] }[] };
+
+/**
+ * The 4-day forecast. Next's fetch cache answers a stale entry first and refreshes it in the
+ * background, so a city nobody asked about for days came back with an old forecast (11-23: a
+ * report from 11-11) until the next request. If the answer doesn't cover today (Beijing), ask
+ * again without the cache.
+ */
 export async function weather(adcode: string) {
   if (demo.maps) return mock.weather;
-  const d = await amap<{ forecasts: { city: string; casts: { date: string; dayweather: string; daytemp: string; nighttemp: string }[] }[] }>(
-    "/v3/weather/weatherInfo", { city: adcode, extensions: "all" }, "weather",
-  );
-  return d.forecasts[0];
+  const ask = (fresh: boolean) => amap<Forecast>("/v3/weather/weatherInfo", { city: adcode, extensions: "all" }, "weather", fresh);
+  let f = (await ask(false)).forecasts[0];
+  if (!f?.casts?.some((c) => c.date === beijingDay())) f = (await ask(true)).forecasts[0];
+  return f;
 }
 
 // ---- routes (SPEC v0.5 P1.6 #23) ------------------------------------------------------------
