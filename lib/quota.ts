@@ -42,11 +42,14 @@ export async function useQuota(req: Request, kind: QuotaKind): Promise<NextRespo
   if (isEarly(req.headers.get("x-ctg-since"), earlyBefore())) return free;
   const p = period(kind);
   const meal = kind === "menu_photo" ? FREE.menu_photo : null;
+  // D23 3a: three menus a day once any allergy is saved. The limit is sent with each use, so saving
+  // allergies after the first menu raises today's limit at once; nothing used is given back or reset.
+  const max = meal && req.headers.get("x-ctg-allergies") === "1" ? meal.maxWithAllergies : FREE[kind].max;
   try {
     const ok = meal
-      ? await rest("rpc/use_menu_photo", { method: "POST", body: JSON.stringify({ p_device: device, p_period: p, p_max: meal.max, p_pages: meal.pages, p_minutes: meal.minutes }) })
+      ? await rest("rpc/use_menu_photo", { method: "POST", body: JSON.stringify({ p_device: device, p_period: p, p_max: max, p_pages: meal.pages, p_minutes: meal.minutes }) })
       : await rest("rpc/use_quota", { method: "POST", body: JSON.stringify({ p_device: device, p_kind: kind, p_period: p, p_max: FREE[kind].max }) });
-    if (ok === false) return NextResponse.json({ error: "quota", kind, max: FREE[kind].max, per: FREE[kind].per }, { status: 402 });
+    if (ok === false) return NextResponse.json({ error: "quota", kind, max, per: FREE[kind].per }, { status: 402 });
   } catch (e) {
     console.error("[quota]", (e as Error).message);
     return free;

@@ -27,10 +27,11 @@ export const unlimitedDays = (id: string): number | undefined => (id === TRIAL.i
 /**
  * Free uses per phone after the trial, or without one (website). "day" resets at midnight Beijing
  * time; "ever" never resets. A menu photo use is a meal: up to `pages` photos within `minutes` of
- * the first (DECISIONS D8). Numbers from DECISIONS D23 (one menu a day, was two).
+ * the first (DECISIONS D8). Numbers from DECISIONS D23: one menu a day, three for a phone with
+ * allergies saved (D23 3a: enough for three meals), the rest unchanged.
  */
 export const FREE = {
-  menu_photo: { max: 1, per: "day", pages: 4, minutes: 30 },
+  menu_photo: { max: 1, maxWithAllergies: 3, per: "day", pages: 4, minutes: 30 },
   menu_text: { max: 3, per: "day" },
   translate: { max: 10, per: "day" },
   hotel: { max: 2, per: "ever" },

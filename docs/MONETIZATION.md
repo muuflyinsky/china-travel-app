@@ -32,8 +32,16 @@ typed dish names) is limited, and that reading is what produces a new allergy ch
   and staff replies, emergency help; the allergy verdicts of every dish already read in this meal and of saved
   dishes (worked out on the phone, so editing your allergies re-checks them at once); opening an already-read dish
   for its details (`/api/dish`, not counted).
-- **Limited** (1 menu a day, 3 typed lookups a day, unlimited in the trial or with a pass): reading *new* dishes,
-  which is when they get their allergy check.
+- **Limited** (1 menu a day, **3 with any allergy saved** (D23 3a, Veer 11-23: enough for three meals), 3 typed
+  lookups a day; unlimited in the trial or with a pass): reading *new* dishes, which is when they get their allergy
+  check.
+- **How "allergy saved" is known**: the page sends `x-ctg-allergies: 1` when the profile has at least one allergy
+  (diets such as vegetarian don't count). Only that yes/no is sent, never which allergies, and it isn't stored: it
+  only sets the limit for that request. Like the other headers it's the page's word; someone could save an allergy
+  they don't have to get 3 menus (D23 re-evaluation watches the share of profiles with allergies).
+- **Saving allergies mid-day**: the limit is sent with every use and compared with today's count, so someone who has
+  used their 1 menu and then saves an allergy can read 2 more that day; nothing used is given back or reset. Removing
+  all allergies lowers the limit again from the next use.
 - When a reading is refused because the free uses are gone, Eat says that page (or those dishes) has no allergy check
   and to ask staff or show the allergy card; the pass sheet puts the allergy card first (or, with no allergies saved,
   a link to add them), before the trial and passes.
@@ -45,7 +53,7 @@ typed dish names) is limited, and that reading is what produces a new allergy ch
 
 | Feature | Free | Resets |
 |---|---|---|
-| Menu photo | 1 meal (up to 4 photos within 30 min of the first) | daily, midnight Beijing time |
+| Menu photo | 1 meal (up to 4 photos within 30 min of the first); **3 with any allergy saved** (D23 3a) | daily, midnight Beijing time |
 | Typed dish names | 3 | daily |
 | Translation | 10 | daily |
 | Booking screenshot | 2 | never |

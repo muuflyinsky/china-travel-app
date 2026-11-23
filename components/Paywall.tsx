@@ -118,7 +118,7 @@ export function Paywall() {
               // that it costs nothing, and what using the app costs afterwards.
               <div className="space-y-3 rounded-card border border-cobalt bg-card p-4">
                 <ul className="space-y-2 text-subhead">
-                  {[t.trial.includes, t.trial.ends, fmt(t.trial.after, { menus: FREE.menu_photo.max, dishes: FREE.menu_text.max, lines: FREE.translate.max, price: cheapest?.displayPrice ?? "" })].map((line) => (
+                  {[t.trial.includes, t.trial.ends, fmt(t.trial.after, { menus: FREE.menu_photo.max, allergyMenus: FREE.menu_photo.maxWithAllergies, dishes: FREE.menu_text.max, lines: FREE.translate.max, price: cheapest?.displayPrice ?? "" })].map((line) => (
                     <li key={line} className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-cobalt" aria-hidden />{line}</li>
                   ))}
                 </ul>
@@ -129,6 +129,8 @@ export function Paywall() {
               <p className="px-1 text-body">{t.pass.body}</p>
             )}
             {kind && kind !== "none" && kind !== "hotel" && <p className="px-1 text-subhead text-muted">{t.pass.resets}</p>}
+            {/* D23 3a: with an allergy saved, three menus a day; worth knowing when today's one is used. */}
+            {kind === "menu_photo" && profile.allergens.length === 0 && <p className="px-1 text-subhead text-muted">{fmt(t.pass.allergyMenus, { n: FREE.menu_photo.maxWithAllergies })}</p>}
           </>
         )}
         {!outOfUses && allergyRow}
