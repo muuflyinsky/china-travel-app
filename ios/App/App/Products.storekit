@@ -64,6 +64,21 @@
   ],
   "products": [
     {
+      "displayPrice": "0",
+      "familyShareable": false,
+      "internalID": "3047712925",
+      "localizations": [
+        {
+          "description": "Unlimited menu photos, dish lookups and translation for 3 days. Ends by itself; no charge.",
+          "displayName": "3-Day Trial",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.haodego.app.trial.3d",
+      "referenceName": "3-Day Trial",
+      "type": "NonConsumable"
+    },
+    {
       "displayPrice": "1.99",
       "familyShareable": false,
       "internalID": "1748682444",
