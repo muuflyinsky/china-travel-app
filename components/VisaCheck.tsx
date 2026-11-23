@@ -73,7 +73,7 @@ export function VisaCheck({ onRow }: {
 
   const choose = (c: string) => {
     const rule = visaRule(c, null);
-    set({ nationality: c, onwardThird: null, homeCurrency: currencyFor(c), entryType: entryTypeFor(rule) });
+    set({ nationality: c, onwardThird: null, stayUntil: "", homeCurrency: currencyFor(c), entryType: entryTypeFor(rule) });
   };
   const rule = p.nationality ? visaRule(p.nationality, p.onwardThird) : null;
   // The entry type follows the passport only when the passport or the onward answer changes here:

@@ -81,7 +81,7 @@ export function EditToday({ open, onClose }: { open: boolean; onClose: () => voi
                 <ul className="overflow-hidden rounded-card border border-line bg-card">
                   {ids.map((id, i) => {
                     const Icon = SHORTCUT_ICON[id];
-                    const auto = id === "allergy" && prefs.allergyAutoAdded && p.allergens.length > 0;
+                    const auto = id === "allergy" && prefs.allergyAutoAdded && !prefs.allergyByUser && p.allergens.length > 0;
                     const lifted = drag?.from === i;
                     return (
                       <li key={id} className={`relative border-b border-line last:border-b-0 ${lifted ? "z-10 shadow-bar" : ""} ${drag && !lifted ? "transition-transform duration-150" : ""}`}
@@ -127,7 +127,7 @@ export function EditToday({ open, onClose }: { open: boolean; onClose: () => voi
                         const Icon = SHORTCUT_ICON[id];
                         return (
                           <li key={id}>
-                            <button type="button" onClick={() => save([...ids, id])} disabled={full} aria-label={fmt(t.home.addX, { name: title(id) })}
+                            <button type="button" onClick={() => (id === "allergy" ? update({ shortcuts: [...ids, id], allergyByUser: true }) : save([...ids, id]))} disabled={full} aria-label={fmt(t.home.addX, { name: title(id) })}
                               className={`${ROW} text-left disabled:opacity-40`}>
                               <span className="grid h-touch w-touch shrink-0 place-items-center text-cobalt"><CirclePlus className="h-[22px] w-[22px]" aria-hidden /></span>
                               <span className="grid h-8 w-8 shrink-0 place-items-center rounded-[9px] bg-cobalt-soft text-cobalt"><Icon className="h-[18px] w-[18px]" aria-hidden /></span>

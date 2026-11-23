@@ -37,6 +37,8 @@ export type TodayPrefs = {
   datesHintDone: boolean;
   /** The allergy card was added once for this traveller's allergies; removing it later is respected. */
   allergyAutoAdded: boolean;
+  /** The traveller put the allergy card back from More shortcuts themselves (no "Added because…" line). */
+  allergyByUser?: boolean;
 };
 
 const EMPTY: TodayPrefs = { reminders: {}, hidden: {}, hintDone: false, datesHintDone: false, allergyAutoAdded: false };

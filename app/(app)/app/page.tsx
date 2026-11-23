@@ -53,7 +53,7 @@ function EntryConfirm() {
     <Card className="mt-2">
       <p className="flex items-center gap-2 text-headline"><LogIn className="h-5 w-5 shrink-0 text-cobalt" aria-hidden />{fmt(t.today.entryConfirm, { date: fmtDay(p.arrival, p.lang, "long") })}</p>
       <div className="mt-3 grid grid-cols-2 gap-2">
-        <Button onClick={() => set({ entryDate: p.arrival })} className="text-subhead!"><Check className="h-5 w-5" aria-hidden />{t.today.entryYes}</Button>
+        <Button onClick={() => set({ entryDate: p.arrival, stayUntil: "" })} className="text-subhead!"><Check className="h-5 w-5" aria-hidden />{t.today.entryYes}</Button>
         <Button variant="soft" href="/app/settings#entry" className="text-subhead!">{t.today.entryOther}</Button>
       </div>
     </Card>

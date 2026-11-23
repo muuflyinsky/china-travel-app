@@ -46,7 +46,9 @@ export function ReminderCard({ phase }: { phase: Phase }) {
 
   // Stay limit: the planned departure is after the legal limit, or 3 days or fewer are left in China.
   const w = stayWindow(p);
-  if (w) {
+  // Once the planned departure has passed the trip is over (phase is "before" again): never a stay card then.
+  const tripOver = Boolean(p.departure && today > p.departure);
+  if (w && !tripOver) {
     const left = daysBetween(today, w.legal);
     const inChinaSoon = w.entered && left <= 3;
     if (w.overstay || inChinaSoon) {
@@ -104,7 +106,8 @@ export function ReminderCard({ phase }: { phase: Phase }) {
       title: fmt(h.beforeNext, { item: prep.next.title }), actions: [{ label: h.howTo, href: `#${prep.next.key}` }] });
   }
 
-  const hol = holidaysAhead(today, p.arrival && p.departure ? { from: p.arrival, to: p.departure } : undefined)[0];
+  // Only with dates (design §5.6: no dates, no reminder cards).
+  const hol = p.arrival || p.departure ? holidaysAhead(today, p.arrival && p.departure ? { from: p.arrival, to: p.departure } : undefined)[0] : undefined;
   if (hol) {
     const span = hol.days[0] === hol.days[1] ? day(hol.days[0]) : `${day(hol.days[0])} – ${day(hol.days[1])}`;
     list.push({ type: "holiday", key: `holiday:${hol.id}:${hol.days[0]}`, Icon: CalendarRange, label: h.rHoliday,
