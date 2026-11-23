@@ -93,7 +93,7 @@ export function RoutePanel({ dest, origin }: { dest: Place; origin: { location: 
           <div className="flex items-baseline gap-2">
             <CarTaxiFront className="h-5 w-5 shrink-0 self-center text-cobalt" aria-hidden />
             <span className="flex-1 text-headline">{t.go.taxi}</span>
-            <span className="text-subhead tabular-nums">{fmt(t.go.taxiEst, { min: r.taxi.minutes })}{r.taxi.cost ? ` · ≈ ¥${r.taxi.cost}` : ""}</span>
+            {r.taxi.minutes != null && <span className="text-subhead tabular-nums">{fmt(t.go.taxiEst, { min: r.taxi.minutes })}{r.taxi.cost ? ` · ≈ ¥${r.taxi.cost}` : ""}</span>}
           </div>
           <div className="mt-3"><RideButtons to={{ location: dest.location, name: dest.name }} address={dest.address} /></div>
         </Card>

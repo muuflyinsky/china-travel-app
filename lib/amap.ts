@@ -320,7 +320,8 @@ export type RouteStep =
   | { kind: "rail"; line: string; from: string; to: string; fromPy: string; toPy: string };
 
 export type TransitPlan = { minutes: number; cost?: number; walkMeters: number; steps: RouteStep[] };
-export type Routes = { transit: TransitPlan[]; taxi: { minutes: number; cost?: number; km: number } | null };
+/** `taxi` without minutes = the driving route is a big detour (see routes()): the card keeps its ride buttons, no estimate. */
+export type Routes = { transit: TransitPlan[]; taxi: { minutes?: number; cost?: number; km?: number } | null };
 
 type RawTransit = {
   cost: string | []; duration: string; walking_distance: string;
@@ -361,6 +362,23 @@ function toPlan(t: RawTransit): TransitPlan {
  * Public transport (up to 3 plans) and a taxi estimate between two GCJ-02 points.
  * `city`/`cityTo`: adcode or citycode of each end (needed by Amap for transit).
  */
+/** Straight-line metres between two "lng,lat" points. */
+function straightMeters(a: string, b: string) {
+  const [x1, y1] = a.split(",").map(Number), [x2, y2] = b.split(",").map(Number);
+  const rad = Math.PI / 180, dLat = (y2 - y1) * rad, dLng = (x2 - x1) * rad;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(y1 * rad) * Math.cos(y2 * rad) * Math.sin(dLng / 2) ** 2;
+  return 2 * 6371e3 * Math.asin(Math.sqrt(h));
+}
+/**
+ * A driving route more than 3× the straight line is Amap snapping the place to the wrong road
+ * (People's Square → the Bund, ~2 km apart, came back as 10.1 km / 54 min, 2026-11-24): showing
+ * that time and fare would mislead, so the taxi card drops its estimate (Veer, 2026-11-24).
+ */
+const detour = (origin: string, destination: string, roadMeters: number) => {
+  const line = straightMeters(origin, destination);
+  return line > 0 && roadMeters > 3 * line;
+};
+
 export async function routes(origin: string, destination: string, city: string, cityTo?: string): Promise<Routes> {
   if (demo.maps) return mock.routes;
   const [transit, drive] = await Promise.all([
@@ -376,6 +394,7 @@ export async function routes(origin: string, destination: string, city: string, 
   const taxiCost = num(drive?.route.taxi_cost) ?? num(transit?.route.taxi_cost);
   return {
     transit: (transit?.route.transits ?? []).slice(0, 3).map(toPlan).filter((p) => p.steps.some((s) => s.kind !== "walk")),
-    taxi: path ? { minutes: Math.round(Number(path.duration) / 60), km: Math.round(Number(path.distance) / 100) / 10, cost: taxiCost ? Math.round(taxiCost) : undefined } : null,
+    taxi: !path ? null : detour(origin, destination, Number(path.distance)) ? {}
+      : { minutes: Math.round(Number(path.duration) / 60), km: Math.round(Number(path.distance) / 100) / 10, cost: taxiCost ? Math.round(taxiCost) : undefined },
   };
 }
