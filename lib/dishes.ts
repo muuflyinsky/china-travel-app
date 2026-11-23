@@ -42,12 +42,12 @@ const ReadSchema = z.object({
 
 const READ_SYSTEM = `You read Chinese restaurant menus from photos (printed or handwritten).
 List every dish exactly as written, top to bottom: "zh" is the dish name in Chinese (copy it, don't translate or fix it), "price" is the price as printed including the unit such as 份/斤/位 (empty if none), "printed" is any ingredient or description text printed with that dish in Chinese (empty if none). Skip section headings, drinks lists without names, and restaurant slogans.
-"cuisine" is the kind of restaurant in English in one or two words (e.g. Sichuan, Cantonese, hotpot, noodles), empty if unclear.
+"cuisine" is the kind of restaurant in English in one or two words, judged from the dishes themselves: the regional style they belong to (红烧肉, 腌笃鲜, 八宝鸭 = Shanghainese; 白切鸡, 烧鹅 = Cantonese; 麻婆豆腐, 回锅肉 = Sichuan), or a kind of place (hotpot, noodles, dumplings). If the dishes are mixed or don't point to one style, give "Chinese" or leave it empty; never pick a style just because it is a common one.
 If the image is not a food menu, return an empty dishes array.`;
 
-export async function readMenuPhoto(image: { data: string; mediaType: string }) {
+export async function readMenuPhoto(image: { data: string; mediaType: string }, city?: string) {
   return structured(ReadSchema, {
-    system: READ_SYSTEM, maxTokens: 4000, image, text: "Read the menu.",
+    system: READ_SYSTEM, maxTokens: 4000, image, text: city ? `Read the menu. The restaurant is in ${city}.` : "Read the menu.",
     example: { cuisine: "Sichuan", dishes: [{ zh: "宫保鸡丁", price: "¥48/份", printed: "" }] },
     repair: (raw) => {
       const m = (raw ?? {}) as Record<string, unknown>;
@@ -229,7 +229,7 @@ export async function* readMenu(input: { image?: { data: string; mediaType: stri
   const region = regionOf(input.adcode);
   let items: Item[], cuisine = "";
   if (input.image) {
-    const read = await readMenuPhoto(input.image);
+    const read = await readMenuPhoto(input.image, input.city);
     items = read.dishes.slice(0, 60); cuisine = read.cuisine;
   } else {
     items = splitTyped(input.text ?? "");

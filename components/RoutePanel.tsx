@@ -8,6 +8,9 @@ import { useT } from "./useT";
 import { fmt, type Dict } from "@/lib/i18n";
 import type { Place, RouteStep, Routes } from "@/lib/amap";
 
+/** Walking distance: metres under 1 km, then kilometres to one decimal (1537 m → 1.5 km). */
+const distance = (m: number) => (m < 1000 ? `${Math.round(m)} m` : `${(m / 1000).toFixed(1)} km`);
+
 const STEP_ICON = { walk: Footprints, metro: TrainFront, bus: Bus, rail: TramFront } as const;
 
 /** "地铁10号线" → "Metro Line 10", "71路" → "Bus 71"; anything else stays as Amap wrote it. */
@@ -26,7 +29,7 @@ function Step({ s }: { s: RouteStep }) {
   return (
     <li className="flex gap-2">
       <Icon className="mt-0.5 h-4 w-4 shrink-0 text-cobalt" aria-hidden />
-      {s.kind === "walk" ? <span>{fmt(t.go.walkM, { m: s.meters })}</span> : (
+      {s.kind === "walk" ? <span>{fmt(t.go.walkM, { d: distance(s.meters) })}</span> : (
         <span className="min-w-0">
           <span className="font-semibold">{lineName(t, s)}</span>
           {"stops" in s && <span className="text-muted"> · {s.stops === 1 ? t.go.stop1 : fmt(t.go.stops, { n: s.stops })}</span>}
@@ -78,7 +81,7 @@ export function RoutePanel({ dest, origin }: { dest: Place; origin: { location: 
               {open === i && (
                 <div className="px-4 pb-3">
                   <ol className="space-y-2 text-subhead">{plan.steps.map((s, j) => <Step key={j} s={s} />)}</ol>
-                  <p className="mt-2 text-footnote text-muted">{fmt(t.go.walkTotal, { m: plan.walkMeters })}</p>
+                  <p className="mt-2 text-footnote text-muted">{fmt(t.go.walkTotal, { d: distance(plan.walkMeters) })}</p>
                 </div>
               )}
             </li>

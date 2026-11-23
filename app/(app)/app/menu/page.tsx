@@ -826,7 +826,7 @@ export default function MenuPage() {
             {tips.length > 0 && (
               <div>
                 <button onClick={() => setTipsOpen(!tipsOpen)} aria-expanded={tipsOpen} className="flex min-h-11 items-center gap-1 px-1 text-subhead font-semibold text-cobalt">
-                  <Lightbulb className="h-4 w-4" aria-hidden />{fmt(t.eat.tipsRow, { n: tips.length })}
+                  <Lightbulb className="h-4 w-4" aria-hidden />{tips.length === 1 ? t.eat.tipRow : fmt(t.eat.tipsRow, { n: tips.length })}
                   <ChevronRight className={`h-4 w-4 transition-transform ${tipsOpen ? "rotate-90" : ""}`} aria-hidden />
                 </button>
                 {tipsOpen && <div className="space-y-2">{tips.map((tip, i) => <Note key={i}>{tip}</Note>)}</div>}
