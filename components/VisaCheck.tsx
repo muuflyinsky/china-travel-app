@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { Popup, Searchbar } from "konsta/react";
-import { Check, ExternalLink, X } from "lucide-react";
-import { Card, Button, Seg } from "./ui";
+import { Check, ExternalLink, Stamp, X } from "lucide-react";
+import { Card, Button, Seg, Row, IconTile } from "./ui";
 import { useProfile } from "./useProfile";
 import { useT } from "./useT";
 import { fmt } from "@/lib/i18n";
@@ -60,7 +60,10 @@ export function CountryPicker({ open, onClose, onPick }: { open: boolean; onClos
  * Visa-free check: confirm a guessed nationality (usually one tap), ask one follow-up only for
  * transit-only passports, then show a result card. Also sets the stay countdown's entry type.
  */
-export function VisaCheck() {
+export function VisaCheck({ onRow }: {
+  /** Today before the trip (design §5.2): once answered, the result is one row inside a Group; tapping it calls this (the page opens the full card). */
+  onRow?: () => void;
+} = {}) {
   const t = useT();
   const [p, set] = useProfile();
   const name = useCountryName(p.lang);
@@ -70,12 +73,11 @@ export function VisaCheck() {
 
   const choose = (c: string) => {
     const rule = visaRule(c, null);
-    set({ nationality: c, onwardThird: null, homeCurrency: currencyFor(c), entryType: entryTypeFor(rule) });
+    set({ nationality: c, onwardThird: null, stayUntil: "", homeCurrency: currencyFor(c), entryType: entryTypeFor(rule) });
   };
   const rule = p.nationality ? visaRule(p.nationality, p.onwardThird) : null;
-  useEffect(() => {
-    if (rule && p.entryType !== entryTypeFor(rule)) set({ entryType: entryTypeFor(rule) });
-  }, [rule?.kind]); // eslint-disable-line react-hooks/exhaustive-deps
+  // The entry type follows the passport only when the passport or the onward answer changes here:
+  // syncing it on every visit undid a visa or extension the traveller set (Today's stay sheet, Settings).
 
   // Step 1 — confirm the passport.
   if (!p.nationality) {
@@ -106,7 +108,7 @@ export function VisaCheck() {
         <h3 className="text-headline">{t.visa.onwardQ}</h3>
         <p className="mt-1 text-subhead text-muted">{t.visa.onwardSub}</p>
         <div className="mt-3">
-          <Seg value={"" as "yes" | "no" | ""} onChange={(v) => set({ onwardThird: v === "yes" })}
+          <Seg value={"" as "yes" | "no" | ""} onChange={(v) => set({ onwardThird: v === "yes", entryType: entryTypeFor(visaRule(p.nationality, v === "yes")) })}
             options={[{ value: "yes", label: t.visa.onwardYes }, { value: "no", label: t.visa.onwardNo }]} />
         </div>
       </Card>
@@ -127,6 +129,13 @@ export function VisaCheck() {
     : r.kind === "transit240" ? [t.visa.cond.onward, t.visa.cond.ports, t.visa.cond.ordinary]
     : [t.visa.cond.applyVisa, t.visa.cond.transit24];
   const fmtDate = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString(p.lang, { timeZone: "UTC", day: "numeric", month: "long", year: "numeric" });
+
+  if (onRow) {
+    return (
+      <Row onClick={onRow} icon={<IconTile><Stamp className="h-5 w-5" aria-hidden /></IconTile>}
+        title={headline} sub={`${t.visa.title} · ${name(p.nationality)}`} />
+    );
+  }
 
   return (
     <Card>

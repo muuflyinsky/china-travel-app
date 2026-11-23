@@ -8,7 +8,6 @@ import { Screen, DemoNote } from "@/components/Shell";
 import { TrialHint } from "@/components/TrialHint";
 import { Section, Card, Group, Row, Note, IconTile, IconButton } from "@/components/ui";
 import { HotelCard } from "@/components/HotelCard";
-import { allergyLinesZh } from "@/lib/allergens";
 import { track } from "@/lib/track";
 import { apiHeaders } from "@/lib/device";
 import { inApp, quotaHit } from "@/lib/passes";
@@ -16,6 +15,7 @@ import { noteWin } from "@/lib/review";
 import { useProfile } from "@/components/useProfile";
 import { useT } from "@/components/useT";
 import { ShowCard } from "@/components/ShowCard";
+import { AllergyShowCard } from "@/components/AllergyShowCard";
 import { PHRASES } from "@/lib/phrases";
 import { langName } from "@/lib/languages";
 
@@ -62,6 +62,11 @@ export default function TalkPage() {
   // Hidden in the app until native speech input (1.1); the website keeps it. Set after mount: the UA isn't known on the server.
   const [micOk, setMicOk] = useState(false);
   useEffect(() => setMicOk(!inApp()), []);
+  // Today's Translate shortcut opens Talk ready to type (?focus=1); Phrasebook opens at #phrases.
+  useEffect(() => {
+    if (new URLSearchParams(location.search).has("focus")) inputRef.current?.focus();
+    if (location.hash === "#phrases") document.getElementById("phrases")?.scrollIntoView({ block: "start" });
+  }, []);
   const hasRestrictions = profile.allergens.length + profile.diets.length > 0;
   const me = profile.lang;
   const from = toZh ? me : "zh", to = toZh ? "zh" : me;
@@ -211,7 +216,7 @@ export default function TalkPage() {
         </Group>
       </Section>
 
-      <Section title={t.talk.phrasebook}>
+      <Section id="phrases" title={t.talk.phrasebook}>
         <div className="chip-row" role="tablist">
           {PHRASES.map((g) => (
             <button key={g.group} role="tab" aria-selected={g.group === group} aria-pressed={g.group === group} onClick={() => setGroup(g.group)} className="pill">
@@ -234,11 +239,7 @@ export default function TalkPage() {
         </Group>
       </Section>
       {card && <ShowCard lines={card.lines} explain={card.explain} onClose={() => setCard(null)} />}
-      {allergyCard && (() => {
-        const { severe, rest } = allergyLinesZh(profile.allergens, profile.diets, profile.severe);
-        return <ShowCard kind="allergy" lead={severe || undefined} lines={["您好！我有饮食限制，麻烦您帮忙确认，谢谢！"]} rest={rest}
-          replies={[{ zh: "可以，没问题", mine: t.eat.replyOk }, { zh: "里面有您过敏的东西", mine: t.eat.replyContainsAny }]} onClose={() => setAllergyCard(false)} />;
-      })()}
+      {allergyCard && <AllergyShowCard onClose={() => setAllergyCard(false)} />}
     </Screen>
   );
 }

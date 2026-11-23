@@ -11,7 +11,7 @@ import { addDays, stayWindow, todayIso, type EntryType } from "./stay";
 export type Phase = "before" | "arrival" | "in_china" | "leaving";
 
 export function tripPhase(
-  p: { arrival: string; departure: string; entryDate: string; locatedInChina: boolean; entryType: EntryType; visaDays: number; nationality?: string | null },
+  p: { arrival: string; departure: string; entryDate: string; locatedInChina: boolean; entryType: EntryType; visaDays: number; nationality?: string | null; stayUntil?: string },
   today = todayIso(),
 ): Phase {
   const over = Boolean(p.departure && today > p.departure);

@@ -166,7 +166,7 @@ export default function SettingsPage() {
 
       {/* ---- editors ---- */}
       <CountryPicker open={sheet === "passport"} onClose={close} onPick={(c) => {
-        set({ nationality: c, onwardThird: null, entryType: entryTypeFor(visaRule(c, null)), homeCurrency: currencyFor(c) });
+        set({ nationality: c, onwardThird: null, stayUntil: "", entryType: entryTypeFor(visaRule(c, null)), homeCurrency: currencyFor(c) });
       }} />
 
       <EditSheet open={sheet === "language"} title={t.settings.language} onClose={close}>
@@ -193,7 +193,7 @@ export default function SettingsPage() {
       </EditSheet>
 
       <EditSheet open={sheet === "entry"} title={t.settings.entryType} onClose={close}>
-        <ChoiceList value={p.entryType} onPick={(v: EntryType) => set({ entryType: v })}
+        <ChoiceList value={p.entryType} onPick={(v: EntryType) => set({ entryType: v, stayUntil: "" })}
           items={(Object.keys(t.settings.entryTypes) as EntryType[]).map((k) => ({ value: k, label: t.settings.entryTypes[k] }))} />
         {derived && <p className="px-1 text-footnote text-muted">{fmt(t.settings.entryAuto, { type: t.settings.entryTypes[derived] })}</p>}
         <Group>
@@ -203,7 +203,7 @@ export default function SettingsPage() {
             </Field>
           )}
           <Field label={t.settings.entry}>
-            <input type="date" value={p.entryDate || p.arrival} onChange={(e) => set({ entryDate: e.target.value })} />
+            <input type="date" value={p.entryDate || p.arrival} onChange={(e) => set({ entryDate: e.target.value, stayUntil: "" })} />
           </Field>
         </Group>
         <p className="px-1 text-footnote text-muted">{t.stay.checkStamp}</p>
