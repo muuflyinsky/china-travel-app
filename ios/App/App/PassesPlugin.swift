@@ -2,9 +2,10 @@ import Foundation
 import Capacitor
 import StoreKit
 
-/// Trip passes (non-renewing subscriptions) and tips (consumables) with StoreKit 2, for the web
-/// app's lib/passes.ts. Each pass comes back as Apple's signed transaction (JWS), which the
-/// server checks at /api/pass before lifting the free limits.
+/// Trip passes (non-renewing subscriptions), the free 3-day trial (a non-consumable at price 0,
+/// App Review 3.1.1) and tips (consumables) with StoreKit 2, for the web app's lib/passes.ts.
+/// Each pass or trial comes back as Apple's signed transaction (JWS), which the server checks at
+/// /api/pass before lifting the free limits.
 @objc(PassesPlugin)
 public class PassesPlugin: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "PassesPlugin"
@@ -63,11 +64,12 @@ public class PassesPlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
 
-    /// The newest pass transactions on this Apple ID (non-renewing stay in the history).
+    /// The newest pass and trial transactions on this Apple ID (non-renewing passes stay in the
+    /// history; the trial is the app's only non-consumable). The server works out which still run.
     private func passTransactions() async -> [String] {
         var found: [(Date, String)] = []
         for await result in Transaction.all {
-            if case .verified(let t) = result, t.productType == .nonRenewable, t.revocationDate == nil {
+            if case .verified(let t) = result, t.productType == .nonRenewable || t.productType == .nonConsumable, t.revocationDate == nil {
                 found.append((t.purchaseDate, result.jwsRepresentation))
             }
         }
