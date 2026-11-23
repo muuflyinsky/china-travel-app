@@ -472,7 +472,8 @@ export default function MenuPage() {
       });
       // 402: today's free uses are gone (the pass sheet opens) · 503: no AI configured (production) ·
       // 429: rate limited · 422: unreadable → retake · anything else: the AI service failed.
-      if (await quotaHit(r)) return false;
+      // Out of free uses: say plainly that these dishes have no allergy check (the pass sheet is open).
+      if (await quotaHit(r)) { setError("image" in body ? t.eat.notReadPhoto : t.eat.notReadText); return false; }
       if (!r.ok || !r.body) throw new Error(r.status === 503 || r.status === 429 ? "unavailable" : r.status === 422 ? "unreadable" : "down");
       let m: MealPage = { id, input: "image" in body ? "photo" : "text", thumb, cuisine: "", total: 0, dishes: [], tips: [], missing: 0 };
       setPages((ps) => [...ps, m]);

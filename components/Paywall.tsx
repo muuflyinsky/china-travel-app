@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import { ShieldAlert, Check } from "lucide-react";
+import { ShieldAlert, ShieldPlus, Check } from "lucide-react";
+import NextLink from "next/link";
 import { EditSheet } from "./EditSheet";
 import { ShowCard } from "./ShowCard";
 import { Button, Note } from "./ui";
@@ -88,10 +89,23 @@ export function Paywall() {
   const saving = (p: StoreProduct, days: number) => (oneDay && days > 1 && oneDay.price > 0 ? Math.floor((1 - p.price / days / oneDay.price) * 100) : 0);
   const cheapest = list.filter((x) => x.id !== TRIAL.id).sort((a, b) => a.price - b.price)[0];
   const title = kind === null ? "" : kind === "none" && offerTrial ? t.trial.title : t.pass.out[kind];
+  const outOfUses = kind !== null && kind !== "none";
+  // The allergy card is always one tap away; with no allergies saved yet, the way to make one.
+  const allergyRow = hasRestrictions ? (
+    <button onClick={() => setCard(true)} className="flex min-h-touch items-center gap-2 px-1 text-headline text-danger">
+      <ShieldAlert className="h-5 w-5" aria-hidden />{t.eat.showAllergyCard}
+    </button>
+  ) : (
+    <NextLink href="/app/settings#allergies" onClick={() => setKind(null)} className="flex min-h-touch items-center gap-2 px-1 text-subhead font-semibold text-cobalt">
+      <ShieldPlus className="h-5 w-5 shrink-0" aria-hidden />{t.pass.addAllergies}
+    </NextLink>
+  );
 
   return (
     <>
       <EditSheet open={kind !== null} title={title} onClose={() => setKind(null)}>
+        {/* Out of free uses, maybe at a restaurant table: the allergy card comes before anything on sale. */}
+        {outOfUses && allergyRow}
         {pass ? (
           <Note>{fmt(onTrial ? t.trial.active : t.pass.active, { date: until(pass.ends) })}</Note>
         ) : (
@@ -116,11 +130,7 @@ export function Paywall() {
             {kind && kind !== "none" && kind !== "hotel" && <p className="px-1 text-subhead text-muted">{t.pass.resets}</p>}
           </>
         )}
-        {hasRestrictions && (
-          <button onClick={() => setCard(true)} className="flex min-h-touch items-center gap-2 px-1 text-headline text-danger">
-            <ShieldAlert className="h-5 w-5" aria-hidden />{t.eat.showAllergyCard}
-          </button>
-        )}
+        {!outOfUses && allergyRow}
         {/* Passes stay on offer during the trial; a pass bought then starts at once. */}
         {canBuy && (!pass || onTrial) && (
           <div className="space-y-3">

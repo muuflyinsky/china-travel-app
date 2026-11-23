@@ -23,6 +23,24 @@ period withdrawn). Built (off until `QUOTA=on`); see "How it works" and "Turning
 - Offered in the pass sheet (opens when free uses run out, or from Settings → Trip pass) and in one line under
   the inputs on Eat and Talk (hidden for good with ×). Not on Today.
 
+## Allergy safety when the free uses run out
+
+D3 says the allergy check and allergy card are always free. With D23 the AI *reading* of new dishes (a menu photo,
+typed dish names) is limited, and that reading is what produces a new allergy check. So, precisely:
+
+- **Always free and unlimited**: the allergy card (with the severe "clean pans and utensils" line), the order card
+  and staff replies, emergency help; the allergy verdicts of every dish already read in this meal and of saved
+  dishes (worked out on the phone, so editing your allergies re-checks them at once); opening an already-read dish
+  for its details (`/api/dish`, not counted).
+- **Limited** (1 menu a day, 3 typed lookups a day, unlimited in the trial or with a pass): reading *new* dishes,
+  which is when they get their allergy check.
+- When a reading is refused because the free uses are gone, Eat says that page (or those dishes) has no allergy check
+  and to ask staff or show the allergy card; the pass sheet puts the allergy card first (or, with no allergies saved,
+  a link to add them), before the trial and passes.
+- Store and app wording therefore says "your allergy card and emergency help are always free, and dishes you've
+  already read keep their allergy check", not "allergy checks are unlimited". If Veer wants new-dish checks unlimited
+  for people with allergies, that is a decision (it would lift the menu limit for them), not a wording change.
+
 ## Free limits (per phone, after the trial or without one)
 
 | Feature | Free | Resets |
@@ -106,7 +124,8 @@ Events before 2026-11-01 have a per-tab id, not a daily one; leave them out.
   bound to the device until the pass ends, signed with `PASS_SECRET` (its own secret, not a Supabase key;
   without it `/api/pass` answers 503 and no token is accepted).
 - `components/Paywall.tsx`: opens on a 402 (or from Settings → Trip pass, or the trial line); offers the trial while
-  this Apple ID hasn't taken it, then the passes; always offers the allergy card. `components/TrialHint.tsx`: the
+  this Apple ID hasn't taken it, then the passes; always offers the allergy card (first, on a 402), or with no
+  allergies saved a link to add them. `components/TrialHint.tsx`: the
   trial line on Eat and Talk. `lib/passes.ts` remembers on the phone whether the trial was taken (`ctg.trial`, read
   from the transaction without trusting it: nothing is unlocked from it).
   `components/TipJar.tsx`: Settings → Leave a tip.
