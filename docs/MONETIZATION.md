@@ -59,11 +59,11 @@ typed dish names) is limited, and that reading is what produces a new allergy ch
 | Booking screenshot | 2 | never |
 | Allergy check and card, emergency, maps, routes, taxi card, booking links | unlimited | |
 
-**Open (Veer to decide)**: a restaurant's signature dishes (Explore → a restaurant, `components/RestaurantDetail.tsx`)
-are read through the same route as typed dish names, so for a phone on the free daily uses, opening a restaurant
-counts as one typed lookup (and once they're gone the dishes just don't show). Trial, pass and early devices aren't
-affected. Not counting them needs the server to know the names really are a restaurant's (a header the page sets
-would let anyone skip the typed-lookup limit).
+**Restaurant signature dishes** (Explore → a restaurant, `components/RestaurantDetail.tsx`; Veer 11-23): read through
+the same route as typed dish names, but dishes already in the dish cache are free; one typed lookup is counted only when
+some have to be generated, at the moment before the model call (`readMenu`'s `beforeModel`). With no free lookup left
+the cached ones still show and the rest don't. The request says `from: "restaurant"`; claiming that for a typed lookup
+gains nothing, since whatever needs the AI is still counted.
 
 Defined in `lib/products.ts` (`FREE`). Menu photos count per meal (DECISIONS D8, 2026-11-02): a menu is often 3–4 pages, so the first photo opens a 30-minute window for up to 4 photos (`use_menu_photo`, migration 0010). A 5th photo, or one after 30 minutes, starts the next meal.
 

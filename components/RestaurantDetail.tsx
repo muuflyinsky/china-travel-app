@@ -38,7 +38,8 @@ function useSignatureDishes(names: string[], lang: string, city: { e: string; n:
       const r = await fetch("/api/menu", {
         // Device headers like the Eat page: a trial, pass or early device isn't counted (lib/quota.ts).
         method: "POST", signal: ctl.signal, headers: { "content-type": "application/json", ...apiHeaders() },
-        body: JSON.stringify({ text: key, lang, city: `${city.e} (${city.n}, ${city.p})`, adcode: city.a }),
+        // from: cached signature dishes don't use up a free lookup (app/api/menu/route.ts).
+        body: JSON.stringify({ text: key, lang, city: `${city.e} (${city.n}, ${city.p})`, adcode: city.a, from: "restaurant" }),
       });
       if (!r.ok || !r.body) throw new Error(String(r.status));
       const reader = r.body.pipeThrough(new TextDecoderStream()).getReader();

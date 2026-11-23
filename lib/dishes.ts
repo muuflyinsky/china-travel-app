@@ -211,13 +211,20 @@ export type MenuEvent =
   | { type: "meta"; cuisine: string; total: number }
   | { type: "dish"; i: number; dish: ListDish; cached: boolean }
   | { type: "tips"; tips: string[] }
-  | { type: "missing"; i: number[]; reason?: string };
+  | { type: "missing"; i: number[]; reason?: string }
+  /** No free use left for the dishes that need the AI (restaurant lookups, which count only then). */
+  | { type: "quota" };
 
 /**
  * Streams a menu: the dish count first, then each dish as soon as it's known (cache hits at
  * once, the rest per model call), then tips. Timings go to the server log.
  */
-export async function* readMenu(input: { image?: { data: string; mediaType: string }; text?: string; lang: string; city?: string; adcode?: string }): AsyncGenerator<MenuEvent> {
+/**
+ * `beforeModel`: asked once, after the cache hits are out and before any model call; false stops
+ * there (the rest aren't read). Restaurant signature dishes use it to count a free use only when
+ * something has to be generated (app/api/menu/route.ts).
+ */
+export async function* readMenu(input: { image?: { data: string; mediaType: string }; text?: string; lang: string; city?: string; adcode?: string; beforeModel?: () => Promise<boolean> }): AsyncGenerator<MenuEvent> {
   const t0 = Date.now();
   const region = regionOf(input.adcode);
   let items: Item[], cuisine = "";
@@ -247,6 +254,7 @@ export async function* readMenu(input: { image?: { data: string; mediaType: stri
     if (h) yield { type: "dish", i, dish: fromCache(items[i], h), cached: true };
     else misses.push(i);
   }
+  if (misses.length && input.beforeModel && !(await input.beforeModel())) { yield { type: "quota" }; return; }
 
   // Facts another language already stored: a new language merges into them instead of replacing them.
   const stored = new Map<number, Cached["facts"]>();
