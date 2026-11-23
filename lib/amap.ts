@@ -379,6 +379,25 @@ const detour = (origin: string, destination: string, roadMeters: number) => {
   return line > 0 && roadMeters > 3 * line;
 };
 
+/** How much slower a metro plan may be and still come first (Veer, 2026-11-24). */
+const METRO_LEAD_MIN = 10;
+/**
+ * Fastest first, three at most. Amap's own order weighs transfers and walking, so a 46-min metro
+ * trip came before a 28-min bus. Exception: if the fastest is bus-only and a metro plan is at most
+ * METRO_LEAD_MIN slower, the metro comes first: English station names and announcements are
+ * easier for a visitor than Chinese bus stops.
+ */
+export function orderPlans(plans: TransitPlan[]): TransitPlan[] {
+  const byTime = [...plans].sort((a, b) => a.minutes - b.minutes);
+  const hasMetro = (p: TransitPlan) => p.steps.some((s) => s.kind === "metro");
+  const metro = byTime.find(hasMetro);
+  if (byTime[0] && !hasMetro(byTime[0]) && metro && metro.minutes - byTime[0].minutes <= METRO_LEAD_MIN) {
+    byTime.splice(byTime.indexOf(metro), 1);
+    byTime.unshift(metro);
+  }
+  return byTime.slice(0, 3);
+}
+
 export async function routes(origin: string, destination: string, city: string, cityTo?: string): Promise<Routes> {
   if (demo.maps) return mock.routes;
   const [transit, drive] = await Promise.all([
@@ -393,7 +412,7 @@ export async function routes(origin: string, destination: string, city: string, 
   const path = drive?.route.paths?.[0];
   const taxiCost = num(drive?.route.taxi_cost) ?? num(transit?.route.taxi_cost);
   return {
-    transit: (transit?.route.transits ?? []).slice(0, 3).map(toPlan).filter((p) => p.steps.some((s) => s.kind !== "walk")),
+    transit: orderPlans((transit?.route.transits ?? []).map(toPlan).filter((p) => p.steps.some((s) => s.kind !== "walk"))),
     taxi: !path ? null : detour(origin, destination, Number(path.distance)) ? {}
       : { minutes: Math.round(Number(path.duration) / 60), km: Math.round(Number(path.distance) / 100) / 10, cost: taxiCost ? Math.round(taxiCost) : undefined },
   };
