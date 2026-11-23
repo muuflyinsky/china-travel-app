@@ -97,7 +97,7 @@ export function Paywall() {
       <ShieldAlert className="h-5 w-5" aria-hidden />{t.eat.showAllergyCard}
     </button>
   ) : (
-    <NextLink href="/app/settings#allergies" onClick={() => setKind(null)} className="flex min-h-touch items-center gap-2 px-1 text-subhead font-semibold text-cobalt">
+    <NextLink href="/app/settings#allergies" onClick={() => { setKind(null); window.dispatchEvent(new CustomEvent("ctg:settings", { detail: "allergies" })); }} className="flex min-h-touch items-center gap-2 px-1 text-subhead font-semibold text-cobalt">
       <ShieldPlus className="h-5 w-5 shrink-0" aria-hidden />{t.pass.addAllergies}
     </NextLink>
   );

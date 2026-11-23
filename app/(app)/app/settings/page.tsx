@@ -79,10 +79,14 @@ export default function SettingsPage() {
   const day = (ms: number) => new Date(ms).toLocaleDateString(p.lang, { day: "numeric", month: "short" });
   const [version, setVersion] = useState("1.0");
   useEffect(() => setVersion(appVersion()), []);
-  // Deep links such as /app/settings#dates open the matching editor.
+  // Deep links such as /app/settings#dates open the matching editor; "ctg:settings" does the same
+  // while Settings is already open (a link to the same page doesn't remount it, e.g. from the pass sheet).
   useEffect(() => {
     const h = location.hash.slice(1) as Sheet;
     if (SHEETS.includes(h)) setSheet(h);
+    const open = (e: Event) => { const s = (e as CustomEvent<Sheet>).detail; if (SHEETS.includes(s)) setSheet(s); };
+    window.addEventListener("ctg:settings", open);
+    return () => window.removeEventListener("ctg:settings", open);
   }, []);
   const close = () => { setSheet(null); if (location.hash) history.replaceState(null, "", location.pathname); };
 
