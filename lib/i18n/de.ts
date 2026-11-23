@@ -2,6 +2,7 @@ import type { Dict } from "./en";
 
 export const de: Dict = {
   common: {
+    chooseDate: "Datum wählen",
     retry: "Erneut versuchen",
     unavailable: "Vorübergehend nicht verfügbar. Bitte später erneut versuchen.",
     skip: "Überspringen",

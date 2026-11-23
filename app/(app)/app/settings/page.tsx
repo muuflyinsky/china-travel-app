@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Check, Plus, X, Trash2, Languages, Banknote, SunMoon, CarTaxiFront, IdCard, Stamp, CalendarRange, MapPinned, ShieldAlert, Salad, Ticket, HandHeart, Coins, Lock, LifeBuoy, Info } from "lucide-react";
 import { Screen } from "@/components/Shell";
-import { Section, Group, Row, Field, Note, IconTile } from "@/components/ui";
+import { Section, Group, Row, Field, Note, IconTile, DateInput } from "@/components/ui";
 import { EditSheet } from "@/components/EditSheet";
 import { AppIcon } from "@/components/AppIcon";
 import { CountryPicker, useCountryName } from "@/components/VisaCheck";
@@ -184,8 +184,8 @@ export default function SettingsPage() {
 
       <EditSheet open={sheet === "dates"} title={t.settings.dates} onClose={close}>
         <Group>
-          <Field label={t.settings.arrival}><input type="date" value={p.arrival} onChange={(e) => set({ arrival: e.target.value })} /></Field>
-          <Field label={t.settings.departure}><input type="date" value={p.departure} min={p.arrival || undefined} onChange={(e) => set({ departure: e.target.value })} /></Field>
+          <Field label={t.settings.arrival}><DateInput value={p.arrival} onChange={(e) => set({ arrival: e.target.value })} /></Field>
+          <Field label={t.settings.departure}><DateInput value={p.departure} min={p.arrival || undefined} onChange={(e) => set({ departure: e.target.value })} /></Field>
         </Group>
         <p className="px-1 text-footnote text-muted">{t.settings.datesNote}</p>
         {/* Shown as soon as the departure date is past the legal limit, not later on Today. */}
@@ -203,7 +203,7 @@ export default function SettingsPage() {
             </Field>
           )}
           <Field label={t.settings.entry}>
-            <input type="date" value={p.entryDate || p.arrival} onChange={(e) => set({ entryDate: e.target.value, stayUntil: "" })} />
+            <DateInput value={p.entryDate || p.arrival} onChange={(e) => set({ entryDate: e.target.value, stayUntil: "" })} />
           </Field>
         </Group>
         <p className="px-1 text-footnote text-muted">{t.stay.checkStamp}</p>
@@ -222,11 +222,11 @@ export default function SettingsPage() {
                 </div>
                 {/* Optional: lets Today pick the right city on each day of the trip. */}
                 <div className="flex items-center gap-2 pr-4 pb-2 text-subhead text-muted">
-                  <input type="date" aria-label={`${c.e}: ${t.settings.cityFrom}`} value={c.from ?? ""} min={p.arrival || undefined} max={p.departure || undefined}
-                    onChange={(e) => patch({ from: e.target.value || undefined })} className="min-w-0 flex-1 rounded-lg bg-porcelain px-2 py-1.5 text-ink" />
+                  <DateInput wrapClassName="min-w-0 flex-1" hintPad="px-2" aria-label={`${c.e}: ${t.settings.cityFrom}`} value={c.from ?? ""} min={p.arrival || undefined} max={p.departure || undefined}
+                    onChange={(e) => patch({ from: e.target.value || undefined })} className="w-full rounded-lg bg-porcelain px-2 py-1.5 text-ink" />
                   –
-                  <input type="date" aria-label={`${c.e}: ${t.settings.cityTo}`} value={c.to ?? ""} min={c.from || p.arrival || undefined} max={p.departure || undefined}
-                    onChange={(e) => patch({ to: e.target.value || undefined })} className="min-w-0 flex-1 rounded-lg bg-porcelain px-2 py-1.5 text-ink" />
+                  <DateInput wrapClassName="min-w-0 flex-1" hintPad="px-2" aria-label={`${c.e}: ${t.settings.cityTo}`} value={c.to ?? ""} min={c.from || p.arrival || undefined} max={p.departure || undefined}
+                    onChange={(e) => patch({ to: e.target.value || undefined })} className="w-full rounded-lg bg-porcelain px-2 py-1.5 text-ink" />
                 </div>
               </li>
             );

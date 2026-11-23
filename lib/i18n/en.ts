@@ -2,6 +2,7 @@
 // {name} placeholders are filled by fmt().
 export const en = {
   common: {
+    chooseDate: "Choose a date",
     retry: "Try again",
     unavailable: "Temporarily unavailable. Please try again later.",
     skip: "Skip",

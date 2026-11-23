@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { AlarmClock, ExternalLink, TriangleAlert, Check } from "lucide-react";
 import { EditSheet } from "./EditSheet";
-import { Group, Field, Button, Note } from "./ui";
+import { Group, Field, Button, Note, DateInput } from "./ui";
 import { SourceLine } from "./SourceLine";
 import { Feedback } from "./Feedback";
 import { useProfile } from "./useProfile";
@@ -48,7 +48,7 @@ export function ReservationSheet({ r, open, onClose }: { r: Reservation; open: b
     <EditSheet open={open} title={r.en} onClose={onClose}>
       <p className="zh px-1 text-subhead text-muted">{r.zh}</p>
       <Group>
-        <Field label={t.resv.visitDate}><input type="date" value={visit} min={todayIso()} onChange={(e) => { setVisit(e.target.value); setSaved(false); }} /></Field>
+        <Field label={t.resv.visitDate}><DateInput value={visit} min={todayIso()} onChange={(e) => { setVisit(e.target.value); setSaved(false); }} /></Field>
       </Group>
       {at ? (
         <div className="rounded-card border border-line bg-card p-4">
