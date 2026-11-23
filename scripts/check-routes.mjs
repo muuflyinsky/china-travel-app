@@ -14,6 +14,7 @@ const lines = (ps) => ps.map((p) => p.steps[0].line).join(",");
 const cases = [
   ["Bund 11-24: metro 18 min slower stays behind", [metro(46, "M8"), bus(28, "71"), bus(31, "123")], "71,123,M8"],
   ["metro 8 min slower comes first", [bus(30, "71"), metro(38, "M2"), bus(33, "123")], "M2,71,123"],
+  ["metro 5 min slower comes first", [bus(28, "71"), bus(31, "123"), metro(33, "M2")], "M2,71,123"],
   ["metro exactly 10 min slower comes first", [bus(20, "71"), metro(30, "M2")], "M2,71"],
   ["fastest is metro: plain time order", [bus(25, "71"), metro(22, "M2"), metro(24, "M10")], "M2,M10,71"],
   ["no metro: time order", [bus(40, "A"), bus(20, "B"), bus(30, "C")], "B,C,A"],
