@@ -344,7 +344,9 @@ function CityLine() {
     if (detected) return;
     locationAllowed().then((ok) => { if (ok) detect().catch(() => {}); });
   }, [detected, detect]);
-  const today = wx?.casts?.[0];
+  // Today's forecast by date (Beijing), never yesterday's: the API drops past days, this is a second guard.
+  const bj = new Date(Date.now() + 8 * 3600_000).toISOString().slice(0, 10);
+  const today = wx?.casts?.find((c) => c.date === bj);
   return (
     <div className="flex items-center gap-1 px-1 text-subhead text-muted">
       {t.city.youreIn} <CityPicker compact value={city} onChange={setCity} onLocate={detect} />
