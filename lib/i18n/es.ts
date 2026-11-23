@@ -905,7 +905,7 @@ export const es: Dict = {
     trainSoon: "Los billetes salen a la venta el {date}, 15 días antes. Reserva ese día: los trenes populares se agotan rápido.",
     names: { newYear: "Año Nuevo", spring: "Año Nuevo chino", qingming: "Qingming", labour: "Día del Trabajo", dragon: "Festival del Bote del Dragón", midAutumn: "Festival del Medio Otoño", national: "Día Nacional" },
   },
-  /** Launch period (DECISIONS D21): components/PromoNote.tsx, Settings, the pass sheet. */
+  /** Free 3-day trial (DECISIONS D23): components/Paywall.tsx, TrialHint.tsx, Settings. */
   trial: {
     title: "Pruébalo todo gratis 3 días",
     includes: "Fotos de carta, búsquedas de platos, traducciones y capturas de reserva ilimitadas durante 3 días.",
@@ -914,7 +914,7 @@ export const es: Dict = {
     start: "Empezar mis 3 días gratis",
     once: "Una prueba gratis por Apple ID.",
     orPass: "O elige un pase de viaje",
-    passStarts: "Un pase empieza en cuanto lo compras, así que puedes esperar a que termine tu prueba.",
+    passStarts: "Un pase empieza en cuanto lo compras, así que solo ves los pases que duran más que tu prueba.",
     active: "Prueba gratis: ilimitado hasta el {date}",
     started: "Tu prueba gratis ha empezado: ilimitado hasta el {date}.",
     used: "Este Apple ID ya usó su prueba gratis. Elige un pase de viaje o sigue con los usos gratis de cada día.",
@@ -924,6 +924,7 @@ export const es: Dict = {
     hint: "Prueba el uso ilimitado gratis 3 días",
     hide: "Ocultar",
   },
+  /** Early devices, unlimited until 31 December 2026 (DECISIONS D23, lib/early.ts). */
   early: {
     settings: "Ilimitado hasta el {date}",
     sheet: "Usas HaodeGo desde antes de esta versión, así que, como prometimos, tienes uso ilimitado hasta el {date}. Una prueba o un pase empiezan cuando los activas, así que no los necesitarás antes.",

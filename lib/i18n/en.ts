@@ -908,7 +908,7 @@ export const en = {
     trainSoon: "Tickets go on sale {date}, 15 days ahead. Book that day: popular trains sell out fast.",
     names: { newYear: "New Year", spring: "Spring Festival", qingming: "Qingming", labour: "Labour Day", dragon: "Dragon Boat Festival", midAutumn: "Mid-Autumn Festival", national: "National Day" },
   },
-  /** Launch period (DECISIONS D21): components/PromoNote.tsx, Settings, the pass sheet. */
+  /** Free 3-day trial (DECISIONS D23): components/Paywall.tsx, TrialHint.tsx, Settings. */
   trial: {
     title: "Try everything free for 3 days",
     includes: "Unlimited menu photos, dish lookups, translation and booking screenshots for 3 days.",
@@ -917,7 +917,7 @@ export const en = {
     start: "Start your free 3 days",
     once: "One free trial per Apple ID.",
     orPass: "Or choose a trip pass",
-    passStarts: "A pass starts as soon as you buy it, so you can wait until your trial ends.",
+    passStarts: "A pass starts as soon as you buy it, so only passes that run past your trial are shown.",
     active: "Free trial: unlimited until {date}",
     started: "Your free trial has started: unlimited until {date}.",
     used: "This Apple ID has already used its free trial. Choose a trip pass, or keep using the free daily allowance.",
@@ -927,6 +927,7 @@ export const en = {
     hint: "Try unlimited use free for 3 days",
     hide: "Hide",
   },
+  /** Early devices, unlimited until 31 December 2026 (DECISIONS D23, lib/early.ts). */
   early: {
     settings: "Unlimited until {date}",
     sheet: "You’ve been using HaodeGo since before this version, so as promised you have unlimited use until {date}. A trial or pass starts when you take it, so you won’t need one before then.",

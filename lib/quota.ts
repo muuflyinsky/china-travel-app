@@ -2,7 +2,7 @@
 // which waits for iOS 1.1 (trial and passes) to be on sale. Counts live in Supabase (usage_counts);
 // if it can't be reached the use is allowed, so an outage on our side never blocks a traveller.
 // Not limited: a valid trip pass or trial token, an early device until 31 December (lib/early.ts),
-// and app 1.0.
+// and an app build without the StoreKit plugin (none shipped: 1.0 already has it, so it counts as "app").
 import { NextResponse } from "next/server";
 import { FREE, type QuotaKind } from "./products";
 import { passValid } from "./passes-server";
@@ -20,8 +20,8 @@ export function deviceOf(req: Request) {
   return "ip:" + (req.headers.get("x-forwarded-for")?.split(",")[0].trim() || "unknown");
 }
 
-// The first app version (1.0) can't sell passes, so it isn't limited: the page tells us with
-// x-ctg-client: app-old (lib/device.ts). Easy to fake, but the per-IP limits still cap a script.
+// An app build without the StoreKit plugin can't sell passes, so it isn't limited: the page tells us
+// with x-ctg-client: app-old (lib/device.ts). Every shipped build, 1.0 included, has the plugin. Easy to fake, but the per-IP limits still cap a script.
 // Stop honouring it once most phones have updated.
 const limited = (req: Request) =>
   !(req.headers.get("x-ctg-client") === "app-old" && /ChinaTravelBuddy-iOS/.test(req.headers.get("user-agent") ?? ""));

@@ -32,7 +32,9 @@ export const beijingDay = (now = new Date()) => now.toLocaleDateString("en-CA", 
 /** The day 1.1 went on sale (server only; the page gets it from app/(app)/layout.tsx). */
 export function earlyBefore(): string | null {
   const v = process.env.EARLY_BEFORE?.trim();
-  return isDay(v) ? v : null;
+  // Must be after OLD_DEVICE, or every device that was here before this code would count as new;
+  // an earlier value is ignored (and the limits stay off until EARLY_FREE_UNTIL, lib/quota.ts).
+  return isDay(v) && v > OLD_DEVICE ? v : null;
 }
 
 /** True while a device that started before `before` still has its free period. */

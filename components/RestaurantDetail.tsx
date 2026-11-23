@@ -20,6 +20,7 @@ import { track } from "@/lib/track";
 import type { ListedRestaurant } from "@/lib/restaurants";
 import type { ListDish, MenuEvent } from "@/lib/dishes";
 import { hasChinese } from "@/lib/dish-name";
+import { apiHeaders } from "@/lib/device";
 
 /**
  * Signature dishes through the menu pipeline (/api/menu with typed names): dish knowledge base
@@ -35,7 +36,8 @@ function useSignatureDishes(names: string[], lang: string, city: { e: string; n:
     setDishes(names.map(() => undefined));
     (async () => {
       const r = await fetch("/api/menu", {
-        method: "POST", signal: ctl.signal, headers: { "content-type": "application/json" },
+        // Device headers like the Eat page: a trial, pass or early device isn't counted (lib/quota.ts).
+        method: "POST", signal: ctl.signal, headers: { "content-type": "application/json", ...apiHeaders() },
         body: JSON.stringify({ text: key, lang, city: `${city.e} (${city.n}, ${city.p})`, adcode: city.a }),
       });
       if (!r.ok || !r.body) throw new Error(String(r.status));

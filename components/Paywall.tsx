@@ -54,7 +54,8 @@ export function Paywall() {
   const onTrial = isTrial(pass);
   // Offered only while the App Store has it and this Apple ID hasn't taken it (as far as we know:
   // taking it again is harmless, the server keeps the first start).
-  const offerTrial = canBuy && !pass && taken === null && list.some((x) => x.id === TRIAL.id);
+  // Not for an early device: its 3 days would run out while it's unlimited anyway (it comes back on 1 January).
+  const offerTrial = canBuy && !pass && !early && taken === null && list.some((x) => x.id === TRIAL.id);
 
   async function purchase(id: string) {
     setBusy(id); setNote(null);
@@ -63,7 +64,7 @@ export function Paywall() {
     setTaken(trialStart());
     if (r.status === "purchased" && r.pass) {
       setPass(r.pass);
-      setNote({ tone: "info", text: fmt(isTrial(r.pass) ? t.trial.started : t.pass.thanks, { date: until(r.pass.ends) }) });
+      setNote({ tone: "info", text: fmt(id === TRIAL.id ? t.trial.started : t.pass.thanks, { date: until(r.pass.ends) }) });
     }
     else if (r.status === "trialUsed") setNote({ tone: "warn", text: t.trial.used });
     else if (r.status === "unlinked") setNote({ tone: "warn", text: id === TRIAL.id ? t.trial.unlinked : t.pass.unlinked });
@@ -77,7 +78,7 @@ export function Paywall() {
     setBusy(null);
     setTaken(trialStart());
     if (p === "unreachable") setNote({ tone: "warn", text: t.pass.unreachable });
-    else if (p) { setPass(p); setNote({ tone: "info", text: fmt(t.pass.thanks, { date: until(p.ends) }) }); }
+    else if (p) { setPass(p); setNote({ tone: "info", text: fmt(isTrial(p) ? t.trial.active : t.pass.thanks, { date: until(p.ends) }) }); }
     else setNote({ tone: "warn", text: t.pass.restoreNone });
   }
 
@@ -140,7 +141,8 @@ export function Paywall() {
             {items === "error" && <Note tone="warn">{t.pass.unavailable}</Note>}
             {PASSES.map((p) => {
               const sp = list.find((x) => x.id === p.id);
-              if (!sp) return null;
+              // During the trial, only passes that run past it: a shorter one would buy nothing (it starts at once).
+              if (!sp || (pass && Date.now() + p.days * 86_400_000 <= pass.ends)) return null;
               const save = saving(sp, p.days);
               return (
                 <button key={p.id} onClick={() => purchase(p.id)} disabled={busy !== null}

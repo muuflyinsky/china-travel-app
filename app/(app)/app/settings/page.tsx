@@ -100,7 +100,10 @@ export default function SettingsPage() {
 
   function clearAll() {
     if (!confirm(t.settings.clearConfirm)) return;
-    try { Object.keys(localStorage).filter((k) => k.startsWith("ctg.")).forEach((k) => localStorage.removeItem(k)); } catch {}
+    // Kept: when this device started (early devices, lib/early.ts) and whether this Apple ID took the
+    // trial. Neither is personal, and clearing them would only take away what the traveller is owed.
+    const keep = new Set(["ctg.since", "ctg.trial"]);
+    try { Object.keys(localStorage).filter((k) => k.startsWith("ctg.") && !keep.has(k)).forEach((k) => localStorage.removeItem(k)); } catch {}
     location.href = "/app";
   }
 

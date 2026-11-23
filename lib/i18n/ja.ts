@@ -905,7 +905,7 @@ export const ja: Dict = {
     trainSoon: "切符は{date}に発売（15日前）。人気の列車はすぐ売り切れるので、その日に予約しましょう。",
     names: { newYear: "元日", spring: "春節", qingming: "清明節", labour: "労働節", dragon: "端午節", midAutumn: "中秋節", national: "国慶節" },
   },
-  /** Launch period (DECISIONS D21): components/PromoNote.tsx, Settings, the pass sheet. */
+  /** Free 3-day trial (DECISIONS D23): components/Paywall.tsx, TrialHint.tsx, Settings. */
   trial: {
     title: "3日間すべて無料でお試し",
     includes: "3日間、メニュー撮影・料理検索・翻訳・予約スクリーンショット読み取りが無制限です。",
@@ -914,7 +914,7 @@ export const ja: Dict = {
     start: "3日間の無料トライアルを始める",
     once: "無料トライアルはApple IDごとに1回です。",
     orPass: "またはトラベルパスを選ぶ",
-    passStarts: "パスは購入した時点で始まるので、トライアル終了後に購入しても大丈夫です。",
+    passStarts: "パスは購入した時点で始まるため、トライアルより長く使えるパスだけを表示しています。",
     active: "無料トライアル：{date}まで無制限",
     started: "無料トライアルが始まりました：{date}まで無制限です。",
     used: "このApple IDは無料トライアルを使用済みです。トラベルパスを選ぶか、毎日の無料枠をご利用ください。",
@@ -924,6 +924,7 @@ export const ja: Dict = {
     hint: "無制限の利用を3日間無料でお試し",
     hide: "非表示",
   },
+  /** Early devices, unlimited until 31 December 2026 (DECISIONS D23, lib/early.ts). */
   early: {
     settings: "{date}まで無制限",
     sheet: "このバージョンより前からHaodeGoをご利用いただいているため、お約束どおり{date}まで無制限でご利用いただけます。トライアルやパスは始めた時点から数えるので、それまでは必要ありません。",

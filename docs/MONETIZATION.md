@@ -51,6 +51,12 @@ typed dish names) is limited, and that reading is what produces a new allergy ch
 | Booking screenshot | 2 | never |
 | Allergy check and card, emergency, maps, routes, taxi card, booking links | unlimited | |
 
+**Open (Veer to decide)**: a restaurant's signature dishes (Explore → a restaurant, `components/RestaurantDetail.tsx`)
+are read through the same route as typed dish names, so for a phone on the free daily uses, opening a restaurant
+counts as one typed lookup (and once they're gone the dishes just don't show). Trial, pass and early devices aren't
+affected. Not counting them needs the server to know the names really are a restaurant's (a header the page sets
+would let anyone skip the typed-lookup limit).
+
 Defined in `lib/products.ts` (`FREE`). Menu photos count per meal (DECISIONS D8, 2026-11-02): a menu is often 3–4 pages, so the first photo opens a 30-minute window for up to 4 photos (`use_menu_photo`, migration 0010). A 5th photo, or one after 30 minutes, starts the next meal.
 
 ## Passes (starting prices, to be tested)
@@ -114,7 +120,9 @@ Events before 2026-11-01 have a per-tab id, not a daily one; leave them out.
 - `lib/products.ts`: product ids (passes, `TRIAL`, tips) and free limits, shared by server and page.
 - `lib/quota.ts`: counts a use in Supabase (`usage_counts`, `use_quota()`, migration 0008) and answers 402
   when the free uses are gone; gives the use back if the AI call fails; allows the use if Supabase is down.
-  Off unless the env var `QUOTA=on`. App 1.0 (no StoreKit plugin) sends `x-ctg-client: app-old` and isn't limited.
+  Off unless the env var `QUOTA=on`. A build without the StoreKit plugin sends `x-ctg-client: app-old` and isn't
+  limited, but every shipped build has the plugin, 1.0 included: 1.0 users are limited like 1.1 (after their early
+  period) and can buy passes there; the trial bought in 1.0 isn't restored by 1.0's plugin after a reinstall (1.1 does).
   Early devices aren't limited until 31 December 2026 (below).
 - `lib/device.ts`: random device id in localStorage, sent as `x-ctg-device` with `x-ctg-client` and the pass token.
 - `ios/App/App/PassesPlugin.swift`: StoreKit 2 (products, buy, entitlements, restore), registered in
@@ -158,6 +166,16 @@ that used HaodeGo before 1.1 went on sale keep unlimited AI until 2026-12-31, Be
   origin), so 1.0 users who update count as early.
 - **The rule** (`lib/early.ts`): the page sends `x-ctg-since`; a device whose day is before `EARLY_BEFORE` is early.
   Settings → Trip pass shows "Unlimited until 31 December 2026"; the sheet, opened from there, says so too.
+- **Who it misses**: the flag lives in the browser's storage. A website visitor whose browser deleted it (Safari
+  removes a site's data after 7 days without a visit; private windows keep nothing), a new phone or browser, or a
+  device that only ever opened a city guide (that layout stores nothing) counts as new. "Clear all data" in Settings
+  keeps `ctg.since` and `ctg.trial`. A server-side record of device ids seen before `EARLY_BEFORE` would close the
+  first gap; not built, since nothing was recorded before 11-23 anyway.
+- **Website visitors count too**: the D21 note was shown on the website as well, so a browser that used HaodeGo before
+  the cut-off is early. D23 item 7 says "used the App"; if Veer wants the app only, the server can also require
+  `x-ctg-client: app` (one line in `lib/quota.ts`).
+- `EARLY_BEFORE` must be after 2026-11-23 (the day given to devices that were already here); an earlier value is
+  ignored.
 - **Limits of it**: like `x-ctg-client`, the header is the page's word. Someone who edits localStorage can claim an
   early day; that buys free AI until 31 December at most, and the per-IP rate limits still cap scripts. A device
   that cleared its storage, or a new browser, starts again as a new device.

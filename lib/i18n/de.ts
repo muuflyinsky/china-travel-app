@@ -905,7 +905,7 @@ export const de: Dict = {
     trainSoon: "Tickets gibt es ab {date}, 15 Tage vorher. Am besten an dem Tag buchen: Beliebte Züge sind schnell ausgebucht.",
     names: { newYear: "Neujahr", spring: "Frühlingsfest", qingming: "Qingming", labour: "Tag der Arbeit", dragon: "Drachenbootfest", midAutumn: "Mondfest", national: "Nationalfeiertag" },
   },
-  /** Launch period (DECISIONS D21): components/PromoNote.tsx, Settings, the pass sheet. */
+  /** Free 3-day trial (DECISIONS D23): components/Paywall.tsx, TrialHint.tsx, Settings. */
   trial: {
     title: "3 Tage alles kostenlos testen",
     includes: "3 Tage lang unbegrenzt Speisekarten-Fotos, Gerichtsabfragen, Übersetzungen und Buchungs-Screenshots.",
@@ -914,7 +914,7 @@ export const de: Dict = {
     start: "3 Tage kostenlos starten",
     once: "Ein kostenloser Test pro Apple-ID.",
     orPass: "Oder wähle einen Reisepass",
-    passStarts: "Ein Reisepass beginnt sofort mit dem Kauf, du kannst also warten, bis dein Test endet.",
+    passStarts: "Ein Reisepass beginnt sofort mit dem Kauf, deshalb siehst du nur Pässe, die länger laufen als dein Test.",
     active: "Kostenloser Test: unbegrenzt bis {date}",
     started: "Dein kostenloser Test läuft: unbegrenzt bis {date}.",
     used: "Diese Apple-ID hat ihren kostenlosen Test schon genutzt. Wähle einen Reisepass oder nutze weiter das kostenlose Tageskontingent.",
@@ -924,6 +924,7 @@ export const de: Dict = {
     hint: "Unbegrenzte Nutzung 3 Tage kostenlos testen",
     hide: "Ausblenden",
   },
+  /** Early devices, unlimited until 31 December 2026 (DECISIONS D23, lib/early.ts). */
   early: {
     settings: "Unbegrenzt bis {date}",
     sheet: "Du nutzt HaodeGo schon seit vor dieser Version, deshalb hast du wie versprochen unbegrenzte Nutzung bis zum {date}. Ein Test oder Reisepass beginnt erst, wenn du ihn startest, du brauchst also vorher keinen.",
