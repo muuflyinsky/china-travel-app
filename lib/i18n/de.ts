@@ -1090,7 +1090,7 @@ export const de: Dict = {
     stayLeftTitle1: "Noch 1 Tag Aufenthalt",
     stayOverTitle1: "Dein Plan liegt 1 Tag über dem erlaubten Aufenthalt",
     sightsToBook1: "1 Sehenswürdigkeit buchen",
-    airportPlan: "Zum Flughafen",
+    airportPlan: "Route ansehen",
     leaveBody: "Dein Flug geht am {date}. Fahr 3 Stunden vor einem internationalen Flug los.",
     leaveBodyNoDate: "Fahr 3 Stunden vor einem internationalen Flug los.",
   },

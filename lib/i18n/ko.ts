@@ -1090,7 +1090,7 @@ export const ko: Dict = {
     stayLeftTitle1: "체류 기간이 1일 남았어요",
     stayOverTitle1: "계획이 허용 체류 기간을 1일 넘어요",
     sightsToBook1: "예약할 명소 1곳",
-    airportPlan: "공항 가는 법",
+    airportPlan: "경로 보기",
     leaveBody: "{date}에 출국합니다. 국제선은 3시간 전에 출발하세요.",
     leaveBodyNoDate: "국제선은 3시간 전에 출발하세요.",
   },
