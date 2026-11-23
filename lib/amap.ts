@@ -286,18 +286,29 @@ export async function reverseGeocode(location: string) {
 
 type Forecast = { forecasts: { city: string; reporttime?: string; casts: { date: string; dayweather: string; daytemp: string; nighttemp: string }[] }[] };
 
+const retried = new Map<string, number>();
+const addDay = (iso: string, n: number) => new Date(Date.parse(`${iso}T00:00:00Z`) + n * 864e5).toISOString().slice(0, 10);
+
 /**
- * The 4-day forecast. Next's fetch cache answers a stale entry first and refreshes it in the
- * background, so a city nobody asked about for days came back with an old forecast (11-23: a
- * report from 11-11) until the next request. If the answer doesn't cover today (Beijing), ask
- * again without the cache.
+ * The forecast from today (Beijing) on. Next's fetch cache answers a stale entry first and
+ * refreshes it in the background, so the first request could get an old report: from 11-11 for a
+ * quiet city (11-23), or last evening's report just after midnight, whose first day is yesterday
+ * (11-24 05:00 got 11-23 17:03). So: if the first day isn't today, ask once more without the
+ * cache; then drop any day before today either way (Amap may not have the new report yet).
  */
 export async function weather(adcode: string) {
-  if (demo.maps) return mock.weather;
+  const today = beijingDay();
+  // Sample data: same shape, dated from today.
+  if (demo.maps) return { ...mock.weather, casts: mock.weather.casts.map((c, i) => ({ ...c, date: addDay(today, i) })) };
   const ask = (fresh: boolean) => amap<Forecast>("/v3/weather/weatherInfo", { city: adcode, extensions: "all" }, "weather", fresh);
   let f = (await ask(false)).forecasts[0];
-  if (!f?.casts?.some((c) => c.date === beijingDay())) f = (await ask(true)).forecasts[0];
-  return f;
+  // At most one uncached retry per city per 30 minutes: after midnight Amap may keep yesterday's
+  // report for hours, and every request would otherwise spend a call on the same answer.
+  if (f?.casts?.[0]?.date !== today && Date.now() - (retried.get(adcode) ?? 0) > 30 * 60_000) {
+    retried.set(adcode, Date.now());
+    f = (await ask(true)).forecasts[0] ?? f;
+  }
+  return f && { ...f, casts: (f.casts ?? []).filter((c) => c.date >= today) };
 }
 
 // ---- routes (SPEC v0.5 P1.6 #23) ------------------------------------------------------------
