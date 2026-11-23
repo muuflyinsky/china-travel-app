@@ -77,7 +77,11 @@ export function SettingsButton() {
  * content (App Store style), instead of a 44px bar above a 52px title: content starts ~56px
  * higher. Pushed screens (back) keep the standard iOS navigation bar.
  */
-export function Screen({ title, right, children, back }: { title: string; right?: React.ReactNode; children: React.ReactNode; back?: boolean }) {
+export function Screen({ title, right, children, back, brand, subtitle }: {
+  title: string; right?: React.ReactNode; children: React.ReactNode; back?: boolean;
+  /** Today only (D17): the HaodeGo wordmark and Settings on one row, the large title and a subtitle below. */
+  brand?: boolean; subtitle?: React.ReactNode;
+}) {
   const path = usePathname();
   const router = useRouter();
   const t = useT();
@@ -98,10 +102,25 @@ export function Screen({ title, right, children, back }: { title: string; right?
       ) : (
         <>
           <div className="status-scrim" aria-hidden />
-          <header className="flex min-h-[52px] items-center gap-3 px-gutter pt-[max(12px,env(safe-area-inset-top))] pb-2">
-            <h1 className="min-w-0 flex-1 truncate text-large-title">{title}</h1>
-            {right ?? <SettingsButton />}
-          </header>
+          {brand ? (
+            <header className="px-gutter pt-[max(12px,env(safe-area-inset-top))] pb-1">
+              <div className="flex items-center justify-between gap-3">
+                {/* Brand kit v3.1 wordmark, 24px high; not a link, no animation (design §4.6). */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/brand/wordmark-blue.svg" alt="HaodeGo" width={84} height={24} className="h-6 w-auto dark:hidden" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/brand/wordmark-white.svg" alt="HaodeGo" width={84} height={24} className="hidden h-6 w-auto dark:block" />
+                {right ?? <SettingsButton />}
+              </div>
+              <h1 className="mt-1 truncate text-large-title">{title}</h1>
+              {subtitle && <p className="text-subhead text-muted">{subtitle}</p>}
+            </header>
+          ) : (
+            <header className="flex min-h-[52px] items-center gap-3 px-gutter pt-[max(12px,env(safe-area-inset-top))] pb-2">
+              <h1 className="min-w-0 flex-1 truncate text-large-title">{title}</h1>
+              {right ?? <SettingsButton />}
+            </header>
+          )}
         </>
       )}
       <div className="content px-4">{children}</div>

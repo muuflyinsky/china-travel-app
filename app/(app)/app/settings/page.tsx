@@ -193,7 +193,7 @@ export default function SettingsPage() {
       </EditSheet>
 
       <EditSheet open={sheet === "entry"} title={t.settings.entryType} onClose={close}>
-        <ChoiceList value={p.entryType} onPick={(v: EntryType) => set({ entryType: v })}
+        <ChoiceList value={p.entryType} onPick={(v: EntryType) => set({ entryType: v, stayUntil: "" })}
           items={(Object.keys(t.settings.entryTypes) as EntryType[]).map((k) => ({ value: k, label: t.settings.entryTypes[k] }))} />
         {derived && <p className="px-1 text-footnote text-muted">{fmt(t.settings.entryAuto, { type: t.settings.entryTypes[derived] })}</p>}
         <Group>

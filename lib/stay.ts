@@ -30,7 +30,11 @@ export const daysBetween = (from: string, to: string) => dayNum(to) - dayNum(fro
 export const allowedDays = (type: EntryType, visaDays: number, nationality?: string | null) =>
   type === "visa" ? Math.max(1, visaDays) : type === "visa_free_30" ? visaFreeDays(nationality) : ENTRY_DAYS[type];
 
-type TripDates = { entryDate: string; arrival: string; departure: string; entryType: EntryType; visaDays: number; nationality?: string | null };
+type TripDates = {
+  entryDate: string; arrival: string; departure: string; entryType: EntryType; visaDays: number; nationality?: string | null;
+  /** "Allowed until" from an extension by immigration (Today's visa sheet): when set, it is the legal limit. */
+  stayUntil?: string;
+};
 
 /**
  * The stay that counts (SPEC v0.5 · P0-6). `legal` is the latest legal exit day, from the entry
@@ -42,7 +46,7 @@ export function stayWindow(p: TripDates, today = new Date()) {
   const base = p.entryDate || p.arrival;
   if (!base) return null;
   const allowed = allowedDays(p.entryType, p.visaDays, p.nationality);
-  const legal = addDays(base, allowed);
+  const legal = p.stayUntil || addDays(base, allowed);
   const overstay = Boolean(p.departure && p.departure > legal);
   const lastDay = p.departure && p.departure < legal ? p.departure : legal;
   const now = todayIso(today);

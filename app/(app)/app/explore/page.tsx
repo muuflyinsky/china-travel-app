@@ -130,6 +130,14 @@ function Explore() {
     if (preset) { setQ(preset); search(preset); }
   }, [params]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Today's Nearby shortcut: /app/explore#nearby. The city guide above loads late, so scroll again once it has.
+  useEffect(() => {
+    if (location.hash !== "#nearby") return;
+    const go = () => document.getElementById("nearby")?.scrollIntoView({ block: "start" });
+    const a = setTimeout(go, 100), b = setTimeout(go, 900);
+    return () => { clearTimeout(a); clearTimeout(b); };
+  }, []);
+
   const from = here ? { location: here.location, name: "我的位置" } : undefined;
   // Routes start from here, or from the saved hotel when location is off.
   const origin = here ? { location: here.location, label: "here" as const, citycode: here.citycode }
@@ -189,7 +197,7 @@ function Explore() {
   );
 
   const nearby = (
-    <Section title={t.go.nearby}>
+    <Section id="nearby" title={t.go.nearby}>
       {/* Nearby: one row of small buttons; needs the traveller's location. */}
       <div className="chip-row" role="group" aria-label={t.go.nearby}>
         {NEARBY.map(({ key, q: k, Icon }) => (

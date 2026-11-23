@@ -18,6 +18,8 @@ export type Profile = {
   entryDate: string; // actual entry date, YYYY-MM-DD
   entryType: EntryType;
   visaDays: number; // "duration of each stay" on a visa
+  /** Latest exit day after an extension by immigration, YYYY-MM-DD ("" = none). Overrides the computed limit. */
+  stayUntil: string;
   departure: string; // planned departure date, YYYY-MM-DD
   nationality: string; // ISO country code, confirmed by the traveller ("" = not yet)
   onwardThird: boolean | null; // only asked when the passport qualifies for transit only
@@ -37,7 +39,7 @@ export type Profile = {
 
 const DEFAULT: Profile = {
   lang: "en", allergens: [], diets: [], homeCurrency: "USD", name: "",
-  locatedInChina: false, arrival: "", entryDate: "", entryType: "visa_free_30", visaDays: 30,
+  locatedInChina: false, arrival: "", entryDate: "", entryType: "visa_free_30", visaDays: 30, stayUntil: "",
   departure: "", nationality: "", onwardThird: null, guests: 1, hotel: null, allergiesAsked: false,
   severe: [], cities: [], rideApp: "amap", theme: "system", arrivalAirport: "",
 };
