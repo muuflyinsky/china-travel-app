@@ -1087,5 +1087,11 @@ export const ja: Dict = {
     vExtUntil: "滞在許可の期限",
     vSave: "保存",
     vSource: "規定：中国国家移民管理局 · {date}確認",
+    stayLeftTitle1: "滞在期限まであと1日",
+    stayOverTitle1: "予定が滞在可能期間を1日超えています",
+    sightsToBook1: "予約が必要な観光地1件",
+    airportPlan: "空港への行き方",
+    leaveBody: "出発は{date}です。国際線は3時間前に出発しましょう。",
+    leaveBodyNoDate: "国際線は3時間前に出発しましょう。",
   },
 };

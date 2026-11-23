@@ -50,7 +50,8 @@ export function ReminderCard({ phase }: { phase: Phase }) {
   const tripOver = Boolean(p.departure && today > p.departure);
   if (w && !tripOver) {
     const left = daysBetween(today, w.legal);
-    const inChinaSoon = w.entered && left <= 3;
+    // Leaving on time (a departure date on or before the limit): the leaving card, not this one (design review 11-23).
+    const inChinaSoon = w.entered && !p.departure && left <= 3;
     if (w.overstay || inChinaSoon) {
       const kind = p.stayUntil ? fmt(h.bExtended, { date: day(p.stayUntil) })
         : p.entryType === "visa" ? fmt(h.bVisa, { n: w.allowed })
@@ -59,8 +60,8 @@ export function ReminderCard({ phase }: { phase: Phase }) {
       list.push({
         type: "stay", key: "stay", Icon: CalendarClock, label: h.rStay,
         title: inChinaSoon
-          ? left < 0 ? h.stayOverdueTitle : left === 0 ? h.stayLastTitle : fmt(h.stayLeftTitle, { n: left })
-          : fmt(h.stayOverTitle, { n: daysBetween(w.legal, w.planned) }),
+          ? left < 0 ? h.stayOverdueTitle : left === 0 ? h.stayLastTitle : left === 1 ? h.stayLeftTitle1 : fmt(h.stayLeftTitle, { n: left })
+          : daysBetween(w.legal, w.planned) === 1 ? h.stayOverTitle1 : fmt(h.stayOverTitle, { n: daysBetween(w.legal, w.planned) }),
         body: inChinaSoon && left < 0 ? fmt(t.stay.overdue, { n: -left })
           : w.overstay ? fmt(h.stayOverBody, { legal: day(w.legal), planned: day(w.planned) })
           : fmt(t.stay.leaveBy, { date: day(w.legal) }),
@@ -77,8 +78,8 @@ export function ReminderCard({ phase }: { phase: Phase }) {
 
   if (phase === "leaving" && w) {
     list.push({ type: "leaving", key: `leaving:${w.lastDay}`, Icon: PlaneTakeoff, label: h.rLeaving, title: t.today.airportTitle,
-      body: p.departure ? fmt(t.today.airportBody, { date: fmtDay(p.departure, p.lang, "long") }) : t.today.airportBodyNoDate,
-      actions: [{ label: t.today.airportFind, href: "/app/airport?dir=out" }, { label: h.tTax, href: "/app/tax-refund" }] });
+      body: p.departure ? fmt(h.leaveBody, { date: fmtDay(p.departure, p.lang, "long") }) : h.leaveBodyNoDate,
+      actions: [{ label: h.airportPlan, href: "/app/airport?dir=out" }, { label: h.tTax, href: "/app/tax-refund" }] });
   }
 
   // City moves: each trip city with a start date after the first one.
@@ -100,10 +101,12 @@ export function ReminderCard({ phase }: { phase: Phase }) {
       actions: [{ label: t.prepare.findTrains, cta: true, external: true, href: goLink("trip", "train", { from: train.from.e, to: train.to.e, date: train.date }, "today_train", "today-train-alert") }] });
   }
 
-  // Before you fly: the next unticked item of the checklist, once there is an arrival date.
-  if (phase === "before" && p.arrival && p.arrival >= today && prep.next) {
-    list.push({ type: "before", key: `before:${prep.next.key}`, Icon: ListChecks, label: `${h.rBefore} · ${fmt(h.beforeCount, { done: prep.count, total: prep.total })}`,
-      title: fmt(h.beforeNext, { item: prep.next.title }), actions: [{ label: h.howTo, href: `#${prep.next.key}` }] });
+  // Before you fly: the next unticked item of the checklist, once there is an arrival date. "Not needed"
+  // on one item skips to the next (it stays unticked in the list) instead of ending these cards.
+  const nextPrep = prep.items.find((x) => !prep.done.includes(x.key) && !isHidden(prefs, `before:${x.key}`, today));
+  if (phase === "before" && p.arrival && p.arrival >= today && nextPrep) {
+    list.push({ type: "before", key: `before:${nextPrep.key}`, Icon: ListChecks, label: `${h.rBefore} · ${fmt(h.beforeCount, { done: prep.count, total: prep.total })}`,
+      title: fmt(h.beforeNext, { item: prep.title(nextPrep.key) }), actions: [{ label: h.howTo, href: `#${nextPrep.key}` }] });
   }
 
   // Only with dates (design §5.6: no dates, no reminder cards).
@@ -134,21 +137,9 @@ export function ReminderCard({ phase }: { phase: Phase }) {
     setUndo(null);
   };
 
-  // No dates at all: no reminders, one quiet line instead (dismissable for good).
-  const noDates = !p.arrival && !p.entryDate && !p.departure;
-
   return (
     <>
-      {card ? <Card c={card} onMenu={() => setMenu(true)} onSwipe={() => hide(card.key, "never")} />
-        : loaded && noDates && !prefs.datesHintDone && (
-          <div className="mt-2 flex items-center rounded-card border border-line bg-card pr-1">
-            <Link href="/app/settings#dates" className="flex min-h-[52px] flex-1 items-center gap-3 px-4 text-subhead">
-              <CalendarPlus className="h-5 w-5 shrink-0 text-cobalt" aria-hidden />{h.addDates}
-            </Link>
-            <button type="button" onClick={() => update({ datesHintDone: true })} aria-label={t.common.close}
-              className="grid h-touch w-touch shrink-0 place-items-center rounded-full text-muted"><X className="h-4 w-4" aria-hidden /></button>
-          </div>
-        )}
+      {card && <Card c={card} onMenu={() => setMenu(true)} onSwipe={() => hide(card.key, "never")} />}
 
       {/* Options as a bottom action sheet: big targets for a thumb. */}
       <Sheet opened={menu} onBackdropClick={() => setMenu(false)} className="pb-safe">
@@ -237,6 +228,23 @@ function Card({ c, onMenu, onSwipe }: { c: Candidate; onMenu: () => void; onSwip
         </div>
       )}
       {c.foot && <p className="mt-3 text-footnote opacity-70">{c.foot}</p>}
+    </div>
+  );
+}
+
+/** No dates at all: no reminders, one quiet line under the shortcuts instead (dismissable for good, design §5.6). */
+export function DatesHint() {
+  const t = useT();
+  const [p] = useProfile();
+  const { prefs, update, loaded } = useTodayPrefs();
+  if (!loaded || p.arrival || p.entryDate || p.departure || prefs.datesHintDone) return null;
+  return (
+    <div className="mt-stack flex items-center rounded-card border border-line bg-card pr-1">
+      <Link href="/app/settings#dates" className="flex min-h-[52px] flex-1 items-center gap-3 px-4 text-subhead">
+        <CalendarPlus className="h-5 w-5 shrink-0 text-cobalt" aria-hidden />{t.home.addDates}
+      </Link>
+      <button type="button" onClick={() => update({ datesHintDone: true })} aria-label={t.common.close}
+        className="grid h-touch w-touch shrink-0 place-items-center rounded-full text-muted"><X className="h-4 w-4" aria-hidden /></button>
     </div>
   );
 }

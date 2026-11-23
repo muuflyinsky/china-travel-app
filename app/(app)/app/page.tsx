@@ -14,7 +14,7 @@ import { CityPicker } from "@/components/CityPicker";
 import { EditSheet } from "@/components/EditSheet";
 import { StayWarning } from "@/components/StayWarning";
 import { Shortcuts } from "@/components/today/Shortcuts";
-import { ReminderCard } from "@/components/today/ReminderCard";
+import { ReminderCard, DatesHint } from "@/components/today/ReminderCard";
 import { Alarms, CityHotelRows, Checklist, fmtDay, useAlarms } from "@/components/today/Plan";
 import { stayWindow, stayReminderIcs, todayIso, daysBetween } from "@/lib/stay";
 import { tripPhase, type Phase } from "@/lib/phase";
@@ -141,7 +141,7 @@ function BeforeRows({ visaDone }: { visaDone: boolean }) {
           <Row href={ARRIVAL_CARD_URL} external icon={<IconTile><ClipboardList className="h-5 w-5" aria-hidden /></IconTile>}
             title={t.prepare.arrivalCardTitle} sub={t.prepare.arrivalCardSub} />
           <CityHotelRows />
-          {sights > 0 && <Row onClick={() => setSheet("alarms")} icon={<IconTile><Ticket className="h-5 w-5" aria-hidden /></IconTile>} title={fmt(t.home.sightsToBook, { n: sights })} sub={t.resv.reminders} />}
+          {sights > 0 && <Row onClick={() => setSheet("alarms")} icon={<IconTile><Ticket className="h-5 w-5" aria-hidden /></IconTile>} title={sights === 1 ? t.home.sightsToBook1 : fmt(t.home.sightsToBook, { n: sights })} sub={t.resv.reminders} />}
           {/* Shown from the start, so travellers know it's here before they shop (Veer, 2026-11-03). */}
           <TaxRow />
         </Group>
@@ -242,6 +242,7 @@ export default function Home() {
           )}
           <ReminderCard phase={phase} />
           <Shortcuts phase={phase} />
+          <DatesHint />
           {phase === "before" ? <BeforeRows visaDone={visaDone} /> : <ChinaRows />}
         </>
       )}

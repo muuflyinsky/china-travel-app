@@ -1090,6 +1090,12 @@ export const en = {
     vExtUntil: "Allowed until",
     vSave: "Save",
     vSource: "Rules: China’s National Immigration Administration · checked {date}",
+    stayLeftTitle1: "1 day left on your stay",
+    stayOverTitle1: "Your plan is 1 day past your permitted stay",
+    sightsToBook1: "1 sight to book",
+    airportPlan: "Airport plan",
+    leaveBody: "You fly {date}. Leave 3 hours before an international flight.",
+    leaveBodyNoDate: "Leave 3 hours before an international flight.",
   },
 };
 

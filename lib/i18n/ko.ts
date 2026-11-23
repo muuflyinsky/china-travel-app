@@ -1087,5 +1087,11 @@ export const ko: Dict = {
     vExtUntil: "체류 허가 기한",
     vSave: "저장",
     vSource: "규정: 중국 국가이민관리국 · {date} 확인",
+    stayLeftTitle1: "체류 기간이 1일 남았어요",
+    stayOverTitle1: "계획이 허용 체류 기간을 1일 넘어요",
+    sightsToBook1: "예약할 명소 1곳",
+    airportPlan: "공항 가는 법",
+    leaveBody: "{date}에 출국합니다. 국제선은 3시간 전에 출발하세요.",
+    leaveBodyNoDate: "국제선은 3시간 전에 출발하세요.",
   },
 };

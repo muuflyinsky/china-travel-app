@@ -100,17 +100,17 @@ v0.4 把 Pay、Mobile data、Before you go 三个独立页面并入 Today。旧�
 
    | 类型 | 默认 | 出现条件 | 卡片内容 |
    |---|---|---|---|
-   | Stay limit 免签快到期 | 开，**不能关** | 计划离境日晚于最晚合法离境日；或已入境且离最晚合法离境日 ≤ 3 天；计划离境日已过（行程结束）后不出 | 超出几天 / 还剩几天；"Based on: 国籍 · 入境方式 · 入境日期"；按钮 Change dates（设置 → 日期）、I have a visa（改依据弹层） |
+   | Stay limit 免签快到期 | 开，**不能关** | 计划离境日晚于最晚合法离境日；或已入境、没填离境日、离最晚合法离境日 ≤ 3 天（按时离境的人最后几天看离境卡）；计划离境日已过（行程结束）后不出 | 超出几天 / 还剩几天；"Based on: 国籍 · 入境方式 · 入境日期"；按钮 Change dates（设置 → 日期）、I have a visa（改依据弹层） |
    | Arrival day 到达日 | 开 | 到达日期或入境日期 = 今天 | 从机场到酒店，按钮去 `/airport` |
-   | Leaving China 离境 | 开 | 阶段为 leaving | 去机场（`/airport?dir=out`）和退税（`/tax-refund`） |
+   | Leaving China 离境 | 开 | 阶段为 leaving | 一行"You fly {日期}. 国际航班提前 3 小时出发"；按钮 Airport plan（`/airport?dir=out`）和退税（`/tax-refund`） |
    | Moving 换城 | 开 | 设置里第二个及以后的城市开始日期 = 今天 | "Today: on to {城市}"，按钮打开给司机看的面板；不写车次 |
    | Train tickets 放票 | 开 | 换城日的 12306 起售日（提前 15 天）是今天或明天 | 金色按钮去 Trip.com 查车次（`today-train-alert`） |
-   | Before you fly 出发前 | 开 | 出发前、填了未来的到达日期、准备清单还有没勾的 | "Next: {下一项}"，按钮展开清单那一项 |
+   | Before you fly 出发前 | 开 | 出发前、填了未来的到达日期、准备清单还有没勾的 | "Next: {下一项}"，按钮展开清单那一项；对某一项点 Not needed 或左滑 = 跳过它、马上显示下一项（清单里仍未勾） |
    | Holiday crowds 节假日 | **关** | 行程碰上法定假日；只填了一个日期时看 45 天内；一个日期都没填不出 | 同 3.12b |
 
    - 每张卡（免签快到期除外）右上 ⋯ 打开底部动作表：Not needed（这一张不再出现，key = 类型 + 具体情况，如 `leaving:2026-12-05`、`before:pay`）/ Remind me tomorrow（隐藏到本机次日 0 点）/ Turn off these reminders（关掉这一类，编辑页可再开）。手机上左滑也 = Not needed，底部 4 秒"Hidden · Undo"。
    - 样式：浅色深底（#1a1f2e）白字；深色 #262b3a + 1px 边。不用红、琥珀。
-   - 一个日期都没填：不出卡，换成一行"Add your dates for reminders"（去设置日期，可点 × 永久关掉）。
+   - 一个日期都没填：不出卡；快捷入口下方一行"Add your dates for reminders"（去设置日期，可点 × 永久关掉）。
    - **改依据弹层**（`components/today/StaySheet.tsx`，编辑页"Stay limit"一行也能打开）："How are you staying in China?"单选：免签 · N 天（按护照）/ 240 小时过境 / 我有签证（填每次入境可停留天数）/ 移民局已延期（填"允许停留至"日期，存 `profile.stayUntil`，有它时以它为最晚合法离境日，所有倒计时都按它算；在设置里改入境方式、入境日期或护照，或一键确认入境日期时都会清掉它）。保存后立即重算；只存在手机上。底部写规则来源和核对日期（`lib/visa.ts` 的 `VERIFIED_ON`）。
 3. **快捷入口**（`components/today/Shortcuts.tsx`）：标题行"Shortcuts"+ 右侧"Edit"。2 列，第一个占满一行（钴蓝底），其余白卡；只指向我们自己的页面或面板（D19）。
 
