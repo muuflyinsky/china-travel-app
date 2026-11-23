@@ -47,7 +47,9 @@ export function StaySheet({ open, onClose }: { open: boolean; onClose: () => voi
     return (
       <div className={`rounded-card border bg-card ${on ? "border-cobalt" : "border-line"}`}>
         <label className="flex min-h-touch cursor-pointer items-start gap-3 p-3">
-          <input type="radio" name={group} className="mt-1 h-5 w-5 shrink-0 accent-cobalt" checked={on} onChange={() => setChoice(value)} />
+          {/* Drawn by hand: in dark mode the native radio is a filled black circle that reads as "selected". */}
+          <input type="radio" name={group} checked={on} onChange={() => setChoice(value)}
+            className="mt-1 h-5 w-5 shrink-0 appearance-none rounded-full border-2 border-line bg-transparent checked:border-cobalt checked:bg-cobalt checked:shadow-[inset_0_0_0_3px_var(--card)]" />
           <span className="min-w-0 flex-1">
             <span className="block text-headline">{title}</span>
             <span className="block text-footnote text-muted">{sub}</span>

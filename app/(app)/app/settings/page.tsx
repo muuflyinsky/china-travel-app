@@ -223,10 +223,10 @@ export default function SettingsPage() {
                 {/* Optional: lets Today pick the right city on each day of the trip. */}
                 <div className="flex items-center gap-2 pr-4 pb-2 text-subhead text-muted">
                   <DateInput wrapClassName="min-w-0 flex-1" hintPad="px-2" aria-label={`${c.e}: ${t.settings.cityFrom}`} value={c.from ?? ""} min={p.arrival || undefined} max={p.departure || undefined}
-                    onChange={(e) => patch({ from: e.target.value || undefined })} className="w-full rounded-lg bg-porcelain px-2 py-1.5 text-ink" />
+                    onChange={(e) => patch({ from: e.target.value || undefined })} className="w-full min-w-0 appearance-none rounded-lg bg-porcelain px-2 py-1.5 text-ink" />
                   –
                   <DateInput wrapClassName="min-w-0 flex-1" hintPad="px-2" aria-label={`${c.e}: ${t.settings.cityTo}`} value={c.to ?? ""} min={c.from || p.arrival || undefined} max={p.departure || undefined}
-                    onChange={(e) => patch({ to: e.target.value || undefined })} className="w-full rounded-lg bg-porcelain px-2 py-1.5 text-ink" />
+                    onChange={(e) => patch({ to: e.target.value || undefined })} className="w-full min-w-0 appearance-none rounded-lg bg-porcelain px-2 py-1.5 text-ink" />
                 </div>
               </li>
             );
