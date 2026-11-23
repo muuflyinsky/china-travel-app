@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Popup, Preloader, Sheet } from "konsta/react";
 import { Camera, Flame, Info, Leaf, ShieldAlert, ShieldCheck, ShieldOff, ChevronRight, ChevronDown, Plus, Minus, ReceiptText, Keyboard, UtensilsCrossed, Volume2, X, Lightbulb, Images, ScanText, Star, Layers, RotateCcw, Ban, QrCode, Copy, Check } from "lucide-react";
 import { Screen, DemoNote } from "@/components/Shell";
+import { TrialHint } from "@/components/TrialHint";
 import { Section, Card, Group, Row, Field, Button, Note, IconTile, IconButton, Disclosure } from "@/components/ui";
 import { useProfile } from "@/components/useProfile";
 import { useCity } from "@/components/useCity";
@@ -471,7 +472,8 @@ export default function MenuPage() {
       });
       // 402: today's free uses are gone (the pass sheet opens) · 503: no AI configured (production) ·
       // 429: rate limited · 422: unreadable → retake · anything else: the AI service failed.
-      if (await quotaHit(r)) return false;
+      // Out of free uses: say plainly that these dishes have no allergy check (the pass sheet is open).
+      if (await quotaHit(r)) { setError("image" in body ? t.eat.notReadPhoto : t.eat.notReadText); return false; }
       if (!r.ok || !r.body) throw new Error(r.status === 503 || r.status === 429 ? "unavailable" : r.status === 422 ? "unreadable" : "down");
       let m: MealPage = { id, input: "image" in body ? "photo" : "text", thumb, cuisine: "", total: 0, dishes: [], tips: [], missing: 0 };
       setPages((ps) => [...ps, m]);
@@ -728,6 +730,7 @@ export default function MenuPage() {
               </label>
             </div>
           </Card>
+          {!hasMeal && <TrialHint />}
           {/* Most city restaurants order by QR code: their mini-program menu shows photos, not
               ingredients (DECISIONS D9). Screenshots go through the same allergy check. */}
           {!hasMeal && (

@@ -1,6 +1,7 @@
 "use client";
 // Headers the AI routes use for free limits (lib/quota.ts): a random id this app or website makes
-// for itself (never sent anywhere else), which client is asking, and the trip pass token if any.
+// for itself (never sent anywhere else), which client is asking, the trip pass or trial token if
+// any, the day this device started using HaodeGo (lib/early.ts), and whether any allergy is saved.
 import { hasPasses, inApp, passToken } from "./passes";
 
 export function deviceId() {
@@ -18,5 +19,19 @@ export function apiHeaders(): Record<string, string> {
   const h: Record<string, string> = { "x-ctg-device": deviceId(), "x-ctg-client": !inApp() ? "web" : hasPasses() ? "app" : "app-old" };
   const pass = passToken();
   if (pass) h["x-ctg-pass"] = pass;
+  const since = sinceDay();
+  if (since) h["x-ctg-since"] = since;
+  // Only whether any allergy is saved, never which: it sets the free menus a day (D23 3a).
+  if (hasAllergies()) h["x-ctg-allergies"] = "1";
   return h;
+}
+
+/** ctg.since: the Beijing date this device started using HaodeGo (set by the layout's inline script). */
+export function sinceDay() {
+  try { return localStorage.getItem("ctg.since"); } catch { return null; }
+}
+
+/** True when the traveller saved at least one allergy (Settings or Eat); diets don't count. */
+export function hasAllergies() {
+  try { return (JSON.parse(localStorage.getItem("ctg.profile") ?? "{}").allergens ?? []).length > 0; } catch { return false; }
 }

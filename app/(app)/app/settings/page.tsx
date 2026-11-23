@@ -20,10 +20,10 @@ import pkg from "@/package.json";
 import Link from "next/link";
 import { privacyText, supportText } from "@/lib/legal";
 import { TipJar } from "@/components/TipJar";
-import { usePromo } from "@/components/usePromo";
-import { promoDate } from "@/lib/promo";
-import { hasPasses, products, savedPass, showPaywall } from "@/lib/passes";
-import { PASSES } from "@/lib/products";
+import { useEarly } from "@/components/useEarly";
+import { earlyDate } from "@/lib/early";
+import { hasPasses, isTrial, products, savedPass, showPaywall, trialStart } from "@/lib/passes";
+import { PASSES, TRIAL } from "@/lib/products";
 
 /** The app build's version: 1.1 added the Review plugin (ios/App/App/ReviewPlugin.swift). */
 const appVersion = () => ((window as unknown as { Capacitor?: { PluginHeaders?: { name: string }[] } }).Capacitor?.PluginHeaders?.some((h) => h.name === "Review") ? "1.1" : "1.0");
@@ -64,21 +64,29 @@ export default function SettingsPage() {
   const [sheet, setSheet] = useState<Sheet | null>(null);
   // Passes and tips show only in an app version with the StoreKit plugin, and only once the App
   // Store returns the products (never a purchase row that can't work).
-  const [store, setStore] = useState<{ ends: number | null } | null>(null);
+  const [store, setStore] = useState<{ ends: number | null; trial: boolean; offerTrial: boolean } | null>(null);
   useEffect(() => {
     if (!hasPasses()) return;
     let live = true;
-    products(PASSES.map((x) => x.id)).then((items) => { if (live && items.length) setStore({ ends: savedPass()?.ends ?? null }); }, () => {});
+    products([...PASSES.map((x) => x.id), TRIAL.id]).then((items) => {
+      const s = savedPass();
+      if (live && items.some((i) => i.id !== TRIAL.id)) setStore({ ends: s?.ends ?? null, trial: isTrial(s), offerTrial: items.some((i) => i.id === TRIAL.id) && trialStart() === null });
+    }, () => {});
     return () => { live = false; };
   }, [sheet]);
   const [moreAllergens, setMoreAllergens] = useState(false);
-  const promo = usePromo();
+  const early = useEarly();
+  const day = (ms: number) => new Date(ms).toLocaleDateString(p.lang, { day: "numeric", month: "short" });
   const [version, setVersion] = useState("1.0");
   useEffect(() => setVersion(appVersion()), []);
-  // Deep links such as /app/settings#dates open the matching editor.
+  // Deep links such as /app/settings#dates open the matching editor; "ctg:settings" does the same
+  // while Settings is already open (a link to the same page doesn't remount it, e.g. from the pass sheet).
   useEffect(() => {
     const h = location.hash.slice(1) as Sheet;
     if (SHEETS.includes(h)) setSheet(h);
+    const open = (e: Event) => { const s = (e as CustomEvent<Sheet>).detail; if (SHEETS.includes(s)) setSheet(s); };
+    window.addEventListener("ctg:settings", open);
+    return () => window.removeEventListener("ctg:settings", open);
   }, []);
   const close = () => { setSheet(null); if (location.hash) history.replaceState(null, "", location.pathname); };
 
@@ -96,7 +104,10 @@ export default function SettingsPage() {
 
   function clearAll() {
     if (!confirm(t.settings.clearConfirm)) return;
-    try { Object.keys(localStorage).filter((k) => k.startsWith("ctg.")).forEach((k) => localStorage.removeItem(k)); } catch {}
+    // Kept: when this device started (early devices, lib/early.ts) and whether this Apple ID took the
+    // trial. Neither is personal, and clearing them would only take away what the traveller is owed.
+    const keep = new Set(["ctg.since", "ctg.trial"]);
+    try { Object.keys(localStorage).filter((k) => k.startsWith("ctg.") && !keep.has(k)).forEach((k) => localStorage.removeItem(k)); } catch {}
     location.href = "/app";
   }
 
@@ -134,7 +145,7 @@ export default function SettingsPage() {
       {/* "Support" in the app until the App Store has passes to sell (1.1), then "Support and purchases". */}
       <Section title={<><span className="web-only">{t.settings.about}</span><span className="app-only">{store ? t.settings.about : t.inapp.support}</span></>}>
         <Group>
-          {store && <Row onClick={() => showPaywall()} icon={<Ico I={Ticket} />} title={t.pass.settingsRow} after={<Value>{store.ends ? fmt(t.pass.active, { date: new Date(store.ends).toLocaleDateString(p.lang, { day: "numeric", month: "short" }) }) : promo ? fmt(t.promo.settings, { date: promoDate(promo, p.lang) }) : t.pass.settingsNone}</Value>} />}
+          {store && <Row onClick={() => showPaywall()} icon={<Ico I={Ticket} />} title={t.pass.settingsRow} after={<Value>{store.ends ? fmt(store.trial ? t.trial.until : t.pass.active, { date: day(store.ends) }) : early ? fmt(t.early.settings, { date: earlyDate(p.lang) }) : store.offerTrial ? t.trial.row : t.pass.settingsNone}</Value>} />}
           {store && <Row onClick={() => setSheet("tips")} icon={<Ico I={HandHeart} />} title={t.pass.tipsRow} />}
           <Row href="/support" icon={<Ico I={LifeBuoy} />} title={supportText(p.lang).title} />
           <Row onClick={() => setSheet("privacy")} icon={<Ico I={Lock} />} title={t.settings.privacyTitle} />

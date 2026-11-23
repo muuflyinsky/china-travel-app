@@ -5,6 +5,7 @@ import { pinyin } from "pinyin-pro";
 import { Preloader } from "konsta/react";
 import { Mic, Square, Volume2, Maximize2, ArrowLeftRight, CarTaxiFront, ShieldAlert, Siren, Copy, Check, X } from "lucide-react";
 import { Screen, DemoNote } from "@/components/Shell";
+import { TrialHint } from "@/components/TrialHint";
 import { Section, Card, Group, Row, Note, IconTile, IconButton } from "@/components/ui";
 import { HotelCard } from "@/components/HotelCard";
 import { allergyLinesZh } from "@/lib/allergens";
@@ -193,6 +194,7 @@ export default function TalkPage() {
           )}
         </Card>
         {error && <Note tone="warn">{error}</Note>}
+        <TrialHint />
       </Section>
 
       <Section title={t.today.showTo}>

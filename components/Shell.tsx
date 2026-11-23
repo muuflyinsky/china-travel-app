@@ -7,8 +7,7 @@ import { useEffect, useState } from "react";
 import { useT } from "./useT";
 import { useProfile } from "./useProfile";
 import { Paywall } from "./Paywall";
-import { PromoNote } from "./PromoNote";
-import { PromoContext } from "./usePromo";
+import { EarlyContext } from "./useEarly";
 import { fmt, UI_DICTS } from "@/lib/i18n";
 import { trackSession } from "@/lib/track";
 import { maybeAskForReview } from "@/lib/review";
@@ -28,7 +27,7 @@ const TABS = [
  *  The app lives under /app (iOS 1.1); the iOS app never links to the website pages. */
 const isSitePath = (path: string | null) => !!path && (path === "/" || /^\/guide(\/|$)/.test(path));
 
-export function AppShell({ children, promoEnds = null }: { children: React.ReactNode; promoEnds?: string | null }) {
+export function AppShell({ children, earlyBefore = null }: { children: React.ReactNode; earlyBefore?: string | null }) {
   const path = usePathname();
   const [dark, setDark] = useState(false);
   const [profile, , loaded] = useProfile();
@@ -52,15 +51,15 @@ export function AppShell({ children, promoEnds = null }: { children: React.React
   useEffect(() => { if (loaded) syncOfflineHotel(profile.hotel, profile.lang); }, [loaded, profile.hotel, profile.lang]);
   // Rating prompt: only on Today, the calm screen between tasks (lib/review.ts decides the rest).
   useEffect(() => (path === "/app" ? maybeAskForReview() : undefined), [path]);
-  if (isSitePath(path)) return <PromoContext.Provider value={promoEnds}>{children}</PromoContext.Provider>;
+  if (isSitePath(path)) return <EarlyContext.Provider value={earlyBefore}>{children}</EarlyContext.Provider>;
   // One centred column on every screen size, so navbar, content and tab bar always line up.
   return (
-    <PromoContext.Provider value={promoEnds}>
+    <EarlyContext.Provider value={earlyBefore}>
     <App theme="ios" dark={dark} safeAreas className="app-column">
       {children}
       <Paywall />
     </App>
-    </PromoContext.Provider>
+    </EarlyContext.Provider>
   );
 }
 
@@ -105,7 +104,7 @@ export function Screen({ title, right, children, back }: { title: string; right?
           </header>
         </>
       )}
-      <div className="content px-4">{path === "/app" && !back && <PromoNote />}{children}</div>
+      <div className="content px-4">{children}</div>
       <Tabbar
         labels
         icons
