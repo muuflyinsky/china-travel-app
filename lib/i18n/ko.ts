@@ -949,7 +949,7 @@ export const ko: Dict = {
     pending: "승인을 기다리는 중이에요.",
     getApp: "무제한으로 쓰려면 iPhone 앱 HaodeGo의 3일 무료 체험이나 여행 패스를 이용하세요.",
     addAllergies: "알레르기를 등록해 직원에게 보여 줄 카드 만들기 (무료)",
-    allergyMenus: "알레르기를 등록하면 하루 {n}회 메뉴를 무료로 읽을 수 있어요.",
+    allergyMenus: "식품 알레르기가 있다면 등록해 두세요. 하루 {n}회 메뉴를 무료로 읽을 수 있어요.",
     loading: "가격 불러오는 중…",
     unavailable: "지금은 구매할 수 없어요. 잠시 후 다시 시도해 주세요.",
     settingsRow: "여행 패스",

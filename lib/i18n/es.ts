@@ -949,7 +949,7 @@ export const es: Dict = {
     pending: "Esperando aprobación.",
     getApp: "El uso ilimitado viene con una prueba gratis de 3 días o un pase de viaje en la app HaodeGo para iPhone.",
     addAllergies: "Añade tus alergias para crear una tarjeta para el personal (gratis)",
-    allergyMenus: "Con tus alergias guardadas, tienes {n} cartas gratis al día.",
+    allergyMenus: "Si tienes una alergia alimentaria y la guardas, tienes {n} cartas gratis al día.",
     loading: "Cargando precios…",
     unavailable: "Las compras no están disponibles ahora. Inténtalo más tarde.",
     settingsRow: "Pase de viaje",

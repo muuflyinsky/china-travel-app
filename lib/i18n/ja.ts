@@ -949,7 +949,7 @@ export const ja: Dict = {
     pending: "承認待ちです。",
     getApp: "無制限で使うには、iPhoneアプリ「HaodeGo」の3日間無料トライアルかトラベルパスをご利用ください。",
     addAllergies: "アレルギーを登録して店員さん向けカードを作る（無料）",
-    allergyMenus: "アレルギーを登録すると、メニュー読み取りが1日{n}回まで無料になります。",
+    allergyMenus: "食物アレルギーがある方は、登録するとメニュー読み取りが1日{n}回まで無料になります。",
     loading: "価格を読み込み中…",
     unavailable: "現在購入できません。しばらくしてからお試しください。",
     settingsRow: "トラベルパス",

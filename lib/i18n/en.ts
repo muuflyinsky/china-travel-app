@@ -952,7 +952,7 @@ export const en = {
     pending: "Waiting for approval.",
     getApp: "Unlimited use comes with a free 3-day trial or a trip pass in the HaodeGo iPhone app.",
     addAllergies: "Add your allergies to make a card for staff (free)",
-    allergyMenus: "With your allergies saved, you get {n} free menus a day.",
+    allergyMenus: "If you have a food allergy, saving it gives you {n} free menus a day.",
     loading: "Loading prices…",
     unavailable: "Purchases aren’t available right now. Try again later.",
     settingsRow: "Trip pass",
