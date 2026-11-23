@@ -2,6 +2,7 @@ import type { Dict } from "./en";
 
 export const ja: Dict = {
   common: {
+    chooseDate: "日付を選択",
     retry: "再試行",
     unavailable: "現在ご利用いただけません。しばらくしてからお試しください。",
     skip: "スキップ",

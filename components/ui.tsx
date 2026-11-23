@@ -4,6 +4,8 @@
 // 48px main buttons · 44px minimum touch target · radius 16px for cards, 12px for controls.
 import NextLink from "next/link";
 import { ChevronDown, ChevronRight, Info, TriangleAlert } from "lucide-react";
+import { useState } from "react";
+import { useT } from "./useT";
 
 export function Section({ title, id, aside, children, className = "" }: { title?: React.ReactNode; id?: string; aside?: React.ReactNode; children: React.ReactNode; className?: string }) {
   return (
@@ -146,6 +148,29 @@ export function Field({ label, children }: { label: React.ReactNode; children: R
         </span>
       </label>
     </li>
+  );
+}
+
+/**
+ * A date field that says what to do when it's empty. iOS Safari and its WebView ignore
+ * `placeholder` on <input type="date"> and show a blank box; other browsers show their own
+ * "mm/dd/yyyy". So while it's empty and not focused, the browser's text is hidden and a muted hint
+ * ("Choose a date") sits in its place; tapping still opens the system date picker.
+ * `className` styles the input (default: the Field look); `wrapClassName` sizes the wrapper in a row;
+ * `hintPad` matches the input's horizontal padding so the hint lines up with the date.
+ */
+export function DateInput({ value, hint, className = "w-full bg-transparent py-1 text-body outline-none", wrapClassName = "block", hintPad = "", ...rest }:
+  Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" | "value"> & { value: string; hint?: string; wrapClassName?: string; hintPad?: string }) {
+  const t = useT();
+  const [focused, setFocused] = useState(false);
+  const empty = !value && !focused;
+  return (
+    <span className={`relative ${wrapClassName}`}>
+      <input type="date" value={value} {...rest}
+        onFocus={(e) => { setFocused(true); rest.onFocus?.(e); }} onBlur={(e) => { setFocused(false); rest.onBlur?.(e); }}
+        className={`min-h-9 ${className} ${empty ? "text-transparent" : ""}`} />
+      {empty && <span aria-hidden className={`pointer-events-none absolute inset-0 flex items-center truncate text-muted ${hintPad}`}>{hint ?? t.common.chooseDate}</span>}
+    </span>
   );
 }
 

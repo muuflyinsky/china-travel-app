@@ -2,6 +2,7 @@ import type { Dict } from "./en";
 
 export const ko: Dict = {
   common: {
+    chooseDate: "날짜 선택",
     retry: "다시 시도",
     unavailable: "지금은 이용할 수 없습니다. 잠시 후 다시 시도해 주세요.",
     skip: "건너뛰기",

@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { ExternalLink } from "lucide-react";
-import { Group, Field, Button } from "../ui";
+import { Group, Field, Button, DateInput } from "../ui";
 import { CityPicker } from "../CityPicker";
 import { useCity } from "../useCity";
 import { useProfile } from "../useProfile";
@@ -29,7 +29,7 @@ export function TrainBooking() {
         <CityPicker label={t.prepare.to} value={to} onChange={setTo} />
       </div>
       <Group>
-        <Field label={t.prepare.date}><input type="date" value={date} onChange={(e) => setDate(e.target.value)} /></Field>
+        <Field label={t.prepare.date}><DateInput value={date} onChange={(e) => setDate(e.target.value)} /></Field>
       </Group>
       <Button variant="cta" external className="w-full" href={goLink("trip", "train", { from: from.e, to: to.e, date }, "today_train")}>{t.prepare.findTrains}</Button>
       <div className="flex flex-wrap gap-x-4">

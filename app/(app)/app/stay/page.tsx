@@ -3,7 +3,7 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { MapPin, Minus, Plus, ExternalLink, Check, TrainFront, Sparkles, BedDouble, CalendarDays, Info } from "lucide-react";
 import { Screen, DemoNote } from "@/components/Shell";
-import { Section, Group, Field, Note, Seg, Button, Disclosure, EmptyState } from "@/components/ui";
+import { Section, Group, Field, Note, Seg, Button, Disclosure, EmptyState, DateInput } from "@/components/ui";
 import { EditSheet } from "@/components/EditSheet";
 import { SourceLine } from "@/components/SourceLine";
 import { CityPicker } from "@/components/CityPicker";
@@ -208,8 +208,8 @@ function Stay() {
       <EditSheet open={edit} title={t.stay.trip} onClose={() => setEdit(false)}>
         <CityPicker value={asCity(c)} label={t.stay.city} onChange={(x) => setCity({ a: x.a, e: x.e, s: x.s })} />
         <Group>
-          <Field label={t.stay.checkIn}><input type="date" value={checkin} onChange={(e) => { setCheckin(e.target.value); setDated(true); }} /></Field>
-          <Field label={fmt(t.stay.checkOut, { n: nights })}><input type="date" value={checkout} min={checkin} onChange={(e) => { setCheckout(e.target.value); setDated(true); }} /></Field>
+          <Field label={t.stay.checkIn}><DateInput value={checkin} onChange={(e) => { setCheckin(e.target.value); setDated(true); }} /></Field>
+          <Field label={fmt(t.stay.checkOut, { n: nights })}><DateInput value={checkout} min={checkin} onChange={(e) => { setCheckout(e.target.value); setDated(true); }} /></Field>
           <li className="flex min-h-14 items-center gap-3 px-4">
             <span className="flex-1 text-body">{t.stay.guests}</span>
             <button onClick={() => setProfile({ guests: Math.max(1, guests - 1) })} aria-label={t.stay.guestLess} className="grid h-11 w-11 place-items-center rounded-full bg-cobalt-soft text-cobalt"><Minus className="h-5 w-5" /></button>

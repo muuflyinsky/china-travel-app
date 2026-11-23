@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useId, useState } from "react";
 import { Sheet } from "konsta/react";
-import { Button } from "@/components/ui";
+import { Button, DateInput } from "@/components/ui";
 import { useProfile } from "@/components/useProfile";
 import { useT } from "@/components/useT";
 import { fmt } from "@/lib/i18n";
@@ -77,7 +77,7 @@ export function StaySheet({ open, onClose }: { open: boolean; onClose: () => voi
             {option("extended", h.vExt, h.vExtSub,
               <label className="flex flex-wrap items-center gap-2 text-subhead">
                 <span className="text-muted">{h.vExtUntil}</span>
-                <input type="date" value={until} onChange={(e) => setUntil(e.target.value)}
+                <DateInput value={until} onChange={(e) => setUntil(e.target.value)} hintPad="px-2" wrapClassName="inline-block"
                   className="rounded-control border border-line bg-card px-2 py-1.5 text-body" />
               </label>)}
           </div>
