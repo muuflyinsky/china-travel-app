@@ -1,7 +1,7 @@
 // Server side of trip passes: checks a StoreKit 2 transaction that Apple signed, then gives the
 // phone a short pass token the AI routes accept instead of counting free uses.
 import { createHmac, createHash, createVerify, timingSafeEqual, X509Certificate } from "node:crypto";
-import { passDays } from "./products";
+import { TRIAL, unlimitedDays } from "./products";
 
 const BUNDLE_ID = "com.haodego.app";
 
@@ -16,7 +16,7 @@ const passSecret = () => (process.env.PASS_SECRET ?? "").trim();
 export const passesOn = () => Boolean(passSecret());
 const tokenKey = () => createHash("sha256").update("haodego-pass:" + passSecret()).digest();
 
-type Payload = { bundleId: string; productId: string; transactionId: string; purchaseDate: number; revocationDate?: number; environment: string };
+type Payload = { bundleId: string; productId: string; transactionId: string; purchaseDate: number; originalPurchaseDate?: number; revocationDate?: number; environment: string };
 
 const b64url = (s: string) => Buffer.from(s, "base64url");
 
@@ -52,10 +52,16 @@ export function verifyTransaction(jws: string): Payload | null {
   }
 }
 
-/** When a verified pass transaction ends, in ms, or null if it isn't a pass. */
+/**
+ * When a verified pass or trial transaction ends, in ms, or null for anything else (tips). A pass
+ * runs from its purchase. The trial runs from the first time this Apple ID took it: a non-consumable
+ * that is restored or bought again keeps its original purchase date, so the 3 days never restart.
+ */
 export function passEnds(t: Payload) {
-  const days = passDays(t.productId);
-  return days ? t.purchaseDate + days * 86_400_000 : null;
+  const days = unlimitedDays(t.productId);
+  if (!days) return null;
+  const start = t.productId === TRIAL.id ? Math.min(t.purchaseDate, t.originalPurchaseDate ?? t.purchaseDate) : t.purchaseDate;
+  return start + days * 86_400_000;
 }
 
 const sign = (body: string) => createHmac("sha256", tokenKey()).update(body).digest("base64url");

@@ -4,8 +4,9 @@ import { deviceOf } from "@/lib/quota";
 import { passEnds, passesOn, passToken, verifyTransaction } from "@/lib/passes-server";
 
 /**
- * Trip pass bought in the app → token for unlimited AI on this phone until the pass ends.
- * Body: { transactions: [<StoreKit 2 JWS>…] } from lib/passes.ts; the latest-ending valid pass wins.
+ * Trip pass or free trial taken in the app → token for unlimited AI on this phone until it ends.
+ * Body: { transactions: [<StoreKit 2 JWS>…] } from lib/passes.ts; the latest-ending valid one wins.
+ * An expired trial (or pass) gives 404 like none at all.
  */
 export async function POST(req: Request) {
   const limited = rateLimit(req, "pass");

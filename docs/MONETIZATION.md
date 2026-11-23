@@ -1,6 +1,7 @@
-# Monetization: free daily limits + trip passes
+# Monetization: 3-day free trial + free daily limits + trip passes
 
-Decided 2026-11-01. Built (off until `QUOTA=on`); see "How it works" below.
+Decided 2026-11-01 (DECISIONS D3), revised 2026-11-23 (D23: free trial, one free menu a day, launch
+period withdrawn). Built (off until `QUOTA=on`); see "How it works" and "Turning it on" below.
 
 ## Principles
 
@@ -8,13 +9,25 @@ Decided 2026-11-01. Built (off until `QUOTA=on`); see "How it works" below.
 - **Charge for volume and convenience**: photo menus (the costliest AI call), dish lookups, translation.
 - **Don't hurt affiliate revenue**: maps, routes, taxi card and booking links stay free and unlimited.
 - **Trip passes, not monthly subscriptions**: visitors use the app for one trip. Apple's non-renewing subscription type.
-- iOS only, through Apple in-app purchase (15% with the Small Business Program). The website keeps the free tier.
+- iOS only, through Apple in-app purchase (15% with the Small Business Program). The website keeps the free tier
+  and points to the iPhone app when it runs out (never the other way: no App Store links inside the app, D19).
 
-## Free limits (per phone)
+## Free trial (iOS, D23)
+
+- "Start your free 3 days": unlimited AI for 3 days. A **non-consumable at price 0** named "3-Day Trial"
+  (`com.haodego.app.trial.3d`), the way App Review 3.1.1 allows a time-based trial without a subscription.
+- It runs from the transaction's **original purchase date**, so restoring, reinstalling or taking it again never
+  restarts it (`lib/passes-server.ts`). One per Apple ID; Family Sharing off.
+- Before it starts the pass sheet says what it includes, that it ends by itself after 3 days, that nothing renews
+  and nothing is charged, and what comes after (the free daily uses below, or a pass from the lowest price).
+- Offered in the pass sheet (opens when free uses run out, or from Settings → Trip pass) and in one line under
+  the inputs on Eat and Talk (hidden for good with ×). Not on Today.
+
+## Free limits (per phone, after the trial or without one)
 
 | Feature | Free | Resets |
 |---|---|---|
-| Menu photo | 2 meals (each: up to 4 photos within 30 min of the first) | daily, midnight Beijing time |
+| Menu photo | 1 meal (up to 4 photos within 30 min of the first) | daily, midnight Beijing time |
 | Typed dish names | 3 | daily |
 | Translation | 10 | daily |
 | Booking screenshot | 2 | never |
@@ -24,12 +37,15 @@ Defined in `lib/products.ts` (`FREE`). Menu photos count per meal (DECISIONS D8,
 
 ## Passes (starting prices, to be tested)
 
-| Pass | Price | Per day |
-|---|---|---|
-| 1 day | $3.99 | $3.99 |
-| 3 days | $4.99 | $1.66 |
-| 7 days | $7.99 | $1.14 |
-| 14 days | $9.99 | $0.71 |
+| Pass | Price | Per day | vs 1 day |
+|---|---|---|---|
+| 1 day | $3.99 | $3.99 | |
+| 3 days | $4.99 | $1.66 | save 58% |
+| 7 days | $7.99 | $1.14 | save 71% |
+| 14 days | $9.99 | $0.71 | save 82% |
+
+The sheet works the per-day price and saving out from the App Store's own prices in the traveller's storefront,
+rounded down, so it never claims more than the real saving. No "was" prices.
 
 All four are standard App Store price points. The 1-day pass mostly makes 3 and 7 days look cheap.
 Watch: whether four choices slow people down (if most pick one tier, drop the others), and whether
@@ -77,41 +93,52 @@ Events before 2026-11-01 have a per-tab id, not a daily one; leave them out.
 
 ## How it works
 
-- `lib/products.ts`: product ids and free limits, shared by server and page.
+- `lib/products.ts`: product ids (passes, `TRIAL`, tips) and free limits, shared by server and page.
 - `lib/quota.ts`: counts a use in Supabase (`usage_counts`, `use_quota()`, migration 0008) and answers 402
   when the free uses are gone; gives the use back if the AI call fails; allows the use if Supabase is down.
   Off unless the env var `QUOTA=on`. App 1.0 (no StoreKit plugin) sends `x-ctg-client: app-old` and isn't limited.
+  Early devices aren't limited until 31 December 2026 (below).
 - `lib/device.ts`: random device id in localStorage, sent as `x-ctg-device` with `x-ctg-client` and the pass token.
 - `ios/App/App/PassesPlugin.swift`: StoreKit 2 (products, buy, entitlements, restore), registered in
   `MainViewController.swift`. `Products.storekit` + the shared App scheme let Xcode test purchases locally.
-- `/api/pass` + `lib/passes-server.ts`: verifies Apple's signed transaction (x5c chain to Apple Root CA G3,
+- `/api/pass` + `lib/passes-server.ts`: takes pass and trial transactions alike; verifies Apple's signed transaction (x5c chain to Apple Root CA G3,
   bundle id, not revoked; Xcode test transactions only outside production) and returns an HMAC token
   bound to the device until the pass ends, signed with `PASS_SECRET` (its own secret, not a Supabase key;
   without it `/api/pass` answers 503 and no token is accepted).
-- `components/Paywall.tsx`: opens on a 402 (or from Settings → Trip pass); always offers the allergy card.
+- `components/Paywall.tsx`: opens on a 402 (or from Settings → Trip pass, or the trial line); offers the trial while
+  this Apple ID hasn't taken it, then the passes; always offers the allergy card. `components/TrialHint.tsx`: the
+  trial line on Eat and Talk. `lib/passes.ts` remembers on the phone whether the trial was taken (`ctg.trial`, read
+  from the transaction without trusting it: nothing is unlocked from it).
   `components/TipJar.tsx`: Settings → Leave a tip.
 - The daily cron deletes daily counts older than 30 days.
 
-## Turning it on
+## Turning it on (iOS 1.1, D23)
 
-1. Apply migration 0008 to Supabase.
-2. App Store Connect: Paid Apps agreement, banking and tax; Small Business Program; create the 4 non-renewing
-   subscriptions and 3 consumable tips with the ids above (prices as in the table; tips $1.99 / $4.99 / $9.99).
-3. Submit an app version built from this code, with the in-app purchases attached to it.
-4. When it's live: set `PASS_SECRET` (a long random string) and `QUOTA=on` in Vercel (Production) and redeploy.
-   Migration 0010 (menu photo meals, D8) must be applied before `QUOTA=on`.
+1. App Store Connect: Paid Apps agreement, banking and tax; Small Business Program; create the 4 non-renewing
+   subscriptions, the trial (non-consumable, price **Free**, reference and display name "3-Day Trial",
+   `com.haodego.app.trial.3d`, Family Sharing off) and 3 consumable tips with the ids above (tips $1.99 / $4.99 / $9.99).
+   Attach all of them to the 1.1 version. The review note says where to find them (Settings → Support and purchases).
+2. `PASS_SECRET` (a long random string) in Vercel Production; already set 2026-11-20.
+3. On the day 1.1 goes on sale, in this order:
+   1. apply migration 0010 to Supabase (Veer approves; 0008 is already applied);
+   2. set `EARLY_BEFORE` to that day (YYYY-MM-DD) **and** `QUOTA=on` in Vercel Production;
+   3. redeploy (the root layout reads `EARLY_BEFORE` at build time).
+   Until 31 December, `QUOTA=on` without `EARLY_BEFORE` leaves the limits off, so the early-device promise can't
+   be broken by a missing variable. `PROMO_ENDS` is no longer read; it can be deleted.
 
-## Launch period (DECISIONS D21, 2026-11-20)
+## Early devices (D23, item 7)
 
-1.1 ships with passes on sale, but everything stays free for a launch period first.
-- `PROMO_ENDS=YYYY-MM-DD` in Vercel (Production): the last free day, Beijing time, inclusive. Set it before or
-  together with `QUOTA=on` (never `QUOTA=on` alone first, or 1.1 users hit the limits before the period starts),
-  then redeploy (the date reaches the app through the root layout at build time). 1.0 builds are never limited.
-- While it runs, `lib/quota.ts` counts nothing and never answers 402, so the pass sheet never opens by itself.
-  From the next day (00:00 Beijing) the free limits apply on their own; nothing to switch.
-- Passes and tips can still be bought and restored (Settings → Support and purchases → Trip pass / Leave a tip),
-  so App Review can test them. The pass sheet says that a pass starts when it's bought, so nobody needs one yet.
-- What travellers see: a note on Today, hidden for good with ×, shown again only if the date changes
-  (`components/PromoNote.tsx`); "Free until {date}" on the Settings pass row. No countdown, no "was" price.
-- The date must be real and kept (consumer law, D21): don't extend it again and again. To end it early, change
-  `PROMO_ENDS` and redeploy; removing it ends the launch period at once.
+From 11-20 to 11-23 the website and the app said "free until 31 December 2026" (D21, withdrawn 11-23). Devices
+that used HaodeGo before 1.1 went on sale keep unlimited AI until 2026-12-31, Beijing time, inclusive; from
+2027-01-01 they're like everyone else, with nothing to switch.
+
+- **How a device's start day is known**: the first page load with this code stores `ctg.since` (the Beijing date)
+  in localStorage, from an inline script in `app/(app)/layout.tsx` that runs before anything else on the page writes.
+  A device that already had HaodeGo data then (any `ctg.*` key, written by an earlier visit) gets `2026-11-23`
+  instead: it was here before this code shipped. The 1.1 app keeps the 1.0 app's storage (same WebView data, same
+  origin), so 1.0 users who update count as early.
+- **The rule** (`lib/early.ts`): the page sends `x-ctg-since`; a device whose day is before `EARLY_BEFORE` is early.
+  Settings → Trip pass shows "Unlimited until 31 December 2026"; the sheet, opened from there, says so too.
+- **Limits of it**: like `x-ctg-client`, the header is the page's word. Someone who edits localStorage can claim an
+  early day; that buys free AI until 31 December at most, and the per-IP rate limits still cap scripts. A device
+  that cleared its storage, or a new browser, starts again as a new device.

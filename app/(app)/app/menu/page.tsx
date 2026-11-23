@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Popup, Preloader, Sheet } from "konsta/react";
 import { Camera, Flame, Info, Leaf, ShieldAlert, ShieldCheck, ShieldOff, ChevronRight, ChevronDown, Plus, Minus, ReceiptText, Keyboard, UtensilsCrossed, Volume2, X, Lightbulb, Images, ScanText, Star, Layers, RotateCcw, Ban, QrCode, Copy, Check } from "lucide-react";
 import { Screen, DemoNote } from "@/components/Shell";
+import { TrialHint } from "@/components/TrialHint";
 import { Section, Card, Group, Row, Field, Button, Note, IconTile, IconButton, Disclosure } from "@/components/ui";
 import { useProfile } from "@/components/useProfile";
 import { useCity } from "@/components/useCity";
@@ -728,6 +729,7 @@ export default function MenuPage() {
               </label>
             </div>
           </Card>
+          {!hasMeal && <TrialHint />}
           {/* Most city restaurants order by QR code: their mini-program menu shows photos, not
               ingredients (DECISIONS D9). Screenshots go through the same allergy check. */}
           {!hasMeal && (

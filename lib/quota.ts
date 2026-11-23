@@ -1,14 +1,17 @@
-// Free daily limits on the AI features (docs/MONETIZATION.md). Off until QUOTA=on, which waits
-// for an app version that can sell passes. Counts live in Supabase (usage_counts); if it can't be
-// reached the use is allowed, so an outage on our side never blocks a traveller.
+// Free daily limits on the AI features (docs/MONETIZATION.md, DECISIONS D23). Off until QUOTA=on,
+// which waits for iOS 1.1 (trial and passes) to be on sale. Counts live in Supabase (usage_counts);
+// if it can't be reached the use is allowed, so an outage on our side never blocks a traveller.
+// Not limited: a valid trip pass or trial token, an early device until 31 December (lib/early.ts),
+// and app 1.0.
 import { NextResponse } from "next/server";
 import { FREE, type QuotaKind } from "./products";
 import { passValid } from "./passes-server";
 import { rest, supabaseOn } from "./supabase";
-import { promoActive, promoEnds } from "./promo";
+import { EARLY_FREE_UNTIL, beijingDay, earlyBefore, isEarly } from "./early";
 
-// During the launch period (PROMO_ENDS, lib/promo.ts) nothing is counted; the limits start by themselves after it.
-const on = () => process.env.QUOTA === "on" && !promoActive(promoEnds());
+// Early devices were promised free use until EARLY_FREE_UNTIL; without EARLY_BEFORE we can't tell
+// them apart, so until then the limits stay off rather than break that promise.
+const on = () => process.env.QUOTA === "on" && (earlyBefore() !== null || beijingDay() > EARLY_FREE_UNTIL);
 
 /** The random id the app or website made for itself (lib/device.ts), or the IP without one. */
 export function deviceOf(req: Request) {
@@ -23,8 +26,7 @@ export function deviceOf(req: Request) {
 const limited = (req: Request) =>
   !(req.headers.get("x-ctg-client") === "app-old" && /ChinaTravelBuddy-iOS/.test(req.headers.get("user-agent") ?? ""));
 
-const period = (kind: QuotaKind) =>
-  FREE[kind].per === "ever" ? "ever" : new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Shanghai" });
+const period = (kind: QuotaKind) => (FREE[kind].per === "ever" ? "ever" : beijingDay());
 
 export type Use = { refund: () => Promise<void> };
 
@@ -37,6 +39,7 @@ export async function useQuota(req: Request, kind: QuotaKind): Promise<NextRespo
   if (!on() || !supabaseOn || !limited(req)) return free;
   const device = deviceOf(req);
   if (passValid(req.headers.get("x-ctg-pass"), device)) return free;
+  if (isEarly(req.headers.get("x-ctg-since"), earlyBefore())) return free;
   const p = period(kind);
   const meal = kind === "menu_photo" ? FREE.menu_photo : null;
   try {
@@ -59,6 +62,6 @@ export async function useQuota(req: Request, kind: QuotaKind): Promise<NextRespo
 /** Daily counts older than 30 days are deleted (the daily cron); "ever" rows sort after dates and stay. */
 export async function pruneUsage() {
   if (!supabaseOn) return;
-  const cutoff = new Date(Date.now() - 30 * 86_400_000).toLocaleDateString("en-CA", { timeZone: "Asia/Shanghai" });
+  const cutoff = beijingDay(new Date(Date.now() - 30 * 86_400_000));
   await rest(`usage_counts?period=lt.${cutoff}`, { method: "DELETE" }).catch((e) => console.error("[quota] prune", (e as Error).message));
 }
