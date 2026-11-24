@@ -379,6 +379,7 @@ export const en = {
     fromHotel: "From your hotel",
     noOrigin: "Use your location (or add your hotel) to see metro, bus and taxi options.",
     busLine: "Bus {n}",
+    lineKinds: { short: "short route", night: "night", express: "express", branch: "branch", special: "special" },
     walkTotal: "Walk {d}",
     transitNone: "No metro or bus route found. Take a taxi.",
     taxi: "Taxi",

@@ -7,20 +7,22 @@ import { RideButtons } from "./RideButtons";
 import { useT } from "./useT";
 import { fmt, type Dict } from "@/lib/i18n";
 import type { Place, RouteStep, Routes } from "@/lib/amap";
+import { parseLine } from "@/lib/line-name";
 
 /** Walking distance: metres under 1 km, then kilometres to one decimal (1537 m → 1.5 km). */
 const distance = (m: number) => (m < 1000 ? `${Math.round(m)} m` : `${(m / 1000).toFixed(1)} km`);
 
 const STEP_ICON = { walk: Footprints, metro: TrainFront, bus: Bus, rail: TramFront } as const;
 
-/** "地铁10号线" → "Metro Line 10", "71路" → "Bus 71"; anything else stays as Amap wrote it. */
+/**
+ * "地铁10号线" → "Metro Line 10", "71路区间" → "Bus 71 (short route)" (lib/line-name.ts); a line
+ * without a number gets its pinyin ("Bus Sui Dao San Xian"). The Chinese name shows underneath.
+ */
 function lineName(t: Dict, s: Exclude<RouteStep, { kind: "walk" }>) {
-  const n = s.line.match(/(\d+)\s*号?线/)?.[1];
-  if (s.kind === "metro" && n) return fmt(t.go.metroLine, { n });
-  const bus = s.line.match(/^(\w+?)路$/)?.[1];
-  if (s.kind === "bus" && bus) return fmt(t.go.busLine, { n: bus });
   if (s.kind === "rail") return fmt(t.go.train, { n: s.line });
-  return s.line;
+  const { n, variant } = parseLine(s.kind, s.line);
+  const base = fmt(s.kind === "metro" ? t.go.metroLine : t.go.busLine, { n: n ?? s.linePy ?? s.line });
+  return variant ? `${base} (${t.go.lineKinds[variant]})` : base;
 }
 
 function Step({ s }: { s: RouteStep }) {
