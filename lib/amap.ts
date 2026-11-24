@@ -316,7 +316,7 @@ export async function weather(adcode: string) {
 /** One leg of a public-transport plan. Names stay in Chinese; the UI words them in the traveller's language. */
 export type RouteStep =
   | { kind: "walk"; meters: number }
-  | { kind: "metro" | "bus"; line: string; from: string; to: string; fromPy: string; toPy: string; stops: number }
+  | { kind: "metro" | "bus"; line: string; linePy?: string; from: string; to: string; fromPy: string; toPy: string; stops: number }
   | { kind: "rail"; line: string; from: string; to: string; fromPy: string; toPy: string };
 
 export type TransitPlan = { minutes: number; cost?: number; walkMeters: number; steps: RouteStep[] };
@@ -345,6 +345,8 @@ function toPlan(t: RawTransit): TransitPlan {
         kind: line.type.includes("地铁") ? "metro" : "bus",
         // "地铁2号线(浦东国际机场--徐泾东)" → "地铁2号线": the direction is in from/to.
         line: line.name.replace(/\(.*$/, ""), from: line.departure_stop.name, to: line.arrival_stop.name,
+        // For names without a route number ("隧道三线"): "Sui Dao San Xian".
+        linePy: py(line.name.replace(/\(.*$/, "").replace(/^地铁/, "")),
         fromPy: py(line.departure_stop.name), toPy: py(line.arrival_stop.name),
         stops: (num(line.via_num) ?? 0) + 1,
       });

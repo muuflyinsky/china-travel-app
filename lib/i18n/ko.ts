@@ -376,6 +376,7 @@ export const ko: Dict = {
     fromHotel: "호텔에서",
     noOrigin: "현재 위치를 사용하거나 호텔을 추가하면 지하철·버스·택시 경로가 보여요.",
     busLine: "버스 {n}",
+    lineKinds: { short: "구간 운행", night: "심야", express: "급행", branch: "지선", special: "특별 노선" },
     walkTotal: "도보 {d}",
     transitNone: "지하철이나 버스 경로가 없어요. 택시를 타세요.",
     taxi: "택시",

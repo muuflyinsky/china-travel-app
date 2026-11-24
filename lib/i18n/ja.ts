@@ -376,6 +376,7 @@ export const ja: Dict = {
     fromHotel: "ホテルから",
     noOrigin: "現在地を使う（またはホテルを登録する）と、地下鉄・バス・タクシーの行き方が表示されます。",
     busLine: "バス {n}",
+    lineKinds: { short: "区間便", night: "深夜便", express: "快速", branch: "支線", special: "特別便" },
     walkTotal: "徒歩 {d}",
     transitNone: "地下鉄・バスのルートが見つかりません。タクシーを使ってください。",
     taxi: "タクシー",

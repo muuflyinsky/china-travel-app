@@ -12,7 +12,8 @@
     "check:dish-names": "node scripts/check-dish-names.mjs",
     "check:visa": "node scripts/check-visa.mjs",
     "check:routes": "node scripts/check-routes.mjs",
-    "verify": "npm run typecheck && npm run check:allergens && npm run check:must-see && npm run check:dish-names && npm run check:visa && npm run check:routes"
+    "check:line-names": "node scripts/check-line-names.mjs",
+    "verify": "npm run typecheck && npm run check:allergens && npm run check:must-see && npm run check:dish-names && npm run check:visa && npm run check:routes && npm run check:line-names"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "1.1.0",

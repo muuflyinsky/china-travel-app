@@ -376,6 +376,7 @@ export const fr: Dict = {
     fromHotel: "Depuis votre hôtel",
     noOrigin: "Utilisez votre position (ou ajoutez votre hôtel) pour voir le métro, le bus et le taxi.",
     busLine: "Bus {n}",
+    lineKinds: { short: "trajet court", night: "de nuit", express: "express", branch: "antenne", special: "spéciale" },
     walkTotal: "Marche {d}",
     transitNone: "Aucun trajet en métro ou en bus. Prenez un taxi.",
     taxi: "Taxi",
